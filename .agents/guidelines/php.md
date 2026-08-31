@@ -28,6 +28,15 @@ where it is; the codebase has ~55 headers of the form `foreach ($order->getLineI
 $lineItem)` and they are fine.
 *Why:* the header should name what is being iterated, not compute it.
 
+**No call inside another call's arguments.** The inner result gets a named variable first:
+`$sessionId = $this->getSessionId($cartToken, $cartContext);` before
+`$this->loader->load($sessionId, $cartContext)` — never
+`$this->loader->load($this->getSessionId($cartToken, $cartContext), $cartContext)`. This holds
+for your own private methods just as much as for injected services. A plain accessor or a cast
+stays where it is: `$order->getId()`, `(string) $order->getOrderNumber()`.
+*Why:* the reader has to unwind the nesting inside-out to see what the outer call receives, and
+the intermediate value has no name in a stack trace or a debugger.
+
 **No arrow functions.**
 Write a normal closure with a body and an explicit `return`, never `fn () =>` or
 `static fn () =>`.

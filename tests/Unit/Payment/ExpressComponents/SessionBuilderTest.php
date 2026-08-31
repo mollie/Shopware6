@@ -83,7 +83,8 @@ final class SessionBuilderTest extends TestCase
         $cart = CartBuilder::create()
             ->withPrice(new CartPrice(100.00, 119.00, 100.00, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_NET))
             ->withShippingCosts(new CalculatedPrice(5.00, 5.00, new CalculatedTaxCollection([new CalculatedTax(0.95, 19.0, 5.00)]), new TaxRuleCollection()))
-            ->build();
+            ->build()
+        ;
         $sessionBuilder = $this->createSessionBuilder();
 
         $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
@@ -271,7 +272,8 @@ final class SessionBuilderTest extends TestCase
             ->withEmail('shopper@example.com')
             ->withActiveBillingAddress($this->createAddress('Billing Street 1'))
             ->withActiveShippingAddress($this->createAddress('Shipping Street 2'))
-            ->build();
+            ->build()
+        ;
         $context = $this->createSalesChannelContext();
         $context->setCustomer($customer);
         $sessionBuilder = $this->createSessionBuilder();
@@ -288,7 +290,8 @@ final class SessionBuilderTest extends TestCase
         $customer = CustomerBuilder::create()
             ->withDefaultBillingAddress($this->createAddress('Default Billing 1'))
             ->withDefaultShippingAddress($this->createAddress('Default Shipping 2'))
-            ->build();
+            ->build()
+        ;
         $context = $this->createSalesChannelContext();
         $context->setCustomer($customer);
         $sessionBuilder = $this->createSessionBuilder();
@@ -305,7 +308,8 @@ final class SessionBuilderTest extends TestCase
         $customer = CustomerBuilder::create()
             ->withEmail('shopper@example.com')
             ->withActiveBillingAddress($this->createAddress('Billing Street 1'))
-            ->build();
+            ->build()
+        ;
         $context = $this->createSalesChannelContext();
         $context->setCustomer($customer);
         $sessionBuilder = $this->createSessionBuilder();
@@ -609,7 +613,8 @@ final class SessionBuilderTest extends TestCase
         return CartBuilder::create()
             ->withPrice(new CartPrice($total, $total, $total, new CalculatedTaxCollection(), new TaxRuleCollection(), CartPrice::TAX_STATE_GROSS))
             ->withShippingCosts($this->createShippingCosts($shippingCosts))
-            ->build();
+            ->build()
+        ;
     }
 
     private function createShippingCosts(float $total, ?CalculatedTaxCollection $taxes = null): CalculatedPrice
