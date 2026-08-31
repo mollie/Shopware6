@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Interval::class)]
+#[CoversClass(IntervalUnit::class)]
 final class IntervalTest extends TestCase
 {
     #[DataProvider('intervals')]

@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie;
 
+use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreateSession;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Mollie\ShippingOption;
 use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -100,8 +102,80 @@ final class CreateSessionTest extends TestCase
         $this->assertSame(['email', 'billing-address', 'shipping-address'], $body['requiredCustomerDetails']);
     }
 
+    /**
+     * SessionBuilder reads a session back through these accessors to decide whether it still
+     * matches the cart. A getter that reports something else than the payload carries would
+     * let it reuse a session Mollie holds for a different amount.
+     */
+    public function testTheScalarAccessorsReportWhatThePayloadCarries(): void
+    {
+        $createSession = $this->createFullSession();
+
+        $body = $createSession->toArray();
+
+        $this->assertSame($body['description'], $createSession->getDescription());
+        $this->assertSame($body['redirectUrl'], $createSession->getRedirectUrl());
+        $this->assertSame($body['cancelUrl'], $createSession->getCancelUrl());
+        $this->assertSame($body['amount'], $createSession->getAmount()->toArray());
+        $this->assertSame($body['sequenceType'], $createSession->getSequenceType()->value);
+        $this->assertSame($body['customerId'], $createSession->getCustomerId());
+        $this->assertSame($body['profileId'], $createSession->getProfileId());
+        $this->assertSame($body['shippingCallbackUrl'], $createSession->getShippingCallbackUrl());
+        $this->assertSame($body['requiredCustomerDetails'], $createSession->getRequiredCustomerDetails());
+        $this->assertSame($body['metadata'], $createSession->getMetadata());
+        $this->assertSame($body['payment']['webhookUrl'], $createSession->getWebhookUrl());
+    }
+
+    public function testTheLinesAreReportedAsTheyWereSet(): void
+    {
+        $this->assertSame('Shirt', $this->createFullSession()->getLines()->first()?->getDescription());
+    }
+
+    public function testBillingAndShippingAddressAreKeptApart(): void
+    {
+        $createSession = $this->createFullSession();
+
+        $this->assertSame('Billing City', $createSession->getBillingAddress()?->getCity());
+        $this->assertSame('Shipping City', $createSession->getShippingAddress()?->getCity());
+    }
+
+    public function testTheShippingOptionsAreReportedAsTheyWereSet(): void
+    {
+        $this->assertSame('Express', $this->createFullSession()->getShippingOptions()?->first()?->getDescription());
+    }
+
     private function createSession(): CreateSession
     {
         return new CreateSession('Storefront', 'https://shop.example/finish', new Money(19.99, 'EUR'));
+    }
+
+    /**
+     * A session with every optional field filled, so nothing is dropped from the payload and
+     * every accessor has something to report.
+     */
+    private function createFullSession(): CreateSession
+    {
+        $lines = new LineItemCollection();
+        $lines->add(new LineItem('Shirt', 2, new Money(9.99, 'EUR'), new Money(19.98, 'EUR')));
+
+        $shippingOptions = new ShippingOptionCollection();
+        $shippingOptions->add(new ShippingOption('Express', 'shipping-method-id', new Money(3.99, 'EUR')));
+
+        $createSession = $this->createSession();
+        $createSession->setDescription('Express checkout');
+        $createSession->setCancelUrl('https://shop.example/cancel');
+        $createSession->setLines($lines);
+        $createSession->setSequenceType(SequenceType::FIRST);
+        $createSession->setBillingAddress(new Address('billing@shop.example', 'Not specified', 'Bill', 'Payer', 'Billing Street 1', '12345', 'Billing City', 'DE'));
+        $createSession->setShippingAddress(new Address('shipping@shop.example', 'Not specified', 'Ship', 'Receiver', 'Shipping Street 2', '54321', 'Shipping City', 'NL'));
+        $createSession->setCustomerId('cst_customer');
+        $createSession->setProfileId('pfl_profile');
+        $createSession->setWebhookUrl('https://shop.example/webhook');
+        $createSession->setShippingCallbackUrl('https://shop.example/shipping-options');
+        $createSession->setShippingOptions($shippingOptions);
+        $createSession->setRequiredCustomerDetails(['email']);
+        $createSession->setMetadata(['orderId' => 'order-id']);
+
+        return $createSession;
     }
 }
