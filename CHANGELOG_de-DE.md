@@ -1,4 +1,5 @@
 # Unreleased
+- Geändert: Die Mollie-Zahlarten stehen in der Zahlarten-Übersicht nun gesammelt in einer Kachel.
 
 # 5.5.0
 - Hinzugefügt: Plugins können eigene Positionen, etwa Container-Positionen von Set-Produkten, über das neue Event `FilterLineItemEvent` selbst vom Mollie-Payload ausschließen.

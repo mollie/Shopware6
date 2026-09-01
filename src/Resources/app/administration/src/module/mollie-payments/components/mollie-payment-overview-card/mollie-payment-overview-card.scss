@@ -1,0 +1,28 @@
+.mollie-payment-overview-card {
+    &__method {
+        display: flex;
+        align-items: center;
+        column-gap: 20px;
+        padding: 8px 0;
+    }
+
+    &__preview {
+        max-width: 40px;
+        max-height: 40px;
+        flex-shrink: 0;
+    }
+
+    &__name {
+        flex-grow: 1;
+    }
+
+    &__link {
+        text-decoration: underline;
+        flex-shrink: 0;
+    }
+
+    &__active {
+        margin: 0;
+        flex-shrink: 0;
+    }
+}

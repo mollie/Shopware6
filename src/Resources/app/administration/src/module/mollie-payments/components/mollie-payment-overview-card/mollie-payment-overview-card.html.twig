@@ -1,0 +1,40 @@
+{% block mollie_payment_overview_card %}
+<sw-card
+    class="mollie-payment-overview-card"
+    position-identifier="mollie-payment-overview-card"
+    :title="$tc('mollie-payments.pluginTitle')"
+>
+    <div
+        v-for="paymentMethod in paymentMethods"
+        :key="paymentMethod.id"
+        class="mollie-payment-overview-card__method"
+    >
+        <img
+            v-if="paymentMethod.media"
+            class="mollie-payment-overview-card__preview"
+            :src="paymentMethod.media.url"
+            :alt="paymentMethod.translated.name"
+        />
+
+        <div class="mollie-payment-overview-card__name">{{ paymentMethod.translated.name }}</div>
+
+        <sw-internal-link
+            class="mollie-payment-overview-card__link"
+            :router-link="{ name: 'sw.settings.payment.detail', params: { id: paymentMethod.id } }"
+            :disabled="!acl.can('payment.editor')"
+            hide-icon
+        >
+            {{ $tc('sw-settings-payment.overview.editDetails') }}
+        </sw-internal-link>
+
+        <sw-switch-field
+            class="mollie-payment-overview-card__active"
+            :value="paymentMethod.active"
+            :disabled="!acl.can('payment.editor')"
+            :label="$tc('sw-settings-payment.overview.activeToggle')"
+            :noMarginTop="true"
+            @update:value="setPaymentMethodActive(paymentMethod, $event)"
+        />
+    </div>
+</sw-card>
+{% endblock %}
