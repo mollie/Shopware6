@@ -3,7 +3,6 @@ export type RefundMode = 'none' | 'quantity' | 'amount';
 export interface RefundItemShopware {
     quantity: number;
     unitPrice: number;
-    totalPrice: number;
     isPromotion: boolean;
     isDelivery: boolean;
     promotion: {
@@ -13,7 +12,6 @@ export interface RefundItemShopware {
     };
     tax?: {
         perItemTax: number;
-        totalItemTax: number;
         totalToPerItemRoundingDiff: number;
     };
 }
@@ -21,7 +19,6 @@ export interface RefundItemShopware {
 export interface RefundItem {
     shopware: RefundItemShopware;
     refunded: number;
-    refundedAmount?: number;
     refundMode?: RefundMode;
     refundQuantity?: number;
     refundAmount?: number;
