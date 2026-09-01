@@ -39,6 +39,9 @@ build:
           - .github
           - .git
           - .gitignore
+          # Covers every *.spec.ts/js too: they all live in these two directories.
+          # A spec colocated next to its source would NOT be caught - patterns are
+          # ignored here (see above), so keep new specs inside tests/.
           - src/Resources/app/storefront/tests
           - src/Resources/app/administration/tests
 

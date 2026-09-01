@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import PrivacyNotesService from './privacy-notes.service';
+import PrivacyNotesService from '../../../src/mollie-payments/services/express/privacy-notes.service';
 
 /**
  * The data protection checkbox lives in the `.mollie-privacy-note` sibling of the express
