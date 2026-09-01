@@ -9,7 +9,7 @@ const requireFromDev = createRequire(new URL('../dev/package.json', import.meta.
 
 export default defineConfig({
     test: {
-        include: ['./src/Resources/app/**/*.spec.js'],
+        include: ['./src/Resources/app/**/*.spec.{js,ts}'],
         watch: false,
         // Writes Allure results for the CI report, next to the PHP suites and Cypress.
         setupFiles: [

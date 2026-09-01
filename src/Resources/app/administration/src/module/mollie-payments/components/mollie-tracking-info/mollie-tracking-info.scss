@@ -6,4 +6,13 @@
             margin-right: 0.25rem;
         }
     }
+
+    // sw-text-field carries the default field bottom margin (32px on mt-field);
+    // the container already spaces the fields via its gap, so drop the extra
+    // margin to keep them evenly spaced. .sw-field covers the Vue 2 / older
+    // Shopware rendering.
+    .mt-field,
+    .sw-field {
+        margin-bottom: 0;
+    }
 }

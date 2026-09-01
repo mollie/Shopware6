@@ -1,0 +1,78 @@
+import './module/mollie-payments/components/mollie-pluginconfig-section-info';
+import './module/mollie-payments/components/mollie-pluginconfig-section-api';
+import './module/mollie-payments/components/mollie-pluginconfig-section-payments';
+import './module/mollie-payments/components/mollie-pluginconfig-section-payments-format';
+import './module/mollie-payments/components/mollie-pluginconfig-section-rounding';
+import './module/mollie-payments/components/mollie-pluginconfig-support-modal';
+import './module/mollie-payments/components/mollie-pluginconfig-section-order-lifetime-warning';
+import './module/mollie-payments/components/mollie-pluginconfig-element-orderstate-select';
+import './init/api-service.init';
+import './extension/sw-flow-sequence-action';
+import './extension/structure/sw-search-bar-item';
+import './component/flow-sequence/action-order-ship-modal';
+import './component/flow-sequence/action-order-refund-modal';
+import './module/mollie-payments';
+import './module/sw-customer';
+import './module/sw-product';
+import './module/mollie-payments/acl';
+import './module/mollie-payments/extension/sw-order';
+import './module/mollie-payments/extension/sw-settings';
+import './module/mollie-payments/components/mollie-tracking-info';
+import './module/mollie-payments/components/mollie-refund-manager';
+import './module/mollie-payments/components/mollie-ship-order';
+import './module/mollie-payments/components/mollie-cancel-item';
+import './module/mollie-payments/components/mollie-order-line-items-grid';
+
+import deDE from './snippet/de-DE.json';
+import enGB from './snippet/en-GB.json';
+import nlNL from './snippet/nl-NL.json';
+import itIT from './snippet/it-IT.json';
+import ptPT from './snippet/pt-PT.json';
+import esES from './snippet/es-ES.json';
+import svSE from './snippet/sv-SE.json';
+import nbNO from './snippet/nb-NO.json';
+import plPL from './snippet/pl-PL.json';
+import csCZ from './snippet/cs-CZ.json';
+import slSI from './snippet/sl-SI.json';
+import huHU from './snippet/hu-HU.json';
+import fiFI from './snippet/fi-FI.json';
+import daDK from './snippet/da-DK.json';
+import elGR from './snippet/el-GR.json';
+import hrHR from './snippet/hr-HR.json';
+import etEE from './snippet/et-EE.json';
+import isIS from './snippet/is-IS.json';
+import ltLT from './snippet/lt-LT.json';
+import lvLV from './snippet/lv-LV.json';
+import roRO from './snippet/ro-RO.json';
+import skSK from './snippet/sk-SK.json';
+import bgBG from './snippet/bg-BG.json';
+
+const locales: Record<string, any> = {
+    'de-DE': deDE,
+    'en-GB': enGB,
+    'nl-NL': nlNL,
+    'it-IT': itIT,
+    'pt-PT': ptPT,
+    'es-ES': esES,
+    'sv-SE': svSE,
+    'nb-NO': nbNO,
+    'pl-PL': plPL,
+    'cs-CZ': csCZ,
+    'sl-SI': slSI,
+    'hu-HU': huHU,
+    'fi-FI': fiFI,
+    'da-DK': daDK,
+    'el-GR': elGR,
+    'hr-HR': hrHR,
+    'et-EE': etEE,
+    'is-IS': isIS,
+    'lt-LT': ltLT,
+    'lv-LV': lvLV,
+    'ro-RO': roRO,
+    'sk-SK': skSK,
+    'bg-BG': bgBG,
+};
+
+Object.entries(locales).forEach(([code, messages]) => {
+    Shopware.Locale.extend(code, messages);
+});

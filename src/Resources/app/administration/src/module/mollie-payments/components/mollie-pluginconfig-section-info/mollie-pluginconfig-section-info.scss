@@ -16,10 +16,34 @@
     }
 
     .list {
-        margin-left: 30px;
+        list-style: none;
+        counter-reset: mollie-onboarding-step;
+        margin: 0;
+        padding: 0;
 
         .list-item {
-            margin-bottom: 15px;
+            counter-increment: mollie-onboarding-step;
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 20px;
+            min-height: 28px;
+
+            &::before {
+                content: counter(mollie-onboarding-step);
+                position: absolute;
+                left: 0;
+                top: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: #189eff;
+                color: #fff;
+                font-size: 13px;
+                font-weight: $font-weight-bold;
+            }
         }
     }
 

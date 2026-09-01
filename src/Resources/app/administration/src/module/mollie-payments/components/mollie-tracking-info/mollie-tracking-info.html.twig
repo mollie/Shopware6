@@ -1,7 +1,9 @@
 {% block mollie_tracking_info %}
-    <sw-container>
-        <sw-base-field v-if="delivery.trackingCodes.length > 0"
-                       :label="$tc('mollie-payments.modals.shipping.availableTracking.label')">
+    <sw-container class="mollie-tracking-info">
+        <sw-base-field
+            v-if="delivery.trackingCodes.length > 0"
+            :label="$tc('mollie-payments.modals.shipping.availableTracking.label')"
+        >
             <template #sw-field-input>
                 <sw-button
                     v-for="trackingCode in delivery.trackingCodes"
@@ -18,20 +20,29 @@
         </sw-base-field>
 
         <sw-container columns="1fr" justify="start" gap="16px">
-            <sw-text-field v-model:value="tracking.carrier"  v-model="tracking.carrier"
-                           :label="$tc('mollie-payments.modals.shipping.tracking.carrier')"
-                           class="cy-trackiing-carrier"
-                           size="medium"
-                           required/>
-            <sw-text-field v-model:value="tracking.code" v-model="tracking.code"
-                           :label="$tc('mollie-payments.modals.shipping.tracking.code')"
-                           size="medium"
-                           class="cy-tracking-code"
-                           required/>
-            <sw-text-field v-model:value="tracking.url" v-model="tracking.url"
-                           size="medium"
-                           class="cy-tracking-url"
-                           :label="$tc('mollie-payments.modals.shipping.tracking.url')"/>
+            <sw-text-field
+                v-model="tracking.carrier"
+                v-model:value="tracking.carrier"
+                :label="$tc('mollie-payments.modals.shipping.tracking.carrier')"
+                class="cy-tracking-carrier"
+                size="medium"
+                required
+            />
+            <sw-text-field
+                v-model="tracking.code"
+                v-model:value="tracking.code"
+                :label="$tc('mollie-payments.modals.shipping.tracking.code')"
+                class="cy-tracking-code"
+                size="medium"
+                required
+            />
+            <sw-text-field
+                v-model="tracking.url"
+                v-model:value="tracking.url"
+                :label="$tc('mollie-payments.modals.shipping.tracking.url')"
+                class="cy-tracking-url"
+                size="medium"
+            />
         </sw-container>
     </sw-container>
 {% endblock %}

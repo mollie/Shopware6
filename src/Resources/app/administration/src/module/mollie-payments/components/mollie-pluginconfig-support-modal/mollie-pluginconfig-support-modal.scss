@@ -36,6 +36,37 @@
             margin-top: 0;
         }
     }
+
+    // Vertically center the selected value inside the single-select box.
+    .input-recepient .sw-select__selection {
+        display: flex;
+        align-items: center;
+
+        // The selection box is a flex row, so let the selection wrapper grow and let
+        // its input fill the full width — otherwise the selected value is clipped when
+        // the dropdown is open (e.g. "International Support (inf").
+        .sw-single-select__selection {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .sw-single-select__selection-input {
+            width: 100%;
+        }
+    }
+
+    // The email field renders as the newer grid-based mt-email-field while the name
+    // field is an mt-text-field; its taller label row pushes the input ~8px lower.
+    // Match the label row to the name field's label (16px) + margin (8px) = 24px and
+    // shrink the label line-height to fit, so both inputs line up.
+    .input-email.mt-email-field {
+        grid-template-rows: 24px 56px 8px 8px;
+    }
+
+    .input-email .mt-field-label {
+        height: 16px;
+        line-height: 16px;
+    }
 }
 
 .mollie-btn-action-custom {

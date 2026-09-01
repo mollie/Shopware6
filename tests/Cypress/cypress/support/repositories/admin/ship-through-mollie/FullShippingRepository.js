@@ -54,7 +54,7 @@ export default class FullShippingRepository {
      * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
      */
     getTrackingCarrier() {
-        return cy.get('.cy-trackiing-carrier input');
+        return cy.get('.cy-tracking-carrier input');
     }
 
     /**

@@ -1,10 +1,32 @@
+// ---------------------------------------------------------------------------------------------------
+// Color palette
+// ---------------------------------------------------------------------------------------------------
+$color-brand: #189eff; // Shopware brand blue (delivery hint + ghost buttons)
+$color-brand-tint: #189eff14; // subtle brand background on hover
+$color-refund: #1abc9c;
+$color-stock: #ca5208;
+$color-promotion: #ffd700;
+$color-product-discounted: #d2d2d2;
+$color-danger: #de294c;
+$color-danger-hover: #c31f3f; // darker danger for button hover
+$color-danger-tint: #de294c14; // subtle danger background on ghost hover
+$color-warning-bg: gold;
+$color-warning-bg-hover: #e6c200; // darker gold for button hover
+$color-warning-text: #1e1e24; // refund button text (dark on gold for readability)
+$color-input-active-bg: antiquewhite;
+$color-white: #fff;
+$color-background: #f0f2f5;
+$color-highlight: red; // tutorial highlight ring
+$color-disabled-bg: #e0e3e8; // muted background for disabled refund buttons
+$color-disabled-text: #8a94a6;
+
 .mollie-refund-manager {
     /*
     otherwise it would not be wide
     enough if the instructions are turned off
     */
     width: 100%;
-    background-color: #f0f2f5;
+    background-color: $color-background;
     padding: 20px;
 
     /*
@@ -15,31 +37,31 @@
     display: inline-table;
 
     .color-delivery {
-        color: #189effff;
+        color: $color-brand;
     }
 
     .color-refund {
-        color: #1abc9cff;
+        color: $color-refund;
     }
 
     .color-stock {
-        color: #ca5208ff;
+        color: $color-stock;
     }
 
     .color-promotion {
-        color: #ffd700ff;
+        color: $color-promotion;
     }
 
     .color-product-discounted {
-        color: #d2d2d2ff;
+        color: $color-product-discounted;
     }
 
     .color-refunded {
-        color: #1abc9c;
+        color: $color-refund;
     }
 
     .color-rounding-item {
-        color: #ca5208ff;
+        color: $color-stock;
     }
 
     .sw-card--large {
@@ -49,20 +71,46 @@
     }
 
     .tutorial-active {
-        border: red solid 4px;
-        padding: 6px;
+        /* outline (instead of border) so the highlight stays visible even on
+           coloured buttons and does not shift the layout; the offset leaves a
+           gap so the ring is also visible on the red full-refund button */
+        outline: 3px solid $color-highlight;
+        outline-offset: 3px;
     }
 
     .danger {
-        background: #de294c;
-        color: #fff;
+        background: $color-danger;
+        color: $color-white;
         line-height: 36px;
+        transition: background-color 0.15s ease-in-out;
+
+        &:not(.mt-button--disabled):hover {
+            background: $color-danger-hover;
+        }
     }
 
     .warning {
-        background: gold;
-        color: #52667a;
+        background: $color-warning-bg;
+        color: $color-warning-text;
         line-height: 36px;
+        transition: background-color 0.15s ease-in-out;
+
+        &:not(.mt-button--disabled):hover {
+            background: $color-warning-bg-hover;
+        }
+    }
+
+    /*
+     The custom .warning/.danger classes above also win while the button is
+     disabled, so Meteor's disabled look is lost. Give those disabled buttons a
+     clearly muted appearance instead, so they stand out from the active state.
+    */
+    .mt-button--disabled.warning,
+    .mt-button--disabled.danger {
+        background: $color-disabled-bg;
+        color: $color-disabled-text;
+        cursor: not-allowed;
+        opacity: 1;
     }
 
     .mollie-refund-manager-order-container {
@@ -97,7 +145,7 @@
 
         .input-mode-active {
             input {
-                background: antiquewhite;
+                background: $color-input-active-bg;
             }
         }
 
@@ -165,7 +213,7 @@
             }
 
             .summary-fix-available {
-                color: red;
+                color: $color-highlight;
                 font-size: 16px;
             }
         }
@@ -183,6 +231,10 @@
         .field-description {
             margin-bottom: 10px;
         }
+
+        .verify-checkbox {
+            margin-bottom: 15px;
+        }
     }
 
     .mollie-refund-manager-refunds {
@@ -192,6 +244,45 @@
             align-content: flex-start;
             justify-content: flex-end;
             margin-bottom: 30px;
+        }
+    }
+
+    .refund-divider {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    /*
+     Shopware >= 6.6 renders sw-button through Meteor's mt-button. The combination
+     variant="ghost" + the ghost prop maps to the classes .mt-button--ghost-ghost
+     (and .mt-button--ghost-danger-ghost for ghost-danger), which Meteor does not
+     style. We restore a proper ghost (outlined) appearance for those buttons here.
+    */
+    .mt-button.mt-button--ghost-ghost {
+        background-color: transparent;
+        border: 1px solid $color-brand;
+        color: $color-brand;
+
+        .mt-button__content {
+            color: $color-brand;
+        }
+
+        &:hover {
+            background-color: $color-brand-tint;
+        }
+    }
+
+    .mt-button.mt-button--ghost-danger-ghost {
+        background-color: transparent;
+        border: 1px solid $color-danger;
+        color: $color-danger;
+
+        .mt-button__content {
+            color: $color-danger;
+        }
+
+        &:hover {
+            background-color: $color-danger-tint;
         }
     }
 }
