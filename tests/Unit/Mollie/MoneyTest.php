@@ -28,6 +28,30 @@ final class MoneyTest extends TestCase
         $this->assertSame('EUR', $money->getCurrency());
     }
 
+    public function testFromArrayReadsValueAndCurrency(): void
+    {
+        $money = Money::fromArray(['value' => '19.99', 'currency' => 'EUR']);
+
+        $this->assertSame(19.99, $money->getValue());
+        $this->assertSame('EUR', $money->getCurrency());
+    }
+
+    public function testFromArrayFallsBackToZeroAndFallbackCurrency(): void
+    {
+        $money = Money::fromArray([], 'USD');
+
+        $this->assertSame(0.0, $money->getValue());
+        $this->assertSame('USD', $money->getCurrency());
+    }
+
+    public function testFromArrayPrefersOwnCurrencyOverFallback(): void
+    {
+        $money = Money::fromArray(['value' => '4.00', 'currency' => 'EUR'], 'USD');
+
+        $this->assertSame(4.0, $money->getValue());
+        $this->assertSame('EUR', $money->getCurrency());
+    }
+
     public function testDefaultCurrencyUsesTwoDecimals(): void
     {
         $money = new Money(10.5, 'EUR');

@@ -26,7 +26,12 @@
                 "selectBank": "Bank auswählen"
             },
             "pos": {
-                "selectTerminal": "Terminal auswählen"
+                "selectTerminal": "Terminal auswählen",
+                "returnToWebsite": "Zurück zur Website",
+                "terminalInstructions": "Folgen Sie den Anweisungen auf dem Terminal",
+                "paymentSuccess": "Ihre Zahlung war erfolgreich!",
+                "paymentFailed": "Ihre Zahlung war nicht erfolgreich!",
+                "paymentFailedNoDebit": "Es wurde kein Geld von der Karte abgebucht"
             },
             "mandate": {
                 "sectionTitle": "Gespeicherte Karten",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefonnummer",
                 "phoneErrorMessage": "Die Telefonnummer ist erforderlich. Zum Beispiel +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Zur Kasse"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Zahlung fehlgeschlagen",
                 "failed": "Die Zahlung ist fehlgeschlagen oder wurde storniert. Sie werden zu Mollie weitergeleitet, wo Sie Ihre Zahlung mit der Methode Ihrer Wahl abschließen können. "
             },
-            "redirecting": "Leiten Sie weiter zu: "
+            "redirecting": "Leiten Sie weiter zu: ",
+            "paymentLink": {
+                "error": "Diese Bestellung kann nicht mehr bezahlt werden.",
+                "alreadyPaid": "Diese Bestellung wurde bereits bezahlt."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "Dein Abonnement wird nun wieder fortgesetzt",
                 "successSkip": "Dein Abonnement wird ausgesetzt",
                 "successUpdateAddress": "Deine Adresse wurde erfolgreich aktualisiert",
-                "successUpdatePayment": "Die Zahlungsart konnte erfolgreich aktualisiert werden"
+                "successUpdatePayment": "Die Zahlungsart konnte erfolgreich aktualisiert werden",
+                "actionsMenuLabel": "Abo-Aktionen"
             },
             "options": {
                 "everyDay": "Jeden Tag",

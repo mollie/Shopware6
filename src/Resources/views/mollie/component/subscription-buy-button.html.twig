@@ -1,0 +1,33 @@
+{% set subscribeOnlyClass = subscribeOnlyClass|default('btn btn-primary btn-block btn-buy') %}
+{% set subscribeText = "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize %}
+{% set mollieSubscriptionEnabled = mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
+{% set mollieAllowOneTime = mollieSubscriptionEnabled and product.translated.customFields.mollie_payments_product_subscription_allow_onetime %}
+
+{% block mollie_subscription_buy_button %}
+    {% if mollieSubscriptionEnabled and not mollieAllowOneTime %}
+        <div class="d-grid">
+            <button class="{{ subscribeOnlyClass }}"
+                    title="{{ subscribeText }}"
+                    aria-label="{{ subscribeText }}">
+                {{ subscribeText }}
+            </button>
+        </div>
+    {% else %}
+        {{ defaultButton }}
+
+        {% if mollieAllowOneTime %}
+            {% block mollie_subscription_buy_button_subscribe %}
+                <div class="d-grid mt-2">
+                    <button class="btn btn-secondary btn-block btn-buy"
+                            type="submit"
+                            data-mollie-subscribe-button
+                            data-mollie-subscribe-button-options='{{ { productId: product.id }|json_encode }}'
+                            title="{{ subscribeText }}"
+                            aria-label="{{ subscribeText }}">
+                        {{ subscribeText }}
+                    </button>
+                </div>
+            {% endblock %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

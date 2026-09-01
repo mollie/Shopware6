@@ -33,9 +33,11 @@ final class EntityDefinitionsTest extends TestCase
 
     /**
      * @param class-string<EntityDefinition> $definitionClass
+     * @param class-string $expectedEntityClass
+     * @param class-string $expectedCollectionClass
      */
     #[DataProvider('definitionProvider')]
-    public function testGetEntityNameMatchesEntityNameConstant(string $definitionClass, string $expectedEntityName): void
+    public function testGetEntityNameMatchesEntityNameConstant(string $definitionClass, string $expectedEntityName, string $expectedEntityClass, string $expectedCollectionClass): void
     {
         $definition = new $definitionClass();
 
@@ -45,9 +47,11 @@ final class EntityDefinitionsTest extends TestCase
 
     /**
      * @param class-string<EntityDefinition> $definitionClass
+     * @param class-string $expectedEntityClass
+     * @param class-string $expectedCollectionClass
      */
     #[DataProvider('definitionProvider')]
-    public function testAutoconfigureTagDeclaresEntityNameMatchingEntityConstant(string $definitionClass, string $expectedEntityName): void
+    public function testAutoconfigureTagDeclaresEntityNameMatchingEntityConstant(string $definitionClass, string $expectedEntityName, string $expectedEntityClass, string $expectedCollectionClass): void
     {
         $reflection = new \ReflectionClass($definitionClass);
         $attributes = $reflection->getAttributes(AutoconfigureTag::class);
@@ -74,9 +78,10 @@ final class EntityDefinitionsTest extends TestCase
     /**
      * @param class-string<EntityDefinition> $definitionClass
      * @param class-string $expectedEntityClass
+     * @param class-string $expectedCollectionClass
      */
     #[DataProvider('definitionProvider')]
-    public function testGetEntityClassReturnsExpectedEntityClass(string $definitionClass, string $expectedEntityName, string $expectedEntityClass): void
+    public function testGetEntityClassReturnsExpectedEntityClass(string $definitionClass, string $expectedEntityName, string $expectedEntityClass, string $expectedCollectionClass): void
     {
         $definition = new $definitionClass();
 
@@ -101,9 +106,11 @@ final class EntityDefinitionsTest extends TestCase
 
     /**
      * @param class-string<EntityDefinition> $definitionClass
+     * @param class-string $expectedEntityClass
+     * @param class-string $expectedCollectionClass
      */
     #[DataProvider('definitionProvider')]
-    public function testDefineFieldsReturnsAFieldCollection(string $definitionClass): void
+    public function testDefineFieldsReturnsAFieldCollection(string $definitionClass, string $expectedEntityName, string $expectedEntityClass, string $expectedCollectionClass): void
     {
         $fields = $this->invokeDefineFields(new $definitionClass());
 
@@ -118,9 +125,10 @@ final class EntityDefinitionsTest extends TestCase
      *
      * @param class-string<EntityDefinition> $definitionClass
      * @param class-string $expectedEntityClass
+     * @param class-string $expectedCollectionClass
      */
     #[DataProvider('definitionProvider')]
-    public function testEveryDeclaredFieldHasGetterAndSetterOnEntity(string $definitionClass, string $expectedEntityName, string $expectedEntityClass): void
+    public function testEveryDeclaredFieldHasGetterAndSetterOnEntity(string $definitionClass, string $expectedEntityName, string $expectedEntityClass, string $expectedCollectionClass): void
     {
         $fields = $this->invokeDefineFields(new $definitionClass());
         $entityReflection = new \ReflectionClass($expectedEntityClass);

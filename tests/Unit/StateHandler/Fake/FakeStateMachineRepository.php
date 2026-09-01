@@ -128,4 +128,85 @@ final class FakeStateMachineRepository extends EntityRepository
 
         $this->collection = $collection;
     }
+
+    public function createCustomerCollection(): void
+    {
+        $collection = new StateMachineTransitionCollection();
+
+        $stateMachine = new StateMachineEntity();
+        $stateMachine->setId('oder.state.id');
+        $stateMachine->setTechnicalName(OrderStates::STATE_MACHINE);
+
+        $openState = new StateMachineStateEntity();
+        $openState->setTechnicalName(OrderStates::STATE_OPEN);
+        $openState->setName('Open');
+        $openState->setId('openId');
+
+        $inProgressState = new StateMachineStateEntity();
+        $inProgressState->setTechnicalName(OrderStates::STATE_IN_PROGRESS);
+        $inProgressState->setName('In Progress');
+        $inProgressState->setId('inProgressId');
+
+        $cancelledState = new StateMachineStateEntity();
+        $cancelledState->setTechnicalName(OrderStates::STATE_CANCELLED);
+        $cancelledState->setName('Cancelled');
+        $cancelledState->setId('cancelledId');
+
+        $completedState = new StateMachineStateEntity();
+        $completedState->setTechnicalName(OrderStates::STATE_COMPLETED);
+        $completedState->setName('Done');
+        $completedState->setId('completedId');
+
+        $transition = new StateMachineTransitionEntity();
+        $transition->setId('processId');
+        $transition->setActionName('process');
+        $transition->setFromStateMachineState($openState);
+        $transition->setFromStateId($openState->getId());
+        $transition->setToStateMachineState($inProgressState);
+        $transition->setToStateId($inProgressState->getId());
+        $transition->setStateMachine($stateMachine);
+        $collection->add($transition);
+
+        $transition = new StateMachineTransitionEntity();
+        $transition->setId('cancelFromInProgressId');
+        $transition->setActionName('cancel');
+        $transition->setFromStateMachineState($inProgressState);
+        $transition->setFromStateId($inProgressState->getId());
+        $transition->setToStateMachineState($cancelledState);
+        $transition->setToStateId($cancelledState->getId());
+        $transition->setStateMachine($stateMachine);
+        $collection->add($transition);
+
+        $transition = new StateMachineTransitionEntity();
+        $transition->setId('doneId');
+        $transition->setActionName('complete');
+        $transition->setFromStateMachineState($inProgressState);
+        $transition->setFromStateId($inProgressState->getId());
+        $transition->setToStateMachineState($completedState);
+        $transition->setToStateId($completedState->getId());
+        $transition->setStateMachine($stateMachine);
+        $collection->add($transition);
+
+        $transition = new StateMachineTransitionEntity();
+        $transition->setId('reopenFromCancelledId');
+        $transition->setActionName('reopen');
+        $transition->setFromStateMachineState($cancelledState);
+        $transition->setFromStateId($cancelledState->getId());
+        $transition->setToStateMachineState($openState);
+        $transition->setToStateId($openState->getId());
+        $transition->setStateMachine($stateMachine);
+        $collection->add($transition);
+
+        $transition = new StateMachineTransitionEntity();
+        $transition->setId('reopenFromCompletedId');
+        $transition->setActionName('reopen');
+        $transition->setFromStateMachineState($completedState);
+        $transition->setFromStateId($completedState->getId());
+        $transition->setToStateMachineState($openState);
+        $transition->setToStateId($openState->getId());
+        $transition->setStateMachine($stateMachine);
+        $collection->add($transition);
+
+        $this->collection = $collection;
+    }
 }

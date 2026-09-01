@@ -26,7 +26,12 @@
                 "selectBank": "Select bank"
             },
             "pos": {
-                "selectTerminal": "Select terminal"
+                "selectTerminal": "Select terminal",
+                "returnToWebsite": "Return to website",
+                "terminalInstructions": "Follow the instructions on the terminal",
+                "paymentSuccess": "Your payment was successful!",
+                "paymentFailed": "Your payment was not successful!",
+                "paymentFailedNoDebit": "No money has been debited from the debit card"
             },
             "mandate": {
                 "sectionTitle": "Saved cards",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Phone number",
                 "phoneErrorMessage": "Phone Number is required. For example +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Checkout"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Payment failed",
                 "failed": "The payment is failed or was canceled. You will be redirected to Mollie, where you can finish your payment with the method of your choice. "
             },
-            "redirecting": "Redirecting you to: "
+            "redirecting": "Redirecting you to: ",
+            "paymentLink": {
+                "error": "This order can no longer be paid.",
+                "alreadyPaid": "This order has already been paid."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "Your subscription will now be resumed",
                 "successSkip": "Your subscription has been skipped",
                 "successUpdateAddress": "Your address has been updated successfully",
-                "successUpdatePayment": "Your payment method has been updated successfully"
+                "successUpdatePayment": "Your payment method has been updated successfully",
+                "actionsMenuLabel": "Subscription actions"
             },
             "options": {
                 "everyDay": "Every day",

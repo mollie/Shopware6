@@ -7,12 +7,17 @@ use Mollie\Shopware\Component\Mollie\Exception\MissingLineItemPriceException;
 use Mollie\Shopware\Component\Mollie\Exception\MissingShippingMethodException;
 use Mollie\Shopware\Entity\Product\Product;
 use Mollie\Shopware\Mollie;
+use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Promotion\Aggregate\PromotionDiscount\PromotionDiscountEntity;
+use Shopware\Core\Checkout\Promotion\Cart\PromotionProcessor;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Content\Product\ProductEntity;
 use Shopware\Core\System\Currency\CurrencyEntity;
@@ -55,7 +60,7 @@ final class LineItem implements \JsonSerializable
         $this->type = LineItemType::PHYSICAL;
     }
 
-    public static function fromDelivery(OrderDeliveryEntity $delivery, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS): self
+    public static function fromDelivery(OrderDeliveryEntity $delivery, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS, ?string $descriptionOverride = null): self
     {
         $shippingMethod = $delivery->getShippingMethod();
         if (! $shippingMethod instanceof ShippingMethodEntity) {
@@ -63,8 +68,18 @@ final class LineItem implements \JsonSerializable
         }
         $shippingCosts = $delivery->getShippingCosts();
 
-        $lineItem = self::createBaseLineItem((string) $shippingMethod->getName(), $taxStatus, $shippingCosts, $currency);
-        $lineItem->setType(LineItemType::SHIPPING);
+        // getName() only contains the translation of the first language in the context chain and is
+        // null e.g. for storefront languages without an own translation; getTranslation() falls back
+        // through the language chain
+        $shippingMethodName = $shippingMethod->getTranslation('name') ?? $shippingMethod->getName();
+        $description = $descriptionOverride ?? (string) $shippingMethodName;
+        $description = trim($description);
+        if (mb_strlen($description) === 0) {
+            $description = 'Shipping';
+        }
+        $lineItem = self::createBaseLineItem($description, $taxStatus, $shippingCosts, $currency);
+        $type = $shippingCosts->getTotalPrice() < 0 ? LineItemType::DISCOUNT : LineItemType::SHIPPING;
+        $lineItem->setType($type);
         $lineItem->setSku(sprintf('mol-delivery-%s', $shippingMethod->getId()));
         $lineItem->setShopwareLineItemId($delivery->getId());
 
@@ -73,6 +88,46 @@ final class LineItem implements \JsonSerializable
         if ($mollieLineId !== null) {
             $lineItem->setId((string) $mollieLineId);
         }
+
+        return $lineItem;
+    }
+
+    /**
+     * A cart line item carries the same price shape as an order line item, but the payload
+     * holds the product number instead of a loaded product entity.
+     */
+    public static function fromCartLineItem(CartLineItem $cartLineItem, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS): self
+    {
+        $price = $cartLineItem->getPrice();
+        if (! $price instanceof CalculatedPrice) {
+            throw new MissingLineItemPriceException((string) $cartLineItem->getLabel());
+        }
+
+        $lineItem = self::createBaseLineItem((string) $cartLineItem->getLabel(), $taxStatus, $price, $currency);
+        $lineItem->setType(LineItemType::fromCartLineItem($cartLineItem));
+        $lineItem->setShopwareLineItemId($cartLineItem->getId());
+
+        $productNumber = $cartLineItem->getPayload()['productNumber'] ?? null;
+        $lineItem->setSku(is_string($productNumber) && $productNumber !== '' ? $productNumber : $cartLineItem->getId());
+
+        return $lineItem;
+    }
+
+    public static function fromCartDelivery(Delivery $delivery, CurrencyEntity $currency, string $taxStatus = CartPrice::TAX_STATE_GROSS): self
+    {
+        $shippingMethod = $delivery->getShippingMethod();
+        $shippingCosts = $delivery->getShippingCosts();
+
+        $shippingMethodName = $shippingMethod->getTranslation('name') ?? $shippingMethod->getName();
+        $description = trim((string) $shippingMethodName);
+        if (mb_strlen($description) === 0) {
+            $description = 'Shipping';
+        }
+
+        $lineItem = self::createBaseLineItem($description, $taxStatus, $shippingCosts, $currency);
+        $type = $shippingCosts->getTotalPrice() < 0 ? LineItemType::DISCOUNT : LineItemType::SHIPPING;
+        $lineItem->setType($type);
+        $lineItem->setSku(sprintf('mol-delivery-%s', $shippingMethod->getId()));
 
         return $lineItem;
     }
@@ -117,6 +172,33 @@ final class LineItem implements \JsonSerializable
         return $lineItem;
     }
 
+    public static function isDeliveryDiscountPlaceholder(OrderLineItemEntity $orderLineItem): bool
+    {
+        if ((string) $orderLineItem->getType() !== PromotionProcessor::LINE_ITEM_TYPE) {
+            return false;
+        }
+
+        $payload = $orderLineItem->getPayload() ?? [];
+
+        return ($payload['discountScope'] ?? null) === PromotionDiscountEntity::SCOPE_DELIVERY;
+    }
+
+    public static function resolveDeliveryDiscountLabel(OrderLineItemCollection $orderLineItems): ?string
+    {
+        $labels = [];
+        foreach ($orderLineItems as $orderLineItem) {
+            if (self::isDeliveryDiscountPlaceholder($orderLineItem)) {
+                $labels[] = (string) $orderLineItem->getLabel();
+            }
+        }
+
+        if (count($labels) === 0) {
+            return null;
+        }
+
+        return implode(', ', $labels);
+    }
+
     /**
      * @param array<string, mixed> $body
      */
@@ -132,7 +214,8 @@ final class LineItem implements \JsonSerializable
         );
 
         $lineItem = new self(
-            (string) ($body['name'] ?? ''),
+            // the Orders API calls it name, the Sessions API description
+            (string) ($body['name'] ?? $body['description'] ?? ''),
             (int) ($body['quantity'] ?? 1),
             $unitPrice,
             $amount,
@@ -140,6 +223,11 @@ final class LineItem implements \JsonSerializable
 
         $lineItem->setId((string) ($body['id'] ?? ''));
         $lineItem->setSku((string) ($body['sku'] ?? ''));
+
+        $type = LineItemType::tryFrom((string) ($body['type'] ?? ''));
+        if ($type !== null) {
+            $lineItem->setType($type);
+        }
 
         $rawMetadata = $body['metadata'] ?? [];
         $metadata = is_string($rawMetadata) ? (json_decode($rawMetadata, true) ?? []) : $rawMetadata;
@@ -439,7 +527,7 @@ final class LineItem implements \JsonSerializable
 
     private static function createBaseLineItem(string $label, string $taxStatus, CalculatedPrice $price, CurrencyEntity $currency): self
     {
-        $tax = self::calculateTax($price->getCalculatedTaxes(), $price->getTotalPrice());
+        $tax = self::calculateTax($price->getCalculatedTaxes(), $taxStatus);
 
         $unitPrice = new Money($price->getUnitPrice(), $currency->getIsoCode());
         $totalPrice = new Money($price->getTotalPrice(), $currency->getIsoCode());
@@ -452,8 +540,22 @@ final class LineItem implements \JsonSerializable
         $lineItem = new self($label, $price->getQuantity(), $unitPrice, $totalPrice);
 
         if ($tax instanceof CalculatedTax) {
-            $lineItem->setVatAmount(new Money($tax->getTax(), $currency->getIsoCode()));
-            $lineItem->setVatRate((string) $tax->getTaxRate());
+            $vatRate = $tax->getTaxRate();
+            $vatAmount = new Money($tax->getTax(), $currency->getIsoCode());
+
+            // Shopware rounds line taxes to the currency's item-rounding decimals (often 0 for
+            // PLN, SEK or CZK), but Mollie validates vatAmount === totalAmount × vatRate / (100 + vatRate)
+            // on the transmitted values and rejects the payment otherwise ("The 'vatAmount' field is off").
+            // If the Shopware tax breaks that invariant, derive the vatAmount from the transmitted totalAmount.
+            $decimals = $totalPrice->getDecimals();
+            $transmittedTotal = round($totalPrice->getValue(), $decimals);
+            $expectedVatAmount = round($transmittedTotal * $vatRate / (100 + $vatRate), $decimals);
+            if (round($vatAmount->getValue(), $decimals) !== $expectedVatAmount) {
+                $vatAmount = new Money($expectedVatAmount, $currency->getIsoCode());
+            }
+
+            $lineItem->setVatAmount($vatAmount);
+            $lineItem->setVatRate((string) $vatRate);
         }
 
         return $lineItem;
@@ -462,9 +564,15 @@ final class LineItem implements \JsonSerializable
     /**
      * Mollie Payments API does allow only one vatRate and vatAmount per line item.
      * In Shopware, the shipping costs and voucher lineitems might have multiple vat rates
-     * so we need to create an avarage tax amount and recalculate it for the API
+     * so we need to blend them into a single average tax rate for the API.
+     *
+     * Mollie validates that vatAmount === totalAmount * vatRate / (100 + vatRate), where
+     * totalAmount is the gross amount we send. To stay consistent we must return the real
+     * summed tax as vatAmount and an average rate derived from the net base. Shopware's
+     * CalculatedTax::getPrice() is the net base in net tax state but the gross base in
+     * gross tax state, so we normalize it to the net base here.
      */
-    private static function calculateTax(CalculatedTaxCollection $taxCollection, float $price): ?CalculatedTax
+    private static function calculateTax(CalculatedTaxCollection $taxCollection, string $taxStatus): ?CalculatedTax
     {
         if ($taxCollection->count() === 0) {
             return null;
@@ -478,18 +586,25 @@ final class LineItem implements \JsonSerializable
 
             return null;
         }
-        $totalAmount = 0.0;
+        $totalBase = 0.0;
         $totalTaxAmount = 0.0;
         /** @var CalculatedTax $calculatedTax */
         foreach ($taxCollection as $calculatedTax) {
             $totalTaxAmount += $calculatedTax->getTax();
-            $totalAmount += $calculatedTax->getPrice();
+            $totalBase += $calculatedTax->getPrice();
         }
 
-        $averageVatRate = round($totalTaxAmount / $totalAmount * 100, 2);
-        $vatAmount = $price * ($averageVatRate / (100 + $averageVatRate));
+        $totalNet = $taxStatus === CartPrice::TAX_STATE_GROSS
+            ? $totalBase - $totalTaxAmount
+            : $totalBase;
 
-        return new CalculatedTax($vatAmount, $averageVatRate, $price);
+        if ($totalNet === 0.0) {
+            return null;
+        }
+
+        $averageVatRate = round($totalTaxAmount / $totalNet * 100, 2);
+
+        return new CalculatedTax($totalTaxAmount, $averageVatRate, $totalNet);
     }
 
     private function addCategory(VoucherCategory $voucherCategory): void

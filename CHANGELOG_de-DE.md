@@ -1,3 +1,92 @@
+# Unreleased
+
+# 5.5.0
+- Hinzugefügt: Plugins können eigene Positionen, etwa Container-Positionen von Set-Produkten, über das neue Event `FilterLineItemEvent` selbst vom Mollie-Payload ausschließen.
+- Hinzugefügt: Mollie Express Components (Beta) im Warenkorb, Off-Canvas und Checkout.
+- Hinzugefügt: Die Mollie Erstattungs-, Erfassungs- und Versand-IDs stehen für Buchhaltungsexporte an der Bestellung bereit, im DATEV-tauglichen Format mit Bindestrich.
+- Hinzugefügt: Neue Einstellung "Retouren-Integration deaktivieren" im Refund Manager, mit der Retouren aus dem Shopware Return Management keine Rückerstattung bei Mollie mehr auslösen.
+- Geändert: Bancontact mit Status "open" gilt nun als fehlgeschlagen.
+- Geändert: Sonderzeichen in Adressen werden vor der Zahlung entfernt.
+- Geändert: Der Abgleich offener Zahlungen mit Mollie ist nun abgeschaltet und in der Auftragsverwaltung pro Verkaufskanal aktivierbar.
+- Behoben: PayPal Express ist nach der Rückkehr sofort die einzige Zahlart im Checkout.
+- Behoben: Das erneute Öffnen eines Payment-Links funktioniert wieder.
+- Behoben: Die Versandkosten von Bestellungen aus älteren Plugin-Versionen werden bei Mollie nun wieder korrekt erstattet, retourniert und als versendet markiert.
+- Behoben: Express-Checkouts schlagen bei erforderlicher Datenschutz-Checkbox nicht mehr fehl.
+- Behoben: In den Mollie-Logdateien landen keine Log-Einträge anderer Plugins mehr.
+- Behoben: Der Bestellstatus wird bei einem zweiten Zahlungsversuch nicht mehr zurückgesetzt.
+- Behoben: Teilerstattungen über den Shopware Return Manager verwenden nun den dort eingestellten Betrag.
+
+# 5.4.0
+- Hinzugefügt: Das minimale Log-Level der Mollie-Log-Handler ist nun über den Container-Parameter `mollie.logger.level` konfigurierbar; der Debug-Modus übersteuert es und erzwingt das Debug-Level.
+- Geändert: In Headless-Setups werden die Store-API-Webhook- und Return-URLs nun aus APP_URL statt aus dem Proxy-Host gebildet, damit Mollie sie erreichen kann.
+- Geändert: Webhooks für Mollie-Zahlungen ohne Zahlart schlagen nicht mehr fehl; die aktuelle Zahlart wird beibehalten.
+- Geändert: Die Beschreibung der Erfassung enthält nun die Bestellnummer statt der versendeten Positionen.
+- Behoben: Die Erfassung beim Versand sendet für Netto-Kunden nun den Bruttobetrag.
+- Behoben: Die Rundungsdifferenz wird bei eigener Rundungs-SKU nun korrekt erfasst und erstattet.
+- Behoben: Anreden mit mehr als 20 Zeichen brechen die Zahlungserstellung nicht mehr ab; der Adress-Titel wird nun auf Mollies 20-Zeichen-Limit gekürzt.
+- Behoben: Der automatische Versand beim Wechsel des Lieferstatus läuft nun nur noch für über Mollie bezahlte Bestellungen.
+- Behoben: Abo-Verlängerungen schlagen bei Alt-Abonnements nicht mehr fehl und erstellen die Verlängerungsbestellung wieder zuverlässig.
+- Behoben: Das Öffnen einer Bestellung in der Administration löst für vorhandene Retouren keine doppelte Erstattung mehr aus.
+- Behoben: Adresszusätze und Firmennamen, die nur aus Leerzeichen bestehen, werden nicht mehr für die Mollie-Adresse verwendet.
+- Behoben: Beim Lesen von Bestellungen über die API werden keine `Undefined array key "refunds"`-Warnungen mehr geloggt.
+- Behoben: Der Versand von Bestellungen mit individuellen Produkten oder Produkt-Sets schlägt bei Mollie nicht mehr fehl.
+- Behoben: Der Mollie-Tab und die Spalten in der Bestellübersicht verschwinden in anderen Sprachen nicht mehr.
+- Behoben: Der Versand über den Mollie-Tab funktioniert wieder, auch bei teilgelieferten Bestellungen mit manueller Erfassung (Klarna, Riverty, ...).
+- Behoben: Die Mollie-Zahlarten verschwinden unter Shopware 6.6 mit `APP_DEBUG=1` nicht mehr aus dem Checkout.
+
+# 5.3.0
+- Hinzugefügt: Bestellungen können über einen Mollie-Payment-Link (Route `mollie.pay`) bezahlt werden, nutzbar in E-Mail-Templates, z. B. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
+- Hinzugefügt: Nach einer erfolgreichen Zahlung werden ältere, doppelte Mollie-Zahlungen der Bestellung automatisch storniert oder erstattet.
+- Hinzugefügt: Unterstützung für NetiNextEasyCoupon-Gutscheinprodukte.
+- Geändert: Bei erneutem Bezahlen mit derselben Zahlart wird die bestehende Mollie-Zahlung wiederverwendet statt einer zweiten erzeugt.
+- Geändert: Die Transaktions-Custom-Fields enthalten jetzt zusätzlich `order_id`, `payment_id` und `third_party_payment_id` für externe ERP-Integrationen.
+- Geändert: Der automatische Versand setzt keine autorisierte Zahlung mehr voraus, sodass manuell auf „bezahlt" gestellte Bestellungen weiterhin versendet werden.
+- Behoben: Bei Alt-Bestellungen wird die Mollie-ID in Bestellliste und -detailansicht wieder angezeigt und der Mollie-Tab lässt sich wieder öffnen.
+- Behoben: Adressfelder werden vor dem Senden an die Mollie-API getrimmt, wodurch Fehler durch führende oder nachgestellte Leerzeichen vermieden werden.
+
+# 5.2.0
+- Hinzugefügt: Abo-Produkte können zusätzlich als Einmalkauf angeboten werden, konfigurierbar im Mollie-Tab des Produkts.
+- Hinzugefügt: Die Add-to-Cart-Route akzeptiert einen neuen Parameter `mollieSubscribe`, um ein Produkt als Abo hinzuzufügen (für Headless-Nutzung).
+- Hinzugefügt: Zahlungsart Billink.
+- Hinzugefügt: E-Rechnungen (ZUGFeRD/XRechnung) enthalten jetzt das Zahlungsmittel für Mollie-Zahlarten.
+- Geändert: Auto-Stornierung protokolliert eine Warnung statt eines Fehlers, wenn Mollie die Zahlung/Bestellung nicht mehr stornieren kann.
+- Geändert: Die Storefront lädt und speichert die Mollie-Profil-ID nun, wenn sie fehlt.
+- Geändert: Der Zahlungsstatus wird nicht mehr geändert, wenn die Transaktion bereits im Zielstatus ist.
+- Geändert: Die Pending-Order-Weiterleitung startet die Session nur noch auf den relevanten Storefront-Routen.
+- Behoben: Digitale Produkte (Downloads) ohne Lieferadresse können jetzt bezahlt werden.
+- Behoben: Das Aktivieren des Plugins schlägt nicht mehr mit einem „should not be blank“-Fehler fehl, wenn doppelte Zahlarten-Icons in der Medienbibliothek vorhanden sind.
+- Behoben: Die Änderung des Bestellstatus läuft nicht mehr in eine Endlosschleife.
+- Behoben: Die Order-Custom-Fields enthalten jetzt zusätzlich `order_id`, `payment_id` und `third_party_payment_id` für den JTL-Connector. Bestehende Bestellungen werden nachgezogen.
+- Behoben: Apple Pay Direct schlägt nicht mehr mit „Invalid domain passed" fehl, wenn die Verkaufskanal-Domain ein Protokoll oder einen Pfad enthält. An Mollie wird nun nur noch der Host übertragen.
+- Behoben: Der Checkout auf Verkaufskanal-Domains mit Pfad-Präfix kehrt nun korrekt zurück und finalisiert, statt „Sales Channel Not Found" zu zeigen; auch Mollie-Webhooks werden aufgelöst.
+- Behoben: Für eine bereits bezahlte oder autorisierte Bestellung wird keine zweite Mollie-Zahlung mehr erzeugt, wodurch Doppelbelastungen verhindert werden.
+- Behoben: Der Mollie-Tab in der Bestelldetailansicht entfernt keine Tabs mehr, die andere Plugins am selben Erweiterungspunkt hinzufügen.
+- Behoben: Der Mollie-Tab im Produkt ist ohne Produkt-Bearbeitungsrecht schreibgeschützt.
+- Behoben: Teil-Erstattungen im Refund-Manager funktionieren nun korrekt über mehrere Erstattungen pro Position hinweg – mit korrekter erstatteter Menge, Zusammensetzung und verbleibendem Bestellbetrag.
+- Behoben: Die Mollie-Actions „Versenden" und „Erstatten" sind im Flow Builder wieder verfügbar.
+- Behoben: Bestellungen per Banküberweisung leiten beim Browser-Zurück nicht mehr auf das Bestell-Bearbeiten-Formular weiter, da sie während der Verarbeitung nicht bearbeitet werden dürfen.
+- Behoben: Bestellungen aus älteren Plugin-Versionen können wieder versendet, erstattet und storniert werden.
+
+# 5.1.0
+- Hinzugefügt: Zahlungsart Wero.
+- Hinzugefügt: Apple Pay ist jetzt in allen Browsern verfügbar, nicht mehr nur in Safari.
+- Hinzugefügt: Die Mollie-Zahlungsdaten werden nun auch in den Zusatzfeldern der Bestellung gespeichert (nicht nur in der Transaktion), damit Warenwirtschaftssysteme wie der JTL-Connector sie auslesen können. Bestehende Bestellungen werden nachgefüllt.
+- Geändert: Der Zahlungsstatus-Webhook überspringt den Statuswechsel, wenn die Transaktion bereits im Zielstatus ist.
+- Behoben: Bei der Rückkehr von der Bezahlseite erscheint kein Token-Fehler mehr, wenn die Zahlung bereits abgeschlossen war. Kunden werden je nach Zahlungsstatus zur Bestätigungs- oder Bestellbearbeitungsseite geleitet.
+- Behoben: Der Mollie-Bestell-Tab stürzt auf Shopware-Versionen, die die Bestelldetailseite nicht als Pinia-Store registrieren, nicht mehr ab.
+- Behoben: Der automatische Versand captured nur noch eine autorisierte Mollie-Zahlung und bricht den Lieferstatus-Wechsel im Admin nicht mehr ab, wenn der Mollie-Aufruf fehlschlägt.
+- Behoben: Eine bezahlte Bestellung wird von einem späteren Webhook mit niedrigerem Status nicht mehr herabgestuft; eine zweite ebenfalls als „paid“ abgeschlossene Zahlung aktualisiert die Bestellung nun.
+- Behoben: Rückerstattungen, Bestell-Stornierung und der Mollie-Bestell-Tab wählen bei Bestellungen mit mehreren Transaktionen nun die korrekte Mollie-Transaktion.
+- Behoben: Eine ungültige Telefonnummer in der Adresse lässt die Zahlung nicht mehr fehlschlagen. Nummern im nationalen Format werden nun nach E.164 normalisiert (auch für Bancomat Pay / Bizum eingegebene Nummern); nicht normalisierbare Nummern werden aus dem Payload entfernt.
+- Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Name der Versandart leer ist. Als Ersatz wird „Shipping" verwendet.
+- Behoben: Plugin-Updates schlagen auf Shopware 6.5 nicht mehr mit einem 500er-Fehler fehl.
+- Behoben: Die Storefront bricht auf Shopware 6.5 nicht mehr mit dem Fehler „Plugin is already registered" ab.
+- Behoben: Die Anzeige-Einschränkungen für Apple Pay Direct greifen nun, sodass der Button auf den konfigurierten Seiten ausgeblendet wird.
+- Behoben: Storefront-Seiten brechen bei von Mollie nicht unterstützten Locales (z. B. cs_CZ, sk_SK) nicht mehr ab. Die Locale weicht nun auf eine unterstützte oder auf en_GB aus.
+- Behoben: Zahlungen schlagen nicht mehr fehl, wenn der Warenkorb einen Rabatt eines Drittanbieter-Plugins enthält (eigener Positionstyp mit negativem Preis). Solche Positionen werden nun als Typ 'discount' an Mollie übertragen.
+- Behoben: Die an Mollie übertragene Versandzeile verwendet nun den übersetzten Namen der Versandart. Storefront-Sprachen ohne eigene Versandart-Übersetzung schlagen nicht mehr fehl (vor dem „Shipping“-Fallback) bzw. zeigen nicht mehr das generische „Shipping“; der Name fällt nun über die Sprachkette zurück.
+- Behoben: Zahlungen schlagen nicht mehr mit „The 'vatAmount' field is off“ fehl, wenn Shopware die Währung auf ganze Beträge rundet (0 Nachkommastellen bei der Positionsrundung, z. B. PLN, SEK, CZK). Verletzt die gerundete Shopware-Steuer Mollies vatAmount-Validierung, wird das vatAmount nun aus dem übertragenen totalAmount abgeleitet.
+
 # 5.0.0
 - Hinweis: Durch Autoloader-Caching kann beim Hochladen/Update des Plugins ein Fehler erscheinen. Dieser kann ignoriert werden.
 - Hinzugefügt: Beim Deinstallieren des Plugins mit der Option „Alle Daten löschen" werden nun alle Mollie-Daten gelöscht.

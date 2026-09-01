@@ -48,7 +48,12 @@ final class RegularProductsFixture extends AbstractFixture
         $category = MollieCategoriesFixture::CATEGORY_REGULAR;
         $description = 'Mollie Product for testing purpose in development environment. You can use this products for LIVE tests or other scenarios';
 
+        // features that Mollie only supports in live mode have to be tested with real money,
+        // so this one keeps the damage at a single cent
+        $liveDescription = 'Mollie Product for testing purpose in development environment. Costs 0.01 so features that are only available in LIVE mode can be tested without losing money';
+
         $productData = [];
+        $productData[] = $this->getProductData('One Cent Mollie Shirt', 'MOL_ONE_CENT', $liveDescription, $mediaId, $category, $salesChannelId, 0.01);
         $productData[] = $this->getProductData('Cheap Mollie Shirt', 'MOL_CHEAP', $description, $mediaId, $category, $salesChannelId, 1);
         $productData[] = $this->getProductData('Regular Mollie Shirt', 'MOL_REGULAR', $description, $mediaId, $category, $salesChannelId, 29.90);
         $productData[] = $this->getProductData('Reduced Tax Rate Mollie Shirt', 'MOL_REDUCED_TAX', $description, $mediaId, $category, $salesChannelId, 19.90, 7.00);
@@ -60,6 +65,7 @@ final class RegularProductsFixture extends AbstractFixture
     public function uninstall(Context $context): void
     {
         $productData = [
+            ['id' => $this->getProductId('MOL_ONE_CENT')],
             ['id' => $this->getProductId('MOL_CHEAP')],
             ['id' => $this->getProductId('MOL_REGULAR')],
             ['id' => $this->getProductId('MOL_REDUCED_TAX')],

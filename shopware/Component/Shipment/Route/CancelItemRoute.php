@@ -6,19 +6,23 @@ namespace Mollie\Shopware\Component\Shipment\Route;
 
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Shipment\CancelItemEvent;
+use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Content\Product\Stock\AbstractStockStorage;
 use Shopware\Core\Content\Product\Stock\StockAlteration;
 use Shopware\Core\Content\Product\Stock\StockStorage;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,6 +43,8 @@ final class CancelItemRoute
         private readonly MollieGatewayInterface $mollieGateway,
         #[Autowire(service: StockStorage::class)]
         private readonly AbstractStockStorage $stockStorage,
+        #[Autowire(service: LineItemFilter::class)]
+        private readonly LineItemFilterInterface $lineItemFilter,
         #[Autowire(service: 'event_dispatcher')]
         private readonly EventDispatcherInterface $eventDispatcher,
     ) {
@@ -60,10 +66,7 @@ final class CancelItemRoute
         }
 
         $criteria = new Criteria([$shopwareLineId]);
-        $criteria->getAssociation('order.transactions')
-            ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
-            ->setLimit(1)
-        ;
+        $criteria->addAssociation('order.transactions.stateMachineState');
         $criteria->addAssociation('order.lineItems');
 
         $lineItem = $this->orderLineRepository->search($criteria, $context)->first();
@@ -80,12 +83,20 @@ final class CancelItemRoute
         $salesChannelId = $order->getSalesChannelId();
         $orderNumber = (string) $order->getOrderNumber();
 
-        $latestTransaction = $order->getTransactions()?->first();
-        if ($latestTransaction === null) {
-            return new JsonResponse(['success' => false, 'message' => 'noTransaction'], 400);
+        // Cancelling items only applies to an authorized (manual capture / pay-later) payment. A paid
+        // payment is already captured and would need a refund instead, so we only proceed when the
+        // order's current payment is authorized.
+        $mollieTransactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $latestAuthorized = $mollieTransactions->getCurrentOrderTransaction();
+        $currentState = $latestAuthorized?->getStateMachineState();
+        if ($latestAuthorized === null || $currentState === null || $currentState->getTechnicalName() !== OrderTransactionStates::STATE_AUTHORIZED) {
+            return new JsonResponse(['success' => false, 'message' => 'notAuthorized'], 400);
         }
 
-        $payment = $latestTransaction->getExtension(Mollie::EXTENSION);
+        $repairEvent = new RepairLegacyTransactionEvent($latestAuthorized, $order, $context);
+        $this->eventDispatcher->dispatch($repairEvent);
+
+        $payment = $latestAuthorized->getExtension(Mollie::EXTENSION);
         if (! $payment instanceof Payment) {
             return new JsonResponse(['success' => false, 'message' => 'notMollieOrder'], 400);
         }
@@ -103,10 +114,10 @@ final class CancelItemRoute
         }
 
         if ($mollieOrderId !== null && $mollieOrderId !== '') {
-            return $this->cancelOrdersApi($lineItem, $mollieOrderId, $quantity, $orderNumber, $salesChannelId, $latestTransaction->getId(), $context);
+            return $this->cancelOrdersApi($lineItem, $mollieOrderId, $quantity, $orderNumber, $salesChannelId, $latestAuthorized->getId(), $context);
         }
 
-        return $this->cancelPaymentsApi($lineItem, $payment, $quantity, $shopwareLineId, $orderNumber, $salesChannelId, $order->getLineItems() ?? new OrderLineItemCollection(), $latestTransaction->getId(), $context);
+        return $this->cancelPaymentsApi($lineItem, $payment, $quantity, $shopwareLineId, $orderNumber, $salesChannelId, $order->getLineItems() ?? new OrderLineItemCollection(), $latestAuthorized->getId(), $context);
     }
 
     private function cancelOrdersApi(
@@ -185,7 +196,9 @@ final class CancelItemRoute
     private function isFullyHandled(OrderLineItemCollection $allLineItems, string $updatedLineId, int $updatedCancelledQty): bool
     {
         foreach ($allLineItems as $lineItem) {
-            if ($lineItem->getQuantity() <= 0) {
+            // Container line items are not part of the Mollie payload, so they never carry a shipped
+            // or cancelled quantity and would block the release of the authorization forever.
+            if ($lineItem->getQuantity() <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem)) {
                 continue;
             }
 

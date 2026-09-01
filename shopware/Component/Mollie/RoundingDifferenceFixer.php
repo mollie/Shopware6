@@ -7,6 +7,7 @@ final class RoundingDifferenceFixer implements RoundingDifferenceFixerInterface
 {
     public const DEFAULT_TITLE = 'Automatic Rounding Difference';
     public const METADATA_TYPE = 'rounding';
+    public const SKU = 'mollie-rounding-diff';
 
     public function fixAmountDiff(Money $orderTotal, LineItemCollection $lineItems, string $title, string $sku): LineItemCollection
     {
@@ -29,14 +30,17 @@ final class RoundingDifferenceFixer implements RoundingDifferenceFixerInterface
         $price = new Money($diff, $orderTotal->getCurrency());
         $vatAmount = new Money(0.0, $orderTotal->getCurrency());
 
+        $type = LineItemType::SURCHARGE;
+        if ($diff < 0.0) {
+            $type = LineItemType::DISCOUNT;
+        }
+
         $lineItem = new LineItem($name, 1, $price, $price);
-        $lineItem->setType(LineItemType::PHYSICAL);
+        $lineItem->setType($type);
         $lineItem->setVatRate('0');
         $lineItem->setVatAmount($vatAmount);
 
-        if ($sku !== '') {
-            $lineItem->setSku($sku);
-        }
+        $lineItem->setSku($sku !== '' ? $sku : self::SKU);
 
         // kept for internal (technical) identification later on (e.g. in refund manager)
         $lineItem->setMetadata(['type' => self::METADATA_TYPE]);

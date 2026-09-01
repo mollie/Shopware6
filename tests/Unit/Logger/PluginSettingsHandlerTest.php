@@ -11,6 +11,7 @@ use Monolog\Level;
 use Monolog\LogRecord;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 
 #[CoversClass(PluginSettingsHandler::class)]
 final class PluginSettingsHandlerTest extends TestCase
@@ -69,7 +70,7 @@ final class PluginSettingsHandlerTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('isConnected')->willReturn(true);
 
-        $handler = new PluginSettingsHandler($fakeSettingsService, $connection, '', false);
+        $handler = new PluginSettingsHandler($fakeSettingsService, $connection, '', LogLevel::INFO, false);
 
         $record = new LogRecord(new \DateTimeImmutable(),'mollie',Level::Debug,'test');
         $result = $handler->handle($record);

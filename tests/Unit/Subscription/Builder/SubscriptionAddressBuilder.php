@@ -84,6 +84,13 @@ final class SubscriptionAddressBuilder
         return $this;
     }
 
+    public function withCountryStateId(?string $countryStateId): self
+    {
+        $this->countryStateId = $countryStateId;
+
+        return $this;
+    }
+
     public function build(): SubscriptionAddressEntity
     {
         $address = new SubscriptionAddressEntity();

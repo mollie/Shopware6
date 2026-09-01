@@ -11,9 +11,18 @@ final class EventSpy implements EventDispatcherInterface
     /** @var list<object> */
     private array $events = [];
 
+    /** @var array<string, list<callable>> */
+    private array $listeners = [];
+
     public function dispatch(object $event, ?string $eventName = null): object
     {
         $this->events[] = $event;
+
+        $name = $eventName ?? $event::class;
+
+        foreach ($this->listeners[$name] ?? [] as $listener) {
+            $listener($event, $name, $this);
+        }
 
         return $event;
     }
@@ -40,8 +49,13 @@ final class EventSpy implements EventDispatcherInterface
         return count($this->events);
     }
 
+    /**
+     * Symfony dispatches an event without an explicit name under its class name, so a listener
+     * registered for the event class is what a production subscriber effectively is.
+     */
     public function addListener(string $eventName, callable $listener, int $priority = 0): void
     {
+        $this->listeners[$eventName][] = $listener;
     }
 
     public function addSubscriber(EventSubscriberInterface $subscriber): void
@@ -58,7 +72,11 @@ final class EventSpy implements EventDispatcherInterface
 
     public function getListeners(?string $eventName = null): array
     {
-        return [];
+        if ($eventName === null) {
+            return $this->listeners;
+        }
+
+        return $this->listeners[$eventName] ?? [];
     }
 
     public function getListenerPriority(string $eventName, callable $listener): ?int
@@ -68,6 +86,10 @@ final class EventSpy implements EventDispatcherInterface
 
     public function hasListeners(?string $eventName = null): bool
     {
-        return false;
+        if ($eventName === null) {
+            return count($this->listeners) > 0;
+        }
+
+        return count($this->listeners[$eventName] ?? []) > 0;
     }
 }

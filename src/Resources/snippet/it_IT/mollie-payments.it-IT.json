@@ -26,7 +26,12 @@
                 "selectBank": "Selezionare la banca"
             },
             "pos": {
-                "selectTerminal": "Selezionare il terminale"
+                "selectTerminal": "Selezionare il terminale",
+                "returnToWebsite": "Torna al sito web",
+                "terminalInstructions": "Segui le istruzioni sul terminale",
+                "paymentSuccess": "Il pagamento è andato a buon fine!",
+                "paymentFailed": "Il pagamento non è andato a buon fine!",
+                "paymentFailedNoDebit": "Nessun importo è stato addebitato sulla carta"
             },
             "mandate": {
                 "sectionTitle": "Carte salvate",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Numero di telefono",
                 "phoneErrorMessage": "Il numero di telefono è obbligatorio. Ad esempio +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Cassa"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Pagamento non riuscito",
                 "failed": "Il pagamento non è riuscito o è stato annullato. Sarà reindirizzato a Mollie, dove potrà completare il pagamento con il metodo di sua scelta. "
             },
-            "redirecting": "Reindirizzamento a: "
+            "redirecting": "Reindirizzamento a: ",
+            "paymentLink": {
+                "error": "Questo ordine non può più essere pagato.",
+                "alreadyPaid": "Questo ordine è già stato pagato."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "Il suo abbonamento verrà ora ripreso",
                 "successSkip": "Il suo abbonamento è stato saltato",
                 "successUpdateAddress": "Il suo indirizzo è stato aggiornato con successo",
-                "successUpdatePayment": "Il metodo di pagamento è stato aggiornato con successo"
+                "successUpdatePayment": "Il metodo di pagamento è stato aggiornato con successo",
+                "actionsMenuLabel": "Azioni abbonamento"
             },
             "options": {
                 "everyDay": "Ogni giorno",

@@ -10,14 +10,16 @@ use Mollie\Shopware\Component\Mollie\Subscription as MollieSubscription;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
@@ -26,9 +28,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class PriceMigrationHandler
 {
     /**
-     * Cap candidates per scheduled run. The task runs daily, so a backlog still
-     * drains within days even on shops with many subscriptions, but each run
-     * makes at most CANDIDATE_LIMIT PATCH calls and a single batched DB write.
+     * Cap candidates per scheduled run. The task runs every few minutes, so a
+     * backlog drains quickly while each run makes at most CANDIDATE_LIMIT PATCH
+     * calls and a single batched DB write.
      */
     public const CANDIDATE_LIMIT = 50;
 
@@ -57,7 +59,10 @@ final class PriceMigrationHandler
         $today = new \DateTimeImmutable();
         $migratedCount = 0;
 
-        $salesChannels = $this->salesChannelRepository->search(new Criteria(), $context)->getEntities();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('active', true));
+
+        $salesChannels = $this->salesChannelRepository->search($criteria, $context)->getEntities();
 
         foreach ($salesChannels as $salesChannel) {
             $migratedCount += $this->migrateForSalesChannel($salesChannel, $today, $context);
@@ -76,25 +81,11 @@ final class PriceMigrationHandler
             return 0;
         }
 
-        $candidates = [];
-        foreach ($this->findCandidates($salesChannel->getId(), $context) as $subscription) {
-            if (! $this->isMollieActive($subscription)) {
-                continue;
-            }
-            if ($subscription->getPriceUpdateState() !== PriceDriftDetector::STATE_NOTIFIED) {
-                continue;
-            }
-            if ($subscription->getCanceledAt() !== null) {
-                continue;
-            }
-            if (! $this->isNoticeWindowElapsed($subscription, $settings, $today)) {
-                continue;
-            }
+        // Migrate once the notice window has elapsed: notifiedAt <= today - noticeDays.
+        $notifiedBefore = $today->modify(sprintf('-%d day', $settings->getPriceUpdateNoticeDays()));
 
-            $candidates[] = $subscription;
-        }
-
-        if ($candidates === []) {
+        $candidates = $this->findCandidates($salesChannel->getId(), $notifiedBefore, $context);
+        if (count($candidates) === 0) {
             return 0;
         }
 
@@ -109,13 +100,21 @@ final class PriceMigrationHandler
         $migratedCount = 0;
 
         foreach ($candidates as $subscription) {
-            $payload = $this->migrateOne($subscription, $mollieSubscriptionsByMollieId);
-            if ($payload === null) {
+            $orderNumber = (string) $subscription->getOrder()?->getOrderNumber();
+
+            $newAmount = $subscription->getNextNotifiedPrice();
+            if ($newAmount === null) {
+                $this->logger->error('Cannot migrate subscription without a notified price', [
+                    'subscriptionId' => $subscription->getId(),
+                    'orderNumber' => $orderNumber,
+                ]);
                 continue;
             }
 
-            $upsertPayloads[] = $payload['payload'];
-            if ($payload['migrated']) {
+            $payload = $this->migrateOne($subscription, $newAmount, $orderNumber, $mollieSubscriptionsByMollieId);
+            $upsertPayloads[] = $payload;
+            // A migrated subscription is reset to "none"; a failed one keeps its state.
+            if (($payload['priceUpdateState'] ?? null) === PriceDriftDetector::STATE_NONE) {
                 ++$migratedCount;
             }
         }
@@ -128,24 +127,27 @@ final class PriceMigrationHandler
     }
 
     /**
+     * Migrates one subscription to its notified price and returns the upsert
+     * payload. A migrated subscription is reset to STATE_NONE; a failed one only
+     * gets a history entry.
+     *
      * @param array<string,MollieSubscription> $mollieSubscriptionsByMollieId
      *
-     * @return null|array{migrated:bool,payload:array<string,mixed>}
+     * @return array<string,mixed>
      */
-    private function migrateOne(SubscriptionEntity $subscription, array $mollieSubscriptionsByMollieId): ?array
+    private function migrateOne(SubscriptionEntity $subscription, float $newAmount, string $orderNumber, array $mollieSubscriptionsByMollieId): array
     {
-        $newAmount = $subscription->getNextNotifiedPrice();
-        if ($newAmount === null) {
-            $this->logger->error('Cannot migrate subscription without a notified price', [
-                'subscriptionId' => $subscription->getId(),
-            ]);
-
-            return null;
-        }
-
-        $orderNumber = (string) ($subscription->getOrder()?->getOrderNumber() ?? '');
+        $logData = [
+            'subscriptionId' => $subscription->getId(),
+            'orderNumber' => $orderNumber,
+            'mollieId' => $subscription->getMollieId(),
+        ];
 
         try {
+            $this->logger->debug('Migrating subscription to its notified price at Mollie', $logData + [
+                'newAmount' => $newAmount,
+            ]);
+
             $mollieSubscription = $mollieSubscriptionsByMollieId[$subscription->getMollieId()] ?? null;
             if (! $mollieSubscription instanceof MollieSubscription) {
                 throw new \RuntimeException(sprintf('Mollie subscription "%s" was not returned by listSubscriptions', $subscription->getMollieId()));
@@ -161,42 +163,36 @@ final class PriceMigrationHandler
                 $subscription->getSalesChannelId()
             );
 
+            $this->logger->debug('Subscription price migrated at Mollie', $logData + [
+                'newAmount' => $newAmount,
+            ]);
+
             return [
-                'migrated' => true,
-                'payload' => [
-                    'id' => $subscription->getId(),
-                    'amount' => $newAmount,
-                    'priceUpdateState' => PriceDriftDetector::STATE_NONE,
-                    'nextNotifiedPrice' => null,
-                    'notifiedAt' => null,
-                    'historyEntries' => [[
-                        'statusFrom' => $subscription->getStatus(),
-                        'statusTo' => $subscription->getStatus(),
-                        'comment' => sprintf('price_migrated: %s', $newAmount),
-                        'mollieId' => $subscription->getMollieId(),
-                    ]],
-                ],
+                'id' => $subscription->getId(),
+                'amount' => $newAmount,
+                'priceUpdateState' => PriceDriftDetector::STATE_NONE,
+                'nextNotifiedPrice' => null,
+                'notifiedAt' => null,
+                'historyEntries' => [[
+                    'statusFrom' => $subscription->getStatus(),
+                    'statusTo' => $subscription->getStatus(),
+                    'comment' => sprintf('price_migrated: %s', $newAmount),
+                    'mollieId' => $subscription->getMollieId(),
+                ]],
             ];
         } catch (\Throwable $exception) {
-            $this->logger->error('Failed to migrate subscription price', [
-                'subscriptionId' => $subscription->getId(),
-                'mollieId' => $subscription->getMollieId(),
-                'customerId' => $subscription->getCustomerId(),
-                'orderId' => $subscription->getOrderId(),
+            $this->logger->error('Failed to migrate subscription price', $logData + [
                 'exception' => $exception->getMessage(),
             ]);
 
             return [
-                'migrated' => false,
-                'payload' => [
-                    'id' => $subscription->getId(),
-                    'historyEntries' => [[
-                        'statusFrom' => $subscription->getStatus(),
-                        'statusTo' => $subscription->getStatus(),
-                        'comment' => 'price_migration_failed: ' . $exception->getMessage(),
-                        'mollieId' => $subscription->getMollieId(),
-                    ]],
-                ],
+                'id' => $subscription->getId(),
+                'historyEntries' => [[
+                    'statusFrom' => $subscription->getStatus(),
+                    'statusTo' => $subscription->getStatus(),
+                    'comment' => 'price_migration_failed: ' . $exception->getMessage(),
+                    'mollieId' => $subscription->getMollieId(),
+                ]],
             ];
         }
     }
@@ -209,11 +205,11 @@ final class PriceMigrationHandler
      * ID is the cursor entry point. We never compare Mollie IDs ourselves —
      * pagination uses whatever ID Mollie returned last in the previous page.
      *
-     * @param list<SubscriptionEntity> $candidates
+     * @param SubscriptionCollection<SubscriptionEntity> $candidates
      *
      * @return array<string,MollieSubscription>
      */
-    private function bulkLoadMollieSubscriptions(array $candidates, string $salesChannelId): array
+    private function bulkLoadMollieSubscriptions(SubscriptionCollection $candidates, string $salesChannelId): array
     {
         $neededIds = [];
         foreach ($candidates as $candidate) {
@@ -221,7 +217,7 @@ final class PriceMigrationHandler
         }
 
         $result = [];
-        $from = $candidates[0]->getMollieId();
+        $from = $candidates->first()?->getMollieId();
 
         while ($from !== null && $neededIds !== []) {
             try {
@@ -259,41 +255,29 @@ final class PriceMigrationHandler
         return $result;
     }
 
-    private function isNoticeWindowElapsed(SubscriptionEntity $subscription, SubscriptionSettings $settings, \DateTimeImmutable $today): bool
-    {
-        $notifiedAt = $subscription->getNotifiedAt();
-        if (! $notifiedAt instanceof \DateTimeInterface) {
-            return false;
-        }
-
-        $earliestMigration = (new \DateTimeImmutable($notifiedAt->format('Y-m-d H:i:s')))
-            ->modify(sprintf('+%d day', $settings->getPriceUpdateNoticeDays()))
-        ;
-
-        return $today >= $earliestMigration;
-    }
-
     /**
-     * @return iterable<SubscriptionEntity>
+     * @return SubscriptionCollection<SubscriptionEntity>
      */
-    private function findCandidates(string $salesChannelId, Context $context): iterable
+    private function findCandidates(string $salesChannelId, \DateTimeImmutable $notifiedBefore, Context $context): SubscriptionCollection
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
         $criteria->addFilter(new EqualsFilter('canceledAt', null));
         $criteria->addFilter(new EqualsFilter('priceUpdateState', PriceDriftDetector::STATE_NOTIFIED));
+        $criteria->addFilter(new EqualsAnyFilter('status', [
+            SubscriptionStatus::ACTIVE->value,
+            SubscriptionStatus::RESUMED->value,
+        ]));
+        $criteria->addFilter(new RangeFilter('notifiedAt', [
+            // Millisecond precision (Shopware stores DATETIME(3)) — a whole-second
+            // format would exclude a subscription notified in the same second when
+            // the notice window is 0.
+            RangeFilter::LTE => $notifiedBefore->format(Defaults::STORAGE_DATE_TIME_FORMAT),
+        ]));
         $criteria->addAssociation('order');
         $criteria->addSorting(new FieldSorting('notifiedAt', FieldSorting::ASCENDING));
         $criteria->setLimit(self::CANDIDATE_LIMIT);
 
         return $this->subscriptionRepository->search($criteria, $context)->getEntities();
-    }
-
-    private function isMollieActive(SubscriptionEntity $subscription): bool
-    {
-        $status = $subscription->getStatus();
-
-        return $status === SubscriptionStatus::ACTIVE->value
-            || $status === SubscriptionStatus::RESUMED->value;
     }
 }

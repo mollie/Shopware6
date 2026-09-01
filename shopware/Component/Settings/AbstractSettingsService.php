@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
+use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -23,11 +24,15 @@ abstract class AbstractSettingsService
 
     abstract public function getApiSettings(?string $salesChannelId = null): ApiSettings;
 
+    abstract public function setApiSettings(ApiSettings $apiSettings, ?string $salesChannelId = null): ApiSettings;
+
     abstract public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings;
 
     abstract public function getEnvironmentSettings(): EnvironmentSettings;
 
     abstract public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings;
+
+    abstract public function getExpressComponentsSettings(?string $salesChannelId = null): ExpressComponentsSettings;
 
     abstract public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings;
 

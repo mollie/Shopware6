@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Settings;
 
+use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
 use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
+use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -16,8 +18,10 @@ use Mollie\Shopware\Component\Settings\Struct\RefundSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+#[Autoconfigure(tags: [['name' => 'kernel.reset', 'method' => 'clearCache']])]
 final class SettingsService extends AbstractSettingsService
 {
     public const SYSTEM_CONFIG_DOMAIN = 'MolliePayments.config';
@@ -34,6 +38,8 @@ final class SettingsService extends AbstractSettingsService
     private int $paypalExpressStyle = 1;
     private int $paypalExpressShape = 1;
     private string $paypalExpressRestrictions = '';
+    private bool $expressComponentsEnabled = false;
+    private string $expressComponentsRestrictions = '';
 
     public function __construct(
         private SystemConfigService $systemConfigService,
@@ -48,7 +54,11 @@ final class SettingsService extends AbstractSettingsService
         #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_SHAPE')]
         ?string $paypalExpressShape = '1',
         #[Autowire(env: 'default::MOLLIE_PAYPAL_EXPRESS_BUTTON_RESTRICTIONS')]
-        ?string $paypalExpressRestrictions = ''
+        ?string $paypalExpressRestrictions = '',
+        #[Autowire(env: 'default::MOLLIE_EXPRESS_COMPONENTS_BETA')]
+        ?string $expressComponentsEnabled = null,
+        #[Autowire(env: 'default::MOLLIE_EXPRESS_COMPONENTS_RESTRICTIONS')]
+        ?string $expressComponentsRestrictions = ''
     ) {
         if ($devMode !== null) {
             $this->devMode = (bool) $devMode;
@@ -68,6 +78,13 @@ final class SettingsService extends AbstractSettingsService
             }
             if ($paypalExpressRestrictions !== null) {
                 $this->paypalExpressRestrictions = $paypalExpressRestrictions;
+            }
+        }
+
+        if ($expressComponentsEnabled !== null) {
+            $this->expressComponentsEnabled = (bool) $expressComponentsEnabled;
+            if ($expressComponentsRestrictions !== null) {
+                $this->expressComponentsRestrictions = $expressComponentsRestrictions;
             }
         }
     }
@@ -109,7 +126,27 @@ final class SettingsService extends AbstractSettingsService
         $settings->setStyle((int) $style);
         $settings->setShape((int) $shape);
 
-        $settings->setRestrictions($restrictions);
+        $settings->setRestrictions(VisibilityRestrictionCollection::fromArray($restrictions));
+
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getExpressComponentsSettings(?string $salesChannelId = null): ExpressComponentsSettings
+    {
+        $cacheKey = ExpressComponentsSettings::class . '_' . ($salesChannelId ?? 'all');
+
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+        $fallbackRestrictions = explode(' ', trim($this->expressComponentsRestrictions));
+        $restrictions = $shopwareSettings[ExpressComponentsSettings::KEY_RESTRICTIONS] ?? $fallbackRestrictions;
+
+        $settings = new ExpressComponentsSettings($this->expressComponentsEnabled);
+        $settings->setRestrictions(VisibilityRestrictionCollection::fromArray($restrictions));
 
         $this->settingsCache[$cacheKey] = $settings;
 
@@ -134,6 +171,23 @@ final class SettingsService extends AbstractSettingsService
         $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;
+    }
+
+    public function setApiSettings(ApiSettings $apiSettings, ?string $salesChannelId = null): ApiSettings
+    {
+        $shopwareArray = $apiSettings->toShopwareArray();
+
+        $values = [];
+        foreach ($shopwareArray as $key => $value) {
+            $values[self::SYSTEM_CONFIG_DOMAIN . '.' . $key] = $value;
+        }
+        $this->systemConfigService->setMultiple($values, $salesChannelId);
+
+        $newSettings = ApiSettings::createFromShopwareArray($shopwareArray);
+        $cacheKey = ApiSettings::class . '_' . ($salesChannelId ?? 'all');
+        $this->settingsCache[$cacheKey] = $newSettings;
+
+        return $newSettings;
     }
 
     public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings

@@ -3,6 +3,8 @@
 .idea
 /node_modules
 
+/allure-results
+
 /cypress/videos
 /cypress/screenshots
 

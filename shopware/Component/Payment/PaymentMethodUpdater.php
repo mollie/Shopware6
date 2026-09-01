@@ -12,18 +12,18 @@ use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-final readonly class PaymentMethodUpdater implements PaymentMethodUpdaterInterface
+final class PaymentMethodUpdater implements PaymentMethodUpdaterInterface
 {
     /**
      * @param EntityRepository<OrderTransactionCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
     public function __construct(
         #[Autowire(service: 'order_transaction.repository')]
-        private EntityRepository $orderTransactionRepository,
+        private readonly EntityRepository $orderTransactionRepository,
         #[Autowire(service: PaymentMethodRepository::class)]
-        private PaymentMethodRepositoryInterface $paymentMethodRepository,
+        private readonly PaymentMethodRepositoryInterface $paymentMethodRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
-        private LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
     ) {
     }
 

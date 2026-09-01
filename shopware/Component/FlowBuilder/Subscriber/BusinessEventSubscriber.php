@@ -6,8 +6,14 @@ namespace Mollie\Shopware\Component\FlowBuilder\Subscriber;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\CancelledEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\FailedEvent;
 use Mollie\Shopware\Component\FlowBuilder\Event\Payment\SuccessEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Refund\RefundStartedEvent;
+use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookEvent;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionEndedEvent;
 use Mollie\Shopware\Component\Subscription\Event\SubscriptionPriceChangeNoticeEvent;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionRemindedEvent;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionRenewedEvent;
+use Mollie\Shopware\Component\Subscription\Event\SubscriptionStartedEvent;
 use Mollie\Shopware\Component\Subscription\SubscriptionActionHandler;
 use Shopware\Core\Framework\Event\BusinessEventCollector;
 use Shopware\Core\Framework\Event\BusinessEventCollectorEvent;
@@ -23,7 +29,13 @@ final class BusinessEventSubscriber implements EventSubscriberInterface
         SuccessEvent::class,
         FailedEvent::class,
         CancelledEvent::class,
+        WebhookEvent::class,
+        RefundStartedEvent::class,
         SubscriptionPriceChangeNoticeEvent::class,
+        SubscriptionRemindedEvent::class,
+        SubscriptionStartedEvent::class,
+        SubscriptionEndedEvent::class,
+        SubscriptionRenewedEvent::class,
     ];
 
     public function __construct(

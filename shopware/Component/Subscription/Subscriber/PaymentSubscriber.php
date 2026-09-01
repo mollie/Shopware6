@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Subscription\Subscriber;
 
 use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
+use Mollie\Shopware\Component\Payment\Event\PaymentInitializedEvent;
+use Mollie\Shopware\Component\Payment\Event\PaymentLinkCreatedEvent;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Action\CreateAction;
@@ -37,12 +39,15 @@ final class PaymentSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
+        // Symfony does not walk the class hierarchy, so both concrete events are registered; the
+        // handler itself only relies on the shared PaymentInitializedEvent data.
         return [
-            PaymentCreatedEvent::class => ['onPaymentCreated', self::PRIORITY],
+            PaymentCreatedEvent::class => ['onPaymentInitialized', self::PRIORITY],
+            PaymentLinkCreatedEvent::class => ['onPaymentInitialized', self::PRIORITY],
         ];
     }
 
-    public function onPaymentCreated(PaymentCreatedEvent $event): void
+    public function onPaymentInitialized(PaymentInitializedEvent $event): void
     {
         $transactionData = $event->getTransactionDataStruct();
         $order = $transactionData->getOrder();

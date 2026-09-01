@@ -4,10 +4,11 @@
             "mollie_subscription": "Suscripciones Mollie | Suscripción Mollie"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Pedido realizado",
-            "mollie_checkout_order_failed": " Pedido fallido",
-            "mollie_checkout_order_canceled": " Pedido cancelado",
+            "mollie_payment_success": " Pedido realizado",
+            "mollie_payment_failed": " Pedido fallido",
+            "mollie_payment_cancelled": " Pedido cancelado",
             "mollie_webhook_received_All": " Mollie Webhook Recibido (Todo)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Recibido (Abierto)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Recibido (Autorizado)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Recibido (Fallido)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Recibido (Cancelado)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook Recibido (Completado)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook Recibido (Reembolsado)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Recibido (Reembolso parcial)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook Recibido (Contracargo)",
             "mollie_refund_started": "Reembolso de Mollie iniciado",
             "mollie_subscription_started": "Suscripción de Mollie iniciada",
             "mollie_subscription_ended": "Suscripción de Mollie completada",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": "Suscripción de Mollie reanudada",
             "mollie_subscription_skipped": " Suscripción de Mollie pospuesta",
             "mollie_subscription_renewed": "Suscripción de Mollie renovada",
-            "mollie_subscription_renewal_reminder": "Recordatorio de suscripción de Mollie"
+            "mollie_subscription_renewal_reminder": "Recordatorio de suscripción de Mollie",
+            "mollie_subscription_priceChangeNotice": "Suscripción de Mollie cambio de precio"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Suscripciones Mollie",
                 "description": "Es muy fácil gestionar pagos recurrentes gracias a las funciones que ofrecemos. Lleva tu negocio al siguiente nivel con opciones de seguimiento, integraciones sencillas y más. Con las suscripciones Mollie, puedes crear suscripciones y programar pagos recurrentes con el cobro en un intervalo y período establecido.",
                 "mollieSubscriptionProduct": "Producto de suscripción",
+                "mollieAllowOneTime": "Ofrecer también como compra única",
+                "mollieAllowOneTimeHelp": "Muestra un botón adicional «Añadir a la cesta» en la página del producto para que se pueda comprar sin suscripción.",
                 "mollieSubscriptionIntervalAmount": "Repetir pago cada",
                 "mollieSubscriptionIntervalType": "Unidad de intervalo",
                 "mollieSubscriptionRepetitionAmount": "Número de repeticiones",
@@ -501,9 +506,9 @@
             "canceled": "Cancelado",
             "expired": "Caducado",
             "partiallyRefunded": "Reembolsado (parcialmente)",
-            "orderSuccess": "Pedido realizado",
-            "orderFailed": "Pedido fallido",
-            "orderCanceled": "Pedido cancelado"
+            "payment": "Pago",
+            "success": "Éxito",
+            "priceChangeNotice": "Cambio de precio"
         }
     }
 }

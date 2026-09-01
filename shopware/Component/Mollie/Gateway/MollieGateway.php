@@ -18,6 +18,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentCollection;
+use Mollie\Shopware\Component\Mollie\PaymentHydrator;
 use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\Terminal;
@@ -43,6 +44,10 @@ final class MollieGateway implements MollieGatewayInterface
         private ClientFactoryInterface $clientFactory,
         #[Autowire(service: TransactionService::class)]
         private TransactionServiceInterface $transactionService,
+        #[Autowire(service: PaymentLinkGateway::class)]
+        private PaymentLinkGatewayInterface $paymentLinkGateway,
+        #[Autowire(service: PaymentHydrator::class)]
+        private PaymentHydrator $paymentHydrator,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -69,7 +74,9 @@ final class MollieGateway implements MollieGatewayInterface
         /** @var ?Payment $mollieTransaction */
         $mollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
 
-        if ($mollieTransaction instanceof Payment) {
+        $payment = null;
+
+        if ($mollieTransaction instanceof Payment && $mollieTransaction->getId() !== '') {
             $logData['molliePaymentId'] = $mollieTransaction->getId();
             $this->logger->debug('Transaction has mollie payment data, load additional data from mollie', $logData);
 
@@ -78,7 +85,14 @@ final class MollieGateway implements MollieGatewayInterface
             $payment->setOrderId($mollieTransaction->getOrderId());
         }
 
-        if ($mollieTransaction === null) {
+        if ($payment === null && $mollieTransaction instanceof Payment && $mollieTransaction->getPaymentLinkId() !== null) {
+            $logData['paymentLinkId'] = $mollieTransaction->getPaymentLinkId();
+            $this->logger->debug('Transaction has a payment link, resolve the payment via the payment link', $logData);
+
+            $payment = $this->resolvePaymentLinkPayment($mollieTransaction->getPaymentLinkId(), $mollieTransaction->getFinalizeUrl(), $transaction, $transactionOrder, $context);
+        }
+
+        if ($payment === null) {
             $this->logger->debug('Transaction is without mollie payment data', $logData);
             $payment = $this->repairLegacyTransaction($transaction, $transactionOrder, $context);
             if ($payment === null) {
@@ -113,9 +127,37 @@ final class MollieGateway implements MollieGatewayInterface
                 'salesChannelId' => $salesChannelId,
             ]);
 
-            return Payment::createFromClientResponse($body);
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $shopwareOrderNumber);
+        }
+    }
+
+    public function updatePayment(string $molliePaymentId, CreatePayment $molliePayment, string $orderNumber, string $salesChannelId): Payment
+    {
+        try {
+            $client = $this->clientFactory->create($salesChannelId);
+
+            // The Mollie update-payment endpoint only accepts a subset of the create payload; amount
+            // and lines are immutable (a changed cart total makes Shopware open a new transaction).
+            $updatableFields = ['description', 'redirectUrl', 'cancelUrl', 'webhookUrl', 'metadata', 'locale'];
+            $formParams = array_intersect_key($molliePayment->toArray(), array_flip($updatableFields));
+
+            $response = $client->patch('payments/' . $molliePaymentId, [
+                'form_params' => $formParams,
+            ]);
+            $body = json_decode($response->getBody()->getContents(), true);
+
+            $this->logger->info('Mollie Payment updated', [
+                'molliePaymentId' => $molliePaymentId,
+                'requestParameter' => $formParams,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
+        } catch (ClientException $exception) {
+            throw $this->convertException($exception, $orderNumber);
         }
     }
 
@@ -303,7 +345,7 @@ final class MollieGateway implements MollieGatewayInterface
         try {
             $client = $this->clientFactory->create($salesChannelId);
             $response = $client->get('payments/' . $molliePaymentId, [
-                'query' => ['embed' => 'refunds'],
+                'query' => ['embed' => 'refunds,captures'],
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
             $this->logger->debug('Additional data from mollie loaded', [
@@ -313,7 +355,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'body' => $body
             ]);
 
-            return Payment::createFromClientResponse($body);
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -332,7 +374,7 @@ final class MollieGateway implements MollieGatewayInterface
                 'responseParameter' => $body,
             ]);
 
-            return Payment::createFromClientResponse($body);
+            return $this->paymentHydrator->hydrate($body, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
@@ -366,7 +408,7 @@ final class MollieGateway implements MollieGatewayInterface
 
             $collection = new PaymentCollection();
             foreach ($body['_embedded']['payments'] ?? [] as $paymentBody) {
-                $payment = Payment::createFromClientResponse($paymentBody);
+                $payment = $this->paymentHydrator->hydrate($paymentBody, $salesChannelId);
                 $collection->set($payment->getId(), $payment);
             }
 
@@ -474,6 +516,92 @@ final class MollieGateway implements MollieGatewayInterface
         }
     }
 
+    public function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
+    {
+        $transactionId = $transaction->getId();
+        $orderNumber = (string) $order->getOrderNumber();
+        $salesChannelId = $order->getSalesChannelId();
+        $logData = [
+            'transactionId' => $transactionId,
+            'orderNumber' => $orderNumber,
+            'salesChannelId' => $salesChannelId,
+        ];
+        $this->logger->debug('Trying to load data based on order entity', $logData);
+
+        $customFields = $order->getCustomFields()[Mollie::EXTENSION] ?? null;
+        if ($customFields === null) {
+            $this->logger->error('Order does not have mollie custom fields', $logData);
+
+            return null;
+        }
+        $transactionCustomFields = $transaction->getCustomFields()[Mollie::EXTENSION] ?? [];
+        $mollieOrderId = (string) ($customFields['order_id'] ?? '');
+        if ($mollieOrderId === '') {
+            $mollieOrderId = (string) ($transactionCustomFields['order_id'] ?? $transactionCustomFields['orderId'] ?? '');
+        }
+        $returnUrl = $customFields['transactionReturnUrl'] ?? null;
+        if ($mollieOrderId === '' || $returnUrl === null || $returnUrl === '') {
+            $logData['mollieOrderId'] = $mollieOrderId;
+            $logData['returnUrl'] = $returnUrl;
+
+            $this->logger->error('Order does have mollie custom fields but mollie order id or return url is not set', $logData);
+
+            return null;
+        }
+
+        $payment = $this->getPaymentByMollieOrderId($mollieOrderId, $orderNumber, $salesChannelId);
+        $payment->setOrderId($mollieOrderId);
+        $payment->setFinalizeUrl($returnUrl);
+
+        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
+
+        return $payment;
+    }
+
+    /**
+     * A payment link only produces a Mollie payment once the customer actually pays, so the
+     * payment id is unknown when the link is created. Here we load the payments belonging to the
+     * link, take the newest one, persist it as the regular transaction extension and return it -
+     * from then on the order is indistinguishable from a regularly placed Mollie order.
+     */
+    private function resolvePaymentLinkPayment(string $paymentLinkId, string $finalizeUrl, OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
+    {
+        $salesChannelId = $order->getSalesChannelId();
+        $orderNumber = (string) $order->getOrderNumber();
+        $payments = $this->paymentLinkGateway->getPaymentLinkPayments($paymentLinkId, $orderNumber, $salesChannelId);
+
+        $latestPayment = null;
+        foreach ($payments as $payment) {
+            if ($latestPayment === null) {
+                $latestPayment = $payment;
+                continue;
+            }
+            $latestCreatedAt = $latestPayment->getCreatedAt();
+            $currentCreatedAt = $payment->getCreatedAt();
+            if ($currentCreatedAt !== null && ($latestCreatedAt === null || $currentCreatedAt > $latestCreatedAt)) {
+                $latestPayment = $payment;
+            }
+        }
+
+        if (! $latestPayment instanceof Payment) {
+            $this->logger->info('Payment link has no payments yet', [
+                'paymentLinkId' => $paymentLinkId,
+                'orderNumber' => $orderNumber,
+                'salesChannelId' => $salesChannelId,
+            ]);
+
+            return null;
+        }
+
+        // Carry the finalize URL (with the token stored when the link was created) so the return
+        // route can run the regular Shopware finalize, and persist it with the payment.
+        $latestPayment->setFinalizeUrl($finalizeUrl);
+
+        $this->transactionService->savePaymentExtension($transaction->getId(), $order, $latestPayment, $context);
+
+        return $latestPayment;
+    }
+
     private function getPaymentByMollieOrderId(string $mollieOrderId, string $orderNumber, string $salesChannelId): Payment
     {
         try {
@@ -493,47 +621,9 @@ final class MollieGateway implements MollieGatewayInterface
                 'body' => $paymentsBody,
             ]);
 
-            return Payment::createFromClientResponse($paymentsBody);
+            return $this->paymentHydrator->hydrate($paymentsBody, $salesChannelId);
         } catch (ClientException $exception) {
             throw $this->convertException($exception, $orderNumber);
         }
-    }
-
-    private function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment
-    {
-        $transactionId = $transaction->getId();
-        $orderNumber = (string) $order->getOrderNumber();
-        $salesChannelId = $order->getSalesChannelId();
-        $logData = [
-            'transactionId' => $transactionId,
-            'orderNumber' => $orderNumber,
-            'salesChannelId' => $salesChannelId,
-        ];
-        $this->logger->debug('Trying to load data based on order entity', $logData);
-
-        $customFields = $order->getCustomFields()[Mollie::EXTENSION] ?? null;
-        if ($customFields === null) {
-            $this->logger->error('Order does not have mollie custom fields', $logData);
-
-            return null;
-        }
-        $mollieOrderId = $customFields['order_id'] ?? null;
-        $returnUrl = $customFields['transactionReturnUrl'] ?? null;
-        if ($mollieOrderId === null || $returnUrl === null) {
-            $logData['mollieOrderId'] = $mollieOrderId;
-            $logData['returnUrl'] = $returnUrl;
-
-            $this->logger->error('Order does have mollie custom fields but mollie oder id or return url is not set', $logData);
-
-            return null;
-        }
-
-        $payment = $this->getPaymentByMollieOrderId($mollieOrderId, $orderNumber, $salesChannelId);
-        $payment->setOrderId($mollieOrderId);
-        $payment->setFinalizeUrl($returnUrl);
-
-        $this->transactionService->savePaymentExtension($transactionId, $order, $payment, $context);
-
-        return $payment;
     }
 }

@@ -3,14 +3,14 @@ Sehr geehrte(r) {{ customer.firstName }} {{ customer.lastName }},
 wir möchten Sie darüber informieren, dass sich der Preis Ihres Abonnements bei {{ salesChannel.name }} ändert.
 
 Abonnement: {{ subscription.description }}
-Aktueller Betrag: {{ subscription.amount }} {{ subscription.currency.symbol }}
-Neuer Betrag: {{ subscription.nextNotifiedPrice }} {{ subscription.currency.symbol }}
+Aktueller Betrag: {{ subscription.amount }} {{ subscription.currency.symbol ?? '' }}
+Neuer Betrag: {{ subscription.nextNotifiedPrice }} {{ subscription.currency.symbol ?? '' }}
 Gültig ab der nächsten Verlängerung am: {{ subscription.nextPaymentAt | date("d.m.Y", false) }}
 
 {% if subscription.order and subscription.order.lineItems %}
 Bestandteile dieses Abonnements:
 {% for lineItem in subscription.order.lineItems %}
-- {{ lineItem.label }} - {{ lineItem.quantity }} x {{ lineItem.unitPrice }} {{ subscription.currency.symbol }}
+- {{ lineItem.label }} - {{ lineItem.quantity }} x {{ lineItem.unitPrice }} {{ subscription.currency.symbol ?? '' }}
 {% endfor %}
 {% endif %}
 

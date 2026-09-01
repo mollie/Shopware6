@@ -11,7 +11,7 @@ interface ProductDetailMollieView {
 const componentConfig: ThisType<ProductDetailMollieView> = {
     template,
 
-    inject: ['repositoryFactory'],
+    inject: ['repositoryFactory', 'acl'],
 
     metaInfo() {
         return {
@@ -91,6 +91,10 @@ const componentConfig: ThisType<ProductDetailMollieView> = {
 
         isDefaultLanguage() {
             return this.languageId === this.systemLanguageId;
+        },
+
+        allowEdit() {
+            return this.acl.can('product.editor');
         },
     },
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ (app.request.locale|default('en'))|split('-')|first }}">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
@@ -181,12 +181,12 @@
     <div class="mollie-info-container js-info-loading m-info-show">
         <div class="mollie-headline-container">
             <div class="mollie-headline"> 
-                <h2 class="m-headline loading">Follow the instructions on the terminal</h2>
-                <h2 class="m-headline success" style="display:none">Your payment was successful!</h2>
-                <h2 class="m-headline failed" style="display:none">Your payment was not successful!</h2>
-                <p class="failed" style="display:none">No money has been debited from the debit card</p>
-                <a href="#" title="Return to website" id="returnButton" class="m-button" style="display:none">
-                    Return to website
+                <h2 class="m-headline loading">{{ 'molliePayments.components.pos.terminalInstructions'|trans|sw_sanitize }}</h2>
+                <h2 class="m-headline success" style="display:none">{{ 'molliePayments.components.pos.paymentSuccess'|trans|sw_sanitize }}</h2>
+                <h2 class="m-headline failed" style="display:none">{{ 'molliePayments.components.pos.paymentFailed'|trans|sw_sanitize }}</h2>
+                <p class="failed" style="display:none">{{ 'molliePayments.components.pos.paymentFailedNoDebit'|trans|sw_sanitize }}</p>
+                <a href="#" title="{{ 'molliePayments.components.pos.returnToWebsite'|trans|striptags }}" id="returnButton" class="m-button" style="display:none">
+                    {{ 'molliePayments.components.pos.returnToWebsite'|trans|sw_sanitize }}
                     <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
                         <path d="M17.17 32.92l9.17-9.17-9.17-9.17 2.83-2.83 12 12-12 12z"/>
                         <path d="M0-.25h48v48h-48z" fill="none"/>

@@ -10,6 +10,7 @@
       "get": {
         "summary": "Handle Mollie Webhook Notification (GET)",
         "description": "Handles incoming webhook notifications from Mollie for an order transaction.",
+        "tags": ["Mollie"],
         "operationId": "handleMollieWebhookGet",
         "parameters": [
           {
@@ -44,6 +45,7 @@
       "post": {
         "summary": "Handle Mollie Webhook Notification (POST)",
         "description": "Handles incoming webhook notifications from Mollie for an order transaction.",
+        "tags": ["Mollie"],
         "operationId": "handleMollieWebhookPost",
         "parameters": [
           {

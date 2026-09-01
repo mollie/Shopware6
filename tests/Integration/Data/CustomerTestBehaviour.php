@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Integration\Data;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
@@ -34,6 +35,20 @@ trait CustomerTestBehaviour
         $criteria = (new Criteria())
             ->addFilter(new EqualsFilter('country.iso', $isoCode))
             ->addFilter(new EqualsFilter('customerId', $salesChannelContext->getCustomer()->getId()))
+            ->addFilter(new NotFilter(NotFilter::CONNECTION_AND, [new EqualsFilter('company', null)]))
+        ;
+
+        return $repository->searchIds($criteria, $salesChannelContext->getContext());
+    }
+
+    public function getPrivateUserAddressByIso(string $isoCode, SalesChannelContext $salesChannelContext): IdSearchResult
+    {
+        /** @var EntityRepository $repository */
+        $repository = $this->getContainer()->get('customer_address.repository');
+        $criteria = (new Criteria())
+            ->addFilter(new EqualsFilter('country.iso', $isoCode))
+            ->addFilter(new EqualsFilter('customerId', $salesChannelContext->getCustomer()->getId()))
+            ->addFilter(new EqualsFilter('company', null))
         ;
 
         return $repository->searchIds($criteria, $salesChannelContext->getContext());

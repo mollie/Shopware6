@@ -493,6 +493,56 @@
             <helpText lang="sk-SK">Automaticky vytvárajte zákazníkov vo svojom Mollie Dashboarde, aby ste videli všetky platby konkrétneho zákazníka.</helpText><helpText lang="bg-BG">Клиентите автоматично се създават във вашето Mollie Табло, за да видите всички плащания на даден клиент.</helpText>
         </input-field>
         <input-field type="bool">
+            <name>paymentLinkAllowMethodSelection</name>
+            <defaultValue>false</defaultValue>
+            <label>Allow payment method selection for payment links</label>
+            <label lang="de-DE">Auswahl der Zahlarten bei Payment Links erlauben</label>
+            <label lang="nl-NL">Selectie van betaalmethoden voor betaallinks toestaan</label>
+            <label lang="it-IT">Consenti la selezione del metodo di pagamento per i link di pagamento</label>
+            <label lang="pt-PT">Permitir a seleção do método de pagamento nos links de pagamento</label>
+            <label lang="es-ES">Permitir la selección del método de pago en los enlaces de pago</label>
+            <label lang="sv-SE">Tillåt val av betalningsmetod för betalningslänkar</label>
+            <label lang="nb-NO">Tillat valg av betalingsmetode for betalingslenker</label>
+            <label lang="pl-PL">Zezwól na wybór metody płatności w linkach płatności</label>
+            <label lang="cs-CZ">Povolit výběr platební metody u platebních odkazů</label>
+            <label lang="sl-SI">Dovoli izbiro plačilnega načina pri plačilnih povezavah</label>
+            <label lang="hu-HU">Fizetési mód választásának engedélyezése fizetési linkeknél</label>
+            <label lang="fi-FI">Salli maksutavan valinta maksulinkeissä</label>
+            <label lang="da-DK">Tillad valg af betalingsmetode til betalingslinks</label>
+            <label lang="el-GR">Επιτρέψτε την επιλογή μεθόδου πληρωμής για συνδέσμους πληρωμής</label>
+            <label lang="hr-HR">Dopusti odabir načina plaćanja za poveznice za plaćanje</label>
+            <label lang="et-EE">Luba maksemeetodi valik makselinkide puhul</label>
+            <label lang="is-IS">Leyfa val á greiðslumáta fyrir greiðslutengla</label>
+            <label lang="lt-LT">Leisti pasirinkti mokėjimo būdą mokėjimo nuorodose</label>
+            <label lang="lv-LV">Atļaut maksājuma metodes izvēli maksājumu saitēm</label>
+            <label lang="ro-RO">Permite selectarea metodei de plată pentru linkurile de plată</label>
+            <label lang="sk-SK">Povoliť výber platobnej metódy pri platobných odkazoch</label>
+            <label lang="bg-BG">Разрешаване на избор на метод на плащане за връзки за плащане</label>
+            <helpText>When enabled, a payment link lets the customer pick from all payment methods available for the order instead of only the one assigned to the order.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, kann der Kunde beim Payment Link aus allen für die Bestellung verfügbaren Zahlarten wählen, statt nur der bei der Bestellung hinterlegten.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld, kan de klant bij een betaallink kiezen uit alle voor de bestelling beschikbare betaalmethoden in plaats van alleen de aan de bestelling toegewezen methode.</helpText>
+            <helpText lang="it-IT">Se attivato, un link di pagamento consente al cliente di scegliere tra tutti i metodi di pagamento disponibili per l'ordine, anziché solo quello assegnato all'ordine.</helpText>
+            <helpText lang="pt-PT">Quando ativado, um link de pagamento permite ao cliente escolher entre todos os métodos de pagamento disponíveis para a encomenda, em vez de apenas o atribuído à encomenda.</helpText>
+            <helpText lang="es-ES">Si está activado, un enlace de pago permite al cliente elegir entre todos los métodos de pago disponibles para el pedido, en lugar de solo el asignado al pedido.</helpText>
+            <helpText lang="sv-SE">När det är aktiverat kan kunden via en betalningslänk välja bland alla betalningsmetoder som är tillgängliga för ordern, i stället för endast den som är kopplad till ordern.</helpText>
+            <helpText lang="nb-NO">Når aktivert, lar en betalingslenke kunden velge blant alle betalingsmetoder som er tilgjengelige for ordren, i stedet for bare den som er tilknyttet ordren.</helpText>
+            <helpText lang="pl-PL">Po włączeniu link płatności pozwala klientowi wybrać spośród wszystkich metod płatności dostępnych dla zamówienia, zamiast tylko tej przypisanej do zamówienia.</helpText>
+            <helpText lang="cs-CZ">Pokud je povoleno, platební odkaz umožní zákazníkovi vybrat ze všech platebních metod dostupných pro objednávku místo pouze té přiřazené k objednávce.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, lahko stranka prek plačilne povezave izbira med vsemi plačilnimi načini, ki so na voljo za naročilo, in ne le tistim, ki je dodeljen naročilu.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, a fizetési link lehetővé teszi, hogy az ügyfél a rendeléshez elérhető összes fizetési mód közül válasszon, nem csak a rendeléshez rendelt módot.</helpText>
+            <helpText lang="fi-FI">Kun tämä on käytössä, maksulinkki antaa asiakkaan valita kaikista tilaukselle saatavilla olevista maksutavoista sen sijaan, että käytössä olisi vain tilaukseen liitetty tapa.</helpText>
+            <helpText lang="da-DK">Når det er aktiveret, kan kunden via et betalingslink vælge mellem alle betalingsmetoder, der er tilgængelige for ordren, i stedet for kun den, der er tilknyttet ordren.</helpText>
+            <helpText lang="el-GR">Όταν είναι ενεργοποιημένο, ένας σύνδεσμος πληρωμής επιτρέπει στον πελάτη να επιλέξει από όλες τις διαθέσιμες μεθόδους πληρωμής για την παραγγελία, αντί μόνο για εκείνη που έχει ανατεθεί στην παραγγελία.</helpText>
+            <helpText lang="hr-HR">Kada je omogućeno, poveznica za plaćanje omogućuje kupcu odabir između svih načina plaćanja dostupnih za narudžbu, umjesto samo onog dodijeljenog narudžbi.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, saab klient makselingi kaudu valida kõigi tellimuse jaoks saadaolevate maksemeetodite hulgast, mitte ainult tellimusele määratud meetodi.</helpText>
+            <helpText lang="is-IS">Þegar þetta er virkt getur viðskiptavinurinn með greiðslutengli valið úr öllum greiðslumátum sem eru í boði fyrir pöntunina, í stað þess eina sem pöntuninni var úthlutað.</helpText>
+            <helpText lang="lt-LT">Įjungus, mokėjimo nuoroda leidžia klientui pasirinkti iš visų užsakymui prieinamų mokėjimo būdų, o ne tik to, kuris priskirtas užsakymui.</helpText>
+            <helpText lang="lv-LV">Ja iespējots, maksājuma saite ļauj klientam izvēlēties no visām pasūtījumam pieejamajām maksājuma metodēm, nevis tikai no pasūtījumam piešķirtās.</helpText>
+            <helpText lang="ro-RO">Când este activat, un link de plată permite clientului să aleagă dintre toate metodele de plată disponibile pentru comandă, în loc doar de cea atribuită comenzii.</helpText>
+            <helpText lang="sk-SK">Ak je povolené, platobný odkaz umožní zákazníkovi vybrať si zo všetkých platobných metód dostupných pre objednávku namiesto len tej priradenej k objednávke.</helpText>
+            <helpText lang="bg-BG">Когато е активирано, връзката за плащане позволява на клиента да избира измежду всички налични за поръчката методи на плащане, вместо само зададения за поръчката.</helpText>
+        </input-field>
+        <input-field type="bool">
             <name>useMolliePaymentMethodLimits</name>
             <defaultValue>false</defaultValue>
             <label>Use Mollie's availability rules for payment methods</label>
@@ -1426,6 +1476,54 @@
             <helpText lang="ro-RO">Dacă este activat, pluginul va anula automat comenzile Mollie atunci când sunt anulate în Shopware. Numai comenzile care sunt create, autorizate sau parțial expediate vor fi anulate. Dacă sunt expediate parțial, vor fi anulate doar articolele care nu au fost expediate.</helpText>
             <helpText lang="sk-SK">Ak je táto možnosť povolená, doplnok automaticky zruší objednávky v Mollie, keď budú zrušené v Shopware. Zrušené budú iba objednávky, ktoré sú vytvorené, autorizované alebo čiastočne odoslané. V prípade čiastočného odoslania budú zrušené iba tie položky, ktoré neboli odoslané.</helpText><helpText lang="bg-BG">Ако е активирано, плъгинът автоматично ще отмени Mollie поръчките, когато те са отказани в Shopware. Само поръчки, които са създадени, авторизирани или частично изпратени, ще бъдат отказани. Ако са частично изпратени, само артикулите, които не са изпратени, ще бъдат отказани.</helpText>
         </input-field>
+        <input-field type="bool">
+            <name>automaticStatusUpdate</name>
+            <defaultValue>false</defaultValue>
+            <label>Synchronise open payments with Mollie</label>
+            <label lang="de-DE">Offene Zahlungen mit Mollie abgleichen</label>
+            <label lang="nl-NL">Openstaande betalingen synchroniseren met Mollie</label>
+            <label lang="it-IT">Sincronizza i pagamenti aperti con Mollie</label>
+            <label lang="pt-PT">Sincronizar pagamentos em aberto com a Mollie</label>
+            <label lang="es-ES">Sincronizar los pagos pendientes con Mollie</label>
+            <label lang="sv-SE">Synkronisera obetalda betalningar med Mollie</label>
+            <label lang="nb-NO">Synkroniser åpne betalinger med Mollie</label>
+            <label lang="pl-PL">Synchronizuj otwarte płatności z Mollie</label>
+            <label lang="cs-CZ">Synchronizovat otevřené platby s Mollie</label>
+            <label lang="sl-SI">Sinhroniziraj odprta plačila z Mollie</label>
+            <label lang="hu-HU">Nyitott fizetések szinkronizálása a Mollie-val</label>
+            <label lang="fi-FI">Synkronoi avoimet maksut Mollien kanssa</label>
+            <label lang="da-DK">Synkroniser åbne betalinger med Mollie</label>
+            <label lang="el-GR">Συγχρονισμός εκκρεμών πληρωμών με τη Mollie</label>
+            <label lang="hr-HR">Sinkroniziraj otvorena plaćanja s Mollie</label>
+            <label lang="et-EE">Sünkrooni avatud maksed Molliega</label>
+            <label lang="is-IS">Samstilla ólokaðar greiðslur við Mollie</label>
+            <label lang="lt-LT">Sinchronizuoti neuždarytus mokėjimus su Mollie</label>
+            <label lang="lv-LV">Sinhronizēt neapmaksātos maksājumus ar Mollie</label>
+            <label lang="ro-RO">Sincronizează plățile deschise cu Mollie</label>
+            <label lang="sk-SK">Synchronizovať otvorené platby s Mollie</label><label lang="bg-BG">Синхронизиране на откритите плащания с Mollie</label>
+            <helpText>If enabled, the plugin regularly checks open payments against the Mollie API and updates their status. Only needed as a fallback if webhooks cannot reach this shop, because it consumes additional resources.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, prüft das Plugin offene Zahlungen regelmäßig über die Mollie-API und aktualisiert deren Status. Nur als Fallback nötig, wenn Webhooks diesen Shop nicht erreichen können, da es zusätzliche Ressourcen verbraucht.</helpText>
+            <helpText lang="nl-NL">Indien ingeschakeld controleert de plug-in openstaande betalingen regelmatig via de Mollie API en werkt de status bij. Alleen nodig als terugval wanneer webhooks deze shop niet kunnen bereiken, omdat het extra bronnen verbruikt.</helpText>
+            <helpText lang="it-IT">Se attivato, il plugin verifica regolarmente i pagamenti aperti tramite l'API di Mollie e ne aggiorna lo stato. Serve solo come soluzione di riserva se i webhook non riescono a raggiungere questo negozio, perché consuma risorse aggiuntive.</helpText>
+            <helpText lang="pt-PT">Se ativado, o plugin verifica regularmente os pagamentos em aberto através da API da Mollie e atualiza o respetivo estado. Só é necessário como alternativa se os webhooks não conseguirem alcançar esta loja, pois consome recursos adicionais.</helpText>
+            <helpText lang="es-ES">Si se activa, el plugin comprueba periódicamente los pagos pendientes a través de la API de Mollie y actualiza su estado. Solo es necesario como alternativa si los webhooks no pueden llegar a esta tienda, ya que consume recursos adicionales.</helpText>
+            <helpText lang="sv-SE">Om det är aktiverat kontrollerar pluginet regelbundet obetalda betalningar via Mollies API och uppdaterar deras status. Behövs endast som reservlösning om webhooks inte når den här butiken, eftersom det förbrukar extra resurser.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, kontrollerer pluginen åpne betalinger jevnlig via Mollie-API-et og oppdaterer statusen deres. Behøves bare som reserveløsning hvis webhooks ikke når frem til denne butikken, siden det bruker ekstra ressurser.</helpText>
+            <helpText lang="pl-PL">Po włączeniu wtyczka regularnie sprawdza otwarte płatności przez API Mollie i aktualizuje ich status. Potrzebne tylko jako rozwiązanie awaryjne, gdy webhooki nie mogą dotrzeć do tego sklepu, ponieważ zużywa dodatkowe zasoby.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, plugin pravidelně kontroluje otevřené platby přes Mollie API a aktualizuje jejich stav. Je potřeba pouze jako záložní řešení, pokud se webhooky nedostanou do tohoto obchodu, protože spotřebovává další prostředky.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, vtičnik redno preverja odprta plačila prek API-ja Mollie in posodablja njihov status. Potrebno je le kot rezervna možnost, če spletni zahtevki ne morejo doseči te trgovine, saj porablja dodatne vire.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, a bővítmény rendszeresen ellenőrzi a nyitott fizetéseket a Mollie API-n keresztül, és frissíti az állapotukat. Csak tartalék megoldásként szükséges, ha a webhookok nem érik el ezt az üzletet, mivel további erőforrásokat igényel.</helpText>
+            <helpText lang="fi-FI">Jos tämä on käytössä, laajennus tarkistaa avoimet maksut säännöllisesti Mollien API:n kautta ja päivittää niiden tilan. Tarvitaan vain varajärjestelynä, jos webhookit eivät tavoita tätä kauppaa, koska se kuluttaa lisäresursseja.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, kontrollerer plugin'et regelmæssigt åbne betalinger via Mollie-API'et og opdaterer deres status. Er kun nødvendigt som reserve, hvis webhooks ikke kan nå denne shop, da det bruger yderligere ressourcer.</helpText>
+            <helpText lang="el-GR">Αν είναι ενεργοποιημένο, το πρόσθετο ελέγχει τακτικά τις εκκρεμείς πληρωμές μέσω του API της Mollie και ενημερώνει την κατάστασή τους. Χρειάζεται μόνο ως εφεδρική λύση αν τα webhooks δεν μπορούν να φτάσουν σε αυτό το κατάστημα, καθώς καταναλώνει επιπλέον πόρους.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, dodatak redovito provjerava otvorena plaćanja putem Mollie API-ja i ažurira njihov status. Potrebno je samo kao rezervno rješenje ako webhookovi ne mogu doći do ove trgovine jer troši dodatne resurse.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, kontrollib plugin regulaarselt avatud makseid Mollie API kaudu ja uuendab nende olekut. Vajalik ainult varulahendusena, kui veebikonksud ei jõua selle poeni, sest see kulutab lisaressursse.</helpText>
+            <helpText lang="is-IS">Ef þetta er virkjað athugar viðbótin reglulega ólokaðar greiðslur í gegnum Mollie API og uppfærir stöðu þeirra. Aðeins nauðsynlegt sem varaleið ef webhooks ná ekki til þessarar verslunar, því það notar aukauðlindir.</helpText>
+            <helpText lang="lt-LT">Jei įjungta, įskiepis reguliariai tikrina neuždarytus mokėjimus per Mollie API ir atnaujina jų būseną. Reikalinga tik kaip atsarginė priemonė, jei žinutės (webhooks) nepasiekia šios parduotuvės, nes tai naudoja papildomus išteklius.</helpText>
+            <helpText lang="lv-LV">Ja iespējots, spraudnis regulāri pārbauda neapmaksātos maksājumus, izmantojot Mollie API, un atjaunina to statusu. Nepieciešams tikai kā rezerves risinājums, ja tīmekļa āķi nevar sasniegt šo veikalu, jo tas patērē papildu resursus.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, pluginul verifică periodic plățile deschise prin API-ul Mollie și le actualizează starea. Este necesar doar ca soluție de rezervă dacă webhook-urile nu pot ajunge la acest magazin, deoarece consumă resurse suplimentare.</helpText>
+            <helpText lang="sk-SK">Ak je táto možnosť povolená, doplnok pravidelne kontroluje otvorené platby cez Mollie API a aktualizuje ich stav. Je potrebné len ako záložné riešenie, ak webhooky nedokážu dosiahnuť tento obchod, pretože to spotrebováva dodatočné zdroje.</helpText><helpText lang="bg-BG">Ако е активирано, плъгинът редовно проверява откритите плащания чрез Mollie API и актуализира техния статус. Необходимо е само като резервен вариант, ако уебхуковете не могат да достигнат до този магазин, тъй като това консумира допълнителни ресурси.</helpText>
+        </input-field>
     </card>
     <card>
         <title>Refund Manager</title>
@@ -1786,6 +1884,56 @@
             <helpText lang="lv-LV">Sufikss kredītnotas numuram. Kredītnota sastāv no prefiksa, sākotnējās pozīcijas nosaukuma un sufiksa</helpText>
             <helpText lang="ro-RO">Sufix pentru numărul notei de credit. Nota de credit constă din prefix, numele original al liniei și sufix</helpText>
             <helpText lang="sk-SK">Prípona pre číslo dobropisu. Dobropis sa skladá z predpony, pôvodného názvu položky a prípony</helpText><helpText lang="bg-BG">Представка за номера на кредитното известие. Кредитното известие се състои от представка, оригинално име на артикула и надставка</helpText>
+        </input-field>
+        <input-field type="bool">
+            <name>refundManagerReturnManagementDisabled</name>
+            <defaultValue>false</defaultValue>
+            <label>Disable Return Management integration</label>
+            <label lang="de-DE">Retouren-Integration deaktivieren</label>
+            <label lang="nl-NL">Retourintegratie uitschakelen</label>
+            <label lang="it-IT">Disattiva l'integrazione con la gestione dei resi</label>
+            <label lang="pt-PT">Desativar a integração da gestão de devoluções</label>
+            <label lang="es-ES">Desactivar la integración con la gestión de devoluciones</label>
+            <label lang="sv-SE">Inaktivera integrationen med returhantering</label>
+            <label lang="nb-NO">Deaktiver integrasjon med returhåndtering</label>
+            <label lang="pl-PL">Wyłącz integrację z menedżerem zwrotów</label>
+            <label lang="cs-CZ">Zakázat integraci se správou vratek</label>
+            <label lang="sl-SI">Onemogoči integracijo z upravljanjem vračil</label>
+            <label lang="hu-HU">Visszaküldés-integráció letiltása</label>
+            <label lang="fi-FI">Poista palautusten hallinnan integraatio käytöstä</label>
+            <label lang="da-DK">Deaktiver integration med returhåndtering</label>
+            <label lang="el-GR">Απενεργοποίηση ενσωμάτωσης με τη διαχείριση επιστροφών</label>
+            <label lang="hr-HR">Onemogući integraciju s upravljanjem povratima</label>
+            <label lang="et-EE">Keela tagastuste halduse integratsioon</label>
+            <label lang="is-IS">Slökkva á samþættingu við skilastjórnun</label>
+            <label lang="lt-LT">Išjungti grąžinimų valdymo integraciją</label>
+            <label lang="lv-LV">Atspējot atgriešanas pārvaldības integrāciju</label>
+            <label lang="ro-RO">Dezactivează integrarea cu gestionarea retururilor</label>
+            <label lang="sk-SK">Zakázať integráciu so správou vrátení tovaru</label>
+            <label lang="bg-BG">Деактивиране на интеграцията с управлението на връщания</label>
+            <helpText>If enabled, Mollie no longer creates or cancels a refund when a return is processed in the Shopware Return Management. Refunds then have to be created manually in the Mollie Refund Manager.</helpText>
+            <helpText lang="de-DE">Wenn aktiviert, erstellt und storniert Mollie keine Rückerstattung mehr, wenn eine Retoure im Shopware Return Management bearbeitet wird. Rückerstattungen müssen dann manuell im Mollie Refund Manager erstellt werden.</helpText>
+            <helpText lang="nl-NL">Als dit is ingeschakeld, maakt of annuleert Mollie geen terugbetaling meer wanneer een retour in het Shopware Return Management wordt verwerkt. Terugbetalingen moeten dan handmatig in de Mollie Refund Manager worden aangemaakt.</helpText>
+            <helpText lang="it-IT">Se attivato, Mollie non crea né annulla più un rimborso quando un reso viene elaborato nella gestione dei resi di Shopware. I rimborsi devono quindi essere creati manualmente nel Refund Manager di Mollie.</helpText>
+            <helpText lang="pt-PT">Se ativado, a Mollie deixa de criar ou cancelar um reembolso quando uma devolução é processada na gestão de devoluções do Shopware. Os reembolsos têm então de ser criados manualmente no Refund Manager da Mollie.</helpText>
+            <helpText lang="es-ES">Si se activa, Mollie ya no crea ni cancela un reembolso cuando se procesa una devolución en la gestión de devoluciones de Shopware. Los reembolsos deben crearse manualmente en el Refund Manager de Mollie.</helpText>
+            <helpText lang="sv-SE">Om det är aktiverat skapar eller avbryter Mollie inte längre en återbetalning när en retur behandlas i Shopwares returhantering. Återbetalningar måste då skapas manuellt i Mollie Refund Manager.</helpText>
+            <helpText lang="nb-NO">Hvis aktivert, oppretter eller kansellerer ikke Mollie lenger en refusjon når en retur behandles i Shopware returhåndtering. Refusjoner må da opprettes manuelt i Mollie Refund Manager.</helpText>
+            <helpText lang="pl-PL">Po włączeniu Mollie nie tworzy ani nie anuluje już zwrotu płatności, gdy zwrot towaru jest przetwarzany w menedżerze zwrotów Shopware. Zwroty płatności trzeba wtedy utworzyć ręcznie w Mollie Refund Manager.</helpText>
+            <helpText lang="cs-CZ">Pokud je tato možnost povolena, Mollie již nevytváří ani neruší refundaci, když je vratka zpracována ve správě vratek Shopware. Refundace je pak nutné vytvořit ručně ve správci vrácení peněz Mollie.</helpText>
+            <helpText lang="sl-SI">Če je omogočeno, Mollie ne ustvari ali prekliče več vračila, ko je vrnitev obdelana v Shopwareovem upravljanju vračil. Vračila je nato treba ročno ustvariti v upravljalniku vračil Mollie.</helpText>
+            <helpText lang="hu-HU">Ha engedélyezve van, a Mollie már nem hoz létre és nem von vissza visszatérítést, amikor egy visszaküldést feldolgoznak a Shopware visszaküldéskezelőjében. A visszatérítéseket ilyenkor kézzel kell létrehozni a Mollie visszatérítés kezelőben.</helpText>
+            <helpText lang="fi-FI">Jos tämä on käytössä, Mollie ei enää luo tai peruuta hyvitystä, kun palautus käsitellään Shopwaren palautusten hallinnassa. Hyvitykset on tällöin luotava manuaalisesti Mollien hyvityshallinnassa.</helpText>
+            <helpText lang="da-DK">Hvis aktiveret, opretter eller annullerer Mollie ikke længere en refusion, når en returnering behandles i Shopwares returhåndtering. Refusioner skal så oprettes manuelt i Mollie Refusion Manager.</helpText>
+            <helpText lang="el-GR">Εάν ενεργοποιηθεί, η Mollie δεν δημιουργεί ούτε ακυρώνει πλέον επιστροφή χρημάτων όταν μια επιστροφή προϊόντος επεξεργάζεται στη διαχείριση επιστροφών του Shopware. Οι επιστροφές χρημάτων πρέπει τότε να δημιουργούνται χειροκίνητα στον Διαχειριστή Επιστροφών Χρημάτων της Mollie.</helpText>
+            <helpText lang="hr-HR">Ako je omogućeno, Mollie više ne izrađuje niti otkazuje povrat novca kada se povrat robe obradi u Shopware upravljanju povratima. Povrate novca tada je potrebno ručno izraditi u Mollie upravitelju povrata.</helpText>
+            <helpText lang="et-EE">Kui see on lubatud, ei loo ega tühista Mollie enam tagasimakset, kui tagastust töödeldakse Shopware'i tagastuste halduses. Tagasimaksed tuleb siis luua käsitsi Mollie tagasimakse halduris.</helpText>
+            <helpText lang="is-IS">Ef þetta er virkjað býr Mollie hvorki til né afturkallar endurgreiðslu þegar skil eru afgreidd í skilastjórnun Shopware. Þá þarf að búa endurgreiðslur til handvirkt í endurgreiðslustjórnun Mollie.</helpText>
+            <helpText lang="lt-LT">Jei įjungta, Mollie nebekuria ir nebeatšaukia grąžinamosios išmokos, kai prekių grąžinimas apdorojamas Shopware grąžinimų valdyme. Tuomet grąžinamąsias išmokas reikia sukurti rankiniu būdu Mollie grąžinimų valdiklyje.</helpText>
+            <helpText lang="lv-LV">Ja iespējots, Mollie vairs neizveido un neatceļ atmaksu, kad atgriešana tiek apstrādāta Shopware atgriešanas pārvaldībā. Atmaksas tad ir jāizveido manuāli Mollie Refund Manager.</helpText>
+            <helpText lang="ro-RO">Dacă este activat, Mollie nu mai creează și nu mai anulează o rambursare atunci când un retur este procesat în gestionarea retururilor din Shopware. Rambursările trebuie apoi create manual în Managerul de rambursare Mollie.</helpText>
+            <helpText lang="sk-SK">Ak je táto možnosť povolená, Mollie už nevytvára ani neruší vrátenie peňazí, keď sa vrátenie tovaru spracuje v správe vrátení tovaru Shopware. Vrátenia peňazí je potom potrebné vytvoriť ručne v Správcovi vrátení peňazí Mollie.</helpText>
+            <helpText lang="bg-BG">Ако е активирано, Mollie вече не създава и не отменя възстановяване на сума, когато връщане се обработва в управлението на връщания на Shopware. Възстановяванията трябва тогава да се създават ръчно в Управлението на възстановявания на суми на Mollie.</helpText>
         </input-field>
     </card>
     <card>

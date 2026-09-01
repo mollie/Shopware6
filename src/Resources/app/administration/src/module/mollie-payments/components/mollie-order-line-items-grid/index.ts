@@ -89,11 +89,15 @@ const componentConfig: ThisType<LineItemsGridComponent> = {
     },
 
     watch: {
+        // The grid is rendered before the order details of the Mollie tab are loaded, so both status
+        // objects arrive after the component was created. Without these watchers the grid would keep
+        // its empty status and every ship/cancel action would stay disabled.
         initialShippingStatus(value: Record<string, any> | null) {
             if (value !== null && value !== undefined) {
                 this.shippingStatus = value;
             }
         },
+
         initialCancelStatus(value: Record<string, any> | null) {
             if (value !== null && value !== undefined) {
                 this.cancelStatus = value;
@@ -121,21 +125,9 @@ const componentConfig: ThisType<LineItemsGridComponent> = {
         if (this.initialCancelStatus !== null) {
             this.cancelStatus = this.initialCancelStatus;
         }
-
-        if (this.initialShippingStatus === null || this.initialCancelStatus === null) {
-            this.reloadData();
-        }
     },
 
     methods: {
-        async reloadData() {
-            await this.loadMollieShippingStatus();
-        },
-
-        async loadMollieShippingStatus() {
-            this.shippingStatus = await this.MolliePaymentsShippingService.status({ orderId: this.order.id });
-        },
-
         loadMollieCancelStatus(cancelResponse: CancelResponse) {
             this.cancelStatus = this.statusService.applyCancelResponse(this.cancelStatus, cancelResponse);
         },
@@ -145,6 +137,8 @@ const componentConfig: ThisType<LineItemsGridComponent> = {
             this.updateTrackingPrefilling();
         },
 
+        // The refreshed status arrives through the initialShippingStatus prop: the Mollie tab reloads
+        // the order details when the EventShippedOrder event is emitted.
         onCloseShipItemModal() {
             this.isShipItemLoading = false;
             this.showShipItemModal = false;
@@ -152,9 +146,7 @@ const componentConfig: ThisType<LineItemsGridComponent> = {
             this.resetTracking();
             // No reload here: cancelling changes nothing, and after a successful ship the
             // parent (mollie-order-tab) reloads the order details on EventShippedOrder and
-            // re-passes initialShippingStatus, which the watcher above applies. The legacy
-            // reloadData() endpoint returns a different shape (quantityShippable + different
-            // keying) that would blank out the shippable/shipped columns.
+            // re-passes initialShippingStatus, which the watcher above applies.
         },
 
         onOpenCancelItemModal(item: any) {

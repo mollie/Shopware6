@@ -4,21 +4,17 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Mollie;
 
 use Mollie\Shopware\Mollie;
+use Shopware\Core\Framework\Struct\Collection;
 
-final class RefundCollection implements \JsonSerializable
+/**
+ * @extends Collection<Refund>
+ */
+final class RefundCollection extends Collection
 {
-    /** @var Refund[] */
-    private array $refunds = [];
-
-    public function add(Refund $refund): void
-    {
-        $this->refunds[] = $refund;
-    }
-
     public function getSumRefunded(): float
     {
         $total = 0.0;
-        foreach ($this->refunds as $refund) {
+        foreach ($this->elements as $refund) {
             if ($refund->getStatus() === RefundStatus::Refunded) {
                 $total += (float) $refund->getAmount()->getValue();
             }
@@ -30,7 +26,7 @@ final class RefundCollection implements \JsonSerializable
     public function getSumPending(): float
     {
         $total = 0.0;
-        foreach ($this->refunds as $refund) {
+        foreach ($this->elements as $refund) {
             $status = $refund->getStatus();
             if ($status === RefundStatus::Pending || $status === RefundStatus::Queued) {
                 $total += (float) $refund->getAmount()->getValue();
@@ -42,7 +38,7 @@ final class RefundCollection implements \JsonSerializable
 
     public function findByMollieId(string $mollieRefundId): ?Refund
     {
-        foreach ($this->refunds as $refund) {
+        foreach ($this->elements as $refund) {
             if ($refund->getId() === $mollieRefundId) {
                 return $refund;
             }
@@ -53,20 +49,12 @@ final class RefundCollection implements \JsonSerializable
 
     public function findByReturnId(string $returnId): ?Refund
     {
-        foreach ($this->refunds as $refund) {
+        foreach ($this->elements as $refund) {
             if ($refund->getReturnId() === $returnId) {
                 return $refund;
             }
         }
 
         return null;
-    }
-
-    /**
-     * @return Refund[]
-     */
-    public function jsonSerialize(): array
-    {
-        return $this->refunds;
     }
 }

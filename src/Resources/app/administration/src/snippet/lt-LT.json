@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie prenumerata | Mollie prenumeratos"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Užsakymas sėkmingas",
-            "mollie_checkout_order_failed": "Užsakymas nepavyko",
-            "mollie_checkout_order_canceled": "Užsakymas atšauktas",
+            "mollie_payment_success": "Užsakymas sėkmingas",
+            "mollie_payment_failed": "Užsakymas nepavyko",
+            "mollie_payment_cancelled": "Užsakymas atšauktas",
             "mollie_webhook_received_All": " Gautas Mollie „webhook“ (Visi)",
+            "mollie_webhook_received_status_open": " Gautas Mollie „webhook“ (Atidaryta)",
             "mollie_webhook_received_status_authorized": "Gautas Mollie „webhook“ (Autorizuoti)",
             "mollie_webhook_received_status_failed": "Gautas Mollie „webhook“ (Nepavykę)",
             "mollie_webhook_received_status_canceled": "Gautas Mollie „webhook“ (Atšaukti)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Gautas Mollie „webhook“ (Įvykdyti)",
             "mollie_webhook_received_status_refunded": " Gautas Mollie „webhook“ (Grąžinti)",
             "mollie_webhook_received_status_partially_refunded": " Gautas Mollie „webhook“ (Iš dalies grąžinti)",
+            "mollie_webhook_received_status_chargeback": " Gautas Mollie „webhook“ (Atvirkštinis nurašymas)",
             "mollie_refund_started": "Mollie grąžinimo procesas pradėtas",
             "mollie_subscription_started": "Mollie prenumerata pradėta",
             "mollie_subscription_ended": "Mollie prenumerata įvykdyta",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": "Mollie prenumerata atnaujinta",
             "mollie_subscription_skipped": "Mollie prenumerata praleista",
             "mollie_subscription_renewed": "Mollie prenumerata atnaujinta",
-            "mollie_subscription_renewal_reminder": "Mollie priminimas apie prenumeratos atnaujinimą"
+            "mollie_subscription_renewal_reminder": "Mollie priminimas apie prenumeratos atnaujinimą",
+            "mollie_subscription_priceChangeNotice": "Mollie prenumerata kainos pakeitimas"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Mollie prenumeratos",
                 "description": "Valdyti pasikartojančius mokėjimus dar niekada nebuvo taip paprasta – padės mūsų naudingos funkcijos. Pakelkite savo verslą į kitą lygį naudodami efektyvias stebėjimo galimybes, paprastą integravimą ir dar daugiau. Naudodami Mollie prenumeratas, galite lengvai kurti prenumeruojamus produktus ir suplanuoti periodinius mokėjimus taip, kad jie būtų vykdomi nustatytu dažniu ir laikotarpiu.",
                 "mollieSubscriptionProduct": "Prenumeratos produktas",
+                "mollieAllowOneTime": "Siūlyti ir kaip vienkartinį pirkimą",
+                "mollieAllowOneTimeHelp": "Produkto puslapyje rodo papildomą mygtuką „Įdėti į krepšelį\", kad produktą būtų galima įsigyti be prenumeratos.",
                 "mollieSubscriptionIntervalAmount": "Kartoti mokėjimą kas",
                 "mollieSubscriptionIntervalType": "Intervalo vienetas",
                 "mollieSubscriptionRepetitionAmount": "Pasikartojimų skaičius",
@@ -501,9 +506,9 @@
             "canceled": "Atšaukta",
             "expired": "Nebegalioja",
             "partiallyRefunded": "Grąžinta (dalinai)",
-            "orderSuccess": "Užsakymas sėkmingas",
-            "orderFailed": "Užsakymas nepavyko",
-            "orderCanceled": "Užsakymas atšauktas"
+            "payment": "Mokėjimas",
+            "success": "Sėkmė",
+            "priceChangeNotice": "Kainos pakeitimas"
         }
     }
 }

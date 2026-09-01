@@ -39,6 +39,8 @@ final class TaxFixture extends AbstractFixture
         $upsertData[] = $this->getTaxData('Standard tax rate (19%)', 19);
         $upsertData[] = $this->getTaxData('Reduced tax rate (7%)', 7);
         $upsertData[] = $this->getTaxData('Free tax rate (0%)', 0);
+        $upsertData[] = $this->getTaxData('Reduced tax rate (9%)', 9);
+        $upsertData[] = $this->getTaxData('Increased tax rate (21%)', 21);
         $this->taxRepository->upsert($upsertData, $context);
     }
 
@@ -48,6 +50,8 @@ final class TaxFixture extends AbstractFixture
             ['id' => Uuid::fromStringToHex('tax-19')],
             ['id' => Uuid::fromStringToHex('tax-7')],
             ['id' => Uuid::fromStringToHex('tax-0')],
+            ['id' => Uuid::fromStringToHex('tax-9')],
+            ['id' => Uuid::fromStringToHex('tax-21')],
         ];
         $this->taxRepository->delete($taxes, $context);
     }

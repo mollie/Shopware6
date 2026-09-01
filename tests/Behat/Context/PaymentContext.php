@@ -43,5 +43,7 @@ final class PaymentContext extends ShopwareContext
         }
 
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . $configKey, $configValue);
+
+        $this->getContainer()->get(SettingsService::class)->clearCache();
     }
 }

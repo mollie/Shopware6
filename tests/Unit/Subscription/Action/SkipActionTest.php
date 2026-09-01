@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Subscription\Action;
 
+use Mollie\Shopware\Component\Mollie\IntervalUnit;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\Action\Exception\NextPaymentAtNotFoundException;
@@ -72,6 +73,44 @@ final class SkipActionTest extends TestCase
         $this->assertNull($payload['canceledAt']);
         $this->assertSame('skipped', $payload['historyEntries'][0]['comment']);
         $this->assertSame(self::NEW_MOLLIE_ID, $payload['historyEntries'][0]['mollieId']);
+    }
+
+    public function testTheReplacementSubscriptionStartsOneIntervalAfterTheSkippedCharge(): void
+    {
+        $nextPaymentDate = new \DateTimeImmutable('+30 days');
+
+        $copyCall = $this->skipAndCaptureCopyCall($nextPaymentDate);
+
+        $this->assertSame($nextPaymentDate->modify('+1 month')->format('Y-m-d'), $copyCall['startDate']);
+    }
+
+    public function testTheReplacementSubscriptionNeverStartsOnTheDateTheOriginalBeganOn(): void
+    {
+        $nextPaymentDate = new \DateTimeImmutable('+30 days');
+        $original = MollieSubscriptionBuilder::create()->withNextPaymentDate($nextPaymentDate)->build();
+
+        $copyCall = $this->skipAndCaptureCopyCall($nextPaymentDate);
+
+        $this->assertNotSame($original->getStartDate()->format('Y-m-d'), $copyCall['startDate']);
+    }
+
+    public function testTheReplacementSubscriptionStartsInTheFutureSoNoChargeIsTakenRightAway(): void
+    {
+        // At Mollie the start date decides when money is actually taken, so a date in the
+        // past means the customer is charged at the next possible moment - the opposite of
+        // what skipping is meant to do.
+        $copyCall = $this->skipAndCaptureCopyCall(new \DateTimeImmutable('+30 days'));
+
+        $this->assertGreaterThan((new \DateTimeImmutable())->format('Y-m-d'), $copyCall['startDate']);
+    }
+
+    public function testTheSkippedChargeFollowsTheSubscriptionsOwnInterval(): void
+    {
+        $nextPaymentDate = new \DateTimeImmutable('+30 days');
+
+        $copyCall = $this->skipAndCaptureCopyCall($nextPaymentDate, 14, IntervalUnit::DAYS);
+
+        $this->assertSame($nextPaymentDate->modify('+14 days')->format('Y-m-d'), $copyCall['startDate']);
     }
 
     public function testExecuteSchedulesDeferredSkipWhenOutsideCancelWindow(): void
@@ -218,6 +257,46 @@ final class SkipActionTest extends TestCase
     public function testActionNameIsSkip(): void
     {
         $this->assertSame('skip', SkipAction::getActioName());
+    }
+
+    /**
+     * Runs an immediate skip and returns the recorded copySubscription call. Mollie has no
+     * skip endpoint: the charge is only skipped because the replacement subscription starts
+     * one interval later, so that start date is what these tests assert.
+     *
+     * @return array<string, mixed>
+     */
+    private function skipAndCaptureCopyCall(\DateTimeInterface $nextPaymentDate, int $intervalValue = 1, IntervalUnit $intervalUnit = IntervalUnit::MONTHS): array
+    {
+        $context = Context::createDefaultContext();
+        $repository = $this->prepareRepositoryWithSubscription();
+        $gateway = new FakeSubscriptionGateway();
+
+        $oldMollieSubscription = MollieSubscriptionBuilder::create()
+            ->withId(self::OLD_MOLLIE_ID)
+            ->withStatus(SubscriptionStatus::ACTIVE)
+            ->withInterval($intervalValue, $intervalUnit)
+            ->withNextPaymentDate($nextPaymentDate)
+            ->build()
+        ;
+        $gateway->register($oldMollieSubscription);
+        $gateway->setCopyResponse(
+            MollieSubscriptionBuilder::create()
+                ->withId(self::NEW_MOLLIE_ID)
+                ->withStatus(SubscriptionStatus::ACTIVE)
+                ->withNextPaymentDate(new \DateTime('+60 days'))
+                ->build()
+        );
+
+        (new SkipAction($repository, $gateway, new NullLogger()))->execute(
+            $this->loadSubscriptionData($repository, $context),
+            new SubscriptionSettings(enabled: true, allowPauseAndResume: true, cancelDays: 5),
+            $oldMollieSubscription,
+            self::ORDER_NUMBER,
+            $context
+        );
+
+        return $gateway->getCalls('copySubscription')[0];
     }
 
     private function prepareRepositoryWithSubscription(): FakeSubscriptionRepository

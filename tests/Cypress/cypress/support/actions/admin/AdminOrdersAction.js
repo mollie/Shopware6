@@ -38,7 +38,12 @@ export default class AdminOrdersAction {
      */
     openMollieTab() {
         repoOrdersDetails.getMollieTab().click();
-        cy.wait(1000);
+
+        // The tab renders an <sw-skeleton> while it fetches the Mollie order, then swaps in its
+        // content. A fixed cy.wait() is too short on the resource-constrained CI, so wait for the
+        // skeleton to disappear and the payment card to render before callers query the tab.
+        repoOrdersDetails.getMollieTabLoadingSkeleton({timeout: 20000}).should('not.exist');
+        repoOrdersDetails.getMollieTabContent({timeout: 20000}).should('be.visible');
     }
 
     /**
@@ -117,11 +122,19 @@ export default class AdminOrdersAction {
             repoOrdersDetails.getOrderDetailsTab().click();
         }
 
+        // the order detail page grew taller, so the tracking-code input (and the "add" popover entry
+        // it reveals) can sit below the fold. scroll it into view before interacting, and force the
+        // add-button click since the popover entry may still be partly outside the viewport.
+        repoOrdersDetails.getTrackingCode(trackingCode).scrollIntoView();
         repoOrdersDetails.getTrackingCode(trackingCode).type(trackingCode, forceOption);
-        repoOrdersDetails.getTrackingCodeAddButton().click();
+        repoOrdersDetails.getTrackingCodeAddButton().click(forceOption);
 
         cy.wait(1000);
 
+        // Shopware auto-saves the order in the background after adding the tracking code, which
+        // briefly disables the save button. On the resource-constrained CI this save can still be
+        // running here, so wait for the button to be enabled again before clicking it.
+        repoOrdersDetails.getSaveButton().should('not.be.disabled');
         repoOrdersDetails.getSaveButton().click();
 
         if (shopware.isVersionGreaterEqual('6.5')) {

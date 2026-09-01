@@ -64,6 +64,17 @@ final class Money implements \JsonSerializable
         return $this->value;
     }
 
+    /**
+     * @param array<mixed> $data Mollie amount shape: {value: string, currency: string}
+     */
+    public static function fromArray(array $data, string $fallbackCurrency = ''): self
+    {
+        return new self(
+            (float) ($data['value'] ?? 0.0),
+            (string) ($data['currency'] ?? $fallbackCurrency),
+        );
+    }
+
     public static function fromOrder(OrderEntity $order, CurrencyEntity $currency): self
     {
         $value = $order->getAmountTotal();

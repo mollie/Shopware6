@@ -8,7 +8,6 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Locale;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
@@ -59,12 +58,7 @@ final class ConfigRoute
 
     private function resolveLocale(SalesChannelContext $context): string
     {
-        $customer = $context->getCustomer();
-        if ($customer instanceof CustomerEntity) {
-            $languageId = $customer->getLanguageId();
-        } else {
-            $languageId = $context->getSalesChannel()->getLanguageId();
-        }
+        $languageId = $context->getCustomer()?->getLanguageId() ?? $context->getSalesChannel()->getLanguageId();
 
         $criteria = new Criteria([$languageId]);
         $criteria->addAssociation('locale');

@@ -81,11 +81,7 @@ final class PaymentMethodRouteCacheKeySubscriber implements EventSubscriberInter
     {
         $paymentSettings = $this->settingsService->getPaymentSettings($context->getSalesChannelId());
 
-        if ($paymentSettings->useMollieLimits()) {
-            $parts[] = 'with-limits';
-        } else {
-            $parts[] = 'without-limits';
-        }
+        $parts[] = $paymentSettings->useMollieLimits() ? 'with-limits' : 'without-limits';
 
         return $parts;
     }
@@ -97,11 +93,8 @@ final class PaymentMethodRouteCacheKeySubscriber implements EventSubscriberInter
      */
     private function addSubscriptionKey(Cart $cart, array $parts): array
     {
-        if ($this->lineItemAnalyzer->hasSubscriptionProduct($cart->getLineItems())) {
-            $parts[] = 'with-subscription';
-        } else {
-            $parts[] = 'without-subscription';
-        }
+        $hasSubscription = $this->lineItemAnalyzer->hasSubscriptionProduct($cart->getLineItems());
+        $parts[] = $hasSubscription ? 'with-subscription' : 'without-subscription';
 
         return $parts;
     }

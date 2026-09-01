@@ -6,10 +6,19 @@ namespace Mollie\Shopware\Component\Mollie;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 use Shopware\Core\Framework\Struct\Struct;
+use Shopware\Core\Framework\Struct\VariablesAccessTrait;
 
 final class Payment extends Struct implements \JsonSerializable
 {
     use JsonSerializableTrait;
+    // Both traits resolve get_object_vars() in this class scope, so getVars() reports the same
+    // private properties that jsonSerialize() emits. Shopware's JsonEntityEncoder looks every
+    // serialized key up in getVars() and warns about undefined array keys otherwise.
+    use VariablesAccessTrait;
+
+    private const MOLLIE_ID_SEPARATOR = '_';
+    private const EXPORT_ID_SEPARATOR = '-';
+    private const EXPORT_ID_DELIMITER = ', ';
 
     private PaymentStatus $status;
     private OrderTransactionEntity $shopwareTransaction;
@@ -33,6 +42,7 @@ final class Payment extends Struct implements \JsonSerializable
 
     private string $finalizeUrl = '';
     private int $countPayments = 1;
+    private bool $reconciled = false;
     private string $changePaymentStateUrl;
 
     private ?string $authenticationId = null;
@@ -53,13 +63,46 @@ final class Payment extends Struct implements \JsonSerializable
 
     private Money $amountRefunded;
 
+    private ?Money $amountChargedBack = null;
+
+    private float $voucherAmount = 0.0;
+
+    private float $roundingDiff = 0.0;
+
     private RefundCollection $refunds;
+
+    /**
+     * The refund, capture and shipment ids of this payment. toArray() merges each list into a single
+     * string in the format an accounting export (DATEV) needs - a hyphen instead of the Mollie
+     * underscore - so they end up in the mollie_payments custom fields of the order and the
+     * transaction whenever the payment is saved.
+     *
+     * @var list<string>
+     */
+    private array $refundIds = [];
+
+    /**
+     * @var list<string>
+     */
+    private array $captureIds = [];
+
+    /**
+     * @var list<string>
+     */
+    private array $shipmentIds = [];
 
     private bool $cancelable = false;
 
     private ?string $orderId = null;
 
-    public function __construct(private string $id)
+    /**
+     * Set for "pay by link" transactions: the Mollie payment link id created before an actual
+     * payment exists. Persisted alongside the regular payment data on the transaction so the
+     * return/webhook flow can resolve the real payment via the payment link.
+     */
+    private ?string $paymentLinkId = null;
+
+    public function __construct(private string $id = '')
     {
         $this->refunds = new RefundCollection();
     }
@@ -107,6 +150,16 @@ final class Payment extends Struct implements \JsonSerializable
     public function setCountPayments(int $countPayments): void
     {
         $this->countPayments = $countPayments;
+    }
+
+    public function isReconciled(): bool
+    {
+        return $this->reconciled;
+    }
+
+    public function setReconciled(bool $reconciled): void
+    {
+        $this->reconciled = $reconciled;
     }
 
     public function getShopwareTransaction(): OrderTransactionEntity
@@ -302,99 +355,9 @@ final class Payment extends Struct implements \JsonSerializable
      */
     public static function createFromClientResponse(array $body): self
     {
-        $payment = new self($body['id']);
-        $paymentMethod = PaymentMethod::tryFrom($body['method'] ?? '');
-        $payment->setStatus(PaymentStatus::from($body['status']));
-        $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
-        $checkoutUrl = $body['_links']['checkout']['href'] ?? null;
-        $changePaymentStateUrl = $body['_links']['changePaymentState']['href'] ?? null;
-        $customerId = $body['customerId'] ?? null;
-        $mandateId = $body['mandateId'] ?? null;
-        $profileId = $body['profileId'] ?? null;
-        $createdAt = $body['createdAt'] ?? null;
-        $subscriptionId = $body['subscriptionId'] ?? null;
-        $capturedAmount = $body['amountCaptured'] ?? null;
-        $amountRemaining = $body['amountRemaining'] ?? null;
-        $amount = $body['amount'] ?? null;
-        $amountRefunded = $body['amountRefunded'] ?? null;
+        $hydrator = new PaymentHydrator();
 
-        if ($paymentMethod !== null) {
-            $payment->setMethod($paymentMethod);
-        }
-        if ($thirdPartyPaymentId !== null) {
-            $payment->setThirdPartyPaymentId($thirdPartyPaymentId);
-        }
-        if ($checkoutUrl !== null) {
-            $payment->setCheckoutUrl($checkoutUrl);
-        }
-        if ($changePaymentStateUrl !== null) {
-            $payment->setChangePaymentStateUrl($changePaymentStateUrl);
-        }
-        if ($customerId !== null) {
-            $payment->setCustomerId($customerId);
-        }
-        if ($mandateId !== null) {
-            $payment->setMandateId($mandateId);
-        }
-        if ($profileId !== null) {
-            $payment->setProfileId($profileId);
-        }
-        if ($createdAt !== null) {
-            $createdAtDate = \DateTime::createFromFormat(\DateTimeInterface::ATOM, $createdAt);
-            if ($createdAtDate instanceof \DateTimeInterface) {
-                $payment->setCreatedAt($createdAtDate);
-            }
-        }
-
-        if ($subscriptionId !== null) {
-            $payment->setSubscriptionId($subscriptionId);
-        }
-
-        if ($capturedAmount !== null) {
-            $payment->setCapturedAmount(new Money((float) $capturedAmount['value'], $capturedAmount['currency']));
-        }
-
-        if ($amountRemaining !== null) {
-            $payment->setAmountRemaining(new Money((float) $amountRemaining['value'], $amountRemaining['currency']));
-        }
-        if ($amount !== null) {
-            $payment->setAmount(new Money((float) $amount['value'], $amount['currency']));
-        }
-        $payment->setAmountRefunded(new Money(
-            (float) ($amountRefunded['value'] ?? 0.0),
-            (string) ($amountRefunded['currency'] ?? $amount['currency'] ?? ''),
-        ));
-
-        $payment->setCancelable((bool) ($body['isCancelable'] ?? false));
-
-        $cardLabel = $body['details']['cardLabel'] ?? null;
-        if ($cardLabel !== null) {
-            $payment->setCreditCardLabel((string) $cardLabel);
-            $payment->setCreditCardNumber((string) ($body['details']['cardNumber'] ?? ''));
-            $payment->setCreditCardHolder((string) ($body['details']['cardHolder'] ?? ''));
-        }
-
-        $paypalPayerId = $body['details']['paypalPayerId'] ?? null;
-        if ($paypalPayerId !== null) {
-            $payment->setPaypalPayerId((string) $paypalPayerId);
-        }
-
-        $bankAccount = $body['details']['bankAccount'] ?? null;
-        if ($bankAccount !== null) {
-            $payment->setBankName((string) ($body['details']['bankName'] ?? ''));
-            $payment->setBankAccount((string) $bankAccount);
-            $payment->setBankBic((string) ($body['details']['bankBic'] ?? ''));
-            $payment->setTransferReference((string) ($body['details']['transferReference'] ?? ''));
-            $payment->setConsumerName((string) ($body['details']['consumerName'] ?? ''));
-            $payment->setConsumerAccount((string) ($body['details']['consumerAccount'] ?? ''));
-            $payment->setConsumerBic((string) ($body['details']['consumerBic'] ?? ''));
-        }
-
-        foreach ($body['_embedded']['refunds'] ?? [] as $refundData) {
-            $payment->refunds->add(Refund::createFromClientResponse($refundData));
-        }
-
-        return $payment;
+        return $hydrator->hydrate($body);
     }
 
     public function getSubscriptionId(): ?string
@@ -458,12 +421,32 @@ final class Payment extends Struct implements \JsonSerializable
     }
 
     /**
+     * The Shopware transaction is left out: it carries this payment as its own extension, so keeping it
+     * would make the structure recursive, and no consumer of the payment data needs it.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $vars = get_object_vars($this);
+        unset($vars['shopwareTransaction']);
+        $this->convertDateTimePropertiesToJsonStringRepresentation($vars);
+
+        return $vars;
+    }
+
+    /**
      * @return array<mixed>
      */
     public function toArray(): array
     {
         $data = json_decode((string) json_encode($this), true);
-        unset($data['shopwareTransaction']);
+
+        // An accounting export reads a single value per column, so the lists are merged here instead
+        // of being written as arrays.
+        $data['refundIds'] = self::toExportIds($this->refundIds);
+        $data['captureIds'] = self::toExportIds($this->captureIds);
+        $data['shipmentIds'] = self::toExportIds($this->shipmentIds);
 
         return array_filter($data);
     }
@@ -486,6 +469,16 @@ final class Payment extends Struct implements \JsonSerializable
     public function setOrderId(?string $orderId): void
     {
         $this->orderId = $orderId;
+    }
+
+    public function getPaymentLinkId(): ?string
+    {
+        return $this->paymentLinkId;
+    }
+
+    public function setPaymentLinkId(?string $paymentLinkId): void
+    {
+        $this->paymentLinkId = $paymentLinkId;
     }
 
     public function getAuthenticationId(): ?string
@@ -541,5 +534,171 @@ final class Payment extends Struct implements \JsonSerializable
     public function getRefunds(): RefundCollection
     {
         return $this->refunds;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getRefundIds(): array
+    {
+        return $this->refundIds;
+    }
+
+    /**
+     * @param list<string> $refundIds
+     */
+    public function setRefundIds(array $refundIds): void
+    {
+        $this->refundIds = $refundIds;
+    }
+
+    public function addRefundId(string $mollieRefundId): void
+    {
+        $this->refundIds[] = $mollieRefundId;
+    }
+
+    public function removeRefundId(string $mollieRefundId): void
+    {
+        $exportId = self::toExportId($mollieRefundId);
+
+        $this->refundIds = array_values(array_filter(
+            $this->refundIds,
+            function (string $id) use ($exportId): bool {
+                return self::toExportId($id) !== $exportId;
+            }
+        ));
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getCaptureIds(): array
+    {
+        return $this->captureIds;
+    }
+
+    /**
+     * @param list<string> $captureIds
+     */
+    public function setCaptureIds(array $captureIds): void
+    {
+        $this->captureIds = $captureIds;
+    }
+
+    public function addCaptureId(string $mollieCaptureId): void
+    {
+        $this->captureIds[] = $mollieCaptureId;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getShipmentIds(): array
+    {
+        return $this->shipmentIds;
+    }
+
+    /**
+     * @param list<string> $shipmentIds
+     */
+    public function setShipmentIds(array $shipmentIds): void
+    {
+        $this->shipmentIds = $shipmentIds;
+    }
+
+    public function addShipmentId(string $mollieShipmentId): void
+    {
+        $this->shipmentIds[] = $mollieShipmentId;
+    }
+
+    public function getAmountChargedBack(): ?Money
+    {
+        return $this->amountChargedBack;
+    }
+
+    public function setAmountChargedBack(Money $amountChargedBack): void
+    {
+        $this->amountChargedBack = $amountChargedBack;
+    }
+
+    public function getVoucherAmount(): float
+    {
+        return $this->voucherAmount;
+    }
+
+    public function setVoucherAmount(float $voucherAmount): void
+    {
+        $this->voucherAmount = $voucherAmount;
+    }
+
+    public function getRoundingDiff(): float
+    {
+        return $this->roundingDiff;
+    }
+
+    public function setRoundingDiff(float $roundingDiff): void
+    {
+        $this->roundingDiff = $roundingDiff;
+    }
+
+    /**
+     * The Mollie Payments API has no dedicated chargeback status. A charged back payment keeps
+     * its "paid" status and only exposes a positive "amountChargedBack" value instead.
+     */
+    public function hasChargeback(): bool
+    {
+        return $this->amountChargedBack !== null && $this->amountChargedBack->getValue() > 0.0;
+    }
+
+    public function hasRefund(): bool
+    {
+        return isset($this->amountRefunded) && $this->amountRefunded->getValue() > 0.0;
+    }
+
+    public function isFullyRefunded(): bool
+    {
+        return $this->hasRefund()
+            && $this->amountRemaining !== null
+            && $this->amountRemaining->getValue() <= 0.0;
+    }
+
+    public function isPartiallyRefunded(): bool
+    {
+        return $this->hasRefund() && ! $this->isFullyRefunded();
+    }
+
+    /**
+     * The amount Mollie still accepts for a refund. Mollie can only refund money that has actually
+     * been captured, so for manual capture methods (e.g. Klarna) a partially captured or released
+     * authorization is the real ceiling - not the order total. "amountRemaining" already accounts
+     * for existing refunds and is only returned for paid payments; the captured amount is the
+     * fallback. Null means Mollie reported no ceiling, so the caller must not cap the amount.
+     */
+    public function getRefundableAmount(): ?float
+    {
+        if ($this->amountRemaining !== null) {
+            return $this->amountRemaining->getValue();
+        }
+
+        if ($this->capturedAmount === null || $this->capturedAmount->getValue() <= 0.0) {
+            return null;
+        }
+
+        $refunded = isset($this->amountRefunded) ? $this->amountRefunded->getValue() : 0.0;
+
+        return $this->capturedAmount->getValue() - $refunded;
+    }
+
+    /**
+     * @param list<string> $mollieIds
+     */
+    private static function toExportIds(array $mollieIds): string
+    {
+        return implode(self::EXPORT_ID_DELIMITER, array_map(self::toExportId(...), $mollieIds));
+    }
+
+    private static function toExportId(string $mollieId): string
+    {
+        return str_replace(self::MOLLIE_ID_SEPARATOR, self::EXPORT_ID_SEPARATOR, $mollieId);
     }
 }

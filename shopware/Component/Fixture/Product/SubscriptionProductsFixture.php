@@ -58,30 +58,41 @@ final class SubscriptionProductsFixture extends AbstractFixture
         $customFieldsDaily = [
             'mollie_payments_product_subscription_enabled' => true,
             'mollie_payments_product_subscription_interval' => 1,
-            'mollie_payments_product_subscription_interval_unit' => 'days'
+            'mollie_payments_product_subscription_interval_unit' => 'days',
+            'mollie_payments_product_subscription_allow_onetime' => false
         ];
 
         $customFieldsWeekly = [
             'mollie_payments_product_subscription_enabled' => true,
             'mollie_payments_product_subscription_interval' => 1,
-            'mollie_payments_product_subscription_interval_unit' => 'weeks'
+            'mollie_payments_product_subscription_interval_unit' => 'weeks',
+            'mollie_payments_product_subscription_allow_onetime' => false
         ];
         $customFieldsMonthly = [
             'mollie_payments_product_subscription_enabled' => true,
             'mollie_payments_product_subscription_interval' => 1,
-            'mollie_payments_product_subscription_interval_unit' => 'months'
+            'mollie_payments_product_subscription_interval_unit' => 'months',
+            'mollie_payments_product_subscription_allow_onetime' => false
         ];
 
         $customFieldsThreeWeekly = [
             'mollie_payments_product_subscription_enabled' => true,
             'mollie_payments_product_subscription_interval' => 3,
-            'mollie_payments_product_subscription_interval_unit' => 'weeks'
+            'mollie_payments_product_subscription_interval_unit' => 'weeks',
+            'mollie_payments_product_subscription_allow_onetime' => false
         ];
         $customFieldsDailyRepetition = [
             'mollie_payments_product_subscription_enabled' => true,
             'mollie_payments_product_subscription_interval' => 1,
             'mollie_payments_product_subscription_interval_unit' => 'days',
-            'mollie_payments_product_subscription_repetition' => '10'
+            'mollie_payments_product_subscription_repetition' => '10',
+            'mollie_payments_product_subscription_allow_onetime' => false
+        ];
+        $customFieldsDailyOnetime = [
+            'mollie_payments_product_subscription_enabled' => true,
+            'mollie_payments_product_subscription_interval' => 1,
+            'mollie_payments_product_subscription_interval_unit' => 'days',
+            'mollie_payments_product_subscription_allow_onetime' => true
         ];
         $parentId = $this->getProductId('MOL_SUB_6');
         $options = $this->getSubscriptionOptions();
@@ -92,6 +103,7 @@ final class SubscriptionProductsFixture extends AbstractFixture
         $productData[] = $this->getProductData('Subscription (3x Weekly)', 'MOL_SUB_3', $description, $mediaId, $category, $salesChannelId, 29.00, customFields: $customFieldsThreeWeekly);
         $productData[] = $this->getProductData('Subscription (1x Monthly)', 'MOL_SUB_4', $description, $mediaId, $category, $salesChannelId, 19.90, customFields: $customFieldsMonthly);
         $productData[] = $this->getProductData('Subscription (1x Daily, 10 Times)', 'MOL_SUB_5', $description, $mediaId, $category, $salesChannelId, 19.90, customFields: $customFieldsDailyRepetition);
+        $productData[] = $this->getProductData('Subscription (1x Daily, Onetime allowed)', 'MOL_SUB_7', $description, $mediaId, $category, $salesChannelId, 19.00, customFields: $customFieldsDailyOnetime);
         $productData[] = $this->getProductData('Subscription Variant', 'MOL_SUB_6', $description, $mediaId, $category, $salesChannelId, 19.90, options: $options);
 
         $productData[] = $this->getProductData('Regular Child', 'MOL_SUB_6.1', $description, $mediaId, $category, $salesChannelId, 19.90, parentId: $parentId, options: [['id' => $this->getOptionId('regular')]]);
@@ -110,6 +122,7 @@ final class SubscriptionProductsFixture extends AbstractFixture
             ['id' => $this->getProductId('MOL_SUB_3')],
             ['id' => $this->getProductId('MOL_SUB_4')],
             ['id' => $this->getProductId('MOL_SUB_5')],
+            ['id' => $this->getProductId('MOL_SUB_7')],
             ['id' => $this->getProductId('MOL_SUB_6')],
             ['id' => $this->getProductId('MOL_SUB_6.1')],
             ['id' => $this->getProductId('MOL_SUB_6.2')],

@@ -6,6 +6,8 @@ namespace Mollie\Shopware\Component\Payment\PayPalExpress\Route;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Session;
+use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractCartBackupService;
+use Mollie\Shopware\Component\Payment\ExpressMethod\CartBackupService;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Payment\PaymentMethodRepository;
 use Mollie\Shopware\Component\Payment\PaymentMethodRepositoryInterface;
@@ -32,6 +34,8 @@ final class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
         #[Autowire(service: SessionGateway::class)]
         private SessionGatewayInterface $sessionGateway,
         private CartService $cartService,
+        #[Autowire(service: CartBackupService::class)]
+        private AbstractCartBackupService $cartBackupService,
     ) {
     }
 
@@ -62,7 +66,9 @@ final class CancelCheckoutRoute extends AbstractCancelCheckoutRoute
             throw PaypalExpressException::cartSessionIdIsEmpty();
         }
         $cart->removeExtension(Mollie::EXTENSION);
-        $this->cartService->recalculate($cart, $salesChannelContext);
+
+        $this->cartBackupService->restoreCart($salesChannelContext);
+        $this->cartBackupService->clearBackup($salesChannelContext);
 
         try {
             $this->sessionGateway->cancelSession($cartExtension->getId(), $salesChannelContext);

@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Абонамент | Mollie Абонаменти"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Поръчката е успешна",
-            "mollie_checkout_order_failed": " Поръчката не е успешна",
-            "mollie_checkout_order_canceled": " Поръчката е отказана",
+            "mollie_payment_success": " Поръчката е успешна",
+            "mollie_payment_failed": " Поръчката не е успешна",
+            "mollie_payment_cancelled": " Поръчката е отказана",
             "mollie_webhook_received_All": " Получен е Mollie уебхук (Всички)",
+            "mollie_webhook_received_status_open": " Получен е Mollie уебхук (Отворен)",
             "mollie_webhook_received_status_authorized": " Получен е уебхук на Mollie (Разрешен)",
             "mollie_webhook_received_status_failed": " Получен е Mollie уебхук (Неуспешно)",
             "mollie_webhook_received_status_canceled": " Получен е Mollie уебхук (Отказан)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Получен е Mollie уебхук (Завършен)",
             "mollie_webhook_received_status_refunded": " Получен е Mollie уебхук (Възстановена сума)",
             "mollie_webhook_received_status_partially_refunded": " Получен е Mollie уебхук (Частично възстановена сума)",
+            "mollie_webhook_received_status_chargeback": " Получен е Mollie уебхук (Сторниране)",
             "mollie_refund_started": " Започнато Mollie възстановяване на сума",
             "mollie_subscription_started": " Mollie абонамент е започнат",
             "mollie_subscription_ended": " Mollie абонамент е завършен",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": " Mollie абонамент е възобновен",
             "mollie_subscription_skipped": " Mollie абонамент е пропуснат",
             "mollie_subscription_renewed": " Mollie абонамент е подновен",
-            "mollie_subscription_renewal_reminder": " Mollie напомняне за подновяване на абонамент"
+            "mollie_subscription_renewal_reminder": " Mollie напомняне за подновяване на абонамент",
+            "mollie_subscription_priceChangeNotice": " Mollie абонамент промяна на цената"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Mollie Абонаменти",
                 "description": "Управлението на вашите периодични плащания е по-лесно от всякога с нашите полезни функции. Издигнете бизнеса си на следващо ниво с ефективни възможности за проследяване, лесни интеграции и още. С абонаментите на Mollie, можете лесно да създавате абонаментни продукти и да планирате периодични плащания, които да се извършват в зададения интервал и период.",
                 "mollieSubscriptionProduct": "Абонаментен продукт",
+                "mollieAllowOneTime": "Предлага се и като еднократна покупка",
+                "mollieAllowOneTimeHelp": "Показва допълнителен бутон „Добавяне в количката“ на продуктовата страница, за да може продуктът да се купи без абонамент.",
                 "mollieSubscriptionIntervalAmount": "Повторение на плащането всеки",
                 "mollieSubscriptionIntervalType": "Интервална единица",
                 "mollieSubscriptionRepetitionAmount": "Броят на повторенията",
@@ -501,9 +506,9 @@
             "canceled": "Отказан",
             "expired": "Изтекъл",
             "partiallyRefunded": "Възстановена сума (частично)",
-            "orderSuccess": "Поръчка успешна",
-            "orderFailed": "Поръчка неуспешна",
-            "orderCanceled": "Поръчката е отказана"
+            "payment": "Плащане",
+            "success": "Успех",
+            "priceChangeNotice": "Промяна на цената"
         }
     }
 }

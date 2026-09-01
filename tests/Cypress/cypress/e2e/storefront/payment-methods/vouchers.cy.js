@@ -90,12 +90,6 @@ describe('Voucher Payments', () => {
 
                 beforeEach(device);
 
-                // hiding of payment methods does not work
-                // belo Shopware 6.4 in the way we have to do it (Storefront + API), so it's not supported
-                if (shopware.isVersionLower(6.4)) {
-                    return;
-                }
-
                 scenarioDummyUser.execute();
                 mollieProductsAction.openRegularProduct();
                 pdpAction.addToCart(1);

@@ -45,6 +45,8 @@ final class TransactionService implements TransactionServiceInterface
 
     public function findById(string $transactionId, Context $context): TransactionDataStruct
     {
+        $transactionId = strtolower($transactionId);
+
         $criteria = new Criteria([$transactionId]);
         $criteria->addAssociation('order.orderCustomer.salutation');
         $criteria->addAssociation('order.orderCustomer.customer.salutation');
@@ -61,7 +63,12 @@ final class TransactionService implements TransactionServiceInterface
         $criteria->addAssociation('order.lineItems.product.media');
         $criteria->addAssociation('order.stateMachineState.stateMachine');
         $criteria->addAssociation('order.mollieSubscriptions');
-        $criteria->addAssociation('order.transactions');
+        // Load all order transactions together with their state so WebhookRoute can check whether the
+        // order already has a paid transaction and skip status updates on already paid orders.
+        $criteria->addAssociation('order.transactions.stateMachineState');
+        // Load the state of the transaction itself so WebhookRoute can skip the payment status
+        // transition when the transaction is already in the target state.
+        $criteria->addAssociation('stateMachineState');
         $criteria->addAssociation('paymentMethod');
 
         $searchResult = $this->orderTransactionRepository->search($criteria, $context);
@@ -90,10 +97,6 @@ final class TransactionService implements TransactionServiceInterface
             $firstDeliveryLine = $order->getPrimaryOrderDelivery();
         }
 
-        if (! $firstDeliveryLine instanceof OrderDeliveryEntity) {
-            throw TransactionDataException::orderWithoutDeliveries($order->getId());
-        }
-
         $language = $order->getLanguage();
         /** @phpstan-ignore identical.alwaysFalse */
         if ($language === null) {
@@ -105,13 +108,20 @@ final class TransactionService implements TransactionServiceInterface
             throw TransactionDataException::orderWithoutCurrency($order->getId());
         }
 
-        $shippingOrderAddress = $firstDeliveryLine->getShippingOrderAddress();
-        if (! $shippingOrderAddress instanceof OrderAddressEntity) {
-            throw TransactionDataException::orderDeliveryWithoutShippingAddress($order->getId(), $firstDeliveryLine->getId());
-        }
         $billingAddress = $order->getBillingAddress();
         if (! $billingAddress instanceof OrderAddressEntity) {
             throw TransactionDataException::orderWithoutBillingAddress($order->getId());
+        }
+
+        // Digital orders (e.g. downloadable products) have no delivery and therefore no shipping
+        // address. Fall back to the billing address so the Mollie payload stays valid.
+        $shippingOrderAddress = $billingAddress;
+        if ($firstDeliveryLine instanceof OrderDeliveryEntity) {
+            $deliveryShippingAddress = $firstDeliveryLine->getShippingOrderAddress();
+            if (! $deliveryShippingAddress instanceof OrderAddressEntity) {
+                throw TransactionDataException::orderDeliveryWithoutShippingAddress($order->getId(), $firstDeliveryLine->getId());
+            }
+            $shippingOrderAddress = $deliveryShippingAddress;
         }
         $orderCustomer = $order->getOrderCustomer();
         if (! $orderCustomer instanceof OrderCustomerEntity) {
@@ -139,19 +149,41 @@ final class TransactionService implements TransactionServiceInterface
     {
         $salesChannel = $order->getSalesChannelId();
         $orderNumber = $order->getOrderNumber();
+        $paymentData = $payment->toArray();
 
         $this->logger->debug('Save payment information in Order Transaction', [
             'transactionId' => $transactionId,
-            'data' => $payment->toArray(),
+            'data' => $paymentData,
             'orderNumber' => $orderNumber,
             'salesChannelId' => $salesChannel,
         ]);
 
+        // External ERP integrations read these fixed keys (order_id, payment_id, third_party_payment_id)
+        // from the custom fields: the JTL connector from the order, ManiacSeller from the transaction.
+        // Map the camelCase payment data onto them on both entities so the exports find the values.
+        $legacyPaymentData = $paymentData;
+        $legacyPaymentData['order_id'] = $payment->getOrderId() ?? '';
+        $legacyPaymentData['payment_id'] = $payment->getId();
+        $legacyPaymentData['third_party_payment_id'] = $payment->getThirdPartyPaymentId();
+        // Shopware allows 4 decimals per currency while Mollie allows only 2, so the line items can
+        // differ from the order total by a rounding amount that is not a Shopware line item. Persist it
+        // so the shipment capture can add it to the (Payments API) capture on the first shipment.
+        $legacyPaymentData['rounding_diff'] = $payment->getRoundingDiff();
+
+        $orderCustomFields = $order->getCustomFields() ?? [];
+        $orderCustomFields[Mollie::EXTENSION] = $legacyPaymentData;
+
+        $orderData = [
+            'id' => $order->getId(),
+            'customFields' => $orderCustomFields,
+        ];
+
         $upsertArray = [
             'id' => $transactionId,
             'customFields' => [
-                Mollie::EXTENSION => $payment->toArray(),
+                Mollie::EXTENSION => $legacyPaymentData,
             ],
+            'order' => $orderData,
         ];
 
         if (! $mollieOrder instanceof MollieOrder) {
@@ -167,8 +199,6 @@ final class TransactionService implements TransactionServiceInterface
         if ($filteredMollieLines->count() === 0 && $filteredMollieDeliveryLines->count() === 0) {
             return $this->orderTransactionRepository->upsert([$upsertArray], $context);
         }
-
-        $orderData = ['id' => $order->getId()];
 
         if ($filteredMollieLines->count() > 0) {
             $lineItemsData = [];

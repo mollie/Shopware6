@@ -8,15 +8,16 @@ use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
-final class PaymentCreatedEvent
+final class PaymentCreatedEvent extends PaymentInitializedEvent
 {
     public function __construct(
         private readonly string $redirectUrl,
         private readonly Payment $payment,
-        private readonly TransactionDataStruct $transactionDataStruct,
+        TransactionDataStruct $transactionDataStruct,
         private readonly RequestDataBag $requestDataBag,
-        private readonly Context $context
+        Context $context
     ) {
+        parent::__construct($transactionDataStruct, $context);
     }
 
     public function getRedirectUrl(): string
@@ -29,18 +30,8 @@ final class PaymentCreatedEvent
         return $this->payment;
     }
 
-    public function getTransactionDataStruct(): TransactionDataStruct
-    {
-        return $this->transactionDataStruct;
-    }
-
     public function getRequestDataBag(): RequestDataBag
     {
         return $this->requestDataBag;
-    }
-
-    public function getContext(): Context
-    {
-        return $this->context;
     }
 }

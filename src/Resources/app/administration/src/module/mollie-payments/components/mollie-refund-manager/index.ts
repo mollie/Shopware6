@@ -2,7 +2,7 @@ import template from './mollie-refund-manager.html.twig';
 import './mollie-refund-manager.scss';
 import RefundItemService from './services/RefundItemService';
 import RefundCalculator from './services/RefundCalculator';
-import RefundPayloadBuilder, { type RefundResponse } from './services/RefundPayloadBuilder';
+import RefundPayloadBuilder, { type RefundResponse, type RefundTotals } from './services/RefundPayloadBuilder';
 import './components/mollie-refund-manager-cart';
 import './components/mollie-refund-manager-refunds';
 import './components/mollie-refund-manager-instructions';
@@ -107,6 +107,11 @@ const componentConfig: ThisType<RefundManagerComponent> = {
             return this.acl.can('mollie_refund_manager:delete');
         },
 
+        // includes pending refunds, since those amounts cannot be refunded again
+        isOrderFullyRefunded() {
+            return this.remainingAmount <= 0;
+        },
+
         /**
          * Instruction blocks rendered in the first instructions column.
          * Each block links a title/text snippet to the tutorial it highlights and
@@ -203,6 +208,7 @@ const componentConfig: ThisType<RefundManagerComponent> = {
 
         onItemAmountChanged(item: any) {
             this.itemService.onAmountChanged(item);
+            this._capItemRefundAmount(item);
             this._calculateFinalAmount();
         },
 
@@ -307,7 +313,9 @@ const componentConfig: ThisType<RefundManagerComponent> = {
                     if (this.payloadBuilder.isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors?.[0]);
+                        this._showNotificationError(
+                            this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'),
+                        );
                     }
                 })
                 .finally(() => {
@@ -334,7 +342,9 @@ const componentConfig: ThisType<RefundManagerComponent> = {
                     if (this.payloadBuilder.isRefundSuccess(response)) {
                         this._handleRefundSuccess(response);
                     } else {
-                        this._showNotificationError(response.errors?.[0]);
+                        this._showNotificationError(
+                            this.$tc('mollie-payments.refund-manager.notifications.error.refund-created'),
+                        );
                     }
                 })
                 .finally(() => {
@@ -367,12 +377,19 @@ const componentConfig: ThisType<RefundManagerComponent> = {
                             }
                             return { ...refund, status: 'canceled', isPending: false, isQueued: false };
                         });
+
+                        this._applyTotals(response.totals);
+                        this._applyRefundedItems(response.refundedItems, response.refundedAmountItems);
                     } else {
-                        this._showNotificationError(response.errors?.[0]);
+                        this._showNotificationError(
+                            this.$tc('mollie-payments.refund-manager.notifications.error.refund-canceled'),
+                        );
                     }
                 })
-                .catch((response: any) => {
-                    this._showNotificationError(response.error);
+                .catch(() => {
+                    this._showNotificationError(
+                        this.$tc('mollie-payments.refund-manager.notifications.error.refund-canceled'),
+                    );
                 });
         },
 
@@ -390,21 +407,18 @@ const componentConfig: ThisType<RefundManagerComponent> = {
                 orderId: this.order.id,
             })
                 .then((response: any) => {
-                    if (!response || response.success === false) {
+                    if (!response || response.success === false || response.errors) {
                         this.isRefundDataLoading = false;
                         return;
                     }
 
                     this.mollieRefunds = response.refunds;
-                    this.remainingAmount = response.totals.remaining;
-                    this.refundedAmount = response.totals.refunded;
-                    this.voucherAmount = response.totals.voucherAmount;
-                    this.pendingRefunds = response.totals.pendingRefunds;
-                    this.roundingDiff = response.totals.roundingDiff;
+                    this._applyTotals(response.totals);
 
                     this.orderItems = response.cart.map((item: any) => {
                         const localItem = {
                             refunded: item.refunded,
+                            refundedAmount: item.refundedAmount,
                             shopware: item.shopware,
                         };
                         this.itemService.resetRefundData(localItem);
@@ -422,6 +436,55 @@ const componentConfig: ThisType<RefundManagerComponent> = {
             this.refundAmount = this.calculator.calculateTotalRefundAmount(this.orderItems);
         },
 
+        /**
+         * Caps the entered refund amount of a line item to the amount that can
+         * still be refunded, so the merchant cannot refund more than the line
+         * item's maximum. Promotions are skipped since they carry no input.
+         */
+        _capItemRefundAmount(item: any) {
+            if (this.itemService.isTypePromotion(item)) {
+                return;
+            }
+
+            const remaining = this.calculator.getItemRemainingRefundable(item, this._isTaxStatusGross());
+            if (item.refundAmount > remaining) {
+                item.refundAmount = remaining;
+            }
+        },
+
+        _isTaxStatusGross() {
+            return this.order.price.taxStatus === 'gross';
+        },
+
+        _applyTotals(totals: RefundTotals) {
+            this.refundedAmount = totals.refunded;
+            this.pendingRefunds = totals.pendingRefunds;
+            this.remainingAmount = totals.remaining;
+            this.voucherAmount = totals.voucherAmount;
+            this.roundingDiff = totals.roundingDiff;
+        },
+
+        /**
+         * Applies the refunded quantities/amounts the backend returned after a
+         * refund was created or cancelled.
+         */
+        _applyRefundedItems(refundedItems?: Record<string, number>, refundedAmountItems?: Record<string, number>) {
+            if (!refundedItems) {
+                return;
+            }
+
+            const amounts = refundedAmountItems ?? {};
+
+            // reassign a new array so sw-data-grid re-syncs its internal records
+            // and re-evaluates isItemRefundable(); mutating items in place is not
+            // picked up because the grid only watches the dataSource reference.
+            this.orderItems = this.orderItems.map((item: any) => ({
+                ...item,
+                refunded: refundedItems[item.shopware.id] ?? 0,
+                refundedAmount: amounts[item.shopware.id] ?? 0,
+            }));
+        },
+
         _showNotificationWarning(message: string) {
             this.createNotificationWarning({ message });
         },
@@ -434,7 +497,7 @@ const componentConfig: ThisType<RefundManagerComponent> = {
             this.createNotificationError({ message });
         },
 
-        _handleRefundSuccess(refund: RefundResponse) {
+        _handleRefundSuccess(response: RefundResponse) {
             this.isRefunding = false;
 
             this._showNotificationSuccess(
@@ -443,8 +506,12 @@ const componentConfig: ThisType<RefundManagerComponent> = {
 
             this.$emit('refund-success');
 
-            this.mollieRefunds = [refund].concat(this.mollieRefunds);
+            this.mollieRefunds = [response.refund].concat(this.mollieRefunds);
+            this._applyTotals(response.totals);
+
             this.btnResetCartForm_Click();
+
+            this._applyRefundedItems(response.refundedItems, response.refundedAmountItems);
         },
     },
 };

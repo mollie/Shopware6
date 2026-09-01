@@ -1,9 +1,42 @@
 const {defineConfig} = require('cypress')
+const {allureCypress} = require('allure-cypress/reporter')
 
 // when running in parallel in Github with multiple instances
 // it's somehow flaky...but this might only be because of a performance on the docker image?!
 // it usually runs really good offline, so let's just try couple of retries in runMode for now
 // and yes I know, this is not perfect...but it might work
+
+// Cypress keeps a single handler per node event, but the Allure reporter, cypress-testrail
+// and our own plugins file all want the same three. Fan those out to every consumer and
+// merge the task objects, so registering Allure does not silently unhook TestRail.
+const FANNED_OUT_EVENTS = ['before:run', 'after:run', 'after:spec']
+
+function createEventMultiplexer(on) {
+    const handlers = {}
+    const tasks = {}
+
+    const register = (event, argument) => {
+        if (event === 'task') {
+            Object.assign(tasks, argument)
+            return
+        }
+
+        if (!FANNED_OUT_EVENTS.includes(event)) {
+            // Everything else keeps its return value - before:browser:launch hands back the
+            // launch options, file:preprocessor the compiled file - so it must not be wrapped.
+            return on(event, argument)
+        }
+
+        if (!handlers[event]) {
+            handlers[event] = []
+            on(event, (...args) => Promise.all(handlers[event].map((handler) => handler(...args))))
+        }
+
+        handlers[event].push(argument)
+    }
+
+    return {register, flushTasks: () => on('task', tasks)}
+}
 
 module.exports = defineConfig({
     chromeWebSecurity: false,
@@ -44,7 +77,21 @@ module.exports = defineConfig({
         // We've imported your old cypress plugins here.
         // You may want to clean this up later by importing these.
         setupNodeEvents(on, config) {
-            return require('./cypress/plugins/index.js')(on, config)
+            const {register, flushTasks} = createEventMultiplexer(on)
+
+            allureCypress(register, config, {
+                resultsDir: 'allure-results',
+                // The layer of the testing pyramid these tests belong to. Set here rather
+                // than in a hook so that a spec which dies in before() is still counted -
+                // see config/allurerc.mjs for the other three.
+                globalLabels: [{name: 'layer', value: 'E2E'}],
+            })
+
+            const result = require('./cypress/plugins/index.js')(register, config)
+
+            flushTasks()
+
+            return result
         },
     },
 })

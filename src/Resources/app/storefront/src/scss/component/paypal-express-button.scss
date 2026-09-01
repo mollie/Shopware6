@@ -12,6 +12,16 @@
     padding: 7px;
 }
 
+.mollie-paypal-button-image {
+    width: 80px;
+}
+
+.mollie-paypal-button-label {
+    margin: 0;
+    margin-left: 8px;
+    font-weight: 100;
+}
+
 .paypal-button-pill {
     border-radius: 30px;
 }
@@ -21,51 +31,51 @@
 }
 
 .paypal-theme-gold {
-    color: #000;
-    background-color: #ffc439ff;
-    border: 1px solid #fcc85b;
+    color: $black;
+    background-color: $mollie-paypal-gold;
+    border: 1px solid $mollie-paypal-gold-hover;
 }
 
 .paypal-theme-gold:hover {
-    background-color: #fcc85b;
+    background-color: $mollie-paypal-gold-hover;
 }
 
 .paypal-theme-blue {
-    color: #fff;
-    background-color: #009cdeff;
-    border: 1px solid #09adf3;
+    color: $white;
+    background-color: $mollie-paypal-blue;
+    border: 1px solid $mollie-paypal-blue-hover;
 }
 
 .paypal-theme-blue:hover {
-    background-color: #09adf3;
+    background-color: $mollie-paypal-blue-hover;
 }
 
 .paypal-theme-silver {
-    color: #000;
-    background-color: #eeef;
-    border: 1px solid #f6f6f6;
+    color: $black;
+    background-color: $mollie-paypal-silver;
+    border: 1px solid $mollie-paypal-silver-border;
 }
 
 .paypal-theme-silver:hover {
-    background-color: #f6f6f6;
+    background-color: $mollie-paypal-silver-hover;
 }
 
 .paypal-theme-white {
-    color: #000;
-    background-color: #fff;
-    border: 1px solid #f3f3f3;
+    color: $black;
+    background-color: $white;
+    border: 1px solid $mollie-paypal-white-border;
 }
 
 .paypal-theme-white:hover {
-    background-color: #f3f3f3;
+    background-color: $mollie-paypal-white-hover;
 }
 
 .paypal-theme-black {
-    color: #fff;
-    background-color: #000;
-    border: 1px solid #555;
+    color: $white;
+    background-color: $black;
+    border: 1px solid $mollie-paypal-black-border;
 }
 
 .paypal-theme-black:hover {
-    background-color: #333;
+    background-color: $mollie-paypal-black-hover;
 }

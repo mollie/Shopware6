@@ -1,7 +1,7 @@
 {
     "name": "kiener/mollie-payments-plugin",
     "description": "Mollie Payments",
-    "version": "v5.0.0",
+    "version": "v5.5.0",
     "type": "shopware-platform-plugin",
     "license": "MIT",
     "authors": [
@@ -61,7 +61,8 @@
     },
     "suggest": {
         "shopware/storefront": "Require '*'. Enables features like Creditcard Components and iDeal issuer selector.",
-        "shopware/administration": "Require '*'. Enables features like partial shipping and refunding."
+        "shopware/administration": "Require '*'. Enables features like partial shipping and refunding.",
+        "shopware/elasticsearch": "Require '*'. Enables the subscription entries in the administration search."
     },
     "require": {
         "php": ">=8.2",
@@ -71,16 +72,20 @@
     },
     "require-dev": {
         "shopware/storefront": ">=6.5.8.0 <6.8",
+        "shopware/administration": ">=6.5.8.0 <6.8",
+        "shopware/elasticsearch": ">=6.5.8.0 <6.8",
         "phpunit/phpunit": ">=10",
         "phpstan/phpstan": "^2",
         "friendsofphp/php-cs-fixer": "^3",
         "phpcompatibility/php-compatibility": "^9",
         "squizlabs/php_codesniffer": "^3",
-        "boxblinkracer/phpunuhi": "dev-main",
+        "boxblinkracer/phpunuhi": "^1.24",
         "spaze/phpstan-disallowed-calls": "^4",
         "behat/behat": "^3",
         "behat/gherkin": "^4",
         "phpstan/phpstan-phpunit": "^2.0",
+        "allure-framework/allure-phpunit": "^3",
+        "cawolf/behat-cucumber-json-formatter": "^1.5",
         "ext-fileinfo": "*",
         "ext-dom": "*"
     },

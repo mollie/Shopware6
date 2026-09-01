@@ -16,6 +16,7 @@ final class PaymentSettings extends Struct
     public const KEY_FIX_ROUNDING_DIFF_ENABLED = 'fixRoundingDiffEnabled';
     public const KEY_FIX_ROUNDING_DIFF_NAME = 'fixRoundingDiffName';
     public const KEY_FIX_ROUNDING_DIFF_SKU = 'fixRoundingDiffSKU';
+    public const KEY_AUTOMATIC_STATUS_UPDATE = 'automaticStatusUpdate';
     private const MIN_DUE_DAYS = 1;
     private const MAX_DUE_DAYS = 100;
 
@@ -25,6 +26,7 @@ final class PaymentSettings extends Struct
 
     private const KEY_USE_MOLLIE_LIMITS = 'useMolliePaymentMethodLimits';
     private const KEY_AUTOMATIC_CANCELLATION = 'automaticCancellation';
+    private const KEY_PAYMENT_LINK_ALLOW_METHOD_SELECTION = 'paymentLinkAllowMethodSelection';
 
     public function __construct(private string $orderNumberFormat,
         private int $dueDateDays,
@@ -38,6 +40,8 @@ final class PaymentSettings extends Struct
         private bool $fixRoundingDiffEnabled = false,
         private string $fixRoundingDiffName = '',
         private string $fixRoundingDiffSku = '',
+        private bool $paymentLinkAllowMethodSelection = false,
+        private bool $automaticStatusUpdate = false,
     ) {
     }
 
@@ -58,8 +62,10 @@ final class PaymentSettings extends Struct
         $fixRoundingDiffEnabled = $settings[self::KEY_FIX_ROUNDING_DIFF_ENABLED] ?? false;
         $fixRoundingDiffName = $settings[self::KEY_FIX_ROUNDING_DIFF_NAME] ?? '';
         $fixRoundingDiffSku = $settings[self::KEY_FIX_ROUNDING_DIFF_SKU] ?? '';
+        $paymentLinkAllowMethodSelection = $settings[self::KEY_PAYMENT_LINK_ALLOW_METHOD_SELECTION] ?? false;
+        $automaticStatusUpdate = $settings[self::KEY_AUTOMATIC_STATUS_UPDATE] ?? false;
 
-        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment, (bool) $automaticCancellation, (bool) $fixRoundingDiffEnabled, (string) $fixRoundingDiffName, (string) $fixRoundingDiffSku);
+        return new self($orderNumberFormat, $dueDateDays,(bool) $oneClickPayment,(bool) $oneClickCompactView,(bool) $shopwareFailedPayment,(bool) $createCustomersAtMollie,(bool) $useMollieLimits, (bool) $automaticShipment, (bool) $automaticCancellation, (bool) $fixRoundingDiffEnabled, (string) $fixRoundingDiffName, (string) $fixRoundingDiffSku, (bool) $paymentLinkAllowMethodSelection, automaticStatusUpdate: (bool) $automaticStatusUpdate);
     }
 
     public function getOrderNumberFormat(): string
@@ -111,6 +117,11 @@ final class PaymentSettings extends Struct
         return $this->automaticCancellation;
     }
 
+    public function isAutomaticStatusUpdate(): bool
+    {
+        return $this->automaticStatusUpdate;
+    }
+
     public function isFixRoundingDiffEnabled(): bool
     {
         return $this->fixRoundingDiffEnabled;
@@ -124,5 +135,10 @@ final class PaymentSettings extends Struct
     public function getFixRoundingDiffSku(): string
     {
         return $this->fixRoundingDiffSku;
+    }
+
+    public function isPaymentLinkMethodSelectionAllowed(): bool
+    {
+        return $this->paymentLinkAllowMethodSelection;
     }
 }

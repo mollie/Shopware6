@@ -62,7 +62,9 @@ final class CartBackupService extends AbstractCartBackupService
             $cart = $this->cartService->getCart($context->getToken(), $context);
             $cart->setLineItems(new LineItemCollection());
 
-            return $cart;
+            $this->cartService->setCart($cart);
+
+            return $this->cartService->recalculate($cart, $context);
         }
 
         // get our backup cart

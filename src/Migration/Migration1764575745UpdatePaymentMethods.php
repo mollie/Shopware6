@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 /**
  * @internal
  */
-#[Package('core')]
 class Migration1764575745UpdatePaymentMethods extends MigrationStep
 {
     public function getCreationTimestamp(): int
@@ -63,5 +62,9 @@ SQL;
 
             $connection->executeStatement($sql);
         }
+    }
+
+    public function updateDestructive(Connection $connection): void
+    {
     }
 }

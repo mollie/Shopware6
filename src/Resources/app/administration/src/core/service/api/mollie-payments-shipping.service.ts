@@ -36,14 +36,6 @@ export default class MolliePaymentsShippingService extends ApiService {
         return this.__post('/item', data);
     }
 
-    status(data: Record<string, any> = { orderId: null }): Promise<any> {
-        return this.__post('/status', data);
-    }
-
-    total(data: Record<string, any> = { orderId: null }): Promise<any> {
-        return this.__post('/total', data);
-    }
-
     private __post(
         endpoint: string = '',
         data: Record<string, any> = {},

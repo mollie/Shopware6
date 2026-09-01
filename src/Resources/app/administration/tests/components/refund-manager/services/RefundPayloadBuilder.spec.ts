@@ -43,24 +43,25 @@ describe('RefundPayloadBuilder.buildItems', () => {
 });
 
 describe('RefundPayloadBuilder.isRefundSuccess', () => {
-    test('is success if the response has a string id', () => {
-        expect(builder.isRefundSuccess({ id: 're_123' })).toBe(true);
-    });
-
-    test('is success if the response has an explicit success flag', () => {
-        expect(builder.isRefundSuccess({ success: true })).toBe(true);
-    });
-
-    test('is no success if success flag is false and no id', () => {
-        expect(builder.isRefundSuccess({ success: false })).toBe(false);
+    test('is success if the response carries a created refund', () => {
+        expect(builder.isRefundSuccess({ refund: { id: 're_123' } })).toBe(true);
     });
 
     test('is no success for an empty response', () => {
         expect(builder.isRefundSuccess({})).toBe(false);
     });
 
-    test('is no success if the id is not a string', () => {
+    test('is no success if the refund node has no id', () => {
+        expect(builder.isRefundSuccess({ refund: {} })).toBe(false);
+    });
+
+    test('is no success if the refund id is not a string', () => {
         // @ts-expect-error testing defensive runtime behaviour
-        expect(builder.isRefundSuccess({ id: 123 })).toBe(false);
+        expect(builder.isRefundSuccess({ refund: { id: 123 } })).toBe(false);
+    });
+
+    test('a success flag alone is not a created refund', () => {
+        // @ts-expect-error the backend no longer answers refunds with a bare success flag
+        expect(builder.isRefundSuccess({ success: true })).toBe(false);
     });
 });

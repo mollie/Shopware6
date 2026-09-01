@@ -26,7 +26,12 @@
                 "selectBank": "Selecionar banco"
             },
             "pos": {
-                "selectTerminal": "Selecionar terminal"
+                "selectTerminal": "Selecionar terminal",
+                "returnToWebsite": "Voltar ao site",
+                "terminalInstructions": "Siga as instruções no terminal",
+                "paymentSuccess": "O seu pagamento foi bem-sucedido!",
+                "paymentFailed": "O seu pagamento não foi bem-sucedido!",
+                "paymentFailedNoDebit": "Não foi debitado qualquer valor do cartão"
             },
             "mandate": {
                 "sectionTitle": "Cartões guardados",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Número de telefone",
                 "phoneErrorMessage": "O número de telefone é obrigatório. Por exemplo +351 912 345 678"
+            },
+            "paypalExpress": {
+                "checkout": "Finalizar compra"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Pagamento não efetuado",
                 "failed": "O pagamento falhou ou foi cancelado. Será redireccionado para a Mollie, onde poderá concluir o pagamento com o método da sua escolha. "
             },
-            "redirecting": "Redireccionando-o para: "
+            "redirecting": "Redireccionando-o para: ",
+            "paymentLink": {
+                "error": "Esta encomenda já não pode ser paga.",
+                "alreadyPaid": "Esta encomenda já foi paga."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "A sua subscrição será retomada",
                 "successSkip": "A sua subscrição foi saltada",
                 "successUpdateAddress": "O seu endereço foi atualizado com sucesso",
-                "successUpdatePayment": "O seu método de pagamento foi atualizado com sucesso"
+                "successUpdatePayment": "O seu método de pagamento foi atualizado com sucesso",
+                "actionsMenuLabel": "Ações da subscrição"
             },
             "options": {
                 "everyDay": "Todos os dias",

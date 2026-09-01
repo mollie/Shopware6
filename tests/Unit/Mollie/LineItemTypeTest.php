@@ -7,7 +7,11 @@ use Mollie\Shopware\Component\Mollie\LineItemType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
+use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
+use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Content\Product\State;
 
 #[CoversClass(LineItemType::class)]
 final class LineItemTypeTest extends TestCase
@@ -24,6 +28,95 @@ final class LineItemTypeTest extends TestCase
         $this->assertSame('customized-products', LineItemType::LINE_ITEM_TYPE_CUSTOM_PRODUCTS->value);
     }
 
+    public function testFromCartLineItemWithProductType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::PRODUCT_LINE_ITEM_TYPE);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::PHYSICAL, $result);
+    }
+
+    public function testFromCartLineItemWithCustomProductsType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItemType::LINE_ITEM_TYPE_CUSTOM_PRODUCTS->value);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::PHYSICAL, $result);
+    }
+
+    public function testFromCartLineItemWithCreditType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::CREDIT_LINE_ITEM_TYPE);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::CREDIT, $result);
+    }
+
+    public function testFromCartLineItemWithPromotionType(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::PROMOTION_LINE_ITEM_TYPE);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DISCOUNT, $result);
+    }
+
+    public function testFromCartLineItemWithUnknownTypeDefaultsToDigital(): void
+    {
+        $cartLineItem = new LineItem('line-1', 'unknown_type');
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
+    public function testFromCartLineItemWithDownloadStateBecomesDigital(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::PRODUCT_LINE_ITEM_TYPE);
+        $cartLineItem->setStates([State::IS_DOWNLOAD]);
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
+    /**
+     * Mollie rejects a negative amount unless the line is typed as a discount, so a third-party
+     * plugin's own line type must not survive.
+     */
+    public function testFromCartLineItemWithNegativePriceBecomesDiscount(): void
+    {
+        $cartLineItem = new LineItem('line-1', 'custom-discount');
+        $cartLineItem->setPrice(new CalculatedPrice(-10.0, -10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DISCOUNT, $result);
+    }
+
+    public function testFromCartLineItemKeepsCreditEvenWithANegativePrice(): void
+    {
+        $cartLineItem = new LineItem('line-1', LineItem::CREDIT_LINE_ITEM_TYPE);
+        $cartLineItem->setPrice(new CalculatedPrice(-10.0, -10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::CREDIT, $result);
+    }
+
+    public function testFromCartLineItemWithPositivePriceKeepsType(): void
+    {
+        $cartLineItem = new LineItem('line-1', 'custom-surcharge');
+        $cartLineItem->setPrice(new CalculatedPrice(10.0, 10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+        $result = LineItemType::fromCartLineItem($cartLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
     public function testFromOrderLineItemWithProductType(): void
     {
         $orderLineItem = new OrderLineItemEntity();
@@ -32,6 +125,17 @@ final class LineItemTypeTest extends TestCase
         $result = LineItemType::fromOderLineItem($orderLineItem);
 
         $this->assertSame(LineItemType::PHYSICAL, $result);
+    }
+
+    public function testFromOrderLineItemWithDownloadStateBecomesDigital(): void
+    {
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setType(LineItem::PRODUCT_LINE_ITEM_TYPE);
+        $orderLineItem->assign(['states' => [State::IS_DOWNLOAD]]);
+
+        $result = LineItemType::fromOderLineItem($orderLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
     }
 
     public function testFromOrderLineItemWithCustomProductsType(): void
@@ -78,6 +182,36 @@ final class LineItemTypeTest extends TestCase
     {
         $orderLineItem = new OrderLineItemEntity();
         $orderLineItem->setType('shipping');
+
+        $result = LineItemType::fromOderLineItem($orderLineItem);
+
+        $this->assertSame(LineItemType::DIGITAL, $result);
+    }
+
+    public function testFromOrderLineItemWithNegativePriceBecomesDiscount(): void
+    {
+        $testCases = [
+            'custom-discount' => LineItemType::DISCOUNT,
+            LineItem::PRODUCT_LINE_ITEM_TYPE => LineItemType::DISCOUNT,
+            LineItem::CREDIT_LINE_ITEM_TYPE => LineItemType::CREDIT,
+        ];
+
+        foreach ($testCases as $shopwareType => $expectedType) {
+            $orderLineItem = new OrderLineItemEntity();
+            $orderLineItem->setType($shopwareType);
+            $orderLineItem->setPrice(new CalculatedPrice(-10.0, -10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
+
+            $result = LineItemType::fromOderLineItem($orderLineItem);
+
+            $this->assertSame($expectedType, $result, sprintf('Negative line item of type "%s" should map to "%s"', $shopwareType, $expectedType->value));
+        }
+    }
+
+    public function testFromOrderLineItemWithPositivePriceKeepsType(): void
+    {
+        $orderLineItem = new OrderLineItemEntity();
+        $orderLineItem->setType('custom-surcharge');
+        $orderLineItem->setPrice(new CalculatedPrice(10.0, 10.0, new CalculatedTaxCollection(), new TaxRuleCollection()));
 
         $result = LineItemType::fromOderLineItem($orderLineItem);
 

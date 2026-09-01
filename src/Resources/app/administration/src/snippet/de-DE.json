@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Abonnement | Mollie Abonnements"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Bestellung erfolgreich",
-            "mollie_checkout_order_failed": " Bestellung fehlgeschlagen",
-            "mollie_checkout_order_canceled": " Bestellung abgebrochen",
+            "mollie_payment_success": " Bestellung erfolgreich",
+            "mollie_payment_failed": " Bestellung fehlgeschlagen",
+            "mollie_payment_cancelled": " Bestellung abgebrochen",
             "mollie_webhook_received_All": " Mollie Webhook empfangen (Alle)",
+            "mollie_webhook_received_status_open": " Mollie Webhook empfangen (Offen)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook empfangen (Authorisiert)",
             "mollie_webhook_received_status_failed": " Mollie Webhook empfangen (Fehler)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook empfangen (Abgebrochen)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook empfangen (Komplett)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook empfangen (Rückerstattet)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook empfangen (Teilweise Rückerstattet)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook empfangen (Rückbuchung)",
             "mollie_refund_started": " Mollie Rückerstattung gestartet",
             "mollie_subscription_started": " Mollie Abonnement gestartet",
             "mollie_subscription_ended": " Mollie Abonnement abgeschlossen",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": " Mollie Abonnement fortgesetzt",
             "mollie_subscription_skipped": " Mollie Abonnement ausgesetzt",
             "mollie_subscription_renewed": " Mollie Abonnement erneuert",
-            "mollie_subscription_renewal_reminder": " Mollie Erinnerung zur Abonnement Erneuerung"
+            "mollie_subscription_renewal_reminder": " Mollie Erinnerung zur Abonnement Erneuerung",
+            "mollie_subscription_priceChangeNotice": " Mollie Abonnement Preisänderung"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Mollie-Abonnements",
                 "description": "Die Verwaltung Ihrer wiederkehrenden Zahlungen ist mit unseren hilfreichen Funktionen einfacher denn je. Bringen Sie Ihr Unternehmen mit effizienten Tracking-Optionen, einfachen Integrationen und mehr auf die nächste Stufe. Mit Mollie-Abonnements können Sie ganz einfach Abonnementprodukte erstellen und wiederkehrende Zahlungen so planen, dass sie im konfigurierten Intervall und Zeitraum stattfinden.",
                 "mollieSubscriptionProduct": "Ist das ein Abo-Produkt?",
+                "mollieAllowOneTime": "Auch als Einmalkauf anbieten",
+                "mollieAllowOneTimeHelp": "Zeigt auf der Produktseite zusätzlich einen „In den Warenkorb“-Button, sodass das Produkt auch ohne Abo gekauft werden kann.",
                 "mollieSubscriptionIntervalAmount": "Zahlung wiederholen alle",
                 "mollieSubscriptionIntervalType": "Abonnement-Intervall-Typ",
                 "mollieSubscriptionRepetitionAmount": "Zahlung wiederholen",
@@ -501,9 +506,9 @@
             "canceled": "Abgebrochen",
             "expired": "Abgelaufen",
             "partiallyRefunded": "Rückerstattet (teilweise)",
-            "orderSuccess": "Bestellung erfolgreich",
-            "orderFailed": "Bestellung fehlgeschlagen",
-            "orderCanceled": "Bestellung abgebrochen"
+            "payment": "Zahlung",
+            "success": "Erfolgreich",
+            "priceChangeNotice": "Preisänderung"
         }
     }
 }

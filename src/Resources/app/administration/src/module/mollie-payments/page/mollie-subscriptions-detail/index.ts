@@ -187,15 +187,9 @@ const componentConfig: ThisType<SubscriptionsDetailPage> = {
                 return '';
             }
 
-            // starting with Shopware 6.4.10.0 we have a new dateWithUserTimezone function;
-            // before this, we just use the old one
-            if (Shopware.Utils.format.dateWithUserTimezone) {
-                const formattedDate = Shopware.Utils.format.dateWithUserTimezone(new Date(date));
+            const formattedDate = Shopware.Utils.format.dateWithUserTimezone(new Date(date));
 
-                return formattedDate.toLocaleDateString() + ' ' + formattedDate.toLocaleTimeString();
-            }
-
-            return Shopware.Utils.format.date(new Date(date));
+            return formattedDate.toLocaleDateString() + ' ' + formattedDate.toLocaleTimeString();
         },
 
         btnCancel_Click() {

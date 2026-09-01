@@ -26,7 +26,12 @@
                 "selectBank": "Selectați banca"
             },
             "pos": {
-                "selectTerminal": "Selectați terminalul"
+                "selectTerminal": "Selectați terminalul",
+                "returnToWebsite": "Înapoi la site",
+                "terminalInstructions": "Urmați instrucțiunile de pe terminal",
+                "paymentSuccess": "Plata dvs. a fost efectuată cu succes!",
+                "paymentFailed": "Plata dvs. nu a fost efectuată!",
+                "paymentFailedNoDebit": "Nu a fost debitată nicio sumă de pe card"
             },
             "mandate": {
                 "sectionTitle": "Carduri salvate",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Numărul de telefon",
                 "phoneErrorMessage": "Numărul de telefon este obligatoriu. De exemplu +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Finalizează comanda"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Plata a eșuat",
                 "failed": "Plata a eșuat sau a fost anulată. Veți fi redirecționat către Mollie, unde puteți finaliza plata cu metoda aleasă."
             },
-            "redirecting": "Te redirecționăm către: "
+            "redirecting": "Te redirecționăm către: ",
+            "paymentLink": {
+                "error": "Această comandă nu mai poate fi plătită.",
+                "alreadyPaid": "Această comandă a fost deja plătită."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "Abonamentul dvs. va fi acum reluat",
                 "successSkip": "Abonamentul dvs. a fost sărit",
                 "successUpdateAddress": "Adresa dvs. a fost actualizată cu succes",
-                "successUpdatePayment": "Metoda de plată a fost actualizată cu succes"
+                "successUpdatePayment": "Metoda de plată a fost actualizată cu succes",
+                "actionsMenuLabel": "Acțiuni abonament"
             },
             "options": {
                 "everyDay": "În fiecare zi",

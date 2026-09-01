@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Payment\Handler\OpenStatusFailedAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\AlmaPayment;
 use Mollie\Shopware\Component\Payment\Method\ApplePayPayment;
 use Mollie\Shopware\Component\Payment\Method\BancomatPayPayment;
@@ -14,6 +15,7 @@ use Mollie\Shopware\Component\Payment\Method\BanContactPayment;
 use Mollie\Shopware\Component\Payment\Method\BankTransferPayment;
 use Mollie\Shopware\Component\Payment\Method\BelfiusPayment;
 use Mollie\Shopware\Component\Payment\Method\BilliePayment;
+use Mollie\Shopware\Component\Payment\Method\BillinkPayment;
 use Mollie\Shopware\Component\Payment\Method\BizumPayment;
 use Mollie\Shopware\Component\Payment\Method\BlikPayment;
 use Mollie\Shopware\Component\Payment\Method\CardPayment;
@@ -42,6 +44,7 @@ use Mollie\Shopware\Component\Payment\Method\TrustlyPayment;
 use Mollie\Shopware\Component\Payment\Method\TwintPayment;
 use Mollie\Shopware\Component\Payment\Method\VippsPayment;
 use Mollie\Shopware\Component\Payment\Method\VoucherPayment;
+use Mollie\Shopware\Component\Payment\Method\WeroPayment;
 use Mollie\Shopware\Unit\Payment\Fake\FakeFinalize;
 use Mollie\Shopware\Unit\Payment\Fake\FakePay;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,6 +61,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 #[CoversClass(BankTransferPayment::class)]
 #[CoversClass(BelfiusPayment::class)]
 #[CoversClass(BilliePayment::class)]
+#[CoversClass(BillinkPayment::class)]
 #[CoversClass(BizumPayment::class)]
 #[CoversClass(BlikPayment::class)]
 #[CoversClass(CardPayment::class)]
@@ -86,6 +90,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 #[CoversClass(TwintPayment::class)]
 #[CoversClass(VippsPayment::class)]
 #[CoversClass(VoucherPayment::class)]
+#[CoversClass(WeroPayment::class)]
 final class PaymentMethodsTest extends TestCase
 {
     #[DataProvider('providePaymentMethods')]
@@ -100,6 +105,18 @@ final class PaymentMethodsTest extends TestCase
         $this->assertSame($expectedName, $handler->getName());
     }
 
+    #[DataProvider('providePaymentMethods')]
+    public function testOnlyBancontactTreatsOpenStatusAsFailed(string $handlerClass, PaymentMethod $expectedMethod): void
+    {
+        $handler = new $handlerClass(new FakePay(), new FakeFinalize(), new NullLogger());
+
+        $this->assertSame(
+            $expectedMethod === PaymentMethod::BAN_CONTACT,
+            $handler instanceof OpenStatusFailedAwareInterface,
+            sprintf('Unexpected open status handling for "%s"', $expectedMethod->value)
+        );
+    }
+
     public static function providePaymentMethods(): array
     {
         return [
@@ -110,6 +127,7 @@ final class PaymentMethodsTest extends TestCase
             'banktransfer' => [BankTransferPayment::class, PaymentMethod::BANK_TRANSFER, 'Banktransfer'],
             'belfius' => [BelfiusPayment::class, PaymentMethod::BELFIUS, 'Belfius'],
             'billie' => [BilliePayment::class, PaymentMethod::BILLIE, 'Billie'],
+            'billink' => [BillinkPayment::class, PaymentMethod::BILLINK, 'Billink'],
             'bizum' => [BizumPayment::class, PaymentMethod::BIZUM, 'Bizum'],
             'blik' => [BlikPayment::class, PaymentMethod::BLIK, 'Blik'],
             'card' => [CardPayment::class, PaymentMethod::CREDIT_CARD, 'Card'],
@@ -138,6 +156,7 @@ final class PaymentMethodsTest extends TestCase
             'twint' => [TwintPayment::class, PaymentMethod::TWINT, 'TWINT'],
             'vipps' => [VippsPayment::class, PaymentMethod::VIPPS, 'Vipps'],
             'voucher' => [VoucherPayment::class, PaymentMethod::VOUCHER, 'Voucher'],
+            'wero' => [WeroPayment::class, PaymentMethod::WERO, 'Wero'],
         ];
     }
 

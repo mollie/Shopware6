@@ -8,7 +8,6 @@ final class ShippingItem implements \JsonSerializable
 {
     public function __construct(
         private int $quantity,
-        private string $description,
         private float $amount,
         private ?string $mollieLineId = null,
     ) {
@@ -17,11 +16,6 @@ final class ShippingItem implements \JsonSerializable
     public function getQuantity(): int
     {
         return $this->quantity;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
     }
 
     public function getAmount(): float

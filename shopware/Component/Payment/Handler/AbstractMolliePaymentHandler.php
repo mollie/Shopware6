@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Handler;
 
+use Mollie\Shopware\Component\Compatibility\FeatureFlag;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\AbstractPaymentHandler;
@@ -11,7 +12,6 @@ use Shopware\Core\Checkout\Payment\Cart\PaymentHandler\PaymentHandlerType;
 use Shopware\Core\Checkout\Payment\Cart\PaymentTransactionStruct;
 use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Feature;
 use Shopware\Core\Framework\HttpException;
 use Shopware\Core\Framework\Struct\Struct;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -20,7 +20,10 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-if (Feature::isActive('v6.7.0.0') || ! interface_exists(AsynchronousPaymentHandlerInterface::class)) {
+// 6.5: only AsynchronousPaymentHandlerInterface exists.
+// 6.6: both exist and the v6.7.0.0 feature flag decides which one the shop runs on.
+// 6.7: the interface is gone, only AbstractPaymentHandler is left.
+if (! interface_exists(AsynchronousPaymentHandlerInterface::class) || FeatureFlag::isActive('v6.7.0.0')) {
     #[AutoconfigureTag('shopware.payment.method')]
     #[AutoconfigureTag('shopware.payment.method.async')]
     #[AutoconfigureTag('mollie.payment.method')]
@@ -57,7 +60,7 @@ if (Feature::isActive('v6.7.0.0') || ! interface_exists(AsynchronousPaymentHandl
             );
 
             try {
-                $this->finalize->execute($struct, $context);
+                $this->finalize->execute($this, $struct, $context);
             } catch (HttpException $exception) {
                 $this->logger->error('Payment is aborted or failed', [
                     'error' => $exception->getMessage(),
@@ -116,7 +119,7 @@ if (Feature::isActive('v6.7.0.0') || ! interface_exists(AsynchronousPaymentHandl
             );
 
             try {
-                $this->finalize->execute($struct, $salesChannelContext->getContext());
+                $this->finalize->execute($this, $struct, $salesChannelContext->getContext());
             } catch (HttpException $exception) {
                 $this->logger->error('Payment is aborted or failed', [
                     'error' => $exception->getMessage(),

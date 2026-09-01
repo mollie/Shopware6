@@ -40,7 +40,7 @@ final class PaymentSubscriberTest extends TestCase
         $subscribed = PaymentSubscriber::getSubscribedEvents();
 
         $this->assertArrayHasKey(PaymentCreatedEvent::class, $subscribed);
-        $this->assertSame(['onPaymentCreated', PaymentSubscriber::PRIORITY], $subscribed[PaymentCreatedEvent::class]);
+        $this->assertSame(['onPaymentInitialized', PaymentSubscriber::PRIORITY], $subscribed[PaymentCreatedEvent::class]);
     }
 
     public function testOnPaymentCreatedSkipsWhenSubscriptionsAreDisabled(): void
@@ -50,7 +50,7 @@ final class PaymentSubscriberTest extends TestCase
 
         $struct = $this->buildStructWithSubscriptionLineItems();
 
-        $subscriber->onPaymentCreated($this->buildEvent($struct));
+        $subscriber->onPaymentInitialized($this->buildEvent($struct));
 
         $this->assertSame(0, $repository->getUpsertCount());
     }
@@ -66,7 +66,7 @@ final class PaymentSubscriberTest extends TestCase
         $existingCollection->add(SubscriptionEntityBuilder::create()->withId('existing-sub')->build());
         $struct->getOrder()->addExtension('mollieSubscriptions', $existingCollection);
 
-        $subscriber->onPaymentCreated($this->buildEvent($struct));
+        $subscriber->onPaymentInitialized($this->buildEvent($struct));
 
         $this->assertSame(0, $repository->getUpsertCount());
     }
@@ -91,7 +91,7 @@ final class PaymentSubscriberTest extends TestCase
         $reflection = new \ReflectionProperty($struct->getOrder(), 'lineItems');
         $reflection->setValue($struct->getOrder(), null);
 
-        $subscriber->onPaymentCreated($this->buildEvent($struct));
+        $subscriber->onPaymentInitialized($this->buildEvent($struct));
 
         $this->assertSame(0, $repository->getUpsertCount());
     }
@@ -120,7 +120,7 @@ final class PaymentSubscriberTest extends TestCase
         $regular->addExtension(Mollie::EXTENSION, $product);
         $struct->getOrder()->setLineItems(new OrderLineItemCollection([$regular]));
 
-        $subscriber->onPaymentCreated($this->buildEvent($struct));
+        $subscriber->onPaymentInitialized($this->buildEvent($struct));
 
         $this->assertSame(0, $repository->getUpsertCount());
     }
@@ -132,7 +132,7 @@ final class PaymentSubscriberTest extends TestCase
 
         $struct = $this->buildStructWithSubscriptionLineItems();
 
-        $subscriber->onPaymentCreated($this->buildEvent($struct));
+        $subscriber->onPaymentInitialized($this->buildEvent($struct));
 
         $this->assertSame(1, $repository->getUpsertCount());
         $payload = $repository->getLastUpsert();
@@ -158,7 +158,7 @@ final class PaymentSubscriberTest extends TestCase
         $weekly = $this->orderLineItemWithMollieProduct('line-weekly', 2, IntervalUnit::WEEKS);
         $struct->getOrder()->setLineItems(new OrderLineItemCollection([$monthly, $weekly]));
 
-        $subscriber->onPaymentCreated($this->buildEvent($struct));
+        $subscriber->onPaymentInitialized($this->buildEvent($struct));
 
         $this->assertSame(2, $repository->getUpsertCount());
     }

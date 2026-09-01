@@ -9,6 +9,6 @@ final class WebhookStatusCancelledEvent extends WebhookEvent
 {
     protected static function getStatus(): string
     {
-        return PaymentStatus::CANCELED->value;
+        return 'status.' . PaymentStatus::CANCELED->value;
     }
 }

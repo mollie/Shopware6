@@ -12,10 +12,10 @@ final class CreateCapture implements \JsonSerializable
     private Money $amount;
     private string $description;
 
-    public function __construct(ShippingItemCollection $items, string $currencyIsoCode)
+    public function __construct(ShippingItemCollection $items, string $currencyIsoCode, string $description)
     {
         $this->amount = new Money($items->getTotalAmount(), $currencyIsoCode);
-        $this->description = $items->getDescription();
+        $this->description = $description;
     }
 
     public function getAmount(): Money
@@ -31,11 +31,6 @@ final class CreateCapture implements \JsonSerializable
     public function getDescription(): string
     {
         return $this->description;
-    }
-
-    public function setDescription(string $description): void
-    {
-        $this->description = $description;
     }
 
     /**

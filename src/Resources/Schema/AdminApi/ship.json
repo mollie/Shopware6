@@ -1,0 +1,290 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mollie Shipment API",
+    "description": "Operational shipment API for 3rd parties / ERP systems. Orders are addressed by their Shopware order number and line items by a single item identifier (either a line item id or a product number; the code resolves which it is).",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/mollie/ship/order": {
+      "post": {
+        "tags": ["Mollie"],
+        "summary": "Ship a full Mollie order",
+        "description": "Ships all remaining (not yet shipped or cancelled) items of an order.",
+        "operationId": "shipMollieOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderNumber": {
+                    "type": "string",
+                    "description": "The Shopware order number."
+                  },
+                  "trackingCarrier": {
+                    "type": "string",
+                    "description": "Optional tracking carrier. When provided it takes precedence over the carrier derived from the shipping method."
+                  },
+                  "trackingCode": {
+                    "type": "string",
+                    "description": "Optional tracking code."
+                  },
+                  "trackingUrl": {
+                    "type": "string",
+                    "description": "Optional tracking URL."
+                  }
+                },
+                "required": ["orderNumber"]
+              },
+              "example": {
+                "orderNumber": "10000",
+                "trackingCarrier": "DHL",
+                "trackingCode": "00340434161094000000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipment successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Shipment was not successful, there was nothing to ship.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mollie/ship/order/batch": {
+      "post": {
+        "tags": ["Mollie"],
+        "summary": "Ship selected items of a Mollie order",
+        "description": "Ships a selected set of items of an order. Each item is addressed by an item identifier (a line item id or a product number).",
+        "operationId": "shipMollieOrderBatch",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderNumber": {
+                    "type": "string",
+                    "description": "The Shopware order number."
+                  },
+                  "items": {
+                    "type": "array",
+                    "description": "The items to ship.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "item": {
+                          "type": "string",
+                          "description": "The item identifier: a Shopware order line item id or a product number. The code resolves which it is."
+                        },
+                        "quantity": {
+                          "type": "integer",
+                          "description": "The quantity to ship.",
+                          "default": 1
+                        }
+                      },
+                      "required": ["item"]
+                    }
+                  },
+                  "trackingCarrier": {
+                    "type": "string",
+                    "description": "Optional tracking carrier. When provided it takes precedence over the carrier derived from the shipping method."
+                  },
+                  "trackingCode": {
+                    "type": "string",
+                    "description": "Optional tracking code."
+                  },
+                  "trackingUrl": {
+                    "type": "string",
+                    "description": "Optional tracking URL."
+                  }
+                },
+                "required": ["orderNumber", "items"]
+              },
+              "example": {
+                "orderNumber": "10000",
+                "items": [
+                  {
+                    "item": "SW10000",
+                    "quantity": 1
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipment successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Shipment was not successful, there was nothing to ship.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mollie/ship/item": {
+      "post": {
+        "tags": ["Mollie"],
+        "summary": "Ship a single item of a Mollie order",
+        "description": "Ships a single item of an order, addressed by an item identifier (a line item id or a product number).",
+        "operationId": "shipMollieItem",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "orderNumber": {
+                    "type": "string",
+                    "description": "The Shopware order number."
+                  },
+                  "item": {
+                    "type": "string",
+                    "description": "The item identifier: a Shopware order line item id or a product number. The code resolves which it is."
+                  },
+                  "quantity": {
+                    "type": "integer",
+                    "description": "The quantity to ship.",
+                    "default": 1
+                  },
+                  "trackingCarrier": {
+                    "type": "string",
+                    "description": "Optional tracking carrier. When provided it takes precedence over the carrier derived from the shipping method."
+                  },
+                  "trackingCode": {
+                    "type": "string",
+                    "description": "Optional tracking code."
+                  },
+                  "trackingUrl": {
+                    "type": "string",
+                    "description": "Optional tracking URL."
+                  }
+                },
+                "required": ["orderNumber", "item"]
+              },
+              "example": {
+                "orderNumber": "10000",
+                "item": "SW10000",
+                "quantity": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipment successfully processed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Shipment was not successful, there was nothing to ship.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MollieShipmentError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MollieShipmentResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The UUID of the shipped Shopware order.",
+            "example": "123e4567e89b12d3a456426614174000"
+          },
+          "mollieId": {
+            "type": "string",
+            "description": "The id returned by Mollie - a capture id (Payments API) or a shipment id (Orders API) depending on how the order was created.",
+            "example": "cpt_4qqhO89gsT"
+          },
+          "updatedLineItems": {
+            "type": "array",
+            "description": "The line items that were updated by this shipment.",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": ["status", "orderId", "mollieId", "updatedLineItems"]
+      },
+      "MollieShipmentError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "example": "SHIPMENT_NOT_SUCCESSFUL"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "500"
+                },
+                "detail": {
+                  "type": "string",
+                  "example": "Shipment was not successful, there was nothing to ship"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

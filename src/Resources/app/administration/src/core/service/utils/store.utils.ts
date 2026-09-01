@@ -3,19 +3,14 @@
  *
  * Shopware <= 6.6 keeps stores in Vuex (`Shopware.State`), whose `get()` returns `undefined`
  * for an unknown id. Shopware 6.7 moved them to Pinia (`Shopware.Store`), whose `get()` THROWS
- * for an unknown id (so optional chaining alone does not make it safe). We therefore check the
- * Vuex state first (undefined-safe) and only then fall back to the Pinia store, swallowing the
- * throw so callers always get the module or `null`.
+ * for an unknown id, so it must not be called blindly - the registry is checked first. Pinia
+ * wins when the module is registered there, because on 6.7 the Vuex shim can still answer with
+ * a stale module.
  */
 export function getStore(id: string): any {
-    const stateModule = Shopware.State?.get?.(id);
-    if (stateModule !== undefined) {
-        return stateModule;
+    if (Shopware.Store?.list?.().includes(id)) {
+        return Shopware.Store.get(id);
     }
 
-    try {
-        return Shopware.Store?.get?.(id) ?? null;
-    } catch {
-        return null;
-    }
+    return Shopware.State?.get?.(id) ?? null;
 }

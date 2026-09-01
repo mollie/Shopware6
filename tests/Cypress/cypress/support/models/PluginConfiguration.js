@@ -3,10 +3,14 @@ export default class PluginConfiguration {
     constructor() {
 
         this._subscriptionIndicator = false;
+        this._subscriptionPriceUpdateMode = 'keep';
+        this._subscriptionPriceUpdateNoticeDays = 0;
         this._mollieFailureMode = false;
         this._creditCardComponents = false;
         this._applePayDirectEnabled = false;
         this._paypalExpressRestrictions = [];
+        this._paymentLinkMethodSelection = false;
+        this._useMolliePaymentMethodLimits = false;
     }
 
 
@@ -16,6 +20,22 @@ export default class PluginConfiguration {
 
     setSubscriptionIndicator(value) {
         this._subscriptionIndicator = value;
+    }
+
+    getSubscriptionPriceUpdateMode() {
+        return this._subscriptionPriceUpdateMode;
+    }
+
+    setSubscriptionPriceUpdateMode(value) {
+        this._subscriptionPriceUpdateMode = value;
+    }
+
+    getSubscriptionPriceUpdateNoticeDays() {
+        return this._subscriptionPriceUpdateNoticeDays;
+    }
+
+    setSubscriptionPriceUpdateNoticeDays(value) {
+        this._subscriptionPriceUpdateNoticeDays = value;
     }
 
     getMollieFailureMode() {
@@ -49,6 +69,22 @@ export default class PluginConfiguration {
 
     setPaypalExpressRestrictions(value) {
         this._paypalExpressRestrictions = value;
+    }
+
+    getPaymentLinkMethodSelection() {
+        return this._paymentLinkMethodSelection;
+    }
+
+    setPaymentLinkMethodSelection(value) {
+        this._paymentLinkMethodSelection = value;
+    }
+
+    getUseMolliePaymentMethodLimits() {
+        return this._useMolliePaymentMethodLimits;
+    }
+
+    setUseMolliePaymentMethodLimits(value) {
+        this._useMolliePaymentMethodLimits = value;
     }
 
 }

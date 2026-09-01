@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as ShopwareLineItem;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
@@ -26,6 +27,7 @@ final class RefundBuilder implements RefundBuilderInterface
     public function __construct(
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
+        private RefundableTotalCalculator $refundableTotalCalculator,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -45,9 +47,12 @@ final class RefundBuilder implements RefundBuilderInterface
         }
 
         $taxStatus = (string) $order->getTaxStatus();
-        $orderLineItems = ($order->getLineItems() ?? new OrderLineItemCollection())
+        $allOrderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+        $shippingDiscountLabel = LineItem::resolveDeliveryDiscountLabel($allOrderLineItems);
+        $orderLineItems = $allOrderLineItems
             ->filter(function (OrderLineItemEntity $item): bool {
-                return $item->getType() !== ShopwareLineItem::CREDIT_LINE_ITEM_TYPE;
+                return $item->getType() !== ShopwareLineItem::CREDIT_LINE_ITEM_TYPE
+                    && ! LineItem::isDeliveryDiscountPlaceholder($item);
             })
         ;
         $orderDeliveries = $order->getDeliveries() ?? new OrderDeliveryCollection();
@@ -57,6 +62,7 @@ final class RefundBuilder implements RefundBuilderInterface
 
         $lineItems = new LineItemCollection();
         $mollieLines = null;
+        $mollieRefundable = null;
 
         if ($payment->getOrderId() !== null) {
             $mollieOrder = $this->mollieGateway->getOrder($payment->getOrderId(), $salesChannelId);
@@ -65,6 +71,7 @@ final class RefundBuilder implements RefundBuilderInterface
         } else {
             $molliePayment = $this->mollieGateway->getPayment($payment->getId(), $orderNumber, $salesChannelId);
             $existingRefunds = $molliePayment->getRefunds();
+            $mollieRefundable = $molliePayment->getRefundableAmount();
         }
 
         $alreadyRefunded = $existingRefunds->getSumRefunded() + $existingRefunds->getSumPending();
@@ -72,27 +79,34 @@ final class RefundBuilder implements RefundBuilderInterface
         $amount = $requestAmount ?? $order->getAmountTotal();
 
         if ($isFullRefund && $alreadyRefunded <= 0.0) {
-            $lineItems = $this->buildItemsFromOrder($orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines);
+            $lineItems = $this->buildItemsFromOrder($orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines, $shippingDiscountLabel);
         }
 
         if ($hasRequestedItems) {
-            $lineItems = $this->buildFromRequestItems($requestItems, $orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines);
+            $lineItems = $this->buildFromRequestItems($requestItems, $orderLineItems, $orderDeliveries, $taxStatus, $currency, $mollieLines, $shippingDiscountLabel);
             // Only override amount if no explicit amount was requested
             if ($requestAmount === null) {
                 $amount = $lineItems->getTotal();
             }
         }
 
-        $baseTotal = $this->computeBaseTotal($orderLineItems, $orderDeliveries);
+        $baseTotal = $this->refundableTotalCalculator->calculate($order);
         $maxRefundable = max(0.0, $baseTotal - $alreadyRefunded);
-        $amount = min($amount, $maxRefundable);
+
+        if ($mollieRefundable !== null) {
+            $maxRefundable = min($maxRefundable, max(0.0, $mollieRefundable));
+        }
+
+        $amount = round(min($amount, $maxRefundable), Mollie::ROUNDING_PRECISION);
 
         $money = new Money($amount, $currency->getIsoCode());
 
+        $refundLines = $mollieLines !== null ? $this->resolveMollieLineIds($lineItems, $mollieLines, $orderNumber) : $lineItems;
+
         // Use order-based refund with line items only when no custom amount is requested;
         // a custom amount requires payment-level refund so Mollie honors the amount.
-        if ($payment->getOrderId() !== null && $lineItems->count() > 0 && $requestAmount === null) {
-            $createRefund = new CreateOrderRefund($payment->getOrderId(), $lineItems);
+        if ($payment->getOrderId() !== null && $refundLines->count() > 0 && $requestAmount === null) {
+            $createRefund = new CreateOrderRefund($payment->getOrderId(), $refundLines);
             $createRefund->setDescription($description);
         } else {
             $createRefund = new CreatePaymentRefund($payment->getId(), $money, $description);
@@ -101,6 +115,8 @@ final class RefundBuilder implements RefundBuilderInterface
         $this->logger->debug('Refund payload built', [
             'orderNumber' => $orderNumber,
             'amount' => $amount,
+            'maxRefundable' => $maxRefundable,
+            'mollieRefundable' => $mollieRefundable,
             'lineCount' => $lineItems->count(),
             'isOrderRefund' => $createRefund instanceof CreateOrderRefund,
         ]);
@@ -108,20 +124,44 @@ final class RefundBuilder implements RefundBuilderInterface
         return $createRefund;
     }
 
-    private function computeBaseTotal(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries): float
+    /**
+     * The Mollie line id comes from the "order_line_id" custom field, which older plugin versions
+     * only wrote for line items and never for deliveries. Since every refund line carries its
+     * Shopware id, fall back to the live Mollie order for the missing ones - otherwise the shipping
+     * line of such an order is sent without an id and Mollie rejects the whole refund with
+     * "Line x contains invalid data. The 'id' field is missing".
+     */
+    private function resolveMollieLineIds(LineItemCollection $lineItems, LineItemCollection $mollieLines, string $orderNumber): LineItemCollection
     {
-        $total = 0.0;
-        foreach ($orderLineItems as $lineItem) {
-            $total += $lineItem->getTotalPrice();
-        }
-        foreach ($orderDeliveries as $delivery) {
-            $total += $delivery->getShippingCosts()->getTotalPrice();
+        foreach ($lineItems as $lineItem) {
+            if ($lineItem->getId() !== '') {
+                continue;
+            }
+
+            $mollieLineId = (string) $mollieLines->findByShopwareId($lineItem->getShopwareLineItemId())?->getId();
+            if ($mollieLineId === '') {
+                continue;
+            }
+
+            $lineItem->setId($mollieLineId);
         }
 
-        return $total;
+        $refundLines = $lineItems->filter(function (LineItem $lineItem): bool {
+            return $lineItem->getId() !== '';
+        });
+
+        if ($refundLines->count() !== $lineItems->count()) {
+            $this->logger->warning('Refund lines without a Mollie line id are skipped', [
+                'orderNumber' => $orderNumber,
+                'lineCount' => $lineItems->count(),
+                'skippedCount' => $lineItems->count() - $refundLines->count(),
+            ]);
+        }
+
+        return $refundLines;
     }
 
-    private function buildItemsFromOrder(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines): LineItemCollection
+    private function buildItemsFromOrder(OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines, ?string $shippingDiscountLabel = null): LineItemCollection
     {
         $collection = new LineItemCollection();
 
@@ -163,7 +203,8 @@ final class RefundBuilder implements RefundBuilderInterface
                 continue;
             }
 
-            $collection->add(LineItem::fromDelivery($delivery, $currency, $taxStatus));
+            $descriptionOverride = $delivery->getShippingCosts()->getTotalPrice() < 0 ? $shippingDiscountLabel : null;
+            $collection->add(LineItem::fromDelivery($delivery, $currency, $taxStatus, $descriptionOverride));
         }
 
         return $collection;
@@ -172,7 +213,7 @@ final class RefundBuilder implements RefundBuilderInterface
     /**
      * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
      */
-    private function buildFromRequestItems(array $requestItems, OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines): LineItemCollection
+    private function buildFromRequestItems(array $requestItems, OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines, ?string $shippingDiscountLabel = null): LineItemCollection
     {
         $collection = new LineItemCollection();
 
@@ -201,7 +242,8 @@ final class RefundBuilder implements RefundBuilderInterface
                     $itemAmount = $delivery->getShippingCosts()->getTotalPrice();
                 }
 
-                $refundLine = LineItem::fromDelivery($delivery, $currency, $taxStatus);
+                $descriptionOverride = $delivery->getShippingCosts()->getTotalPrice() < 0 ? $shippingDiscountLabel : null;
+                $refundLine = LineItem::fromDelivery($delivery, $currency, $taxStatus, $descriptionOverride);
                 $deliveryMoney = new Money($itemAmount, $currency->getIsoCode());
                 $refundLine->setAmount($deliveryMoney);
                 $refundLine->setUnitPrice($deliveryMoney);

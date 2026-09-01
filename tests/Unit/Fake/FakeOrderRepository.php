@@ -13,6 +13,12 @@ final class FakeOrderRepository extends EntityRepository
     /** @var list<array<string,mixed>> */
     private array $upsertedPayloads = [];
 
+    /** @var list<array<string,mixed>> */
+    private array $updatedPayloads = [];
+
+    /** @var list<string> */
+    private array $updateScopes = [];
+
     public function __construct()
     {
     }
@@ -50,6 +56,49 @@ final class FakeOrderRepository extends EntityRepository
         foreach ($data as $entry) {
             $this->upsertedPayloads[] = $entry;
         }
+
+        return new EntityWrittenContainerEvent($context, new NestedEventCollection(), []);
+    }
+
+    public function getUpdateCount(): int
+    {
+        return count($this->updatedPayloads);
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function getLastUpdate(): array
+    {
+        if ($this->updatedPayloads === []) {
+            throw new \RuntimeException('FakeOrderRepository has no update payloads recorded.');
+        }
+
+        return $this->updatedPayloads[array_key_last($this->updatedPayloads)];
+    }
+
+    /**
+     * Write-protected fields such as billingAddressId only go through in the system scope, so a
+     * caller that forgot to switch has to be visible to a test.
+     */
+    public function getLastUpdateScope(): string
+    {
+        if ($this->updateScopes === []) {
+            throw new \RuntimeException('FakeOrderRepository has no update payloads recorded.');
+        }
+
+        return $this->updateScopes[array_key_last($this->updateScopes)];
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $data
+     */
+    public function update(array $data, Context $context): EntityWrittenContainerEvent
+    {
+        foreach ($data as $entry) {
+            $this->updatedPayloads[] = $entry;
+        }
+        $this->updateScopes[] = $context->getScope();
 
         return new EntityWrittenContainerEvent($context, new NestedEventCollection(), []);
     }

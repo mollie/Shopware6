@@ -28,4 +28,15 @@ final class CustomerContext extends ShopwareContext
         $this->setOptions(SalesChannelContextService::BILLING_ADDRESS_ID,$addressId);
         $this->setOptions(SalesChannelContextService::SHIPPING_ADDRESS_ID,$addressId);
     }
+
+    #[Given('i select :arg1 as billing country without company')]
+    public function iSelectAsBillingCountryWithoutCompany(string $billingCountry): void
+    {
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+        $addressIdSearchResult = $this->getPrivateUserAddressByIso($billingCountry, $salesChannelContext);
+        $addressId = $addressIdSearchResult->firstId();
+
+        $this->setOptions(SalesChannelContextService::BILLING_ADDRESS_ID,$addressId);
+        $this->setOptions(SalesChannelContextService::SHIPPING_ADDRESS_ID,$addressId);
+    }
 }

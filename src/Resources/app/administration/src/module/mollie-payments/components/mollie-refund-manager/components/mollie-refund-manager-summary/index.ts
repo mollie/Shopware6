@@ -32,6 +32,11 @@ const componentConfig: ThisType<RefundManagerSummaryComponent> = {
             required: false,
             default: false,
         },
+        isOrderFullyRefunded: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
         configVerifyRefund: {
             type: Boolean,
             required: false,

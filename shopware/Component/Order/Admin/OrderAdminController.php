@@ -7,26 +7,20 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Mollie\PaymentMethod;
-use Mollie\Shopware\Component\Order\Admin\Response\CancelStatusEntry;
 use Mollie\Shopware\Component\Order\Admin\Response\OrderDetailsResponse;
 use Mollie\Shopware\Component\Order\Admin\Response\RefundManagerConfig;
 use Mollie\Shopware\Component\Order\Admin\Response\ShippingData;
-use Mollie\Shopware\Component\Order\Admin\Response\ShippingStatusEntry;
-use Mollie\Shopware\Component\Order\Admin\Response\ShippingTotal;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
-use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Routing\ApiRouteScope;
 use Shopware\Core\PlatformRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -50,6 +44,10 @@ final class OrderAdminController extends AbstractController
         private readonly AbstractSettingsService $mollieSettings,
         #[Autowire(service: MollieGateway::class)]
         private readonly MollieGatewayInterface $mollieGateway,
+        #[Autowire(service: OrderAdminStatusBuilder::class)]
+        private readonly OrderAdminStatusBuilder $statusBuilder,
+        #[Autowire(service: OrderPaymentRecovery::class)]
+        private readonly OrderPaymentRecovery $paymentRecovery,
     ) {
     }
 
@@ -61,13 +59,11 @@ final class OrderAdminController extends AbstractController
     public function details(string $orderId, Context $context): JsonResponse
     {
         $criteria = new Criteria([$orderId]);
-        $criteria->getAssociation('transactions')
-            ->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))
-            ->setLimit(1)
-        ;
+        $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('mollieSubscriptions');
         $criteria->addAssociation('lineItems');
-        $criteria->addAssociation('deliveries');
+        $criteria->addAssociation('deliveries.shippingMethod');
+        $criteria->addAssociation('currency');
 
         /** @var null|OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -76,17 +72,18 @@ final class OrderAdminController extends AbstractController
             return new JsonResponse(['error' => 'Order not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $latestTransaction = $order->getTransactions()?->first();
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $effectiveTransaction = $transactions->getCurrentOrderTransaction();
 
-        if ($latestTransaction === null) {
+        if ($effectiveTransaction === null) {
             return new JsonResponse(['isMollieOrder' => false]);
         }
 
         /** @var null|Payment $payment */
-        $payment = $latestTransaction->getExtension(Mollie::EXTENSION);
+        $payment = $effectiveTransaction->getExtension(Mollie::EXTENSION);
 
         if (! $payment instanceof Payment) {
-            $payment = $this->restorePaymentFromOrderCustomFields($order, $latestTransaction, $context);
+            $payment = $this->paymentRecovery->restore($order, $effectiveTransaction, $context);
 
             if ($payment === null) {
                 return new JsonResponse(['isMollieOrder' => false]);
@@ -110,6 +107,25 @@ final class OrderAdminController extends AbstractController
 
         $mollieOrder = $this->loadMollieOrder($mollieOrderId, $salesChannelId);
 
+        // The Mollie payment status on the loaded extension is not reliable here (no API call, status not
+        // hydrated), so we rely on the Shopware transaction state machine.
+        $transactionState = $effectiveTransaction->getStateMachineState()?->getTechnicalName() ?? '';
+
+        // Shipping is only blocked when the payment can no longer be captured at all. A "paid"
+        // transaction must stay shippable: Mollie already reports a manual-capture payment (Klarna,
+        // Riverty, ...) as paid after the first partial capture, and merchants set orders to paid
+        // manually for their ERP. Whether something is actually captured is decided by ShipOrderRoute.
+        $shippingAllowed = ! in_array($transactionState, [
+            OrderTransactionStates::STATE_CANCELLED,
+            OrderTransactionStates::STATE_FAILED,
+            OrderTransactionStates::STATE_REFUNDED,
+            OrderTransactionStates::STATE_CHARGEBACK,
+        ], true);
+
+        // Cancelling items releases a part of the authorization, which Mollie only allows while the
+        // payment is authorized (see CancelItemRoute).
+        $cancelAllowed = $transactionState === OrderTransactionStates::STATE_AUTHORIZED;
+
         return new JsonResponse(new OrderDetailsResponse(
             $mollieId,
             $payment->getThirdPartyPaymentId() ?: null,
@@ -122,10 +138,10 @@ final class OrderAdminController extends AbstractController
             $this->mollieSettings->getSubscriptionSettings($salesChannelId)->isEnabled(),
             $this->buildRefundManagerConfig($salesChannelId),
             new ShippingData(
-                $this->buildShippingTotal($mollieOrder),
-                $this->buildShippingStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $order->getDeliveries()),
+                $this->statusBuilder->buildShippingTotal($mollieOrder, $order, $shippingAllowed),
+                $this->statusBuilder->buildShippingStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $shippingAllowed, $order->getDeliveries()),
             ),
-            $this->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems()),
+            $this->statusBuilder->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $cancelAllowed),
         ));
     }
 
@@ -140,208 +156,6 @@ final class OrderAdminController extends AbstractController
         } catch (\Throwable $e) {
             return null;
         }
-    }
-
-    /**
-     * @return array<string, CancelStatusEntry>
-     */
-    private function buildCancelStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems): array
-    {
-        if ($mollieOrder === null) {
-            if ($lineItems === null) {
-                return [];
-            }
-
-            $result = [];
-            foreach ($lineItems as $lineItem) {
-                $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
-                $shipped = (int) ($fields['quantity'] ?? 0);
-                $cancelled = (int) ($fields['cancelled_quantity'] ?? 0);
-                $cancelable = max(0, $lineItem->getQuantity() - $shipped - $cancelled);
-                $result[$lineItem->getId()] = new CancelStatusEntry(
-                    '',
-                    $lineItem->getId(),
-                    $cancelable > 0,
-                    $cancelable,
-                    $cancelled,
-                );
-            }
-
-            return $result;
-        }
-
-        $result = [];
-        foreach ($mollieOrder->getLines() as $line) {
-            $shopwareLineItemId = $line->getShopwareLineItemId();
-            if ($shopwareLineItemId === '') {
-                continue;
-            }
-            $result[$shopwareLineItemId] = new CancelStatusEntry(
-                $mollieOrderId,
-                $line->getId(),
-                $line->getCancelableQuantity() > 0,
-                $line->getCancelableQuantity(),
-                $line->getQuantityCanceled(),
-            );
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return array<string, ShippingStatusEntry>
-     */
-    private function buildShippingStatus(string $mollieOrderId, ?Order $mollieOrder, ?OrderLineItemCollection $lineItems, ?OrderDeliveryCollection $deliveries = null): array
-    {
-        if ($mollieOrder === null) {
-            if ($lineItems === null) {
-                return [];
-            }
-
-            $result = [];
-            foreach ($lineItems as $lineItem) {
-                $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
-                $shippedQty = (int) ($fields['quantity'] ?? 0);
-                $cancelledQty = (int) ($fields['cancelled_quantity'] ?? 0);
-                $shippableQty = max(0, $lineItem->getQuantity() - $shippedQty - $cancelledQty);
-                $result[$lineItem->getId()] = new ShippingStatusEntry(
-                    '',
-                    '',
-                    $shippableQty > 0,
-                    $shippableQty,
-                    $shippedQty,
-                );
-            }
-
-            foreach ($deliveries ?? [] as $delivery) {
-                $fields = $delivery->getCustomFields()[Mollie::EXTENSION] ?? [];
-                $shippedQty = (int) ($fields['quantity'] ?? 0);
-                $totalQty = $delivery->getShippingCosts()->getQuantity();
-                $shippableQty = max(0, $totalQty - $shippedQty);
-                $result[$delivery->getId()] = new ShippingStatusEntry(
-                    '',
-                    '',
-                    $shippableQty > 0,
-                    $shippableQty,
-                    $shippedQty,
-                );
-            }
-
-            return $result;
-        }
-
-        $result = [];
-        foreach ($mollieOrder->getLines() as $line) {
-            $shopwareLineItemId = $line->getShopwareLineItemId();
-            if ($shopwareLineItemId === '') {
-                continue;
-            }
-            $result[$shopwareLineItemId] = new ShippingStatusEntry(
-                $mollieOrderId,
-                $line->getId(),
-                $line->getShippableQuantity() > 0,
-                $line->getShippableQuantity(),
-                $line->getQuantityShipped(),
-            );
-        }
-
-        return $result;
-    }
-
-    private function buildShippingTotal(?Order $mollieOrder): ShippingTotal
-    {
-        if ($mollieOrder === null) {
-            return new ShippingTotal('0.00', 0, 0);
-        }
-
-        $totalAmount = 0.0;
-        $totalQuantity = 0;
-        $totalShippable = 0;
-
-        foreach ($mollieOrder->getLines() as $line) {
-            $amountShipped = $line->getAmountShipped();
-            if ($amountShipped !== null) {
-                $totalAmount += (float) $amountShipped->getValue();
-            }
-            $totalQuantity += $line->getQuantityShipped();
-            $totalShippable += $line->getShippableQuantity();
-        }
-
-        return new ShippingTotal(
-            number_format(round($totalAmount, 2), 2),
-            $totalQuantity,
-            $totalShippable,
-        );
-    }
-
-    private function restorePaymentFromOrderCustomFields(OrderEntity $order, OrderTransactionEntity $transaction, Context $context): ?Payment
-    {
-        $orderMollieFields = ($order->getCustomFields() ?? [])[Mollie::EXTENSION] ?? [];
-
-        $paymentId = (string) ($orderMollieFields['payment_id'] ?? '');
-        if ($paymentId === '') {
-            return null;
-        }
-
-        $payment = new Payment($paymentId);
-
-        $orderId = (string) ($orderMollieFields['order_id'] ?? '');
-        if ($orderId !== '') {
-            $payment->setOrderId($orderId);
-        }
-
-        $method = (string) ($orderMollieFields['payment_method'] ?? '');
-        $paymentMethod = $method !== '' ? PaymentMethod::tryFrom($method) : null;
-        if ($paymentMethod !== null) {
-            $payment->setMethod($paymentMethod);
-        }
-
-        $thirdPartyPaymentId = (string) ($orderMollieFields['third_party_payment_id'] ?? '');
-        if ($thirdPartyPaymentId !== '') {
-            $payment->setThirdPartyPaymentId($thirdPartyPaymentId);
-        }
-
-        $checkoutUrl = (string) ($orderMollieFields['molliePaymentUrl'] ?? '');
-        if ($checkoutUrl !== '') {
-            $payment->setCheckoutUrl($checkoutUrl);
-        }
-
-        $creditCardLabel = (string) ($orderMollieFields['creditCardLabel'] ?? '');
-        if ($creditCardLabel !== '') {
-            $payment->setCreditCardLabel($creditCardLabel);
-            $payment->setCreditCardNumber((string) ($orderMollieFields['creditCardNumber'] ?? ''));
-            $payment->setCreditCardHolder((string) ($orderMollieFields['creditCardHolder'] ?? ''));
-        }
-
-        $paypalPayerId = (string) ($orderMollieFields['paypalPayerId'] ?? '');
-        if ($paypalPayerId !== '') {
-            $payment->setPaypalPayerId($paypalPayerId);
-        }
-
-        $bankAccount = (string) ($orderMollieFields['bankAccount'] ?? '');
-        if ($bankAccount !== '') {
-            $payment->setBankName((string) ($orderMollieFields['bankName'] ?? ''));
-            $payment->setBankAccount($bankAccount);
-            $payment->setBankBic((string) ($orderMollieFields['bankBic'] ?? ''));
-            $payment->setTransferReference((string) ($orderMollieFields['transferReference'] ?? ''));
-            $payment->setConsumerName((string) ($orderMollieFields['consumerName'] ?? ''));
-            $payment->setConsumerAccount((string) ($orderMollieFields['consumerAccount'] ?? ''));
-            $payment->setConsumerBic((string) ($orderMollieFields['consumerBic'] ?? ''));
-        }
-
-        $this->orderRepository->upsert([
-            [
-                'id' => $order->getId(),
-                'transactions' => [
-                    [
-                        'id' => $transaction->getId(),
-                        'customFields' => [Mollie::EXTENSION => $payment->toArray()],
-                    ],
-                ],
-            ],
-        ], $context);
-
-        return $payment;
     }
 
     private function buildRefundManagerConfig(string $salesChannelId): RefundManagerConfig

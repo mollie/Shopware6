@@ -1,0 +1,81 @@
+<?php
+declare(strict_types=1);
+
+namespace Mollie\Shopware\Component\Refund\Return;
+
+use Shopware\Core\Defaults;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityWriteResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
+use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
+final class OrderReturnSubscriber implements EventSubscriberInterface
+{
+    private const STATE_MACHINE_EVENT = 'state_machine.order_return.state_changed';
+    private const STATE_DONE = 'done';
+    private const STATE_CANCELLED = 'cancelled';
+
+    public function __construct(
+        private readonly RefundAction $refundAction,
+        private readonly CancelAction $cancelAction,
+    ) {
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            self::STATE_MACHINE_EVENT => ['onOrderReturnStateChanged', 10],
+            'order_return.written' => ['onOrderReturnWritten', 10],
+        ];
+    }
+
+    public function onOrderReturnWritten(EntityWrittenEvent $event): void
+    {
+        // Opening an order in the admin clones its returns into a non-live order version.
+        // Those clones are INSERTs and must not trigger another refund (issue #1421).
+        if (! $this->isLiveVersion($event->getContext())) {
+            return;
+        }
+
+        foreach ($event->getWriteResults() as $result) {
+            if ($result->getOperation() !== EntityWriteResult::OPERATION_INSERT) {
+                continue;
+            }
+
+            $returnId = $result->getPrimaryKey();
+            if (! is_string($returnId)) {
+                continue;
+            }
+
+            $this->refundAction->executeOnCreate($returnId, $event->getContext());
+        }
+    }
+
+    public function onOrderReturnStateChanged(StateMachineStateChangeEvent $event): void
+    {
+        if ($event->getTransitionSide() !== StateMachineStateChangeEvent::STATE_MACHINE_TRANSITION_SIDE_ENTER) {
+            return;
+        }
+
+        // No live version check here: the Return Management always transitions the return inside the
+        // working version of the order the admin opened, so a live context never arrives. Refunding
+        // twice is prevented by the returnId Mollie stores on the refund instead.
+        $returnId = $event->getTransition()->getEntityId();
+        $context = $event->getContext();
+
+        switch ($event->getStateName()) {
+            case self::STATE_DONE:
+                $this->refundAction->execute($returnId, $context);
+                break;
+            case self::STATE_CANCELLED:
+                $this->cancelAction->execute($returnId, $context);
+                break;
+        }
+    }
+
+    private function isLiveVersion(Context $context): bool
+    {
+        return $context->getVersionId() === Defaults::LIVE_VERSION;
+    }
+}

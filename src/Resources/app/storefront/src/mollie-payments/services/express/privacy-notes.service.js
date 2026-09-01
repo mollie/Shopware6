@@ -2,6 +2,7 @@ import BuyBoxRepository from '../../repository/buy-box-repository';
 
 const DISPLAY_NONE_CLS = 'd-none';
 const INVALID_CLS = 'is-invalid';
+const OBSERVED_HOOK = 'js-mollie-observed';
 
 export default class PrivacyNotesService {
     constructor(document) {
@@ -15,14 +16,14 @@ export default class PrivacyNotesService {
      * When all express payment buttons are hidden, the privacy note is also hidden to avoid confusion.
      */
     initCheckbox() {
-        const privacyNotes = this._document.querySelectorAll('.mollie-privacy-note:not(.observed)');
+        const privacyNotes = this._document.querySelectorAll(`.mollie-privacy-note:not(.${OBSERVED_HOOK})`);
 
         for (let i = 0; i < privacyNotes.length; i++) {
             const currentNote = privacyNotes[i];
 
             currentNote.classList.remove(DISPLAY_NONE_CLS);
 
-            currentNote.classList.add('observed');
+            currentNote.classList.add(OBSERVED_HOOK);
 
             const buyElement = this._repoBuyBox.findClosestBuyBox(currentNote);
 
@@ -62,6 +63,38 @@ export default class PrivacyNotesService {
                 observer.observe(currentButton, { attributes: true, attributeFilter: ['class'] });
             }
         }
+    }
+
+    /**
+     * Resolves the accepted-data-protection value that has to be sent to the backend
+     * for a given express payment button.
+     *
+     * The checkbox is never a child of the express button container itself, it is rendered
+     * in the sibling `.mollie-privacy-note` of the surrounding buy box. It therefore has to
+     * be looked up through the buy box, otherwise the value silently stays unaccepted and
+     * Shopware rejects the guest registration.
+     *
+     * A missing privacy note means the shop does not require the checkbox, or the customer
+     * is already logged in and gave the consent while registering. Neither case creates a
+     * guest account, so returning 0 never blocks a checkout and no consent is faked.
+     *
+     * @param {HTMLElement} expressButton - The express payment button element
+     * @returns {number} 1 if an accepted checkbox exists, 0 otherwise
+     */
+    getAcceptedDataProtection(expressButton) {
+        const privacyNoteElement = this._repoBuyBox.findClosestPrivacyBox(expressButton);
+
+        if (privacyNoteElement === null) {
+            return 0;
+        }
+
+        const dataProtection = this._repoBuyBox.getPrivacyBoxCheckbox(privacyNoteElement);
+
+        if (dataProtection === null) {
+            return 0;
+        }
+
+        return dataProtection.checked ? 1 : 0;
     }
 
     /**

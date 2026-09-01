@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMethod;
-use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\FakeApplePayAddress;
+use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddress;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
@@ -164,8 +164,8 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
         }
 
         $customerId = $customer->getId();
-        $fakeApplePayAddress = new FakeApplePayAddress($customer, $countryId);
-        $fakeApplePayAddressId = FakeApplePayAddress::getId($customer);
+        $fakeApplePayAddress = new TempAddress($customer, $countryId);
+        $fakeApplePayAddressId = TempAddress::getId($customer);
 
         $logData['customerId'] = $customerId;
         $logData['addressId'] = $fakeApplePayAddressId;
@@ -187,7 +187,7 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
             return;
         }
 
-        $fakeAddressId = FakeApplePayAddress::getId($customer);
+        $fakeAddressId = TempAddress::getId($customer);
         $this->customerAddressRepository->delete([['id' => $fakeAddressId]], $salesChannelContext->getContext());
     }
 
@@ -207,6 +207,13 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
      */
     private function setSelectedMethodToFirstElement(array $applePayMethods, string $selectedShippingMethodId): array
     {
+        // The method the customer chose in the shop does not have to be available for the country
+        // they pick in the Apple Pay sheet. Apple preselects the first entry, so the remaining
+        // methods keep their order and the first available one is preselected instead.
+        if (! isset($applePayMethods[$selectedShippingMethodId])) {
+            return array_values($applePayMethods);
+        }
+
         $selectedShippingMethod = $applePayMethods[$selectedShippingMethodId];
 
         unset($applePayMethods[$selectedShippingMethodId]);

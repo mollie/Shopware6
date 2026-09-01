@@ -64,6 +64,24 @@ final class ApiSettings extends Struct
         return $this->profileId;
     }
 
+    public function setProfileId(string $profileId): void
+    {
+        $this->profileId = $profileId;
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function toShopwareArray(): array
+    {
+        return [
+            self::KEY_TEST_API_KEY => $this->testApiKey,
+            self::KEY_LIVE_API_KEY => $this->liveApiKey,
+            self::KEY_TEST_MODE => $this->isTestMode(),
+            self::KEY_PROFILE_ID => $this->profileId,
+        ];
+    }
+
     public function getMode(): Mode
     {
         return $this->mode;

@@ -71,4 +71,27 @@ final class LocaleTest extends TestCase
             $this->assertSame($expectedLocale, $actual);
         }
     }
+
+    public function testUnsupportedLocaleFallsBackInsteadOfThrowing(): void
+    {
+        $testCases = [
+            'cs-CZ' => Locale::enGB, // unknown language and region
+            'sk-SK' => Locale::enGB, // unknown language and region
+            'de-LU' => Locale::deDE, // same language available
+            'en-AU' => Locale::enGB, // same language available
+            'gsw-CH' => Locale::deCH, // unknown language, same region available
+        ];
+
+        foreach ($testCases as $code => $expectedLocale) {
+            $locale = new LocaleEntity();
+            $locale->setCode($code);
+
+            $language = new LanguageEntity();
+            $language->setLocale($locale);
+
+            $actual = Locale::fromLanguage($language);
+
+            $this->assertSame($expectedLocale, $actual, sprintf('Locale "%s" should fall back to "%s"', $code, $expectedLocale->value));
+        }
+    }
 }

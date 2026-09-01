@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Subscription | Mollie Subscriptions"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Pasūtījums veiksmīgs ",
-            "mollie_checkout_order_failed": " Pasūtījums neizdevās",
-            "mollie_checkout_order_canceled": " Pasūtījums atcelts",
+            "mollie_payment_success": "Pasūtījums veiksmīgs ",
+            "mollie_payment_failed": " Pasūtījums neizdevās",
+            "mollie_payment_cancelled": " Pasūtījums atcelts",
             "mollie_webhook_received_All": " Mollie Webhook Saņemts (Visi)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Saņemts (Atvērts)",
             "mollie_webhook_received_status_authorized": "Mollie tīmekļa āķi saņemti (Autorizēti)",
             "mollie_webhook_received_status_failed": "Mollie tīmekļa āķi saņemti (Neizdevušies)",
             "mollie_webhook_received_status_canceled": "Mollie tīmekļa āķi saņemti (Atcelti)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": "Mollie tīmekļa āķi saņemti (Pabeigti)",
             "mollie_webhook_received_status_refunded": "Mollie tīmekļa āķi saņemti (Atmaksāti)",
             "mollie_webhook_received_status_partially_refunded": "Mollie tīmekļa āķi saņemti (Daļēji Atmaksāti)",
+            "mollie_webhook_received_status_chargeback": "Mollie tīmekļa āķi saņemti (Maksājuma apstrīdēšana)",
             "mollie_refund_started": "Mollie atmaksa sākta",
             "mollie_subscription_started": " Sākta Mollie abonēšana",
             "mollie_subscription_ended": " Mollie abonēšana pabeigta",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": "Mollie abonements atsākts",
             "mollie_subscription_skipped": "Mollie abonements izlaists",
             "mollie_subscription_renewed": "Mollie abonements atjaunots",
-            "mollie_subscription_renewal_reminder": "Mollie atgādinājums par abonementa atjaunošanu"
+            "mollie_subscription_renewal_reminder": "Mollie atgādinājums par abonementa atjaunošanu",
+            "mollie_subscription_priceChangeNotice": "Mollie abonements cenas izmaiņas"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Mollie Subscriptions",
                 "description": "Jūsu regulāro maksājumu pārvaldīšana ir vieglāka nekā jebkad agrāk ar mūsu noderīgajām funkcijām. Paceliet savu biznesu jaunā līmenī ar efektīvām izsekosanas iespējām, vienkāršām integrācijām un vairāk. Ar Mollie abonementiem jūs varat viegli izveidot abonementa produktus un ieplānot regulārus maksājumus, lai tie notiktu noteiktajos intervālos un periodos.",
                 "mollieSubscriptionProduct": "Abonementa Produkts",
+                "mollieAllowOneTime": "Piedāvāt arī kā vienreizēju pirkumu",
+                "mollieAllowOneTimeHelp": "Produkta lapā parāda papildu pogu „Pievienot grozam\", lai produktu varētu iegādāties bez abonementa.",
                 "mollieSubscriptionIntervalAmount": "Atkārtot maksājumu katru",
                 "mollieSubscriptionIntervalType": "Intervāla vienība",
                 "mollieSubscriptionRepetitionAmount": "Atkārtojumu skaits",
@@ -501,9 +506,9 @@
             "canceled": "Atcelts",
             "expired": "Beidzies",
             "partiallyRefunded": "Atmaksāts (daļēji)",
-            "orderSuccess": "Pasūtījums veiksmīgs",
-            "orderFailed": "Pasūtījums neizdevās",
-            "orderCanceled": "Pasūtījums atcelts"
+            "payment": "Maksājums",
+            "success": "Veiksmīgi",
+            "priceChangeNotice": "Cenas izmaiņas"
         }
     }
 }

@@ -3,14 +3,14 @@ Dear {{ customer.firstName }} {{ customer.lastName }},
 We are writing to inform you that the price of your subscription with {{ salesChannel.name }} will change.
 
 Subscription: {{ subscription.description }}
-Current amount: {{ subscription.amount }} {{ subscription.currency.symbol }}
-New amount: {{ subscription.nextNotifiedPrice }} {{ subscription.currency.symbol }}
+Current amount: {{ subscription.amount }} {{ subscription.currency.symbol ?? '' }}
+New amount: {{ subscription.nextNotifiedPrice }} {{ subscription.currency.symbol ?? '' }}
 Effective from next renewal on: {{ subscription.nextPaymentAt | date("m / d / Y", false) }}
 
 {% if subscription.order and subscription.order.lineItems %}
 Items in this subscription:
 {% for lineItem in subscription.order.lineItems %}
-- {{ lineItem.label }} - {{ lineItem.quantity }} x {{ lineItem.unitPrice }} {{ subscription.currency.symbol }}
+- {{ lineItem.label }} - {{ lineItem.quantity }} x {{ lineItem.unitPrice }} {{ subscription.currency.symbol ?? '' }}
 {% endfor %}
 {% endif %}
 

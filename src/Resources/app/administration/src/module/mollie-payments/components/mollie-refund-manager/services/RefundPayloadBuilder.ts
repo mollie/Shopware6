@@ -16,10 +16,22 @@ export interface RefundItemPayload {
     resetStock: number;
 }
 
+export interface RefundTotals {
+    refunded: number;
+    pendingRefunds: number;
+    remaining: number;
+    voucherAmount: number;
+    roundingDiff: number;
+}
+
 export interface RefundResponse {
-    id?: string;
-    success?: boolean;
-    errors?: unknown[];
+    refund?: {
+        id?: string;
+    };
+    // Absent on a failed refund, which is answered without the created refund.
+    totals?: RefundTotals;
+    refundedItems?: Record<string, number>;
+    refundedAmountItems?: Record<string, number>;
 }
 
 /**
@@ -43,10 +55,10 @@ export default class RefundPayloadBuilder {
 
     /**
      * Gets if the provided refund response represents a success.
-     * A success is either a created refund (string id) or an
-     * explicit success flag.
+     * The backend answers with the created refund; anything without a
+     * refund id is a failure.
      */
     isRefundSuccess(response: RefundResponse): boolean {
-        return typeof response?.id === 'string' || response?.success === true;
+        return typeof response?.refund?.id === 'string';
     }
 }

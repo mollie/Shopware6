@@ -4,47 +4,37 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Shipment;
 
-use Mollie\Shopware\Component\Mollie\CreateCapture;
-use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
-use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
-use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Mollie\ShippingItem;
-use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Shipment\Route\AbstractShipOrderRoute;
+use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
-use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 final class OrderDeliverySubscriber implements EventSubscriberInterface
 {
     /**
      * @param EntityRepository<OrderDeliveryCollection> $orderDeliveryRepository
-     * @param EntityRepository<OrderLineItemCollection> $orderLineRepository
      */
     public function __construct(
         #[Autowire(service: 'order_delivery.repository')]
         private readonly EntityRepository $orderDeliveryRepository,
-        #[Autowire(service: MollieGateway::class)]
-        private readonly MollieGatewayInterface $mollieGateway,
+        #[Autowire(service: ShipOrderRoute::class)]
+        private readonly AbstractShipOrderRoute $shipOrderRoute,
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
-        #[Autowire(service: 'order_line_item.repository')]
-        private readonly EntityRepository $orderLineRepository,
-        #[Autowire(service: 'event_dispatcher')]
-        private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -63,141 +53,62 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $transitionName = $event->getTransition()->getTransitionName();
-        if ($transitionName !== StateMachineTransitionActions::ACTION_SHIP) {
+        if ($event->getTransition()->getTransitionName() !== StateMachineTransitionActions::ACTION_SHIP) {
             return;
         }
-        // dump($event->getPreviousState()->getTechnicalName());
-        $transition = $event->getTransition();
-        $context = $event->getContext();
 
-        $orderDeliveryId = $transition->getEntityId();
+        $context = $event->getContext();
+        $orderDeliveryId = $event->getTransition()->getEntityId();
 
         $criteria = new Criteria([$orderDeliveryId]);
-        $criteria->addAssociation('order.currency');
-        $criteria->addAssociation('order.transactions');
-        $criteria->addAssociation('order.lineItems');
-        $criteria->getAssociation('order.transactions')->addSorting(new FieldSorting('updatedAt', FieldSorting::DESCENDING));
+        $criteria->addAssociation('order.transactions.stateMachineState');
 
-        $searchResult = $this->orderDeliveryRepository->search($criteria, $context);
-        $orderDelivery = $searchResult->first();
-
+        $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->first();
         if (! $orderDelivery instanceof OrderDeliveryEntity) {
-            $this->logger->error('Delivery not found for ' . $orderDeliveryId);
-
             return;
         }
 
         $order = $orderDelivery->getOrder();
         if ($order === null) {
-            $this->logger->error('Order association missing for delivery ' . $orderDeliveryId);
-
             return;
         }
 
-        $orderNumber = $order->getOrderNumber();
-
-        if ($orderNumber === null) {
-            $this->logger->error('Order number missing for order of delivery ' . $orderDeliveryId);
-
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transaction = $transactions->getCurrentOrderTransaction();
+        if (! $transaction instanceof OrderTransactionEntity) {
             return;
         }
 
-        $salesChannelId = $order->getSalesChannelId();
-        $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelId);
-        if (! $paymentSettings->isAutomaticShipment()) {
+        /** @var ?Payment $molliePayment */
+        $molliePayment = $transaction->getExtension(Mollie::EXTENSION);
+        if (! $molliePayment instanceof Payment) {
             return;
         }
 
-        $transactions = $order->getTransactions();
-        if ($transactions === null || $transactions->count() === 0) {
-            $this->logger->debug('No transactions found for order ' . $orderNumber, [
-                'orderDeliveryId' => $orderDeliveryId,
-                'salesChannelId' => $salesChannelId,
-            ]);
-
-            return;
-        }
-
-        $firstTransaction = $transactions->first();
-        if ($firstTransaction === null) {
-            $this->logger->debug('No first transaction found for order ' . $orderNumber, [
-                'orderDeliveryId' => $orderDeliveryId,
-                'salesChannelId' => $salesChannelId,
-            ]);
-
-            return;
-        }
-        $payment = $firstTransaction->getExtension(Mollie::EXTENSION);
-        $transactionId = $firstTransaction->getId();
-
-        $logData = [
-            'orderNumber' => $orderNumber,
+        $logArray = [
+            'orderId' => $order->getId(),
+            'orderNumber' => (string) $order->getOrderNumber(),
             'orderDeliveryId' => $orderDeliveryId,
-            'transactionId' => $transactionId,
-            'salesChannelId' => $salesChannelId,
+            'salesChannelId' => $order->getSalesChannelId(),
         ];
 
-        if (! $payment instanceof Payment) {
-            $this->logger->debug('Transaction was not paid with Mollie', $logData);
+        if (! $this->settingsService->getPaymentSettings($order->getSalesChannelId())->isAutomaticShipment()) {
+            $this->logger->debug('Automatic shipment is disabled for the saleschannel',$logArray);
 
             return;
         }
-        $paymentId = $payment->getId();
+        $this->logger->info('Starting automatic shipment', $logArray);
 
-        $currency = $order->getCurrency();
-        if ($currency === null) {
-            $this->logger->error('Currency association missing for order ' . $orderNumber, $logData);
-
-            return;
+        // All shipment logic (legacy repair, capturable/authorized check, Orders vs Payments API) lives in
+        // the ship route, which is also used headless. This subscriber only reacts to the admin delivery
+        // state change and delegates. A failing shipment (e.g. a Mollie API error) must not break the admin
+        // state change, so any error is caught and logged instead of bubbling up into the state transition.
+        try {
+            $request = new Request([], ['orderId' => $order->getId()]);
+            $this->shipOrderRoute->ship($request, $context);
+        } catch (\Throwable $exception) {
+            $logArray['exception'] = $exception->getMessage();
+            $this->logger->error('Automatic shipment via Mollie failed',$logArray);
         }
-
-        $money = Money::fromOrder($order, $currency);
-
-        $payment = $this->mollieGateway->getPayment($paymentId, $orderNumber, $salesChannelId);
-
-        $alreadyCaptured = $payment->getCapturedAmount();
-
-        $orderShippedEvent = new OrderShippedEvent($transactionId, $context);
-
-        if ($alreadyCaptured instanceof Money && $alreadyCaptured->getValue() >= $money->getValue()) {
-            $this->logger->warning('Order already shipped', $logData);
-            $this->eventDispatcher->dispatch($orderShippedEvent);
-
-            return;
-        }
-
-        // throw new \Exception('stop here');
-
-        $captureItems = new ShippingItemCollection();
-        $captureItem = new ShippingItem(1, 'automaticShipment', $money->getValue());
-        $captureItems->add($captureItem);
-        $createCapture = new CreateCapture($captureItems, $money->getCurrency());
-
-        $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, $orderNumber, $salesChannelId);
-
-        $upsertArray = [];
-        $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
-
-        /** @var OrderLineItemEntity $lineItem */
-        foreach ($lineItems as $lineItem) {
-            $upsertArray[] = [
-                'id' => $lineItem->getId(),
-                'customFields' => [
-                    Mollie::EXTENSION => [
-                        'captureId' => $capture->getId(),
-                        'quantity' => $lineItem->getQuantity()
-                    ]
-                ]
-            ];
-        }
-
-        if ($upsertArray !== []) {
-            $this->orderLineRepository->upsert($upsertArray, $context);
-        }
-
-        $this->eventDispatcher->dispatch($orderShippedEvent);
-
-        $this->logger->info('Order Shipped', $logData);
     }
 }

@@ -4,7 +4,6 @@ export default class ApplePayDirectContainer {
         this._currency = container.querySelector('input[name="currency"]').value;
         this._mode = container.querySelector('input[name="mode"]').value;
         this._withPhone = parseInt(container.querySelector('input[name="withPhone"]').value);
-        this._dataProtection = container.querySelector('input[name="acceptedDataProtection"]');
         this._isProductMode = this._mode === 'productMode';
 
         let shopSlug = applePayButton.getAttribute('data-shop-url');
@@ -32,10 +31,6 @@ export default class ApplePayDirectContainer {
 
     getWithPhone() {
         return this._withPhone;
-    }
-
-    getDataProtection() {
-        return this._dataProtection;
     }
 
     getShopSlug() {

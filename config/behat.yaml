@@ -1,4 +1,10 @@
 default:
+  # Registers the Cucumber JSON formatter without enabling it - `make behat allure=<dir>`
+  # selects it. Allure reads that format directly, including every Given/When/Then step.
+  # Ours, because the vendor formatter reports every row of an Examples table under the same
+  # name - see tests/Behat/Formatter/ExampleRowFormatter.php.
+  extensions:
+    Mollie\Shopware\Behat\Formatter\ExampleRowExtension: ~
   suites:
     default:
       paths:

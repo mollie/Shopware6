@@ -69,7 +69,7 @@ final class AccountService extends AbstractAccountService
         throw new DecorationPatternException(self::class);
     }
 
-    public function loginOrCreateAccount(string $paymentMethodId, Address $billingAddress, Address $shippingAddress, SalesChannelContext $salesChannelContext): SalesChannelContext
+    public function loginOrCreateAccount(string $paymentMethodId, Address $billingAddress, Address $shippingAddress, bool $acceptedDataProtection, SalesChannelContext $salesChannelContext): SalesChannelContext
     {
         $currentPaymentMethodId = $salesChannelContext->getPaymentMethod()->getId();
 
@@ -95,7 +95,7 @@ final class AccountService extends AbstractAccountService
                 $this->logger->debug('Customer was found by email', $logData);
                 $this->accountService->loginById($customer->getId(), $salesChannelContext);
             } catch (\Throwable $e) {
-                $customer = $this->createNewGuestAccount($billingAddress, $countryMap, $salesChannelContext);
+                $customer = $this->createNewGuestAccount($billingAddress, $countryMap, $acceptedDataProtection, $salesChannelContext);
                 $logData['customerId'] = $customer->getId();
                 $logData['customerNumber'] = $customer->getCustomerNumber();
                 $this->logger->debug('New guest account created', $logData);
@@ -199,7 +199,7 @@ final class AccountService extends AbstractAccountService
     /**
      * @param array<string, string> $countryMap pre-built ISO → country UUID mapping (from caller)
      */
-    private function createNewGuestAccount(Address $billingAddress, array $countryMap, SalesChannelContext $salesChannelContext): CustomerEntity
+    private function createNewGuestAccount(Address $billingAddress, array $countryMap, bool $acceptedDataProtection, SalesChannelContext $salesChannelContext): CustomerEntity
     {
         $data = new DataBag();
 
@@ -226,6 +226,9 @@ final class AccountService extends AbstractAccountService
         $data->set('lastName', $billingAddress->getFamilyName());
         $data->set('email', $billingAddress->getEmail());
         $data->set('billingAddress', $billingAddressData);
+        // RegisterRoute adds a NotBlank constraint for this field as soon as the shop requires
+        // the data protection checkbox, so it has to be part of the registration data
+        $data->set('acceptedDataProtection', $acceptedDataProtection);
 
         $registerRouteResponse = $this->registerRoute->register($data->toRequestDataBag(), $salesChannelContext, $data->has('storefrontUrl'));
 

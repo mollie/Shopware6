@@ -56,7 +56,25 @@ final class PaymentMethodInstaller
     {
         $upsertData = $this->loadPaymentMethodMapping($context);
 
-        return $this->shopwarePaymentMethodRepository->upsert($upsertData, $context);
+        try {
+            return $this->shopwarePaymentMethodRepository->upsert($upsertData, $context);
+        } catch (\Throwable $e) {
+            $paymentMethods = [];
+            foreach ($upsertData as $paymentMethod) {
+                $paymentMethods[] = [
+                    'technicalName' => $paymentMethod['technicalName'] ?? null,
+                    'name' => $paymentMethod['name'] ?? null,
+                    'handlerIdentifier' => $paymentMethod['handlerIdentifier'] ?? null,
+                ];
+            }
+
+            $this->logger->error('Failed to upsert Mollie payment methods', [
+                'exception' => $e->getMessage(),
+                'paymentMethods' => $paymentMethods,
+            ]);
+
+            throw $e;
+        }
     }
 
     /**
@@ -116,6 +134,11 @@ final class PaymentMethodInstaller
             /** @var MediaEntity $mediaEntity */
             foreach ($iconNamesSearchResult->getIterator() as $mediaEntity) {
                 $fileName = (string) $mediaEntity->getFileName();
+                // Duplicate media rows can share a file name; the first hit already claimed the
+                // mapping, so skip the rest - otherwise a null key would create a ghost entry.
+                if (! isset($iconMapping[$fileName])) {
+                    continue;
+                }
                 $currentHandlerIdentifier = $iconMapping[$fileName];
                 $mapping[$currentHandlerIdentifier]['mediaId'] = $mediaEntity->getId();
                 unset($iconMapping[$fileName]);
@@ -141,37 +164,53 @@ final class PaymentMethodInstaller
         if ($paymentMethodSearchResult->getTotal() > 0) {
             /** @var PaymentMethodEntity $paymentMethodEntity */
             foreach ($paymentMethodSearchResult->getIterator() as $paymentMethodEntity) {
+                $handlerIdentifier = $paymentMethodEntity->getHandlerIdentifier();
+
+                // The handler always provides a non-empty name; keep it as fallback so we never
+                // upsert an empty name when a translation row (e.g. the system language) is missing.
+                $defaultName = (string) ($mapping[$handlerIdentifier]['name'] ?? '');
+                $systemName = (string) $paymentMethodEntity->getName();
+                if ($systemName === '') {
+                    $systemName = $defaultName;
+                }
+                $description = $paymentMethodEntity->getDescription();
+
                 $changedData = [
                     'id' => $paymentMethodEntity->getId(),
                     'afterOrderEnabled' => $paymentMethodEntity->getAfterOrderEnabled(),
                     'technicalName' => (string) $paymentMethodEntity->getTechnicalName(),
-                    'name' => $paymentMethodEntity->getName(),
-                    'description' => $paymentMethodEntity->getDescription(),
+                    'name' => $systemName,
+                    'description' => $description,
                     'active' => $paymentMethodEntity->getActive(),
+                    'translations' => [
+                        Defaults::LANGUAGE_SYSTEM => [
+                            'name' => $systemName,
+                            'description' => $description,
+                        ],
+                    ],
                 ];
+
                 $translations = $paymentMethodEntity->getTranslations();
-
                 if ($translations !== null) {
-                    $changedData['translations'][Defaults::LANGUAGE_SYSTEM] = [
-                        'name' => $paymentMethodEntity->getName(),
-                        'description' => $paymentMethodEntity->getDescription(),
-                    ];
-
                     foreach ($translations as $translation) {
+                        $translationName = (string) $translation->getName();
+                        if ($translationName === '') {
+                            $translationName = $defaultName;
+                        }
                         $changedData['translations'][$translation->getLanguageId()] = [
-                            'name' => $translation->getName(),
+                            'name' => $translationName,
                             'description' => $translation->getDescription(),
                         ];
                     }
                 }
 
-                $handler = $handlers[$paymentMethodEntity->getHandlerIdentifier()] ?? null;
+                $handler = $handlers[$handlerIdentifier] ?? null;
 
                 if ($handler instanceof DeprecatedMethodAwareInterface) {
                     $changedData['active'] = false;
                 }
 
-                $mapping[$paymentMethodEntity->getHandlerIdentifier()] = array_replace($mapping[$paymentMethodEntity->getHandlerIdentifier()], $changedData);
+                $mapping[$handlerIdentifier] = array_replace($mapping[$handlerIdentifier], $changedData);
             }
         }
 

@@ -1,0 +1,35 @@
+// Mollie storefront brand tokens.
+//
+// These are colors that do NOT map to a Bootstrap/Shopware theme variable
+// (brand colors of Mollie, PayPal and the subscription status badges). Anything
+// that maps cleanly to a theme variable ($white, $black, $danger, ...) uses that
+// variable directly and is not duplicated here.
+//
+// This file must be imported first in base.scss so the tokens are available to
+// all component partials.
+
+// PayPal Express button themes (official PayPal brand colors)
+$mollie-paypal-gold: #ffc439;
+$mollie-paypal-gold-hover: #fcc85b;
+$mollie-paypal-blue: #009cde;
+$mollie-paypal-blue-hover: #09adf3;
+$mollie-paypal-silver: #eee;
+$mollie-paypal-silver-hover: #f6f6f6;
+$mollie-paypal-silver-border: #f6f6f6;
+$mollie-paypal-white-border: #f3f3f3;
+$mollie-paypal-white-hover: #f3f3f3;
+$mollie-paypal-black-border: #555;
+$mollie-paypal-black-hover: #333;
+
+// Subscription status badge colors (account order overview)
+$mollie-subscription-active: #0042a0;
+$mollie-subscription-canceled: #b30000;
+$mollie-subscription-paused: #595959;
+$mollie-subscription-skipped: #ffb100;
+
+// Mollie Components credit card iframe fields
+$mollie-cc-error: #ff233a;
+$mollie-cc-error-shadow: #f33;
+$mollie-cc-error-bg: #fff0f0;
+$mollie-cc-focus: #07f;
+$mollie-cc-input-color: #262626;

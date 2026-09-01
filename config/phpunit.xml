@@ -6,6 +6,7 @@
          colors="true"
          executionOrder="random"
          displayDetailsOnPhpunitDeprecations="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
 >
 
     <testsuites>
@@ -14,10 +15,32 @@
         </testsuite>
     </testsuites>
 
+    <!-- Writes Allure results for the CI report. The config path is resolved against the
+         working directory, which is the plugin root for this suite. -->
+    <extensions>
+        <bootstrap class="Qameta\Allure\PHPUnit\AllureExtension">
+            <parameter name="config" value="config/allure.config.php"/>
+        </bootstrap>
+    </extensions>
+
    <source>
        <include>
            <directory>./../src</directory>
            <directory>./../shopware</directory>
        </include>
+       <exclude>
+           <!-- Migrations only run against a live database, and the fixtures are a dev-only
+                console command that no merchant ever runs. Everything else stays measured:
+                the plugin's events are extension points with setters that decide what
+                reaches the Mollie payload, not value carriers. -->
+           <directory>./../src/Migration</directory>
+           <directory>./../shopware/Component/Fixture</directory>
+           <!-- Maps the Return Management entity of SwagCommercial onto OrderReturnStruct.
+                SwagCommercial is a paid plugin and not in the plugin's own vendor/, so its
+                classes do not exist in the unit bootstrap and this file cannot be loaded here.
+                It stays a pure mapper for that reason - the actions next to it hold the
+                decisions and are measured. -->
+           <file>./../shopware/Component/Refund/Return/OrderReturnLoader.php</file>
+       </exclude>
    </source>
 </phpunit>

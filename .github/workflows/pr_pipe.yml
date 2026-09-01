@@ -24,7 +24,7 @@ jobs:
     steps:
 
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           path: MolliePayments
 
@@ -33,13 +33,43 @@ jobs:
           mkdir -p ~/.build
 
       - name: Mount Build Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-build-${{ github.run_id }}
           path: ~/.build
 
       - name: Build Plugin
         uses: ./MolliePayments/.github/actions/build-plugin
+
+  # Runs the same verifier the Shopware Store runs on upload, against the ZIP we
+  # would actually submit. Separate job instead of a step in the build-plugin
+  # action, because that action is shared with the E2E and nightly pipelines,
+  # which only need the artifact.
+  validate:
+    name: Shopware Extension Verifier
+    needs: build
+    runs-on: ubuntu-latest
+    # Non-blocking for now: the current baseline still has open error-level
+    # findings (plugin icon size, #[Package('core')] in the migrations,
+    # Connection::PARAM_STR_ARRAY). Drop this line once they are fixed, then
+    # the job gates uploads like the Store does.
+    continue-on-error: true
+    steps:
+
+      - name: Clone Code
+        uses: actions/checkout@v6
+        with:
+          path: MolliePayments
+
+      - name: Mount Build Cache
+        uses: actions/cache@v6
+        with:
+          key: cache-build-${{ github.run_id }}
+          path: ~/.build
+
+      - name: Validate Release ZIP
+        working-directory: MolliePayments
+        run: make validate zip=$HOME/.build/MolliePayments.zip -B
 
   e2e:
     name: E2E Core | Shopware ${{ matrix.shopware }}
@@ -49,25 +79,22 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - shopware: '6.7.11.1'
+          - shopware: '6.7.13.1'
             php: '8.2'
             image: 'dockware/shopware'
-          - shopware: '6.7.10.2'
+          - shopware: '6.6.10.23'
             php: '8.2'
             image: 'dockware/shopware'
-          - shopware: '6.6.10.17'
-            php: '8.2'
-            image: 'dockware/shopware'
-          - shopware: '6.5.8.18'
+          - shopware: '6.5.8.19'
             php: '8.2'
             image: 'dockware/shopware'
     steps:
 
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Mount Build Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-build-${{ github.run_id }}
           path: ~/.build
@@ -84,5 +111,23 @@ jobs:
             # -------------------------------------------
             RUN_CYPRESS: true
             TESTRAIL: false
-            # only run @core tests, because we have no API key here
+            # Cypress always runs @core only on PRs — the full suite takes too long.
             FILTERS: "@core"
+            # PHPUnit/Behat depend on the Mollie API key: fork PRs have none, so run only
+            # the API-free 'core' group and skip Behat. When the key IS available (e.g. a
+            # maintainer's own PR) run all integration tests and Behat.
+            PHPUNIT_GROUPS: ${{ secrets.MOLLIE_APIKEY_TEST == '' && 'core' || '' }}
+            RUN_BEHAT: ${{ secrets.MOLLIE_APIKEY_TEST != '' }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  report:
+    name: Test Report
+    needs: [ review, e2e ]
+    # always(), because a red suite is exactly the report worth reading. A pull request
+    # does not publish, it attaches the report to the run as an artifact, so this also
+    # works for contributions from a fork.
+    if: ${{ always() }}
+    uses: ./.github/workflows/step_report.yml
+    permissions:
+      contents: read

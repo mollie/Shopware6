@@ -9,6 +9,6 @@ final class WebhookStatusPaidEvent extends WebhookEvent
 {
     protected static function getStatus(): string
     {
-        return PaymentStatus::PAID->value;
+        return 'status.' . PaymentStatus::PAID->value;
     }
 }

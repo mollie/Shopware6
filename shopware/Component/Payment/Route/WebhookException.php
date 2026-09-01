@@ -12,7 +12,6 @@ final class WebhookException extends HttpException
     public const TRANSACTION_WITHOUT_PAYMENT_METHOD = 'TRANSACTION_WITHOUT_PAYMENT_METHOD';
     public const TRANSACTION_WITHOUT_MOLLIE_PAYMENT = 'TRANSACTION_WITHOUT_MOLLIE_PAYMENT';
     public const NEW_PAYMENT_METHOD_NOT_FOUND = 'NEW_PAYMENT_METHOD_NOT_FOUND';
-    public const PAYMENT_WITHOUT_METHOD = 'PAYMENT_WITHOUT_METHOD';
     public const ORDER_WITHOUT_STATE = 'ORDER_WITHOUT_STATE';
     public const PAYMENT_STATUS_CHANGE_FAILED = 'PAYMENT_STATUS_CHANGE_FAILED';
     public const ORDER_STATUS_CHANGE_FAILED = 'ORDER_STATUS_CHANGE_FAILED';
@@ -47,18 +46,6 @@ final class WebhookException extends HttpException
             self::TRANSACTION_WITHOUT_MOLLIE_PAYMENT,
             'Transaction {{transactionId}} does not have mollie custom fields',[
                 'transactionId' => $transactionId,
-            ]
-        );
-    }
-
-    public static function paymentWithoutMethod(string $transactionId, string $paymentId): self
-    {
-        return new self(
-            Response::HTTP_BAD_REQUEST,
-            self::PAYMENT_WITHOUT_METHOD,
-            'Mollie payment {{paymentId}} is without payment method in transaction {{transactionId}}',[
-                'transactionId' => $transactionId,
-                'paymentId' => $paymentId,
             ]
         );
     }

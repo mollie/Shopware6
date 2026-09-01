@@ -3,20 +3,20 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Subscriber;
 
+use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -60,8 +60,7 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
         $context = $event->getContext();
 
         $criteria = new Criteria([$orderId]);
-        $criteria->addAssociation('transactions');
-        $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))->setLimit(1);
+        $criteria->addAssociation('transactions.stateMachineState');
 
         /** @var ?OrderEntity $order */
         $order = $this->orderRepository->search($criteria, $context)->first();
@@ -77,12 +76,9 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $transactions = $order->getTransactions();
-        if (! $transactions instanceof OrderTransactionCollection) {
-            return;
-        }
-
-        $transaction = $transactions->first();
+        // Only cancel when the order's current payment is a Mollie payment.
+        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transaction = $transactions->getCurrentOrderTransaction();
         if (! $transaction instanceof OrderTransactionEntity) {
             return;
         }
@@ -108,6 +104,20 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
             $molliePaymentId = $molliePayment->getId();
             $this->mollieGateway->cancelPayment($molliePaymentId, $orderNumber, $salesChannelId);
             $this->logger->info('Auto-cancelled Mollie payment', ['molliePaymentId' => $molliePaymentId, 'orderNumber' => $orderNumber]);
+        } catch (ApiException $e) {
+            if ($e->isCancellationNotPossible()) {
+                $this->logger->warning('Mollie order/payment is no longer in a cancellable state, skipping auto-cancel', [
+                    'orderNumber' => $orderNumber,
+                    'error' => $e->getMessage(),
+                ]);
+
+                return;
+            }
+
+            $this->logger->error('Failed to auto-cancel Mollie order/payment', [
+                'orderNumber' => $orderNumber,
+                'error' => $e->getMessage(),
+            ]);
         } catch (\Throwable $e) {
             $this->logger->error('Failed to auto-cancel Mollie order/payment', [
                 'orderNumber' => $orderNumber,

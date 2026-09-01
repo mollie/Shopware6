@@ -42,6 +42,16 @@ inputs:
     default: ''
     required: false
   # ------------------------------------------------------------------------------------
+  # PHP TEST SETTINGS
+  PHPUNIT_GROUPS:
+    description: "Optional PHPUnit group filter for the integration tests. Use 'core' to skip API-dependent tests when no Mollie API key is available (e.g. on pull requests)."
+    default: ''
+    required: false
+  RUN_BEHAT:
+    description: "If disabled, the Behat tests are skipped. They all require a Mollie API key, so disable them on pull requests."
+    default: 'true'
+    required: false
+  # ------------------------------------------------------------------------------------
   # TESTRAIL SETTINGS
   TESTRAIL:
     description: "If enabled, all results will be sent to TestRail."
@@ -74,6 +84,10 @@ inputs:
     description: 'This is the defined filename of the ZIP file that we use for the installation of the plugin'
     default: '~/.build/MolliePayments.zip'
     required: false
+  _ALLURE_DIR:
+    description: 'Where the PHP suites write their Allure results inside the container. Absolute, because the integration tests and Behat both run from the Shopware root.'
+    default: '/var/www/html/custom/plugins/MolliePayments/.reports/allure'
+    required: false
 
 
 
@@ -88,33 +102,52 @@ runs:
     - name: Start Docker
       shell: bash
       run: |
-        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SW_API_ACCESS_KEY=${{ inputs._STORE_API_KEY }} -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
+        docker run -p 443:443 --name shop --env PHP_VERSION=${{ inputs.PHP }} --env SHOPWARE_HTTP_CACHE_ENABLED=0 -d  ${{ inputs.IMAGE }}:${{ inputs.SHOPWARE }}
         sudo echo "127.0.0.1 ${{ inputs._SHOP_DOMAIN }}" | sudo tee -a /etc/hosts
-        echo "Waiting for Shopware to be ready..."
-        timeout 120 sh -c 'until curl -sk https://${{ inputs._SHOP_DOMAIN }}/api/info > /dev/null 2>&1; do sleep 5; done'
-        echo "Shop is ready."
-        echo "Waiting for MySQL to be ready..."
-        timeout 60 sh -c 'until docker exec shop bash -c "mysqladmin -h 127.0.0.1 -u root -proot ping --silent" > /dev/null 2>&1; do sleep 2; done'
-        echo "MySQL is ready."
+        echo "Waiting for container to be ready..."
+        timeout 420 sh -c 'until docker logs shop 2>&1 | grep -q "container IS READY"; do sleep 2; done' || { echo "::error::Container did not become ready in time"; docker logs shop; exit 1; }
+        echo "Container is ready."
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel_domain SET url='https://${{ inputs._SHOP_DOMAIN }}' WHERE url NOT LIKE 'default.%';\""
     - name: Fix Store API Key
       shell: bash
       run: |
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"UPDATE sales_channel SET access_key='${{ inputs._STORE_API_KEY }}' WHERE id = (SELECT sales_channel_id FROM sales_channel_domain WHERE url = 'https://${{ inputs._SHOP_DOMAIN }}' LIMIT 1);\""
+    - name: Disable Composer Platform Check
+      shell: bash
+      run: |
+        # Some dockware images ship a composer.lock whose platform requirement is PHP >=8.3
+        # while the container runs PHP 8.2, so vendor/composer/platform_check.php fatals on
+        # every bin/console call. Disable the runtime check and regenerate the autoloader.
+        docker exec shop bash -c 'composer config platform-check false'
+        docker exec shop bash -c 'composer dump-autoload --no-scripts' || true
+    - name: Disable Usage-Data Consent Banner
+      shell: bash
+      run: |
+        # Sets the "Help us improve Shopware" consent so the banner does not overlay the
+        # admin during Cypress. Nothing is transmitted since no message-queue worker runs
+        # in the CI container.
+        # <= 6.7.8 reads this system_config key.
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.usageData.consentState accepted' || true
+        # >= 6.7.9.1 moved consent to the generic consent_state table.
+        # The intrusive global MODAL ("Help us improve Shopware") is gated ONLY by the
+        # 'product_analytics' consent, whose identifier is the admin user's id (hex) - NOT
+        # the 'backend_data'/'system' row. The modal hides as soon as product_analytics has
+        # any status != 'unset', so seed a 'declined' row for every admin user (declined
+        # avoids enabling any tracking).
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) SELECT UNHEX(REPLACE(UUID(),'-','')), 'product_analytics', LOWER(HEX(u.id)), 'declined', u.username, NOW(3) FROM \\\`user\\\` u ON DUPLICATE KEY UPDATE state=VALUES(state), updated_at=VALUES(updated_at);\"" || true
+        # The Settings > Usage data page card is gated by the 'backend_data'/'system' row.
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) VALUES (UNHEX(REPLACE(UUID(),'-','')), 'backend_data', 'system', 'accepted', 'migration', NOW(3)) ON DUPLICATE KEY UPDATE state='accepted', updated_at=NOW(3);\"" || true
     - name: Update Shopware Config
       shell: bash
       run: |
-        #docker exec shop bash -c 'sed -i "s/APP_ENV=dev/APP_ENV=prod/g" /var/www/html/.env' || true;
         # we have to enable cypress mode in our shop, this helps us to create subscriptions without webhooks
         docker exec shop bash -c "echo "MOLLIE_CYPRESS_MODE=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "APP_URL=https://${{ inputs._SHOP_DOMAIN }}" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MOLLIE_PAYPAL_EXPRESS_BETA=1" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "TEST_TOKEN='none'" >> /var/www/html/.env" || true;
         docker exec shop bash -c "echo "MAILER_DSN=null://null" >> /var/www/html/.env" || true;
-        # disable the storefront reverse-proxy HTTP cache: in prod it can serve a
-        # cached anonymous "/account -> login" redirect to an already logged-in
-        # request (SW 6.7), which breaks the storefront login in the e2e suite.
         docker exec shop bash -c "echo "SHOPWARE_HTTP_CACHE_ENABLED=0" >> /var/www/html/.env" || true;
+        docker exec shop bash -c "cp /var/www/html/.env /var/www/html/.env.local" || true;
         docker exec -u root bash shop -c "chown -R www-data:www-data /var/www/html" || true;
 
     # --------------------------------------------------------------------------------------------------------------------------------------
@@ -135,7 +168,7 @@ runs:
     - name: Configure Shopware
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console system:config:set core.loginRegistration.showAccountTypeSelection true' 
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.loginRegistration.showAccountTypeSelection true' 
   
 
     - name: Prepare Shop for e2e tests
@@ -144,53 +177,59 @@ runs:
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.wikimedia/composer-merge-plugin true'
         docker exec shop bash -c 'composer config --no-plugins allow-plugins.php-http/discovery true'
         docker exec shop bash -c 'composer config --json extra.merge-plugin "{\"include\":[\"custom/plugins/MolliePayments/composer.json\"], \"ignore-duplicates\":true}"'
-        docker exec shop bash -c 'composer require wikimedia/composer-merge-plugin:*'
-        docker exec shop bash -c 'composer require --dev phpunit/phpunit:* -W'
+        # Some dockware images lock packages to releases that require PHP >=8.3 while the
+        # container runs PHP 8.2. Downgrade them to the newest PHP 8.2 compatible release
+        # that still satisfies shopware/core, before merging the plugin's require-dev.
+        # lcobucci/clock: 6.7.3.1 / 6.7.4.2 lock 3.4.0 (needs >=8.3); core only needs ^3.1.0.
+        docker exec shop bash -c 'composer require --no-scripts -W --ignore-platform-reqs "lcobucci/clock:>=3.1 <3.4"'
+        # phpunit: the merged require-dev (phpunit >=10) otherwise resolves to ^12 (needs >=8.3).
+        docker exec shop bash -c 'composer require --dev --no-scripts -W --ignore-platform-reqs "phpunit/phpunit:^11.4"'
+        docker exec shop bash -c 'composer require --ignore-platform-reqs -W wikimedia/composer-merge-plugin:*'
 
     - name: Install Plugin
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console plugin:refresh'
-        docker exec shop bash -c 'php bin/console plugin:install MolliePayments --activate'
-        docker exec shop bash -c 'php bin/console cache:clear'
+        docker exec shop bash -c 'php bin/console --no-debug plugin:refresh'
+        docker exec shop bash -c 'php bin/console --no-debug plugin:install MolliePayments --activate'
+        docker exec shop bash -c 'php bin/console --no-debug cache:clear'
 
     - name: Configure Plugin
       if: ${{ inputs.MOLLIE_APIKEY_TEST != '' }}
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testMode true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.debugMode true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
-        docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.disableDelivery true'
-        docker exec shop bash -c 'php bin/console system:config:set core.mailerSettings.emailAgent ""'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsEnabled true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowPauseResume true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowSkip true'
-        docker exec shop bash -c 'php bin/console system:config:set MolliePayments.config.subscriptionsAllowAddressEditing true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.testMode true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.debugMode true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.liveApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.testApiKey ${{ inputs.MOLLIE_APIKEY_TEST }}'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.formatOrderNumber github_{ordernumber}'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.mailerSettings.disableDelivery true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set core.mailerSettings.emailAgent ""'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsEnabled true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsAllowPauseResume true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsAllowSkip true'
+        docker exec shop bash -c 'php bin/console --no-debug system:config:set MolliePayments.config.subscriptionsAllowAddressEditing true'
         # clean settings inheritance
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"DELETE FROM system_config WHERE sales_channel_id IS NOT NULL;\""
-        docker exec shop bash -c 'php bin/console cache:clear'
+        docker exec shop bash -c 'php bin/console --no-debug cache:clear'
 
     - name: Compile Theme
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console assets:install'
-        docker exec shop bash -c 'php bin/console theme:compile'
-        docker exec shop bash -c 'php bin/console cache:clear'
+        docker exec shop bash -c 'php bin/console --no-debug assets:install'
+        docker exec shop bash -c 'php bin/console --no-debug theme:compile'
+        docker exec shop bash -c 'php bin/console --no-debug cache:clear'
 
     - name: Install Fixtures
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console mollie:fixtures:load'
+        docker exec shop bash -c 'php bin/console --no-debug mollie:fixtures:load'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
 
     - name: DAL Validate
       shell: bash
       run: |
-        docker exec shop bash -c 'php bin/console dal:validate'
+        docker exec shop bash -c 'php bin/console --no-debug dal:validate'
 
     # --------------------------------------------------------------------------------------------------------------------------------------
     - name: Integration analyzer
@@ -201,12 +240,24 @@ runs:
     - name: Integration tests
       shell: bash
       run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration -B'
+        docker exec \
+          -e ALLURE_OUTPUT_DIRECTORY=${{ inputs._ALLURE_DIR }}/results \
+          -e ALLURE_LAYER="Integration" \
+          shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration groups="${{ inputs.PHPUNIT_GROUPS }}" -B'
 
     - name: Functional tests
+      if: ${{ inputs.RUN_BEHAT == 'true' }}
       shell: bash
       run: |
-        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat -B'
+        docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat allure=${{ inputs._ALLURE_DIR }}/behat -B'
+
+    # The PHP integration/behat tests create sales channel contexts that get persisted here.
+    # Clear them so the Cypress store-api logins start from a clean state and bind the customer
+    # to a fresh context token instead of reusing a stale, customer-less one.
+    - name: Clear stale sales channel contexts
+      shell: bash
+      run: |
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"TRUNCATE sales_channel_api_context;\""
 
     - name: Install Cypress
       if: ${{ inputs.RUN_CYPRESS == 'true' }}
@@ -245,9 +296,45 @@ runs:
         docker cp shop:/var/www/html/var/log/. $(pwd)/tests/Cypress/cypress/logs/shopware || true
         docker cp shop:/var/log/php/. $(pwd)/tests/Cypress/cypress/logs/apache || true
 
+    # One artifact per Shopware version, holding nothing but Allure results. The report job
+    # turns each of them into its own environment, so the same test from four Shopware
+    # versions stays four results instead of collapsing into retries of a single one.
+    - name: Collect Allure Results
+      if: always()
+      shell: bash
+      run: |
+        mkdir -p allure-results
+        docker cp shop:${{ inputs._ALLURE_DIR }}/results/. allure-results/ || true
+        docker cp shop:${{ inputs._ALLURE_DIR }}/behat/. allure-results/ || true
+        cp -r tests/Cypress/allure-results/. allure-results/ || true
+
+        # Behat writes every feature into a single all.json, but Allure's Cucumber reader
+        # only ever reads the first entry of such an array - the other features would be
+        # dropped without a word. Give it one file per feature instead.
+        node -e '
+          const fs = require("fs");
+
+          if (fs.existsSync("allure-results/all.json")) {
+            JSON.parse(fs.readFileSync("allure-results/all.json")).forEach((feature, index) => {
+              fs.writeFileSync(`allure-results/behat-${index}.json`, JSON.stringify([feature]));
+            });
+
+            fs.unlinkSync("allure-results/all.json");
+          }
+        '
+
+    - name: Store Allure Results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: allure-results-Shopware_${{ inputs.SHOPWARE }}
+        retention-days: 1
+        if-no-files-found: ignore
+        path: allure-results
+
     - name: Store Cypress Results
       if: ${{ inputs.RUN_CYPRESS == 'true' && always() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: cypress_results_v${{ inputs.SHOPWARE }}${{ inputs.CYPRESS_RESULTS_SUFFIX }}
         retention-days: 1

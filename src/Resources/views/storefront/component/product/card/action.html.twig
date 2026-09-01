@@ -26,7 +26,7 @@
 
         {% if applePayVisible %}
             {% block component_product_box_action_buy_apple_direct_component %}
-                <div class="mt-2 only-support-apple-pay js-apple-pay-container mollie-apple-pay-direct-listing d-none">
+                <div class="mt-2 js-apple-pay-container mollie-apple-pay-direct-container mollie-apple-pay-direct-listing d-none">
                     {% include '@MolliePayments/mollie/component/apple-pay-direct-button.html.twig' %}
                 </div>
             {% endblock %}
@@ -45,28 +45,20 @@
 
 {% endblock %}
 
-{% set showButton = mollie_subscriptions_enabled and product.translated.customFields.mollie_payments_product_subscription_enabled %}
-{% set subscribeButton %}
-    <div class="d-grid">
-        <button class="btn btn-block btn-buy"
-                title="{{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}">
-            {{ "molliePayments.subscriptions.product.addToCartText"|trans|sw_sanitize }}
-        </button>
-    </div>
-{% endset %}
-
 {% block component_product_box_action_buy_button %}
-    {% if showButton %}
-        {{ subscribeButton }}
-    {% else %}
-        {{ parent() }}
-    {% endif %}
+    {% set mollieDefaultButton %}{{ parent() }}{% endset %}
+    {% sw_include '@MolliePayments/mollie/component/subscription-buy-button.html.twig' with {
+        product: product,
+        defaultButton: mollieDefaultButton,
+        subscribeOnlyClass: 'btn btn-block btn-buy'
+    } %}
 {% endblock %}
 
 {% block page_product_detail_product_buy_button %}
-    {% if showButton %}
-        {{ subscribeButton }}
-    {% else %}
-        {{ parent() }}
-    {% endif %}
+    {% set mollieDefaultButton %}{{ parent() }}{% endset %}
+    {% sw_include '@MolliePayments/mollie/component/subscription-buy-button.html.twig' with {
+        product: product,
+        defaultButton: mollieDefaultButton,
+        subscribeOnlyClass: 'btn btn-block btn-buy'
+    } %}
 {% endblock %}

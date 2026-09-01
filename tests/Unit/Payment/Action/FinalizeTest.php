@@ -13,6 +13,8 @@ use Mollie\Shopware\Component\Payment\Action\Finalize;
 use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Payment\Fake\FakeOpenStatusFailedAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +41,7 @@ final class FinalizeTest extends TestCase
         $fakePayment->setStatus(PaymentStatus::PAID);
 
         $paymentFinalize = $this->getFinalizeAction($fakePayment);
-        $paymentFinalize->execute(new MollieTransactionStruct('test', ''), $this->context);
+        $paymentFinalize->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', ''), $this->context);
 
         $this->assertInstanceOf(SuccessEvent::class, $this->eventSpy->getEvent());
     }
@@ -53,7 +55,7 @@ final class FinalizeTest extends TestCase
         $this->expectExceptionMessageMatches('/customer canceled the external payment process/');
 
         $paymentFinalize = $this->getFinalizeAction($fakePayment);
-        $paymentFinalize->execute(new MollieTransactionStruct('test', ''), $this->context);
+        $paymentFinalize->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', ''), $this->context);
         $this->assertInstanceOf(CancelledEvent::class, $this->eventSpy->getEvent());
     }
 
@@ -66,7 +68,32 @@ final class FinalizeTest extends TestCase
         $this->expectExceptionMessageMatches('/payment finalize was interrupted/');
 
         $paymentFinalize = $this->getFinalizeAction($fakePayment);
-        $paymentFinalize->execute(new MollieTransactionStruct('test', ''), $this->context);
+        $paymentFinalize->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', ''), $this->context);
+        $this->assertInstanceOf(FailedEvent::class, $this->eventSpy->getEvent());
+    }
+
+    public function testOpenStatusIsSuccessForRegularPaymentMethods(): void
+    {
+        $fakePayment = $this->getPayment();
+        $fakePayment->setStatus(PaymentStatus::OPEN);
+
+        $paymentFinalize = $this->getFinalizeAction($fakePayment);
+        $paymentFinalize->execute(new FakePaymentMethodHandler(), new MollieTransactionStruct('test', ''), $this->context);
+
+        $this->assertInstanceOf(SuccessEvent::class, $this->eventSpy->getEvent());
+    }
+
+    public function testOpenStatusIsFailedForOpenStatusFailedAwareMethods(): void
+    {
+        $fakePayment = $this->getPayment();
+        $fakePayment->setMethod(PaymentMethod::BAN_CONTACT);
+        $fakePayment->setStatus(PaymentStatus::OPEN);
+
+        $this->expectException(PaymentException::class);
+        $this->expectExceptionMessageMatches('/payment finalize was interrupted/');
+
+        $paymentFinalize = $this->getFinalizeAction($fakePayment);
+        $paymentFinalize->execute(new FakeOpenStatusFailedAwarePaymentHandler(), new MollieTransactionStruct('test', ''), $this->context);
         $this->assertInstanceOf(FailedEvent::class, $this->eventSpy->getEvent());
     }
 

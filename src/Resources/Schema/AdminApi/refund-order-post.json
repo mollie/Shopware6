@@ -10,6 +10,7 @@
       "post": {
         "summary": "Process Refund for Mollie Order",
         "description": "Processes a refund for a Mollie order.",
+        "tags": ["Mollie"],
         "operationId": "processRefund",
         "requestBody": {
           "required": true,

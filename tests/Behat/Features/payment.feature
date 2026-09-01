@@ -1,10 +1,47 @@
 @core @payment
-Feature: Basic payment checkout
+Feature: Payment
   In order to use payment methods
   As a customer
 
   Background:
     Given iam logged in as user "cypress@mollie.com"
+
+  Scenario Outline: payment success for digital product without delivery address
+    Given payment method "<paymentMethod>" exists and active
+    And i select "<billingCountry>" as billing country
+    And i select "<currency>" as currency
+    And product "<productNumber>" with quantity "<quantity>" is in cart
+    When i start checkout with payment method "<paymentMethod>"
+    And select payment status "<paymentStatus>"
+    Then i see success page
+    And order payment status is "<paymentStatus>"
+
+    Examples:
+      | paymentMethod | productNumber | quantity | paymentStatus | billingCountry | currency |
+      | paypal        | MOL_DIGITAL   | 1        | paid          | DE             | EUR      |
+      | banktransfer  | MOL_DIGITAL   | 2        | paid          | DE             | EUR      |
+
+  Scenario: digital product with klarna is captured automatically and becomes paid
+    Given payment method "klarna" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_DIGITAL" with quantity "1" is in cart
+    When i start checkout with payment method "klarna"
+    And select payment status "authorized"
+    Then i see success page
+    And order payment status is "paid"
+
+  Scenario: mixed digital and physical order with klarna captures only the digital part
+    Given payment method "klarna" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And product "MOL_DIGITAL" with quantity "1" is in cart
+    When i start checkout with payment method "klarna"
+    And select payment status "authorized"
+    Then i see success page
+    And order payment status is "authorized"
+    And delivery status is "open"
 
   Scenario Outline: payment success
     Given payment method "<paymentMethod>" exists and active
@@ -41,6 +78,26 @@ Feature: Basic payment checkout
       | twint         | MOL_REGULAR   | 1        | paid          | DE             | CHF      |
       | vipps         | MOL_REGULAR   | 1        | paid          | NO             | NOK      |
       | mobilepay     | MOL_REGULAR   | 1        | paid          | DK             | DKK      |
+
+  Scenario: billink payment success with a private address
+    Given payment method "billink" exists and active
+    And i select "DE" as billing country without company
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    When i start checkout with payment method "billink"
+    And select payment status "authorized"
+    Then i see success page
+    And order payment status is "authorized"
+
+  Scenario: wero payment with pending status leads to success
+    Given payment method "wero" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    When i start checkout with payment method "wero"
+    And select payment status "pending"
+    Then i see success page
+    And order payment status is "unconfirmed"
 
   Scenario Outline: payment success with issuer
     Given payment method "<paymentMethod>" exists and active
@@ -81,6 +138,8 @@ Feature: Basic payment checkout
       | giftcard      | paypal              | MOL_REGULAR   | 1        | paid          | NL             | EUR      | biercheque         |
       | giftcard      | paypal              | MOL_REGULAR   | 1        | paid          | NL             | EUR      | bloemencadeaukaart |
 
+
+
   Scenario: payment success with mixed tax
     Given payment method "paypal" exists and active
     And i select "DE" as billing country
@@ -101,6 +160,30 @@ Feature: Basic payment checkout
     And product "MOL_REGULAR" with quantity "1" is in cart
     And product "MOL_REDUCED_TAX" with quantity "1" is in cart
     And product "MOL_TAX_FREE" with quantity "1" is in cart
+    When i start checkout with payment method "paypal"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+
+  Scenario: payment success with mixed tax and net customer and percentage discount
+    Given payment method "paypal" exists and active
+    And iam logged in as user "cypress-net@mollie.com"
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And product "MOL_REDUCED_TAX" with quantity "1" is in cart
+    And i apply promotion code "mollie_50"
+    When i start checkout with payment method "paypal"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+
+  Scenario: payment success with 100 percent shipping discount
+    Given payment method "paypal" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And i apply promotion code "mollie_free_shipping"
     When i start checkout with payment method "paypal"
     And select payment status "paid"
     Then i see success page

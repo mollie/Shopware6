@@ -50,9 +50,11 @@ final class PaymentMethodDataRemover implements DataRemoverInterface
             if (in_array($paymentMethodId, $referencedIds, true)) {
                 $deactivateUpdates[] = ['id' => $paymentMethodId, 'active' => false];
                 $detachIds[] = $paymentMethodId;
-            } else {
-                $deletes[] = ['id' => $paymentMethodId];
+
+                continue;
             }
+
+            $deletes[] = ['id' => $paymentMethodId];
         }
 
         if (count($deactivateUpdates) > 0) {

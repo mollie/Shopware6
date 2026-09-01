@@ -2,8 +2,7 @@ import template from './mollie-pluginconfig-support-modal.html.twig';
 import './mollie-pluginconfig-support-modal.scss';
 import VersionCompare from './../../../../core/service/utils/version-compare.utils';
 
-const { Application, Component, Context, Mixin, State } = Shopware;
-const { Criteria } = Shopware.Data;
+const { Application, Component, Context, Mixin } = Shopware;
 const { string: stringUtils } = Shopware.Utils;
 
 interface SupportModalComponent {
@@ -23,9 +22,8 @@ const componentConfig: ThisType<SupportModalComponent> = {
     template,
 
     inject: {
-        shopwareExtensionService: { default: null }, // This did not exist before 6.4, so default to null to avoid errors.
+        shopwareExtensionService: {},
         MolliePaymentsSupportService: {},
-        repositoryFactory: {},
     },
 
     mixins: [Mixin.getByName('notification')],
@@ -55,11 +53,7 @@ const componentConfig: ThisType<SupportModalComponent> = {
 
     computed: {
         isLoading() {
-            if (this.shopwareExtensionService) {
-                return this.getShopwareExtensions().loading;
-            }
-
-            return this.isLoadingPlugins;
+            return this.getShopwareExtensions().loading;
         },
 
         canSubmit() {
@@ -116,15 +110,7 @@ const componentConfig: ThisType<SupportModalComponent> = {
         },
 
         plugins() {
-            // If this is not null, we're in Shopware 6.4 and using the new extension service
-            if (this.shopwareExtensionService) {
-                return this.getShopwareExtensions().data || [];
-            }
-            let swPlugin = Shopware.State.get('swPlugin');
-            if (swPlugin === undefined) {
-                swPlugin = Shopware.Store.get('swPlugin');
-            }
-            return swPlugin.plugins || [];
+            return this.getShopwareExtensions().data || [];
         },
 
         molliePlugin() {
@@ -153,11 +139,7 @@ const componentConfig: ThisType<SupportModalComponent> = {
             this.determineDefaultSupportDesk();
 
             if (this.plugins.length === 0) {
-                if (this.shopwareExtensionService) {
-                    this.shopwareExtensionService.updateExtensionData();
-                } else {
-                    this.loadPluginsLegacy();
-                }
+                this.shopwareExtensionService.updateExtensionData();
             }
         },
 
@@ -173,23 +155,6 @@ const componentConfig: ThisType<SupportModalComponent> = {
             this.recipientLocale = this.recipientOptions.some((option: any) => option.value === this.locale)
                 ? this.locale
                 : null;
-        },
-
-        loadPluginsLegacy() {
-            this.isLoadingPlugins = true;
-
-            const criteria = new Criteria();
-            criteria.setTerm('Mollie');
-
-            const searchData = {
-                criteria: criteria,
-                repository: this.repositoryFactory.create('plugin'),
-                context: Context.api,
-            };
-
-            State.dispatch('swPlugin/updatePluginList', searchData).finally(() => {
-                this.isLoadingPlugins = false;
-            });
         },
 
         onRequestSupport() {

@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@cypress/webpack-preprocessor": "5.14.0",
+    "allure-cypress": "^3.11.0",
     "axios": "^1.11.0",
     "cypress": "15.7.1",
     "cypress-axe": "^1.6.0",

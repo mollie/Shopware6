@@ -44,6 +44,13 @@ final class MollieSubscriptionBuilder
         return $this;
     }
 
+    public function withCustomerId(string $customerId): self
+    {
+        $this->customerId = $customerId;
+
+        return $this;
+    }
+
     public function withStatus(SubscriptionStatus $status): self
     {
         $this->status = $status;

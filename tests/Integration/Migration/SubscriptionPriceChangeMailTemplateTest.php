@@ -7,10 +7,12 @@ use Doctrine\DBAL\Connection;
 use Kiener\MolliePayments\Migration\Migration1778100100SubscriptionPriceChangeMailTemplate;
 use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
 
 #[CoversClass(Migration1778100100SubscriptionPriceChangeMailTemplate::class)]
+#[Group('core')]
 final class SubscriptionPriceChangeMailTemplateTest extends TestCase
 {
     use ShopwareTestBehaviour;

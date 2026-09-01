@@ -85,7 +85,7 @@ class MigrationUtils
      */
     public function addConstraint(string $tableName, string $constraintName, string $sqlContent): void
     {
-        $isExisting = $this->isIndexExisting($tableName, $constraintName);
+        $isExisting = $this->isConstraintExisting($tableName, $constraintName);
 
         if ($isExisting) {
             return;
@@ -103,6 +103,11 @@ class MigrationUtils
      */
     public function buildIndex(string $table, string $indexName, string $targetField): void
     {
+        // skip if the target column no longer exists (e.g. removed by a later migration)
+        if ($this->columnExists($table, $targetField) === false) {
+            return;
+        }
+
         $isExisting = $this->isIndexExisting($table, $indexName);
 
         if ($isExisting) {
@@ -110,6 +115,33 @@ class MigrationUtils
         }
 
         $this->connection->executeStatement('CREATE INDEX `' . $indexName . '` ON ' . $table . ' (' . $targetField . ');');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function dropIndex(string $table, string $indexName): void
+    {
+        // only drop if the index is actually present
+        if ($this->isIndexExisting($table, $indexName) === false) {
+            return;
+        }
+
+        $this->connection->executeStatement('ALTER TABLE `' . $table . '` DROP INDEX `' . $indexName . '`');
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function isConstraintExisting(string $table, string $constraintName): bool
+    {
+        $constraintExistsCheck = $this->connection->executeQuery("
+            SELECT COUNT(1) foundCount
+            FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+            WHERE constraint_schema = DATABASE() and table_name = '" . $table . "' and constraint_name = '" . $constraintName . "';
+        ")->fetchAssociative();
+
+        return (int) $constraintExistsCheck['foundCount'] >= 1;
     }
 
     /**

@@ -25,6 +25,10 @@ export default class SubscriptionDetailsRepository {
         return cy.get('.cy-subscription-translated-status input', {timeout: 20000});
     }
 
+    getAmountField() {
+        return cy.get('.cy-subscription-amount input', {timeout: 20000});
+    }
+
     getNextPaymentAtField() {
         return cy.get('.cy-subscription-formatted-next-payment-at input');
     }

@@ -1,11 +1,13 @@
 import template from './mollie-refund-manager-cart.html.twig';
 import ShopwareOrderGrid from '../../grids/ShopwareOrderGrid';
 import RefundItemService from '../../services/RefundItemService';
+import RefundCalculator from '../../services/RefundCalculator';
 
 const { Component, Filter } = Shopware;
 
 interface RefundManagerCartComponent {
     itemService: RefundItemService;
+    calculator: RefundCalculator;
 
     [key: string]: any;
 }
@@ -23,6 +25,11 @@ const componentConfig: ThisType<RefundManagerCartComponent> = {
             required: true,
         },
         isLoading: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        isOrderFullyRefunded: {
             type: Boolean,
             required: false,
             default: false,
@@ -57,6 +64,7 @@ const componentConfig: ThisType<RefundManagerCartComponent> = {
     data() {
         return {
             itemService: null,
+            calculator: null,
         };
     },
 
@@ -77,6 +85,7 @@ const componentConfig: ThisType<RefundManagerCartComponent> = {
 
     created() {
         this.itemService = new RefundItemService();
+        this.calculator = new RefundCalculator();
     },
 
     methods: {
@@ -97,11 +106,23 @@ const componentConfig: ThisType<RefundManagerCartComponent> = {
         },
 
         isItemRefundable(item: any) {
+            if (this.isOrderFullyRefunded) {
+                return false;
+            }
+
+            if (this.calculator.isItemFullyRefunded(item, this.isTaxStatusGross())) {
+                return false;
+            }
+
             return this.itemService.isRefundable(item);
         },
 
+        getItemRemainingRefundable(item: any) {
+            return this.calculator.getItemRemainingRefundable(item, this.isTaxStatusGross());
+        },
+
         isTaxStatusGross() {
-            return this.order.taxStatus === 'gross';
+            return this.order.price.taxStatus === 'gross';
         },
     },
 };

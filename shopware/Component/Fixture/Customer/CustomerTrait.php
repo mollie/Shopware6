@@ -100,6 +100,24 @@ trait CustomerTrait
             ];
         }
 
+        // Billink treats an address with a company name as a B2B order and then requires a valid
+        // entity type, which the API rejects. A dedicated address without a company name is used for
+        // the Billink checkout so it is created as a private (B2C) order.
+        $germany = $countries->filterByProperty('iso', 'DE')->first();
+        if ($germany instanceof CountryEntity) {
+            $addresses['DE-private'] = [
+                'id' => $this->getAddressId('DE-private'),
+                'salutationId' => $customer['salutationId'],
+                'firstName' => $customer['firstName'],
+                'lastName' => $customer['lastName'],
+                'street' => 'Cypress Street 1',
+                'zipcode' => '10115',
+                'city' => 'Berlin',
+                'countryId' => $germany->getId(),
+                'phoneNumber' => '+490123456789',
+            ];
+        }
+
         return array_values($addresses);
     }
 

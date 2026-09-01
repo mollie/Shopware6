@@ -13,12 +13,12 @@ use Mollie\Shopware\Component\Subscription\SubscriptionGroupAmount;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilder;
 use Mollie\Shopware\Component\Subscription\SubscriptionGroupCartBuilderInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\System\SalesChannel\SalesChannelCollection;
@@ -32,26 +32,43 @@ final class PriceDriftDetector
     public const STATE_NOTIFIED = 'notified';
 
     /**
-     * Cap candidates per scheduled run. The task runs daily so a backlog still
-     * drains within days even on shops with many subscriptions, but each run
-     * stays bounded in DB load and event dispatch volume.
+     * Marks a subscription whose underlying price (product or shipping) changed
+     * and that therefore needs a price re-check. Set cheaply and event-driven
+     * by SubscriptionPriceCheckFlagger; only these are processed by detect().
+     */
+    public const STATE_DIRTY = 'dirty';
+
+    /**
+     * Cap candidates per scheduled run. The task runs every few minutes, so a
+     * backlog drains quickly while each run stays bounded in DB load, cart
+     * builds and event dispatch volume.
      */
     public const CANDIDATE_LIMIT = 50;
 
-    private const EPSILON = 0.005;
+    /**
+     * Two amounts are treated as equal when they differ by less than half a cent.
+     * Prices are floats with a 1 cent (0.01) granularity, so a smaller difference
+     * is only floating-point noise, not a real price change.
+     */
+    private const AMOUNT_EQUALITY_TOLERANCE = 0.005;
+
+    /**
+     * Price change notice events collected during a sales channel run; dispatched
+     * after the batched upsert so the flow's storer reloads the persisted price.
+     *
+     * @var array<int,SubscriptionPriceChangeNoticeEvent>
+     */
+    private array $eventsToDispatch = [];
 
     /**
      * @param EntityRepository<SalesChannelCollection> $salesChannelRepository
      * @param EntityRepository<SubscriptionCollection<SubscriptionEntity>> $subscriptionRepository
-     * @param EntityRepository<CustomerCollection> $customerRepository
      */
     public function __construct(
         #[Autowire(service: 'sales_channel.repository')]
         private readonly EntityRepository $salesChannelRepository,
         #[Autowire(service: 'mollie_subscription.repository')]
         private readonly EntityRepository $subscriptionRepository,
-        #[Autowire(service: 'customer.repository')]
-        private readonly EntityRepository $customerRepository,
         #[Autowire(service: SettingsService::class)]
         private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: SubscriptionGroupCartBuilder::class)]
@@ -66,7 +83,10 @@ final class PriceDriftDetector
     {
         $notifiedCount = 0;
 
-        $salesChannels = $this->salesChannelRepository->search(new Criteria(), $context)->getEntities();
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('active', true));
+
+        $salesChannels = $this->salesChannelRepository->search($criteria, $context)->getEntities();
 
         foreach ($salesChannels as $salesChannel) {
             $notifiedCount += $this->detectForSalesChannel($salesChannel, $context);
@@ -87,55 +107,67 @@ final class PriceDriftDetector
 
         $this->logger->info(sprintf('Starting subscription price drift detection for sales channel "%s"', $salesChannel->getName()));
 
+        // $eventsToDispatch is empty here: it is cleared again after each sales
+        // channel's dispatch below (and starts empty).
+
         /** @var array<int,array<string,mixed>> $upsertPayloads */
         $upsertPayloads = [];
-        /** @var array<int,array{0:SubscriptionEntity,1:CustomerEntity}> $eventQueue */
-        $eventQueue = [];
 
-        foreach ($this->findCandidates($salesChannel->getId(), $context) as $subscription) {
-            if (! $this->isMollieActive($subscription)) {
-                continue;
-            }
-            if ($subscription->getPriceUpdateState() !== self::STATE_NONE) {
-                continue;
-            }
-            if ($subscription->getCanceledAt() !== null) {
+        $candidates = $this->findCandidates($salesChannel->getId(), $context);
+
+        foreach ($candidates as $subscription) {
+            $order = $subscription->getOrder();
+            if (! $order instanceof OrderEntity) {
+                $this->logger->error('Subscription has no order loaded, skipping price drift check', [
+                    'subscriptionId' => $subscription->getId(),
+                ]);
                 continue;
             }
 
-            $result = $this->checkOne($subscription, $context);
-            if ($result === null) {
+            $customer = $order->getOrderCustomer()?->getCustomer();
+            if (! $customer instanceof CustomerEntity) {
+                $this->logger->error('Shopware customer not found for subscription, cannot send price change notice', [
+                    'subscriptionId' => $subscription->getId(),
+                    'orderNumber' => $order->getOrderNumber(),
+                ]);
                 continue;
             }
 
-            $upsertPayloads[] = $result['payload'];
-            if (isset($result['event'])) {
-                $eventQueue[] = $result['event'];
-            }
+            $upsertPayloads[] = $this->checkOne($subscription, $order, $customer, $context);
         }
 
+        // Persist everything in one batch first, then dispatch so the flow's
+        // storer reloads the persisted nextNotifiedPrice when rendering the mail.
         if ($upsertPayloads !== []) {
             $this->subscriptionRepository->upsert($upsertPayloads, $context);
         }
 
-        foreach ($eventQueue as [$subscription, $customer]) {
-            $this->eventDispatcher->dispatch(new SubscriptionPriceChangeNoticeEvent($subscription, $customer, $context));
+        foreach ($this->eventsToDispatch as $event) {
+            $this->eventDispatcher->dispatch($event);
         }
 
-        return count($eventQueue);
+        $notifiedCount = count($this->eventsToDispatch);
+        $this->eventsToDispatch = [];
+
+        return $notifiedCount;
     }
 
     /**
-     * @return null|array{payload:array<string,mixed>,event?:array{0:SubscriptionEntity,1:CustomerEntity}}
+     * Checks one subscription for price drift and returns the upsert payload. A
+     * price change notice event is queued in $eventsToDispatch and dispatched by
+     * the caller after the batch.
+     *
+     * @return array<string,mixed>
      */
-    private function checkOne(SubscriptionEntity $subscription, Context $context): ?array
+    private function checkOne(SubscriptionEntity $subscription, OrderEntity $order, CustomerEntity $customer, Context $context): array
     {
-        try {
-            $order = $subscription->getOrder();
-            if (! $order instanceof OrderEntity) {
-                throw new \RuntimeException('Subscription has no order loaded');
-            }
+        $logData = [
+            'subscriptionId' => $subscription->getId(),
+            'orderNumber' => (string) $order->getOrderNumber(),
+            'mollieId' => $subscription->getMollieId(),
+        ];
 
+        try {
             $intervalKey = (string) $subscription->getMetadata()->getInterval();
             $groupCart = $this->groupCartBuilder->buildGroupCart($order, $intervalKey, $context);
             if ($groupCart === null) {
@@ -145,59 +177,51 @@ final class PriceDriftDetector
             $expectedAmount = SubscriptionGroupAmount::fromGroupCart($groupCart)->gross();
             $currentAmount = $subscription->getAmount();
 
-            if (abs($expectedAmount - $currentAmount) < self::EPSILON) {
-                return null;
-            }
+            if (abs($expectedAmount - $currentAmount) < self::AMOUNT_EQUALITY_TOLERANCE) {
+                // Price matches again (e.g. the change was reverted) — clear the
+                // dirty flag so the subscription is not re-checked every run.
+                $this->logger->debug('No subscription price drift detected, clearing dirty flag', $logData);
 
-            $customer = $this->loadCustomer($subscription->getCustomerId(), $context);
-            if (! $customer instanceof CustomerEntity) {
-                $this->logger->error('Shopware customer not found for subscription, cannot send price change notice', [
-                    'subscriptionId' => $subscription->getId(),
-                    'customerId' => $subscription->getCustomerId(),
-                ]);
-
-                return null;
-            }
-
-            $now = new \DateTime();
-            $subscription->setPriceUpdateState(self::STATE_NOTIFIED);
-            $subscription->setNextNotifiedPrice($expectedAmount);
-            $subscription->setNotifiedAt($now);
-
-            return [
-                'payload' => [
+                return [
                     'id' => $subscription->getId(),
-                    'priceUpdateState' => self::STATE_NOTIFIED,
-                    'nextNotifiedPrice' => $expectedAmount,
-                    'notifiedAt' => $now,
-                    'historyEntries' => [[
-                        'statusFrom' => $subscription->getStatus(),
-                        'statusTo' => $subscription->getStatus(),
-                        'comment' => sprintf('price_notified: %s -> %s', $currentAmount, $expectedAmount),
-                        'mollieId' => $subscription->getMollieId(),
-                    ]],
-                ],
-                'event' => [$subscription, $customer],
-            ];
-        } catch (\Throwable $exception) {
-            $this->logger->error('Failed to check subscription for price drift', [
-                'subscriptionId' => $subscription->getId(),
-                'mollieId' => $subscription->getMollieId(),
-                'customerId' => $subscription->getCustomerId(),
-                'orderId' => $subscription->getOrderId(),
-                'exception' => $exception->getMessage(),
+                    'priceUpdateState' => self::STATE_NONE,
+                ];
+            }
+
+            $this->eventsToDispatch[] = new SubscriptionPriceChangeNoticeEvent($subscription, $customer, $context);
+            $this->logger->info('Subscription price drift detected, queuing price change notice', $logData + [
+                'currentAmount' => $currentAmount,
+                'newAmount' => $expectedAmount,
             ]);
 
             return [
-                'payload' => [
-                    'id' => $subscription->getId(),
-                    'historyEntries' => [[
-                        'statusFrom' => $subscription->getStatus(),
-                        'statusTo' => $subscription->getStatus(),
-                        'comment' => 'price_check_skipped: ' . $exception->getMessage(),
-                        'mollieId' => $subscription->getMollieId(),
-                    ]],
-                ],
+                'id' => $subscription->getId(),
+                'priceUpdateState' => self::STATE_NOTIFIED,
+                'nextNotifiedPrice' => $expectedAmount,
+                'notifiedAt' => new \DateTime(),
+                'historyEntries' => [[
+                    'statusFrom' => $subscription->getStatus(),
+                    'statusTo' => $subscription->getStatus(),
+                    'comment' => sprintf('price_notified: %s -> %s', $currentAmount, $expectedAmount),
+                    'mollieId' => $subscription->getMollieId(),
+                ]],
+            ];
+        } catch (\Throwable $exception) {
+            $this->logger->error('Failed to check subscription for price drift', $logData + [
+                'exception' => $exception->getMessage(),
+            ]);
+
+            // Clear the dirty flag so a broken subscription is not retried every
+            // run; a later price change re-flags it.
+            return [
+                'id' => $subscription->getId(),
+                'priceUpdateState' => self::STATE_NONE,
+                'historyEntries' => [[
+                    'statusFrom' => $subscription->getStatus(),
+                    'statusTo' => $subscription->getStatus(),
+                    'comment' => 'price_check_skipped: ' . $exception->getMessage(),
+                    'mollieId' => $subscription->getMollieId(),
+                ]],
             ];
         }
     }
@@ -210,30 +234,18 @@ final class PriceDriftDetector
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('salesChannelId', $salesChannelId));
         $criteria->addFilter(new EqualsFilter('canceledAt', null));
-        $criteria->addFilter(new EqualsFilter('priceUpdateState', self::STATE_NONE));
+        $criteria->addFilter(new EqualsFilter('priceUpdateState', self::STATE_DIRTY));
+        $criteria->addFilter(new EqualsAnyFilter('status', [
+            SubscriptionStatus::ACTIVE->value,
+            SubscriptionStatus::RESUMED->value,
+        ]));
         $criteria->addAssociation('order.lineItems');
         $criteria->addAssociation('order.deliveries');
         $criteria->addAssociation('order.transactions');
-        $criteria->addAssociation('order.orderCustomer');
+        $criteria->addAssociation('order.orderCustomer.customer');
         $criteria->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING));
         $criteria->setLimit(self::CANDIDATE_LIMIT);
 
         return $this->subscriptionRepository->search($criteria, $context)->getEntities();
-    }
-
-    private function isMollieActive(SubscriptionEntity $subscription): bool
-    {
-        $status = $subscription->getStatus();
-
-        return $status === SubscriptionStatus::ACTIVE->value
-            || $status === SubscriptionStatus::RESUMED->value;
-    }
-
-    private function loadCustomer(string $customerId, Context $context): ?CustomerEntity
-    {
-        $criteria = new Criteria([$customerId]);
-        $criteria->addAssociation('defaultBillingAddress');
-
-        return $this->customerRepository->search($criteria, $context)->first(); // @phpstan-ignore return.type
     }
 }

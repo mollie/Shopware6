@@ -9,7 +9,7 @@ export default class HttpClientService {
      * @param {string} contentType
      */
     get(url, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
-        this.send('GET', url, null, callbackSuccess, callbackError, contentType);
+        return this.send('GET', url, null, callbackSuccess, callbackError, contentType);
     }
 
     /**
@@ -21,11 +21,13 @@ export default class HttpClientService {
      * @param {string} contentType
      */
     post(url, data = null, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
-        this.send('POST', url, data, callbackSuccess, callbackError, contentType);
+        return this.send('POST', url, data, callbackSuccess, callbackError, contentType);
     }
 
     /**
-     * Sends an XMLHttpRequest
+     * Sends the request. JSON responses are parsed, everything else is passed
+     * through as text. A network failure or a malformed JSON body rejects and
+     * therefore lands in callbackError.
      * @param {string} type
      * @param {string} url
      * @param {*} data
@@ -34,33 +36,25 @@ export default class HttpClientService {
      * @param {string} contentType
      */
     send(type, url, data = null, callbackSuccess = null, callbackError = null, contentType = DEFAULT_CONTENT_TYPE) {
-        const xhr = new XMLHttpRequest();
-        xhr.open(type, url);
-        xhr.setRequestHeader('Content-Type', contentType);
-
-        xhr.onload = function () {
-            if (!callbackSuccess || typeof callbackSuccess !== 'function') {
-                return;
-            }
-
-            const responseType = xhr.getResponseHeader('content-type');
-            const body = 'response' in xhr ? xhr.response : xhr.responseText;
-
-            if (responseType.indexOf('application/json') > -1) {
-                callbackSuccess(JSON.parse(body));
-            } else {
-                callbackSuccess(body);
-            }
-        };
-
-        xhr.onerror = function () {
-            if (!callbackError || typeof callbackSuccess !== 'function') {
-                return;
-            }
-
-            callbackError();
-        };
-
-        xhr.send(data);
+        return fetch(url, {
+            method: type,
+            headers: { 'Content-Type': contentType },
+            body: data,
+        })
+            .then((response) =>
+                (response.headers.get('content-type') || '').includes('application/json')
+                    ? response.json()
+                    : response.text(),
+            )
+            .then((payload) => {
+                if (typeof callbackSuccess === 'function') {
+                    callbackSuccess(payload);
+                }
+            })
+            .catch((error) => {
+                if (typeof callbackError === 'function') {
+                    callbackError(error);
+                }
+            });
     }
 }

@@ -15,6 +15,12 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         private string $subscriptionWebhookUrl = '',
         private string $subscriptionPaymentUpdateReturnUrl = '',
         private string $subscriptionPaymentUpdateWebhookUrl = '',
+        private string $expressComponentsRedirectUrl = '',
+        private string $expressComponentsShippingCallbackUrl = '',
+        private string $checkoutFinishUrl = '',
+        private string $editOrderUrl = '',
+        private string $paypalExpressRedirectUrl = '',
+        private string $paypalExpressCancelUrl = '',
     ) {
     }
 
@@ -35,12 +41,37 @@ final class FakeRouteBuilder implements RouteBuilderInterface
 
     public function getPaypalExpressRedirectUrl(): string
     {
-        // TODO: Implement getPaypalExpressRedirectUrl() method.
+        return $this->paypalExpressRedirectUrl;
     }
 
     public function getPaypalExpressCancelUrl(): string
     {
-        // TODO: Implement getPaypalExpressCancelUrl() method.
+        return $this->paypalExpressCancelUrl;
+    }
+
+    public function getExpressComponentsRedirectUrl(string $cartToken): string
+    {
+        return $this->expressComponentsRedirectUrl;
+    }
+
+    public function getExpressComponentsOrderRedirectUrl(string $orderId): string
+    {
+        return $this->expressComponentsRedirectUrl;
+    }
+
+    public function getExpressComponentsShippingCallbackUrl(string $salesChannelId, string $cartToken): string
+    {
+        return $this->expressComponentsShippingCallbackUrl;
+    }
+
+    public function getCheckoutFinishUrl(string $orderId): string
+    {
+        return $this->checkoutFinishUrl;
+    }
+
+    public function getEditOrderUrl(string $orderId): string
+    {
+        return $this->editOrderUrl;
     }
 
     public function getSubscriptionWebhookUrl(string $subscriptionId): string

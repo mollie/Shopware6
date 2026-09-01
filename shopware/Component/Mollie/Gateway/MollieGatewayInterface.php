@@ -18,11 +18,22 @@ use Mollie\Shopware\Component\Mollie\Profile;
 use Mollie\Shopware\Component\Mollie\Shipment;
 use Mollie\Shopware\Component\Mollie\TerminalCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 
 interface MollieGatewayInterface
 {
     public function createPayment(CreatePayment $molliePayment, string $salesChannelId): Payment;
+
+    /**
+     * Updates an existing (still open) Mollie payment via the edit endpoint instead of creating a
+     * new one, so a reused Shopware transaction keeps a single Mollie payment. The editable fields
+     * are taken from the freshly built CreatePayment payload.
+     */
+    public function updatePayment(string $molliePaymentId, CreatePayment $molliePayment, string $orderNumber, string $salesChannelId): Payment;
+
+    public function repairLegacyTransaction(OrderTransactionEntity $transaction, OrderEntity $order, Context $context): ?Payment;
 
     public function createOrder(CreateOrder $createOrder, string $salesChannelId): Order;
 

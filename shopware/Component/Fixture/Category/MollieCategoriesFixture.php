@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final class MollieCategoriesFixture extends AbstractFixture
 {
     public const CATEGORY_REGULAR = 'regular';
+    public const CATEGORY_DIGITAL = 'digital';
     public const CATEGORY_VOUCHER = 'voucher';
     public const CATEGORY_SUBSCRIPTIONS = 'subscriptions';
     public const CATEGORY_ROUNDING = 'rounding';
@@ -82,6 +83,11 @@ final class MollieCategoriesFixture extends AbstractFixture
             [
                 'id' => Uuid::fromStringToHex('mollie-' . self::CATEGORY_REGULAR),
                 'name' => 'Regular Products',
+                'parentId' => $mollieRootId,
+            ],
+            [
+                'id' => Uuid::fromStringToHex('mollie-' . self::CATEGORY_DIGITAL),
+                'name' => 'Digital Products',
                 'parentId' => $mollieRootId,
             ],
             [

@@ -26,7 +26,12 @@
                 "selectBank": "Välj bank"
             },
             "pos": {
-                "selectTerminal": "Välj terminal"
+                "selectTerminal": "Välj terminal",
+                "returnToWebsite": "Tillbaka till webbplatsen",
+                "terminalInstructions": "Följ instruktionerna på terminalen",
+                "paymentSuccess": "Din betalning lyckades!",
+                "paymentFailed": "Din betalning misslyckades!",
+                "paymentFailedNoDebit": "Inga pengar har dragits från kortet"
             },
             "mandate": {
                 "sectionTitle": "Sparade kort",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefonnummer",
                 "phoneErrorMessage": "Telefonnummer krävs. Till exempel +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Till kassan"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Betalningen misslyckades",
                 "failed": "Betalningen misslyckades eller avbröts. Du kommer att bli omdirigerad till Mollie, där du kan slutföra din betalning med den metod du väljer. "
             },
-            "redirecting": "Omdirigerar dig till: "
+            "redirecting": "Omdirigerar dig till: ",
+            "paymentLink": {
+                "error": "Den här beställningen kan inte längre betalas.",
+                "alreadyPaid": "Den här beställningen är redan betald."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "Din prenumeration kommer nu att återupptas",
                 "successSkip": "Din prenumeration har hoppats över",
                 "successUpdateAddress": "Din adress har uppdaterats framgångsrikt",
-                "successUpdatePayment": "Din betalningsmetod har uppdaterats framgångsrikt"
+                "successUpdatePayment": "Din betalningsmetod har uppdaterats framgångsrikt",
+                "actionsMenuLabel": "Prenumerationsåtgärder"
             },
             "options": {
                 "everyDay": "Varje dag",

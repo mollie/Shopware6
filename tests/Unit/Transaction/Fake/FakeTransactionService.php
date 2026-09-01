@@ -17,7 +17,9 @@ use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
@@ -31,22 +33,37 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\Language\LanguageEntity;
 use Shopware\Core\System\Locale\LocaleEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
+use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 final class FakeTransactionService implements TransactionServiceInterface
 {
     private bool $withPayment = false;
+    private ?string $paymentLinkId = null;
     private ?TransactionDataStruct $transaction = null;
 
     private CustomerEntityBuilder $customerRepository;
     private OrderEntityBuilder $orderRepository;
     private array $orderCustomFields = [];
+    private array $transactionCustomFields = [];
     private array $mollieCustomerIds = [];
     private bool $withNullLineItems = false;
     private bool $withZeroShippingCosts = false;
+    private bool $withShippingDiscountDelivery = false;
+    private bool $withSubscriptionLineItem = false;
+    private ?string $phoneNumber = null;
 
     private bool $withoutOrder = false;
+    private bool $withoutOrderState = false;
+    private bool $withoutDeliveries = false;
+    private bool $withDigitalLineItem = false;
     private bool $withoutPaymentMethod = false;
     private bool $withoutMollieExtensionOnPaymentMethod = false;
+    /** @var list<string> */
+    private array $orderTransactionStates = [];
+    private ?string $transactionState = null;
+    private bool $withMollieExtensionOnOrderTransactions = false;
+    /** @var list<array{transactionId: string, payment: Payment}> */
+    private array $savedPaymentExtensions = [];
 
     public function __construct()
     {
@@ -66,10 +83,29 @@ final class FakeTransactionService implements TransactionServiceInterface
 
     public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null): EntityWrittenContainerEvent
     {
+        $this->savedPaymentExtensions[] = ['transactionId' => $transactionId, 'payment' => $payment];
+
         $context = new Context(new SystemSource());
         $nestedEventCollection = new NestedEventCollection();
 
         return new EntityWrittenContainerEvent($context, $nestedEventCollection, []);
+    }
+
+    /**
+     * @return list<array{transactionId: string, payment: Payment}>
+     */
+    public function getSavedPaymentExtensions(): array
+    {
+        return $this->savedPaymentExtensions;
+    }
+
+    /**
+     * Attach a Mollie payment extension to every order transaction created via withOrderTransactionStates,
+     * so a settled transaction carries the same Mollie data a real one would.
+     */
+    public function withMolliePaymentOnOrderTransactions(): void
+    {
+        $this->withMollieExtensionOnOrderTransactions = true;
     }
 
     public function createValidStruct(): void
@@ -77,9 +113,43 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->withPayment = true;
     }
 
+    /**
+     * A transaction whose payment link was created but never paid: the Mollie extension is there,
+     * yet it only knows the link, not a payment.
+     */
+    public function withPaymentLinkOnly(string $paymentLinkId): void
+    {
+        $this->withPayment = true;
+        $this->paymentLinkId = $paymentLinkId;
+    }
+
     public function withoutOrder(): void
     {
         $this->withoutOrder = true;
+    }
+
+    /**
+     * An order whose state machine state was not loaded, e.g. because the criteria did not associate it.
+     */
+    public function withoutOrderState(): void
+    {
+        $this->withoutOrderState = true;
+    }
+
+    /**
+     * An order without loaded deliveries - a digital-only order has none at all.
+     */
+    public function withoutDeliveries(): void
+    {
+        $this->withoutDeliveries = true;
+    }
+
+    /**
+     * A downloadable line item, the kind the webhook auto-captures for an authorized payment.
+     */
+    public function withDigitalLineItem(): void
+    {
+        $this->withDigitalLineItem = true;
     }
 
     public function withoutPaymentMethod(): void
@@ -92,9 +162,31 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->withoutMollieExtensionOnPaymentMethod = true;
     }
 
+    /**
+     * Populate the order's transaction collection with one transaction per given state, oldest-first,
+     * so WebhookRoute can derive the order's effective payment status from them.
+     */
+    public function withOrderTransactionStates(string ...$technicalNames): void
+    {
+        $this->orderTransactionStates = array_values($technicalNames);
+    }
+
+    public function withTransactionState(string $technicalName): void
+    {
+        $this->transactionState = $technicalName;
+    }
+
     public function withOrderCustomFields(array $customFields): void
     {
         $this->orderCustomFields = $customFields;
+    }
+
+    /**
+     * @param array<string, mixed> $customFields
+     */
+    public function withTransactionCustomFields(array $customFields): void
+    {
+        $this->transactionCustomFields = $customFields;
     }
 
     public function withMollieCustomerId(string $profileId, string $mollieCustomerId): void
@@ -112,6 +204,21 @@ final class FakeTransactionService implements TransactionServiceInterface
         $this->withZeroShippingCosts = true;
     }
 
+    public function withSubscriptionLineItem(): void
+    {
+        $this->withSubscriptionLineItem = true;
+    }
+
+    public function withPhoneNumber(string $phoneNumber): void
+    {
+        $this->phoneNumber = $phoneNumber;
+    }
+
+    public function withShippingDiscountDelivery(): void
+    {
+        $this->withShippingDiscountDelivery = true;
+    }
+
     public function getDefaultSalesChannelEntity(): SalesChannelEntity
     {
         $salesChannel = new SalesChannelEntity();
@@ -123,6 +230,14 @@ final class FakeTransactionService implements TransactionServiceInterface
     public function createTransaction(): void
     {
         $transaction = new OrderTransactionEntity();
+        if ($this->transactionState !== null) {
+            $state = new StateMachineStateEntity();
+            $state->setTechnicalName($this->transactionState);
+            $transaction->setStateMachineState($state);
+        }
+        if (count($this->transactionCustomFields) > 0) {
+            $transaction->setCustomFields([Mollie::EXTENSION => $this->transactionCustomFields]);
+        }
         $currency = $this->getDefaultCurrency();
         $language = $this->getDefaultLanguage();
         $customer = $this->customerRepository->getDefaultCustomer();
@@ -136,9 +251,14 @@ final class FakeTransactionService implements TransactionServiceInterface
         }
 
         if ($this->withPayment) {
-            $payment = new Payment('testMollieId');
+            // A payment link carries no Mollie payment id until the customer actually pays, so
+            // the extension exists with an empty id and only the link id on it.
+            $payment = new Payment($this->paymentLinkId === null ? 'testMollieId' : '');
             $payment->setMethod(PaymentMethod::CREDIT_CARD);
             $payment->setFinalizeUrl('payment/finalize');
+            if ($this->paymentLinkId !== null) {
+                $payment->setPaymentLinkId($this->paymentLinkId);
+            }
             $payment->setShopwareTransaction($transaction);
             $transaction->addExtension(Mollie::EXTENSION, $payment);
 
@@ -154,7 +274,7 @@ final class FakeTransactionService implements TransactionServiceInterface
                 $transaction->setPaymentMethod($paymentMethod);
             }
         }
-        $order = $this->orderRepository->getDefaultOrder($customer);
+        $order = $this->buildOrderEntity($customer);
         $order->setCurrency($currency);
         $order->setLanguage($language);
         if (count($this->orderCustomFields) > 0) {
@@ -167,8 +287,37 @@ final class FakeTransactionService implements TransactionServiceInterface
             $order->setLineItems(new OrderLineItemCollection());
         }
 
+        if ($this->withSubscriptionLineItem === true) {
+            $order->setLineItems($this->orderRepository->getSubscriptionLineItems());
+        }
+
+        if ($this->withDigitalLineItem === true) {
+            $order->setLineItems(new OrderLineItemCollection([$this->orderRepository->createDigitalLineItem('digitallineitemid', 'SW-DIGITAL', 2, 10.0)]));
+        }
+
         if ($this->withoutOrder === false) {
             $transaction->setOrder($order);
+        }
+
+        if ($this->orderTransactionStates !== []) {
+            $orderTransactions = new OrderTransactionCollection();
+            foreach ($this->orderTransactionStates as $index => $technicalName) {
+                $orderTransaction = new OrderTransactionEntity();
+                $orderTransaction->setId('order-transaction-' . $index);
+                $state = new StateMachineStateEntity();
+                $state->setTechnicalName($technicalName);
+                $orderTransaction->setStateMachineState($state);
+
+                if ($this->withMollieExtensionOnOrderTransactions === true) {
+                    $settledPayment = new Payment('settled-payment-' . $index);
+                    $settledPayment->setMethod(PaymentMethod::CREDIT_CARD);
+                    $settledPayment->setFinalizeUrl('settled/finalize');
+                    $orderTransaction->addExtension(Mollie::EXTENSION, $settledPayment);
+                }
+
+                $orderTransactions->add($orderTransaction);
+            }
+            $order->setTransactions($orderTransactions);
         }
 
         $shippingAddress = $this->orderRepository->getOrderAddress($customer);
@@ -176,11 +325,29 @@ final class FakeTransactionService implements TransactionServiceInterface
 
         $deliveries = $this->orderRepository->getOrderDeliveries($customer);
 
+        if ($this->phoneNumber !== null) {
+            $shippingAddress->setPhoneNumber($this->phoneNumber);
+            $billingAddress->setPhoneNumber($this->phoneNumber);
+            foreach ($deliveries as $delivery) {
+                $deliveryShippingAddress = $delivery->getShippingOrderAddress();
+                if ($deliveryShippingAddress !== null) {
+                    $deliveryShippingAddress->setPhoneNumber($this->phoneNumber);
+                }
+            }
+        }
+
         if ($this->withZeroShippingCosts === true && $deliveries !== null) {
             foreach ($deliveries as $delivery) {
                 $zeroPrice = new CalculatedPrice(0, 0, new CalculatedTaxCollection(), new TaxRuleCollection(), 1);
                 $delivery->setShippingCosts($zeroPrice);
             }
+        }
+
+        if ($this->withShippingDiscountDelivery === true && $deliveries !== null) {
+            $deliveries->add($this->orderRepository->getShippingDiscountDelivery($customer));
+            $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+            $lineItems->add($this->orderRepository->getDeliveryDiscountPromotionLineItem('Mollie test: free shipping'));
+            $order->setLineItems($lineItems);
         }
 
         $this->transaction = new TransactionDataStruct(
@@ -194,6 +361,19 @@ final class FakeTransactionService implements TransactionServiceInterface
             $language,
             $deliveries
         );
+    }
+
+    private function buildOrderEntity(CustomerEntity $customer): OrderEntity
+    {
+        if ($this->withoutOrderState === true) {
+            return $this->orderRepository->getOrderWithoutState($customer);
+        }
+
+        if ($this->withoutDeliveries === true) {
+            return $this->orderRepository->getOrderWithoutDeliveries($customer);
+        }
+
+        return $this->orderRepository->getDefaultOrder($customer);
     }
 
     private function getDefaultCurrency(): CurrencyEntity

@@ -10,6 +10,7 @@
       "post": {
         "summary": "Cancel Mollie Subscription",
         "description": "Cancels a subscription in Mollie.",
+        "tags": ["Mollie"],
         "operationId": "cancelMollieSubscription",
         "requestBody": {
           "required": true,

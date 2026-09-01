@@ -277,10 +277,26 @@ function createOrderAndOpenAdmin(itemCount, itemQty) {
  */
 function assertShippingStatus(statusLabel, shippedItemsCount) {
     cy.contains('The order has been successfully shipped.', {timeout: 20000});
-    repoOrderDetails.getOrderDetailsGeneralTab().click();
+
+    // Shopware 6.6 keeps the "Ship through Mollie" modal open after a successful shipment, and its
+    // backdrop intercepts clicks on the order tabs. Close it if it is still present.
+    closeShipModalIfOpen();
+
+    // force: a late "new Shopware version available" notification can still overlap the tab at our
+    // admin viewport even after it is dismissed on login.
+    repoOrderDetails.getOrderDetailsGeneralTab().click({force: true});
     cy.reload();
 
-    repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
+    // after the reload the admin re-hydrates and shows loading overlays/skeletons; wait for them to
+    // disappear before reading the delivery status, otherwise we assert against a half-loaded page on
+    // the resource-constrained CI (a fixed cy.wait() is too short there).
+    repoOrderDetails.getLoadingOverlay({timeout: 20000}).should('not.exist');
+    repoOrderDetails.getLoadingSkeleton({timeout: 20000}).should('not.exist');
+
+    // the timeout must live on the cy.get() so the .should() retries the query until the field is
+    // populated (an empty "" text otherwise fails the assertion before Vue finished rendering the
+    // state select).
+    repoOrderDetails.getDeliveryStatusTop({timeout: 20000}).should('be.visible').and('contain.text', statusLabel);
 
     if (shopware.isVersionLower('6.5')) {
         /** since 6.5 you don't see the shipped items in summary **/
@@ -294,4 +310,17 @@ function assertShippingButtonIsDisabled() {
     repoOrderDetails.getMollieActionButtonShipThroughMollie()
         .should('have.attr', 'class')
         .and('match', /--disabled/);
+}
+
+/**
+ * Closes the "Ship through Mollie" modal when it is still open (Shopware 6.6 no longer closes it
+ * automatically after a successful shipment). Safe to call when no modal is present.
+ */
+function closeShipModalIfOpen() {
+    cy.get('body').then(($body) => {
+        if ($body.find('.sw-modal__close').length > 0) {
+            cy.get('.sw-modal__close').first().click({force: true});
+            cy.get('.sw-modal').should('not.exist');
+        }
+    });
 }

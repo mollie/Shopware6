@@ -14,6 +14,7 @@
                 <sw-button
                     variant="context"
                     size="small"
+                    :disabled="isOrderFullyRefunded"
                     @click="$emit('select-all')"
                 >
                     {{ $tc('mollie-payments.refund-manager.cart.btnSelectAll') }}
@@ -86,6 +87,8 @@
                 v-model:value="item.refundAmount"
                 v-if="isItemRefundable(item) && !isItemPromotion(item)"
                 :allowEmpty="true"
+                :min="0"
+                :max="getItemRemainingRefundable(item)"
                 :class="{ 'tutorial-active' : tutorialPartialQuantityVisible || tutorialPartialPromotionsVisible || (tutorialRefundShipping && isItemDelivery(item)), 'input-mode-active' : item.refundMode == 'amount', 'input-mode-inactive' : item.refundMode == 'quantity'}"
                 @change="$emit('amount-changed', item)"
                 @update:value="$emit('amount-changed', item)"

@@ -9,12 +9,8 @@ export default class AdminPluginAction {
      *
      */
     openPluginConfiguration() {
-        if (shopware.isVersionGreaterEqual('6.4')) {
-            cy.visit('/admin#/sw/extension/config/MolliePayments');
-        } else {
-            cy.visit('/admin#/sw/plugin/settings/MolliePayments');
-        }
-        
+        cy.visit('/admin#/sw/extension/config/MolliePayments');
+
         cy.contains('.sw-meteor-page__smart-bar-title', 'Mollie Payments', {timeout: 10000});
     }
 

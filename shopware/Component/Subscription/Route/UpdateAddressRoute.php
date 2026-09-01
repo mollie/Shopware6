@@ -97,7 +97,16 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
         $existing = $type === self::TYPE_BILLING
             ? $subscription->getBillingAddress()
             : $subscription->getShippingAddress();
-        $addressId = $existing instanceof SubscriptionAddressEntity ? $existing->getId() : Uuid::randomHex();
+        $counterpart = $type === self::TYPE_BILLING
+            ? $subscription->getShippingAddress()
+            : $subscription->getBillingAddress();
+
+        $addressId = $this->resolveAddressId($existing, $counterpart);
+
+        // The address form does not allow editing the country, so the country is
+        // preserved from the existing address instead of being taken from the request.
+        $countryId = $existing instanceof SubscriptionAddressEntity ? $existing->getCountryId() : $data->countryId;
+        $countryStateId = $existing instanceof SubscriptionAddressEntity ? $existing->getCountryStateId() : $data->countryStateId;
 
         $associationKey = $type === self::TYPE_BILLING ? 'billingAddress' : 'shippingAddress';
         $historyComment = $type === self::TYPE_BILLING
@@ -106,7 +115,7 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
 
         $this->subscriptionRepository->upsert([[
             'id' => $subscription->getId(),
-            $associationKey => $this->buildAddressPayload($addressId, $subscription->getId(), $data),
+            $associationKey => $this->buildAddressPayload($addressId, $subscription->getId(), $data, $countryId, $countryStateId),
             'historyEntries' => [[
                 'statusFrom' => '',
                 'statusTo' => '',
@@ -123,6 +132,23 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
         ]);
 
         return new UpdateAddressResponse($subscription->getId(), $addressId, $type);
+    }
+
+    /**
+     * Billing and shipping share one address row whenever both addresses are identical, so editing
+     * only one of them has to split the row instead of overwriting the other address as well.
+     */
+    private function resolveAddressId(?SubscriptionAddressEntity $existing, ?SubscriptionAddressEntity $counterpart): string
+    {
+        if (! $existing instanceof SubscriptionAddressEntity) {
+            return Uuid::randomHex();
+        }
+
+        if ($counterpart instanceof SubscriptionAddressEntity && $counterpart->getId() === $existing->getId()) {
+            return Uuid::randomHex();
+        }
+
+        return $existing->getId();
     }
 
     private function assertRequiredFields(UpdateAddressData $data): void
@@ -145,9 +171,6 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
         if ($data->city === '') {
             throw UpdateAddressException::requiredFieldMissing('city');
         }
-        if ($data->countryId === '') {
-            throw UpdateAddressException::requiredFieldMissing('countryId');
-        }
     }
 
     private function assertOwnership(SubscriptionEntity $subscription, CustomerEntity $customer): void
@@ -160,7 +183,7 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
     /**
      * @return array<string,mixed>
      */
-    private function buildAddressPayload(string $addressId, string $subscriptionId, UpdateAddressData $data): array
+    private function buildAddressPayload(string $addressId, string $subscriptionId, UpdateAddressData $data, string $countryId, ?string $countryStateId): array
     {
         return [
             'id' => $addressId,
@@ -175,8 +198,8 @@ final class UpdateAddressRoute extends AbstractUpdateAddressRoute
             'street' => $data->street,
             'zipcode' => $data->zipcode,
             'city' => $data->city,
-            'countryId' => $data->countryId,
-            'countryStateId' => $data->countryStateId,
+            'countryId' => $countryId,
+            'countryStateId' => $countryStateId,
             'additionalAddressLine1' => $data->additionalAddressLine1,
             'additionalAddressLine2' => $data->additionalAddressLine2,
         ];

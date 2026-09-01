@@ -9,7 +9,6 @@ use Shopware\Core\Framework\Migration\MigrationStep;
 /**
  * @internal
  */
-#[Package('core')]
 class Migration1779321600FixMissingVippsMobilePayMethods extends MigrationStep
 {
     public function getCreationTimestamp(): int
@@ -33,5 +32,9 @@ SQL;
 
             $connection->executeStatement($sql);
         }
+    }
+
+    public function updateDestructive(Connection $connection): void
+    {
     }
 }

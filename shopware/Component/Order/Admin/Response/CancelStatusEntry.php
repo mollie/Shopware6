@@ -5,16 +5,16 @@ namespace Mollie\Shopware\Component\Order\Admin\Response;
 
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
-final readonly class CancelStatusEntry implements \JsonSerializable
+final class CancelStatusEntry implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
     public function __construct(
-        public string $mollieOrderId,
-        public string $mollieId,
-        public bool $isCancelable,
-        public int $cancelableQuantity,
-        public int $quantityCanceled,
+        public readonly string $mollieOrderId,
+        public readonly string $mollieId,
+        public readonly bool $isCancelable,
+        public readonly int $cancelableQuantity,
+        public readonly int $quantityCanceled,
     ) {
     }
 }

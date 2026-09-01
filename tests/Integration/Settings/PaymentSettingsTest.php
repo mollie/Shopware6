@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Integration\Data\ShopwareTestBehaviour;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\DevOps\Environment\EnvironmentHelper;
 use Shopware\Core\Framework\Test\TestCaseBase\IntegrationTestBehaviour;
@@ -14,6 +15,7 @@ use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 #[CoversClass(SettingsService::class)]
+#[Group('core')]
 final class PaymentSettingsTest extends TestCase
 {
     use ShopwareTestBehaviour;
@@ -33,6 +35,29 @@ final class PaymentSettingsTest extends TestCase
         $paymentSettings = $settingsService->getPaymentSettings();
         $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_ORDER_NUMBER_FORMAT, $oldNumberFormat);
         $this->assertSame('test_{ordernumber}_{customernumber}', $paymentSettings->getOrderNumberFormat());
+    }
+
+    public function testSettingsAreReloadedAfterTheCacheIsCleared(): void
+    {
+        /**
+         * @var SystemConfigService $systemConfigService
+         */
+        $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
+        $configKey = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . PaymentSettings::KEY_AUTOMATIC_STATUS_UPDATE;
+        $oldValue = $systemConfigService->get($configKey);
+        $settingsService = new SettingsService($systemConfigService);
+
+        $systemConfigService->set($configKey, false);
+        $cachedSettings = $settingsService->getPaymentSettings();
+
+        $systemConfigService->set($configKey, true);
+        $settingsService->clearCache();
+        $reloadedSettings = $settingsService->getPaymentSettings();
+
+        $systemConfigService->set($configKey, $oldValue);
+
+        $this->assertFalse($cachedSettings->isAutomaticStatusUpdate());
+        $this->assertTrue($reloadedSettings->isAutomaticStatusUpdate());
     }
 
     public function testSettingsAreCachedPerSalesChannel(): void

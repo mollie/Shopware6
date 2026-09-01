@@ -35,7 +35,7 @@
                                         id="accountOrderDropdown"
                                         data-toggle="dropdown"
                                         data-bs-toggle="dropdown"
-                                        aria-label="Subscription Actions"
+                                        aria-label="{{ 'molliePayments.subscriptions.account.actionsMenuLabel'|trans|striptags }}"
                                         aria-haspopup="true"
                                         aria-expanded="false">
                                     {% sw_icon 'more-horizontal' %}
@@ -68,13 +68,6 @@
                                               method="post"
                                               class="order-table-header-context-menu-content-form"
                                               data-add-to-cart="true">
-
-                                            {% if mollie_csrf_available %}
-                                                {% block page_account_subscriptions_item_context_menu_reorder_form_csrf %}
-                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-reorder.twig' %}
-                                                {% endblock %}
-                                            {% endif %}
-
 
                                             {% block page_account_subscriptions_item_context_menu_reorder_form_redirect %}
                                                 <input type="hidden" name="redirectTo" value="frontend.cart.offcanvas"/>
@@ -123,12 +116,6 @@
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
 
-                                                {% if mollie_csrf_available %}
-                                                    {% block page_account_subscriptions_item_context_menu_update_payment_form_csrf %}
-                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-update-payment.twig' %}
-                                                    {% endblock %}
-                                                {% endif %}
-
                                                 {% block page_account_subscriptions_item_context_menu_update_payment_form_button %}
                                                     <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                         {{ "molliePayments.subscriptions.account.mollieSubscriptionUpdatePayment"|trans|sw_sanitize }}
@@ -148,12 +135,6 @@
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
 
-                                                    {% if mollie_csrf_available %}
-                                                        {% block page_account_subscriptions_item_context_menu_pause_form_csrf %}
-                                                            {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-pause.twig' %}
-                                                        {% endblock %}
-                                                    {% endif %}
-
                                                     {% block page_account_subscriptions_item_context_menu_pause_form_button %}
                                                         <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
                                                             {{ "molliePayments.subscriptions.account.mollieSubscriptionPause"|trans|sw_sanitize }}
@@ -170,12 +151,6 @@
                                                       method="post"
                                                       data-form-csrf-handler="true"
                                                       class="order-table-header-context-menu-content-form">
-
-                                                    {% if mollie_csrf_available %}
-                                                        {% block page_account_subscriptions_item_context_menu_resume_form_csrf %}
-                                                            {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-resume.twig' %}
-                                                        {% endblock %}
-                                                    {% endif %}
 
                                                     {% block page_account_subscriptions_item_context_menu_resume_form_button %}
                                                         <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
@@ -195,12 +170,6 @@
                                                   method="post"
                                                   data-form-csrf-handler="true"
                                                   class="order-table-header-context-menu-content-form">
-
-                                                {% if mollie_csrf_available %}
-                                                    {% block page_account_subscriptions_item_context_menu_skip_form_csrf %}
-                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-skip.twig' %}
-                                                    {% endblock %}
-                                                {% endif %}
 
                                                 {% block page_account_subscriptions_item_context_menu_skip_form_button %}
                                                     <button class="dropdown-item order-table-header-context-menu-content-link" type="submit">
@@ -228,12 +197,6 @@
                                                   data-form-csrf-handler="true"
                                                   id="subscriptionsDetailForm-{{ subscriptions.Id }}"
                                                   method="post">
-
-                                                {% if mollie_csrf_available %}
-                                                    {% block page_account_subscriptions_item_context_menu_cancel_form_csrf %}
-                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-cancel.twig' %}
-                                                    {% endblock %}
-                                                {% endif %}
 
                                                 {% block page_account_mollie_subscriptions_item_order_table_body_cell_toggle_subscription_details_button %}
                                                     <button class="dropdown-item order-table-header-context-menu-content-link btn-mollie-subscription-cancel"
@@ -271,7 +234,7 @@
 
                     {% block page_account_mollie_subscriptions_item_price_update_notice %}
 
-                        {% if subscription.priceUpdateState == 'notified' and subscription.nextNotifiedPrice is not null and subscription.notifiedAt is not null %}
+                        {% if page.autoPriceUpdate and subscription.priceUpdateState == 'notified' and subscription.nextNotifiedPrice is not null and subscription.notifiedAt is not null %}
                             {% set effectiveDate = subscription.notifiedAt|date_modify('+' ~ page.priceUpdateNoticeDays ~ ' day') %}
                             <div class="col-12 px-0 subscription-price-update-notice"
                                  data-test="subscription-price-update-notice">
@@ -310,9 +273,6 @@
                                             <form action="{{ path('frontend.account.mollie.subscriptions.cancel', { 'subscriptionId': subscription.id }) }}"
                                                   method="post"
                                                   data-form-csrf-handler="true">
-                                                {% if mollie_csrf_available %}
-                                                    {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-context-menu-cancel.twig' %}
-                                                {% endif %}
                                                 <button class="btn btn-primary btn-mollie-subscription-price-update-cancel"
                                                         type="submit"
                                                         data-test="btn-subscription-price-update-cancel">
@@ -329,7 +289,7 @@
                     {% block page_account_mollie_subscriptions_order_table_toggle_button %}
                         <div class="col-12 subscription-toggle-button-wrapper">
                             <button class="btn btn-light btn-sm subscription-hide-btn collapsed"
-                                    type="submit"
+                                    type="button"
                                     data-toggle="collapse"
                                     data-target="#subscription{{ subscription.id }}"
                                     data-bs-toggle="collapse"
@@ -427,7 +387,7 @@
                                                                                                 class="close"
                                                                                                 data-dismiss="modal"
                                                                                                 data-bs-dismiss="modal"
-                                                                                                aria-label="Close">
+                                                                                                aria-label="{{ 'general.close'|trans|striptags }}">
                                                                                             <span aria-hidden="true">&times;</span>
                                                                                         </button>
                                                                                         </div>
@@ -451,12 +411,6 @@
                                                                                                                           'subscriptionId': subscription.id,
                                                                                                                       }
                                                                                                                   ) }}">
-
-                                                                                                                {% if mollie_csrf_available %}
-                                                                                                                    {% block component_address_subscription_billing_address_form_csrf %}
-                                                                                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-billing-update.twig' %}
-                                                                                                                    {% endblock %}
-                                                                                                                {% endif %}
 
                                                                                                                 {% block component_address_subscription_billing_address_form_hidden_inputs %}
                                                                                                                 {% endblock %}
@@ -583,7 +537,7 @@
                                                                                                     class="close"
                                                                                                     data-dismiss="modal"
                                                                                                     data-bs-dismiss="modal"
-                                                                                                    aria-label="Close">
+                                                                                                    aria-label="{{ 'general.close'|trans|striptags }}">
                                                                                                 <span aria-hidden="true">&times;</span>
                                                                                             </button>
                                                                                         {% endblock %}
@@ -607,12 +561,6 @@
                                                                                                                           'subscriptionId': subscription.id,
                                                                                                                       }
                                                                                                                   ) }}">
-
-                                                                                                                {% if mollie_csrf_available %}
-                                                                                                                    {% block component_address_subscription_shipping_address_form_csrf %}
-                                                                                                                        {% sw_include '@MolliePayments/storefront/csrf/account/subscriptions-index-shipping-update.twig' %}
-                                                                                                                    {% endblock %}
-                                                                                                                {% endif %}
 
                                                                                                                 {% block component_address_subscription_shipping_address_form_hidden_inputs %}
                                                                                                                 {% endblock %}

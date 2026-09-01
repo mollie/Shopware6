@@ -26,7 +26,12 @@
                 "selectBank": "Pasirinkite banką"
             },
             "pos": {
-                "selectTerminal": "Pasirinkite terminalą"
+                "selectTerminal": "Pasirinkite terminalą",
+                "returnToWebsite": "Grįžti į svetainę",
+                "terminalInstructions": "Vykdykite terminale pateiktus nurodymus",
+                "paymentSuccess": "Jūsų mokėjimas sėkmingas!",
+                "paymentFailed": "Jūsų mokėjimas nepavyko!",
+                "paymentFailedNoDebit": "Nuo kortelės nenurašyta jokia suma"
             },
             "mandate": {
                 "sectionTitle": "Išsaugotos kortelės",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefono numeris",
                 "phoneErrorMessage": "Telefono numeris yra privalomas. Pavyzdžiui, +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Apmokėjimas"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Mokėjimas nepavyko",
                 "failed": "Mokėjimas nepavyko arba buvo atšauktas. Būsite nukreipti į Mollie, kur galėsite užbaigti savo mokėjimą pasirinktu būdų. "
             },
-            "redirecting": "Nukreipiama į: "
+            "redirecting": "Nukreipiama į: ",
+            "paymentLink": {
+                "error": "Šio užsakymo nebegalima apmokėti.",
+                "alreadyPaid": "Šis užsakymas jau apmokėtas."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "Jūsų prenumerata bus atnaujinta",
                 "successSkip": "Jūsų prenumerata buvo praleista",
                 "successUpdateAddress": "Jūsų adresas sėkmingai atnaujintas",
-                "successUpdatePayment": "Jūsų mokėjimo būdas buvo sėkmingai atnaujintas"
+                "successUpdatePayment": "Jūsų mokėjimo būdas buvo sėkmingai atnaujintas",
+                "actionsMenuLabel": "Prenumeratos veiksmai"
             },
             "options": {
                 "everyDay": "Kiekvieną dieną",

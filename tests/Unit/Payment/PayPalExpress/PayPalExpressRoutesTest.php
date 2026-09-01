@@ -16,6 +16,7 @@ use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeAccountService;
+use Mollie\Shopware\Unit\Payment\Fake\FakeCartBackupService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeCartService;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodRepository;
 use Mollie\Shopware\Unit\Payment\Fake\FakeSessionGateway;
@@ -54,6 +55,44 @@ final class PayPalExpressRoutesTest extends TestCase
         $this->assertInstanceOf(StartCheckoutResponse::class, $response);
         $this->assertSame('session-1', $response->getSessionId());
         $this->assertSame('https://mollie.com/checkout', $response->getRedirectUrl());
+    }
+
+    /**
+     * PayPal redirects away between the button click and the guest registration, so the
+     * consent captured in the storefront is kept on the cart session.
+     */
+    public function testStartCheckoutStoresDataProtectionConsentOnSession(): void
+    {
+        $session = $this->buildSession('session-1', 'https://mollie.com/checkout');
+        $cart = $this->buildCartWithItems();
+
+        $route = new StartCheckoutRoute(
+            new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
+            new FakeSessionGateway($session),
+            new FakeCartService($cart),
+        );
+
+        $request = new \Symfony\Component\HttpFoundation\Request();
+        $request->request->set('acceptedDataProtection', '1');
+
+        $route->startCheckout($request, $this->salesChannelContext);
+
+        $this->assertTrue($session->hasAcceptedDataProtection());
+    }
+
+    public function testStartCheckoutKeepsDataProtectionUnacceptedWhenNotSent(): void
+    {
+        $session = $this->buildSession('session-1', 'https://mollie.com/checkout');
+
+        $route = new StartCheckoutRoute(
+            new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
+            new FakeSessionGateway($session),
+            new FakeCartService($this->buildCartWithItems()),
+        );
+
+        $route->startCheckout(new \Symfony\Component\HttpFoundation\Request(), $this->salesChannelContext);
+
+        $this->assertFalse($session->hasAcceptedDataProtection());
     }
 
     public function testStartCheckoutThrowsWhenDisabled(): void
@@ -96,17 +135,22 @@ final class PayPalExpressRoutesTest extends TestCase
         $cart = new Cart('cart-token');
         $cart->addExtension(Mollie::EXTENSION, $session);
 
+        $cartBackupService = new FakeCartBackupService();
+
         $route = new CancelCheckoutRoute(
             new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
             new FakePaymentMethodRepository('paypal-express-method-id'),
             new FakeSessionGateway($session),
             new FakeCartService($cart),
+            $cartBackupService,
         );
 
         $response = $route->cancel($this->salesChannelContext);
 
         $this->assertInstanceOf(CancelCheckoutResponse::class, $response);
         $this->assertSame('session-cancel-1', $response->getSessionId());
+        $this->assertSame(1, $cartBackupService->getRestoreCartCalls());
+        $this->assertSame(1, $cartBackupService->getClearBackupCalls());
     }
 
     public function testCancelCheckoutThrowsWhenPaypalExpressIdIsNull(): void
@@ -116,6 +160,7 @@ final class PayPalExpressRoutesTest extends TestCase
             new FakePaymentMethodRepository(null),
             new FakeSessionGateway($this->buildSession('session-1')),
             new FakeCartService(new Cart('cart-token')),
+            new FakeCartBackupService(),
         );
 
         try {
@@ -133,6 +178,7 @@ final class PayPalExpressRoutesTest extends TestCase
             new FakePaymentMethodRepository('paypal-express-method-id'),
             new FakeSessionGateway($this->buildSession('session-1')),
             new FakeCartService(new Cart('cart-token')),
+            new FakeCartBackupService(),
         );
 
         try {
@@ -150,6 +196,7 @@ final class PayPalExpressRoutesTest extends TestCase
             new FakePaymentMethodRepository('paypal-express-method-id'),
             new FakeSessionGateway($this->buildSession('session-1')),
             new FakeCartService(new Cart('cart-token')),
+            new FakeCartBackupService(),
         );
 
         try {
@@ -185,6 +232,60 @@ final class PayPalExpressRoutesTest extends TestCase
         $this->assertSame('session-finish-1', $response->getSessionId());
         $this->assertSame('auth-id-1', $response->getAuthenticateId());
         $this->assertSame('new-token-1', $response->getContextToken());
+    }
+
+    /**
+     * The consent kept on the cart session during start must reach the account creation,
+     * otherwise the guest registration fails when the shop requires the checkbox. The
+     * session reloaded from Mollie does not carry it, so it has to come from the cart.
+     */
+    public function testFinishCheckoutForwardsSessionConsentToAccountCreation(): void
+    {
+        $cartSession = $this->buildSessionWithAddresses('session-finish-2', 'https://mollie.com/checkout', 'auth-id-2');
+        $cartSession->setAcceptedDataProtection(true);
+
+        $cart = new Cart('cart-token');
+        $cart->addExtension(Mollie::EXTENSION, $cartSession);
+
+        $accountService = new FakeAccountService(new FakeSalesChannelContext('sc-1', 'new-token-2'));
+
+        $route = new FinishCheckoutRoute(
+            new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
+            new FakeSessionGateway($this->buildSessionWithAddresses('session-finish-2', 'https://mollie.com/checkout', 'auth-id-2')),
+            $accountService,
+            new FakePaymentMethodRepository('paypal-express-method-id'),
+            new FakeCartService($cart),
+        );
+
+        $route->finishCheckout($this->salesChannelContext);
+
+        $this->assertTrue($accountService->getLastAcceptedDataProtection());
+    }
+
+    /**
+     * Sessions without a stored consent (e.g. started before the update) must not
+     * accept the data protection on the customer's behalf.
+     */
+    public function testFinishCheckoutDoesNotAcceptDataProtectionWithoutStoredConsent(): void
+    {
+        $session = $this->buildSessionWithAddresses('session-finish-3', 'https://mollie.com/checkout', 'auth-id-3');
+
+        $cart = new Cart('cart-token');
+        $cart->addExtension(Mollie::EXTENSION, $session);
+
+        $accountService = new FakeAccountService(new FakeSalesChannelContext('sc-1', 'new-token-3'));
+
+        $route = new FinishCheckoutRoute(
+            new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
+            new FakeSessionGateway($session),
+            $accountService,
+            new FakePaymentMethodRepository('paypal-express-method-id'),
+            new FakeCartService($cart),
+        );
+
+        $route->finishCheckout($this->salesChannelContext);
+
+        $this->assertFalse($accountService->getLastAcceptedDataProtection());
     }
 
     public function testFinishCheckoutThrowsWhenPaypalExpressIdIsNull(): void

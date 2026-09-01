@@ -1,11 +1,19 @@
 #
 # Makefile
 #
-.PHONY: help prod dev clean build fixtures pr release
+.PHONY: help prod dev clean build fixtures pr release validate report phpmetrics build-js
 .DEFAULT_GOAL := help
 PLUGIN_VERSION = $(shell php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
 
 NODE_VERSION:=$(shell node -v)
+
+# Tool set for "make validate". A literal comma cannot be written inside a make
+# function call, so this is resolved here instead of inline in the recipe.
+ifdef only
+VALIDATE_TOOLS := $(only)
+else
+VALIDATE_TOOLS := sw-cli,phpstan
+endif
 
 ifndef nossl
 	EXPORT_CMD := export NODE_OPTIONS=--openssl-legacy-provider &&
@@ -119,14 +127,89 @@ stan: ##3 Starts the PHPStan Analyser
 	cd ../../.. && php vendor/bin/phpstan analyse -c ./custom/plugins/MolliePayments/config/.phpstan.neon
 
 phpunit: ##3 Starts all PHPUnit Tests
-	@XDEBUG_MODE=coverage php vendor/bin/phpunit --configuration=./config/phpunit.xml --coverage-html ./.reports/phpunit/coverage
+	@php vendor/bin/phpunit --configuration=./config/phpunit.xml
 
-phpintegration: ##3 Starts all PHPUnit Tests
-	#we call "real" phpunit, it seems like in sw 6.4 the vendor/bin/phpunit is overwritten by shopware
-	@XDEBUG_MODE=coverage cd ../../.. && php vendor/phpunit/phpunit/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml
+phpintegration: ##3 Starts all PHPUnit Tests [groups=core to limit to a group]
+	@cd ../../.. && php vendor/bin/phpunit --configuration=./custom/plugins/MolliePayments/config/phpunit.integration.xml $(if $(groups),--group $(groups),)
 
-behat:
-	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml --format progress --colors
+report: ##3 Runs the unit tests with coverage and prints the line coverage of shopware/ and src/
+	# ----------------------------------------------------------------
+	# reset previous report output
+	rm -rf ./.reports/phpunit/coverage ./.reports/phpunit/clover.xml ../../../public/coverage
+	mkdir -p ./.reports/phpunit
+	# ----------------------------------------------------------------
+	# pcov records nothing outside pcov.directory, and the dockware image points that
+	# at the Shopware core - which is why every plugin file used to come back as 0%.
+	# Overriding XDEBUG_MODE instead would not help: php-code-coverage picks pcov
+	# over Xdebug whenever pcov is loaded (see Driver/Selector.php).
+	# XDEBUG_MODE is the fallback for an image without pcov: php-code-coverage picks pcov
+	# whenever it is loaded, so this has no effect on dockware, but without it a
+	# pcov-less environment would produce no report at all.
+	@XDEBUG_MODE=coverage php -d pcov.enabled=1 -d pcov.directory=$(CURDIR) \
+		vendor/bin/phpunit --configuration=./config/phpunit.xml \
+		--coverage-html ./.reports/phpunit/coverage \
+		--coverage-clover ./.reports/phpunit/clover.xml
+	# PHPUnit only warns when no coverage driver is available and still exits 0, which
+	# would leave the summary below reporting a truthful-looking 0.00%. Fail loudly instead.
+	@test -f ./.reports/phpunit/clover.xml || { echo ""; echo "  No coverage was recorded - is pcov or Xdebug available?"; exit 1; }
+	@php -r '$$m = simplexml_load_file("./.reports/phpunit/clover.xml")->project->metrics; $$s = (int) $$m["statements"]; $$c = (int) $$m["coveredstatements"]; printf("%s  Line coverage: %.2f%% (%d/%d statements)%s%s", PHP_EOL, $$s > 0 ? $$c / $$s * 100 : 0, $$c, $$s, PHP_EOL, PHP_EOL);'
+	# ----------------------------------------------------------------
+	# Publish the HTML report into the Shopware document root, so it can be opened
+	# in the browser at <shop-url>/coverage instead of only from the file system.
+	@cp -r ./.reports/phpunit/coverage ../../../public/coverage
+	@echo "  HTML report at .reports/phpunit/coverage/index.html"
+	@echo "  HTML report in the browser at <shop-url>/coverage"
+	@echo ""
+
+# PHPMetrics is deliberately not part of composer.json: its dependencies clash with the
+# other dev tools on the pipeline. It gets its own composer project under dev/tools
+# instead, so the plugin's dependency tree stays untouched.
+# Version 2.x and not the 3.0 release candidates: only 2.x still has --junit, which is
+# what pairs the metrics with the test results.
+PHPMETRICS_DIR := ./dev/tools/phpmetrics
+PHPMETRICS_BIN := $(PHPMETRICS_DIR)/vendor/bin/phpmetrics
+
+phpmetrics: ##3 Installs PHPMetrics and generates the metrics report from the unit test run
+	# ----------------------------------------------------------------
+	@test -f $(PHPMETRICS_BIN) || ( mkdir -p $(PHPMETRICS_DIR) \
+		&& composer require --working-dir=$(PHPMETRICS_DIR) --no-interaction phpmetrics/phpmetrics:^2.11 )
+	# ----------------------------------------------------------------
+	# reset previous report output
+	rm -rf ./.reports/phpmetrics ../../../public/phpmetrics
+	mkdir -p ./.reports/phpmetrics
+	# ----------------------------------------------------------------
+	# PHPMetrics reads the JUnit log to tell which classes the tests actually reach, so the
+	# unit tests have to run first. No coverage driver is involved: PHPMetrics cannot read
+	# Clover, use "make report" for line coverage.
+	# A non-zero exit code must not stop the report here: PHPUnit already returns 1 for the
+	# deprecations the Shopware core triggers, and the JUnit log is written either way.
+	@php vendor/bin/phpunit --configuration=./config/phpunit.xml --log-junit ./.reports/phpmetrics/junit.xml \
+		|| echo "  The test run reported problems - see the JUnit page of the report."
+	# ----------------------------------------------------------------
+	# Analysed directories, exclusions and output paths live in config/.phpmetrics.json,
+	# so they stay in sync with the exclusions of config/phpunit.xml.
+	# PHPMetrics 2.x still writes dynamic properties, which buries the summary under
+	# deprecations on PHP 8.4+. They come from the tool, not from this plugin.
+	@php -d error_reporting="E_ALL & ~E_DEPRECATED" $(PHPMETRICS_BIN) --config=./config/.phpmetrics.json
+	# ----------------------------------------------------------------
+	# Publish the HTML report into the Shopware document root, so it can be opened
+	# in the browser at <shop-url>/phpmetrics instead of only from the file system.
+	@cp -r ./.reports/phpmetrics/html ../../../public/phpmetrics
+	@echo ""
+	@echo "  HTML report at .reports/phpmetrics/html/index.html"
+	@echo "  HTML report in the browser at <shop-url>/phpmetrics"
+	@echo ""
+
+# Behat prints progress to stdout. CI passes allure=<dir> to additionally write Cucumber
+# JSON, which Allure reads as-is; --out maps to --format by position, and `std` is Behat's
+# word for stdout.
+BEHAT_OUTPUT := --format=progress
+ifdef allure
+BEHAT_OUTPUT := --format=progress --format=cucumber_json --out=std --out=$(allure)
+endif
+
+behat: ##3 Starts all Behat Tests [allure=<dir> also writes results for the report]
+	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml $(BEHAT_OUTPUT) --colors
 
 insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction
@@ -205,3 +288,52 @@ release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 
 typecheck: ##3 Starts the TypeScript type check (administration)
 	NODE_PATH=$(CURDIR)/dev/node_modules ./dev/node_modules/.bin/tsc --noEmit -p ./src/Resources/app/administration/tsconfig.json
+
+validate: ##4 Runs the Shopware extension verifier against a release ZIP [zip=<path>, only=<tools>, reporter=<format>]
+	# This is the same tooling the Shopware Store runs on upload, so it catches
+	# rejections before we submit. It deliberately validates the ZIP and not the
+	# source directory: only the ZIP carries the mounted .shopware-extension.yml
+	# (and its validation.ignore list), and only the ZIP is free of the vendor
+	# directory - with a vendor/ present the verifier skips dependency resolution
+	# and every Shopware class would come back as "not found".
+	#
+	# Exit code is non-zero for error-level findings only; warnings are printed
+	# but do not fail the build, which mirrors what the Store does on upload.
+	#
+	# Default tool set:
+	#   phpstan  is what the Store shows as "Statische Code Analyse"
+	#   sw-cli   is a tool in the same --only list, not a separate mode - dropping
+	#            it would also drop metadata.icon.size, packaging and snippet checks
+	# ESLint, Stylelint and the Twig linters are left out on purpose: they already
+	# run as their own jobs in step_review.yml. Override with only=<tools> or
+	# only=all to run everything.
+	@ZIP="$(zip)"; \
+	if [ -z "$$ZIP" ]; then ZIP=$$(ls ../.build/MolliePayments*.zip 2>/dev/null | head -1); fi; \
+	if [ ! -f "$$ZIP" ]; then \
+		echo "No release ZIP found. Run 'make release -B' first, or pass zip=<path>."; \
+		exit 1; \
+	fi; \
+	echo "Validating $$ZIP"; \
+	docker run --rm \
+		--user "$(shell id -u):$(shell id -g)" \
+		-e HOME=/tmp \
+		-v "$$(cd "$$(dirname "$$ZIP")" && pwd)":/build \
+		ghcr.io/shopware/shopware-cli:latest \
+		extension validate --full "/build/$$(basename "$$ZIP")" \
+		$(if $(filter-out all,$(VALIDATE_TOOLS)),--only "$(VALIDATE_TOOLS)",) \
+		$(if $(reporter),--reporter $(reporter),)
+
+build-js:
+	rm -rf "./src/Resources/public/administration/assets"
+	rm -rf "./src/Resources/public/administration/.vite"
+	docker run --rm \
+    -v "./..:/plugins" \
+    -v "./config/.shopware-extension.yml:/plugins/MolliePayments/.shopware-extension.yml" \
+    ghcr.io/shopware/shopware-cli:latest \
+    extension build /plugins/MolliePayments
+	@JS_DIR="./src/Resources/app/storefront/dist/storefront/js"; \
+	if [ -f "$$JS_DIR/mollie-payments.js" ]; then \
+	    mkdir -p "$$JS_DIR/mollie-payments" && \
+	    cp "$$JS_DIR/mollie-payments.js" "$$JS_DIR/mollie-payments/mollie-payments.js" && \
+	    { [ -f "$$JS_DIR/mollie-payments.js.map" ] && cp "$$JS_DIR/mollie-payments.js.map" "$$JS_DIR/mollie-payments/mollie-payments.js.map" || true; }; \
+	fi

@@ -16,6 +16,7 @@ final class RefundSettings extends Struct
     public const KEY_CREATE_CREDIT_NOTES = 'refundManagerCreateCreditNotes';
     public const KEY_CREDIT_NOTES_PREFIX = 'refundManagerCreateCreditNotesPrefix';
     public const KEY_CREDIT_NOTES_SUFFIX = 'refundManagerCreateCreditNotesSuffix';
+    public const KEY_RETURN_MANAGEMENT_DISABLED = 'refundManagerReturnManagementDisabled';
 
     public function __construct(
         private readonly bool $enabled = false,
@@ -25,6 +26,7 @@ final class RefundSettings extends Struct
         private readonly bool $createCreditNotes = false,
         private readonly string $creditNotesPrefix = '',
         private readonly string $creditNotesSuffix = '',
+        private readonly bool $returnManagementDisabled = false,
     ) {
     }
 
@@ -41,6 +43,7 @@ final class RefundSettings extends Struct
             (bool) ($settings[self::KEY_CREATE_CREDIT_NOTES] ?? false),
             (string) ($settings[self::KEY_CREDIT_NOTES_PREFIX] ?? ''),
             (string) ($settings[self::KEY_CREDIT_NOTES_SUFFIX] ?? ''),
+            (bool) ($settings[self::KEY_RETURN_MANAGEMENT_DISABLED] ?? false),
         );
     }
 
@@ -77,6 +80,11 @@ final class RefundSettings extends Struct
     public function getCreditNotesSuffix(): string
     {
         return $this->creditNotesSuffix;
+    }
+
+    public function isReturnManagementDisabled(): bool
+    {
+        return $this->returnManagementDisabled;
     }
 
     public function getCreditNoteLabel(string $label): string

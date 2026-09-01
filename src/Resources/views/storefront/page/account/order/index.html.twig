@@ -1,0 +1,11 @@
+{% sw_extends '@Storefront/storefront/page/account/order/index.html.twig' %}
+
+{# The edit order page overrides page_checkout_aside_actions completely and never calls parent(),
+   so the express component of the confirm page does not reach it and is added here again. #}
+{% block page_checkout_aside_actions %}
+    {{ parent() }}
+
+    {% block page_checkout_aside_actions_mollie_express_components_edit_order %}
+        {% sw_include '@MolliePayments/mollie/component/express-component.html.twig' %}
+    {% endblock %}
+{% endblock %}

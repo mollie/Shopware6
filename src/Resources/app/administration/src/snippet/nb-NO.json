@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie-abonnement | Mollie-abonnementer"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": "Bestilling vellykket",
-            "mollie_checkout_order_failed": "Bestilling mislyktes",
-            "mollie_checkout_order_canceled": "Bestilling kansellert",
+            "mollie_payment_success": "Bestilling vellykket",
+            "mollie_payment_failed": "Bestilling mislyktes",
+            "mollie_payment_cancelled": "Bestilling kansellert",
             "mollie_webhook_received_All": "Mollie Webhook Mottatt (Alle)",
+            "mollie_webhook_received_status_open": "Mollie Webhook Mottatt (Åpen)",
             "mollie_webhook_received_status_authorized": "Mollie Webhook Mottatt (Autorisert)",
             "mollie_webhook_received_status_failed": "Mollie Webhook Mottatt (Mislyktes)",
             "mollie_webhook_received_status_canceled": "Mollie Webhook Mottatt (Kansellert)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": "Mollie Webhook Mottatt (Fullført)",
             "mollie_webhook_received_status_refunded": "Mollie Webhook Mottatt (Refundert)",
             "mollie_webhook_received_status_partially_refunded": "Mollie Webhook Mottatt (Delvis refundert)",
+            "mollie_webhook_received_status_chargeback": "Mollie Webhook Mottatt (Tilbakeføring)",
             "mollie_refund_started": "Mollie refusjon startet",
             "mollie_subscription_started": "Mollie abonnement startet",
             "mollie_subscription_ended": "Mollie abonnement fullført",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": "Mollie abonnement gjenopptatt",
             "mollie_subscription_skipped": "Mollie abonnement hoppet over",
             "mollie_subscription_renewed": "Mollie abonnement fornyet",
-            "mollie_subscription_renewal_reminder": "Mollie påminnelse om fornyelse av abonnement"
+            "mollie_subscription_renewal_reminder": "Mollie påminnelse om fornyelse av abonnement",
+            "mollie_subscription_priceChangeNotice": "Mollie abonnement prisendring"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Mollie-abonnementer",
                 "description": "Håndtering av gjentakende betalinger er enklere enn noen gang med våre praktiske funksjoner. Ta bedriften din til neste nivå med effektive sporingsalternativer, enkle integrasjoner og mer. Med Mollie-abonnementer kan du enkelt opprette abonnementsprodukter og planlegge gjentakende betalinger som skjer på det konfigurerte intervallet og perioden.",
                 "mollieSubscriptionProduct": "Abonnementsprodukt",
+                "mollieAllowOneTime": "Tilby også som engangskjøp",
+                "mollieAllowOneTimeHelp": "Viser en ekstra «Legg i handlekurv»-knapp på produktsiden slik at produktet kan kjøpes uten abonnement.",
                 "mollieSubscriptionIntervalAmount": "Gjenta betaling hver",
                 "mollieSubscriptionIntervalType": "Intervalenhet",
                 "mollieSubscriptionRepetitionAmount": "Antall repetisjoner",
@@ -501,9 +506,9 @@
             "canceled": "Kansellert",
             "expired": "Utløpt",
             "partiallyRefunded": "Refundert (delvis)",
-            "orderSuccess": "Bestilling vellykket",
-            "orderFailed": "Bestilling mislyktes",
-            "orderCanceled": "Bestilling kansellert"
+            "payment": "Betaling",
+            "success": "Vellykket",
+            "priceChangeNotice": "Prisendring"
         }
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Logger;
 
+use Mollie\Shopware\Component\Logger\CleanUpLoggerScheduledTask;
 use Mollie\Shopware\Component\Logger\CleanUpLoggerScheduledTaskHandler;
 use Mollie\Shopware\Component\Logger\OrderLogStorage;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
@@ -117,6 +118,79 @@ final class CleanUpLoggerScheduledTaskHandlerTest extends TestCase
         $this->createHandler()->run();
 
         $this->assertFileExists($other);
+    }
+
+    public function testTheTaskRunsOnItsOwnSchedule(): void
+    {
+        $this->assertSame(
+            [CleanUpLoggerScheduledTask::class],
+            iterator_to_array(CleanUpLoggerScheduledTaskHandler::getHandledMessages())
+        );
+    }
+
+    /**
+     * An order whose transactions were not loaded cannot be judged. Treating it as failed keeps
+     * its log for the longer retention instead of deleting it early.
+     */
+    public function testAnOrderWithoutLoadedTransactionsUsesFailedRetention(): void
+    {
+        $order = new OrderEntity();
+        $order->setId('order-60000');
+        $order->setOrderNumber('60000');
+        $this->orderRepository->add($order);
+
+        $logFile = $this->createLogFile('order-60000.log', 10);
+
+        $this->createHandler()->run();
+
+        $this->assertFileExists($logFile);
+    }
+
+    public function testAnOrderWithoutAnyTransactionUsesFailedRetention(): void
+    {
+        $order = new OrderEntity();
+        $order->setId('order-70000');
+        $order->setOrderNumber('70000');
+        $order->setTransactions(new OrderTransactionCollection());
+        $this->orderRepository->add($order);
+
+        $logFile = $this->createLogFile('order-70000.log', 10);
+
+        $this->createHandler()->run();
+
+        $this->assertFileExists($logFile);
+    }
+
+    public function testATransactionWithoutALoadedStateUsesFailedRetention(): void
+    {
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId('transaction-80000');
+
+        $order = new OrderEntity();
+        $order->setId('order-80000');
+        $order->setOrderNumber('80000');
+        $order->setTransactions(new OrderTransactionCollection([$transaction]));
+        $this->orderRepository->add($order);
+
+        $logFile = $this->createLogFile('order-80000.log', 10);
+
+        $this->createHandler()->run();
+
+        $this->assertFileExists($logFile);
+    }
+
+    /**
+     * A scheduled task that throws is retried by Shopware and floods the log. Cleaning up log
+     * files is housekeeping - it must never fail the queue.
+     */
+    public function testAnUnreadableOrderTableDoesNotFailTheTask(): void
+    {
+        $this->orderRepository->withSearchFailure(new \RuntimeException('database gone'));
+        $logFile = $this->createLogFile('order-90000.log', 40);
+
+        $this->createHandler()->run();
+
+        $this->assertFileExists($logFile);
     }
 
     private function createHandler(): CleanUpLoggerScheduledTaskHandler

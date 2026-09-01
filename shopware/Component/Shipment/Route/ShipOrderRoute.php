@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Shipment\Route;
 
-use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\CreateShipment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
+use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Mollie\ShippingItem;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
 use Mollie\Shopware\Component\Mollie\Tracking;
+use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
+use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
+use Mollie\Shopware\Component\Shipment\ShipmentPersister;
+use Mollie\Shopware\Component\Shipment\ShipmentTrackingResolver;
+use Mollie\Shopware\Component\Transaction\Event\RepairLegacyTransactionEvent;
+use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
+use Mollie\Shopware\Component\Transaction\TransactionService;
+use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
@@ -21,14 +28,12 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Order\SalesChannel\OrderService;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
-use Shopware\Core\System\StateMachine\Aggregation\StateMachineTransition\StateMachineTransitionActions;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
@@ -37,23 +42,29 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => true, 'auth_enabled' => true])]
 final class ShipOrderRoute extends AbstractShipOrderRoute
 {
+    private const MOLLIE_ID_KEY_SHIPMENT = 'shipmentId';
+    private const MOLLIE_ID_KEY_CAPTURE = 'captureId';
+
     /**
      * @param EntityRepository<OrderCollection> $orderRepository
-     * @param EntityRepository<OrderLineItemCollection> $orderLineRepository
-     * @param EntityRepository<OrderDeliveryCollection> $orderDeliveryRepository
      */
     public function __construct(
         #[Autowire(service: 'order.repository')]
         private readonly EntityRepository $orderRepository,
-        #[Autowire(service: 'order_line_item.repository')]
-        private readonly EntityRepository $orderLineRepository,
-        #[Autowire(service: 'order_delivery.repository')]
-        private readonly EntityRepository $orderDeliveryRepository,
         #[Autowire(service: MollieGateway::class)]
         private readonly MollieGatewayInterface $mollieGateway,
         #[Autowire(service: 'event_dispatcher')]
-        private EventDispatcherInterface $eventDispatcher,
-        private readonly OrderService $orderService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        #[Autowire(service: ShipmentItemResolver::class)]
+        private readonly ShipmentItemResolver $itemResolver,
+        #[Autowire(service: ShipmentTrackingResolver::class)]
+        private readonly ShipmentTrackingResolver $trackingResolver,
+        #[Autowire(service: AuthorizationReconciler::class)]
+        private readonly AuthorizationReconciler $reconciler,
+        #[Autowire(service: ShipmentPersister::class)]
+        private readonly ShipmentPersister $persister,
+        #[Autowire(service: TransactionService::class)]
+        private readonly TransactionServiceInterface $transactionService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -67,42 +78,39 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
     #[Route(path: '/api/_action/mollie/ship', name: 'api.action.mollie.ship.order', methods: ['POST', 'GET'])]
     public function ship(Request $request, Context $context): ShipOrderResponse
     {
-        $orderId = (string) $request->get('orderId');
-        $orderId = strtolower($orderId);
-
-        $items = $request->get('items');
+        $orderId = strtolower((string) $request->get('orderId'));
+        $orderNumber = (string) $request->get('orderNumber', '');
+        $items = $this->itemResolver->normalizeItems($request->get('items'));
 
         $logContext = [
-            'orderNumber' => '',
+            'orderNumber' => $orderNumber,
             'orderId' => $orderId,
             'requestedItems' => $items,
         ];
 
         $this->logger->info('ShipOrderRoute: request received', $logContext);
 
-        if (count($items) === 0) {
-            throw ShippingException::noLineItems($orderId);
-        }
+        $order = $this->loadOrder($orderId, $orderNumber, $context);
 
-        $criteria = new Criteria([$orderId]);
-        $criteria->addAssociation('lineItems.product');
-        $criteria->addAssociation('transactions');
-        $criteria->addAssociation('currency');
-        $criteria->addAssociation('deliveries.positions');
-        $criteria->addAssociation('deliveries.shippingMethod');
-
-        $order = $this->orderRepository->search($criteria, $context)->first();
-
-        if (! $order instanceof OrderEntity) {
-            throw ShippingException::orderNotFound($orderId);
-        }
-
+        $orderId = $order->getId();
         $orderNumber = $order->getOrderNumber();
         $salesChannelId = $order->getSalesChannelId();
         if ($orderNumber === null) {
             throw ShippingException::orderNotFound($orderId);
         }
 
+        // When no specific items are requested, ship everything that is still open.
+        if (count($items) === 0) {
+            $items = $this->itemResolver->buildRemainingItems($order);
+        }
+
+        // Nothing left to ship in Shopware: this is not necessarily a no-op. Older orders were
+        // captured with a too low (net) amount, so the shipped items may still owe their taxes at
+        // Mollie. We keep flowing to resolve the Mollie payment and reconcile the open authorization
+        // below instead of returning early here.
+        $nothingToShip = count($items) === 0;
+
+        $logContext['orderId'] = $orderId;
         $logContext['orderNumber'] = $orderNumber;
         $logContext['orderLineItems'] = array_map(
             static function (OrderLineItemEntity $li): array {
@@ -122,29 +130,57 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         if ($transactions === null || $transactions->count() === 0) {
             throw ShippingException::orderNotFound($orderId);
         }
-        $firstTransaction = $transactions->first();
-        if ($firstTransaction === null) {
-            throw ShippingException::orderNotFound($orderId);
+
+        $mollieTransactions = new MollieOrderTransactionCollection($transactions);
+        $currentTransaction = $mollieTransactions->getCurrentOrderTransaction();
+
+        // We no longer gate on the payment being authorized: merchants may flip an authorized order to
+        // "paid" themselves (for their ERP), and those orders must still be shipped. We only require a
+        // current transaction here; whether it is actually a Mollie payment is decided below via the
+        // Mollie payment extension, and the Mollie API call itself is wrapped so a failing shipment
+        // (e.g. an already captured payment) never interrupts the delivery state change.
+        if ($currentTransaction === null) {
+            $this->logger->info('ShipOrderRoute: no current transaction, nothing to ship', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
         }
-        $payment = $firstTransaction->getExtension(Mollie::EXTENSION);
+
+        $repairEvent = new RepairLegacyTransactionEvent($currentTransaction, $order, $context);
+        $this->eventDispatcher->dispatch($repairEvent);
+
+        $payment = $currentTransaction->getExtension(Mollie::EXTENSION);
         if (! $payment instanceof Payment) {
-            throw ShippingException::orderNotFound($orderId);
+            // Not a Mollie order (or legacy data could not be repaired): there is nothing to ship at
+            // Mollie. Treated as an idempotent no-op so headless callers and the automatic-shipment
+            // subscriber don't run into an error.
+            $this->logger->info('ShipOrderRoute: transaction has no Mollie payment, nothing to ship', $logContext);
+
+            return new ShipOrderResponse('', $orderId, []);
         }
+
         $deliveryCollection = $order->getDeliveries() ?? new OrderDeliveryCollection();
-        $paymentId = $payment->getId();
         $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
         $currency = $order->getCurrency();
         if ($currency === null) {
             throw ShippingException::orderNotFound($orderId);
         }
+        $taxStatus = (string) $order->getTaxStatus();
 
-        $orderShippedEvent = new OrderShippedEvent($firstTransaction->getId(), $context);
+        $orderShippedEvent = new OrderShippedEvent($currentTransaction->getId(), $context);
         $mollieOrderId = $payment->getOrderId();
 
+        if ($nothingToShip) {
+            return $this->reconciler->reconcileAuthorizedRemainder($order, $payment, $currency, $taxStatus, (string) $orderNumber, $salesChannelId, $mollieOrderId, $deliveryCollection, $lineItems, $logContext);
+        }
+
+        $mollieLines = $mollieOrderId !== null ? $this->loadMollieLines($mollieOrderId, $salesChannelId, $logContext) : null;
+
         $shippingItems = new ShippingItemCollection();
-        $lineUpserts = $this->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems);
-        $deliveryUpserts = $this->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection);
-        $fullyShipped = $this->isFullyShipped($lineItems, $lineUpserts);
+        $lineUpserts = $this->itemResolver->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems, $currency, $taxStatus, $mollieLines);
+        $deliveryUpserts = $this->itemResolver->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection, $currency, $taxStatus, $mollieLines);
+        $fullyShipped = $this->itemResolver->isFullyShipped($lineItems, $lineUpserts);
+
+        $orderShippedEvent->setShippingItems($shippingItems);
 
         $logContext['lineUpserts'] = $lineUpserts;
         $logContext['deliveryUpsertsCount'] = count($deliveryUpserts);
@@ -153,325 +189,126 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
         $this->logger->info('ShipOrderRoute: collected shipping data', $logContext);
 
+        // The Orders API is line-item based and captures on shipment; the Payments API needs an
+        // explicit capture. Decide here which one applies and delegate the Mollie call.
         if ($mollieOrderId !== null) {
-            $trackingCode = (string) $request->get('trackingCode', '');
             $lineItemIds = array_column($lineUpserts, 'id');
-            $tracking = $this->resolveTracking($trackingCode, $deliveryCollection, $lineItemIds);
-            $createShipment = new CreateShipment($shippingItems, $tracking);
+            $tracking = $this->trackingResolver->resolve($request, $deliveryCollection, $lineItemIds);
+            $orderShippedEvent->setTracking($tracking);
 
-            $logContext['mollieOrderId'] = $mollieOrderId;
-            $logContext['tracking'] = $tracking !== null ? ['carrier' => $tracking->getCarrier(), 'code' => $tracking->getCode()] : null;
+            $mollieId = $this->shipViaOrdersApi($shippingItems, $tracking, $mollieOrderId, (string) $orderNumber, $salesChannelId, $logContext);
+            $mollieIdKey = self::MOLLIE_ID_KEY_SHIPMENT;
+        } else {
+            $mollieId = $this->reconciler->captureViaPaymentsApi($payment, $shippingItems, $order, $lineItems, $currency, (string) $orderNumber, $salesChannelId, $fullyShipped, $logContext);
+            $mollieIdKey = self::MOLLIE_ID_KEY_CAPTURE;
+        }
 
-            $this->logger->info('ShipOrderRoute: calling Mollie createShipment (Orders API)', $logContext);
+        // The Mollie call failed and was swallowed (best-effort); do not touch the delivery state.
+        if ($mollieId === null) {
+            return new ShipOrderResponse('', $orderId, []);
+        }
 
+        // The Mollie call answered with the id of the capture (Payments API) or of the shipment
+        // (Orders API). Record it on the payment and save it, so an accounting export finds it in the
+        // custom fields of the order.
+        if ($mollieIdKey === self::MOLLIE_ID_KEY_CAPTURE) {
+            $payment->addCaptureId($mollieId);
+        }
+
+        if ($mollieIdKey === self::MOLLIE_ID_KEY_SHIPMENT) {
+            $payment->addShipmentId($mollieId);
+        }
+
+        $this->transactionService->savePaymentExtension($currentTransaction->getId(), $order, $payment, $context);
+
+        return $this->persister->persist($lineUpserts, $deliveryUpserts, $mollieId, $mollieIdKey, $orderId, $orderShippedEvent, $fullyShipped, $context);
+    }
+
+    private function loadOrder(string $orderId, string $orderNumber, Context $context): OrderEntity
+    {
+        $criteria = $this->buildOrderCriteria($orderId, $orderNumber);
+
+        $order = $this->orderRepository->search($criteria, $context)->first();
+
+        if (! $order instanceof OrderEntity) {
+            throw $orderNumber !== '' ? ShippingException::orderNumberNotFound($orderNumber) : ShippingException::orderNotFound($orderId);
+        }
+
+        return $order;
+    }
+
+    private function buildOrderCriteria(string $orderId, string $orderNumber): Criteria
+    {
+        $criteria = new Criteria();
+        $criteria->addAssociation('lineItems.product');
+        $criteria->addAssociation('transactions.stateMachineState');
+        $criteria->addAssociation('currency');
+        $criteria->addAssociation('deliveries.positions');
+        $criteria->addAssociation('deliveries.shippingMethod');
+
+        if ($orderNumber !== '') {
+            $criteria->addFilter(new EqualsFilter('orderNumber', $orderNumber));
+
+            return $criteria;
+        }
+
+        $criteria->setIds([$orderId]);
+
+        return $criteria;
+    }
+
+    /**
+     * Older plugin versions never persisted the Mollie line id of the deliveries, so the shipping
+     * costs of those orders would silently drop out of the shipment payload. The Mollie order knows
+     * the id of every line, so it serves as the fallback. Best-effort: a failing call only costs the
+     * fallback, the shipment itself still goes out.
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function loadMollieLines(string $mollieOrderId, string $salesChannelId, array $logContext): ?LineItemCollection
+    {
+        try {
+            return $this->mollieGateway->getOrder($mollieOrderId, $salesChannelId)->getLines();
+        } catch (\Throwable $exception) {
+            $logContext['exception'] = $exception->getMessage();
+            $this->logger->warning('ShipOrderRoute: could not load the Mollie order to resolve missing line ids', $logContext);
+
+            return null;
+        }
+    }
+
+    /**
+     * Ships via the Mollie Orders API (line-item based, captures on shipment). Returns the Mollie
+     * shipment id, or null when the call failed (best-effort: the delivery state change must not be
+     * interrupted).
+     *
+     * @param array<string, mixed> $logContext
+     */
+    private function shipViaOrdersApi(ShippingItemCollection $shippingItems, ?Tracking $tracking, string $mollieOrderId, string $orderNumber, string $salesChannelId, array $logContext): ?string
+    {
+        $createShipment = new CreateShipment($shippingItems, $tracking);
+
+        $logContext['mollieOrderId'] = $mollieOrderId;
+        $logContext['tracking'] = $tracking !== null ? ['carrier' => $tracking->getCarrier(), 'code' => $tracking->getCode()] : null;
+
+        $this->logger->info('ShipOrderRoute: calling Mollie createShipment (Orders API)', $logContext);
+
+        try {
             $shipment = $this->mollieGateway->createShipment($createShipment, $mollieOrderId, $orderNumber, $salesChannelId);
+        } catch (\Throwable $exception) {
+            // Shipping at Mollie may fail (e.g. the payment was already captured because the merchant
+            // set the order to paid manually). This must not interrupt the delivery state change, so we
+            // only log the error and stop here.
+            $logContext['exception'] = $exception->getMessage();
+            $this->logger->error('ShipOrderRoute: Mollie createShipment failed, skipping shipment', $logContext);
 
-            $logContext['mollieShipmentId'] = $shipment->getId();
-
-            $this->logger->info('ShipOrderRoute: Mollie createShipment response', $logContext);
-
-            return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $shipment->getId(), 'shipmentId', $orderId, $orderShippedEvent, $fullyShipped, $context);
+            return null;
         }
 
-        $createCapture = new CreateCapture($shippingItems, $currency->getIsoCode());
+        $logContext['mollieShipmentId'] = $shipment->getId();
 
-        $logContext['molliePaymentId'] = $paymentId;
+        $this->logger->info('ShipOrderRoute: Mollie createShipment response', $logContext);
 
-        $this->logger->info('ShipOrderRoute: calling Mollie createCapture (Payments API)', $logContext);
-
-        $capture = $this->mollieGateway->createCapture($createCapture, $paymentId, (string) $orderNumber, $salesChannelId);
-
-        $logContext['mollieCaptureId'] = $capture->getId();
-
-        $this->logger->info('ShipOrderRoute: Mollie createCapture response', $logContext);
-
-        if ($fullyShipped && $this->hasCancelledItems($lineItems)) {
-            $this->logger->info('ShipOrderRoute: all items handled with cancellations, releasing authorization (Payments API)', $logContext);
-            $this->mollieGateway->releaseAuthorization($paymentId, (string) $orderNumber, $salesChannelId);
-        }
-
-        return $this->persistAndDispatch($lineUpserts, $deliveryUpserts, $capture->getId(), 'captureId', $orderId, $orderShippedEvent, $fullyShipped, $context);
-    }
-
-    /**
-     * @param list<array{id: string, quantity: int}> $items
-     *
-     * @return list<array{id: string, customFields: array<string, mixed>}>
-     */
-    private function collectLineItemUpserts(array $items, OrderLineItemCollection $lineItems, string $orderId, ShippingItemCollection $shippingItems): array
-    {
-        $lineUpserts = [];
-
-        foreach ($items as $item) {
-            $rawId = (string) $item['id'];
-            $requestedQuantity = (int) $item['quantity'];
-
-            $lineItem = $this->findLineItem($lineItems, $rawId);
-
-            if (! $lineItem instanceof OrderLineItemEntity) {
-                throw ShippingException::lineItemNotFound(strtolower($rawId), $orderId);
-            }
-
-            $oldState = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? ['quantity' => 0];
-            $shippedQuantity = (int) ($oldState['quantity'] ?? 0);
-
-            if ($lineItem->getQuantity() === $shippedQuantity) {
-                throw ShippingException::lineItemAlreadyShipped($lineItem->getId(), $orderId);
-            }
-
-            $newQuantity = $shippedQuantity + $requestedQuantity;
-
-            if ($newQuantity > $lineItem->getQuantity()) {
-                throw ShippingException::shippingQuantityTooHigh($lineItem->getId(), $orderId, $newQuantity, $lineItem->getQuantity());
-            }
-
-            $product = $lineItem->getProduct();
-            $name = $product !== null ? (string) $product->getName() : (string) $lineItem->getLabel();
-            $mollieLineId = ($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
-
-            $shippingItem = new ShippingItem(
-                $requestedQuantity,
-                $requestedQuantity . 'x ' . $name,
-                $lineItem->getUnitPrice() * $requestedQuantity,
-                $mollieLineId !== null ? (string) $mollieLineId : null,
-            );
-            $shippingItems->add($shippingItem);
-
-            $lineUpserts[] = [
-                'id' => $lineItem->getId(),
-                'customFields' => [
-                    Mollie::EXTENSION => array_merge($oldState, ['quantity' => $newQuantity]),
-                ],
-            ];
-        }
-
-        return $lineUpserts;
-    }
-
-    /**
-     * @param list<array{id: string, customFields: array<string, mixed>}> $lineUpserts
-     *
-     * @return list<array{id: string, customFields: array<string, mixed>}>
-     */
-    private function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection): array
-    {
-        $deliveryUpserts = [];
-        $targetLineItemIds = array_column($lineUpserts, 'id');
-
-        foreach ($deliveryCollection as $delivery) {
-            $shippingCosts = $delivery->getShippingCosts();
-            $shippingCostsQuantity = $shippingCosts->getQuantity();
-            $positions = $delivery->getPositions();
-            if ($positions === null) {
-                continue;
-            }
-
-            $oldState = $delivery->getCustomFields()[Mollie::EXTENSION] ?? ['quantity' => 0];
-            if ($shippingCostsQuantity === (int) ($oldState['quantity'] ?? 0)) {
-                continue;
-            }
-
-            $deliveryBelongsToItems = false;
-
-            // A delivery belongs to our shipment if at least one of its positions references one of the resolved line item IDs
-            foreach ($positions as $position) {
-                if (in_array($position->getOrderLineItemId(), $targetLineItemIds, true)) {
-                    $deliveryBelongsToItems = true;
-                    break;
-                }
-            }
-
-            if ($deliveryBelongsToItems === false) {
-                continue;
-            }
-
-            $shippingMethod = $delivery->getShippingMethod();
-            if ($shippingMethod === null) {
-                continue;
-            }
-
-            $mollieLineId = ($delivery->getCustomFields()[Mollie::EXTENSION] ?? [])['order_line_id'] ?? null;
-
-            $shippingItem = new ShippingItem(
-                $shippingCostsQuantity,
-                $shippingCostsQuantity . 'x ' . $shippingMethod->getName(),
-                $shippingCosts->getUnitPrice() * $shippingCostsQuantity,
-                $mollieLineId !== null ? (string) $mollieLineId : null,
-            );
-            $shippingItems->add($shippingItem);
-
-            $deliveryUpserts[] = [
-                'id' => $delivery->getId(),
-                'customFields' => [
-                    Mollie::EXTENSION => ['quantity' => $shippingCostsQuantity],
-                ],
-            ];
-        }
-
-        return $deliveryUpserts;
-    }
-
-    /**
-     * @param list<array{id: string, customFields: array<string, mixed>}> $lineUpserts
-     * @param list<array{id: string, customFields: array<string, mixed>}> $deliveryUpserts
-     */
-    private function persistAndDispatch(
-        array $lineUpserts,
-        array $deliveryUpserts,
-        string $mollieId,
-        string $mollieIdKey,
-        string $orderId,
-        OrderShippedEvent $orderShippedEvent,
-        bool $fullyShipped,
-        Context $context
-    ): ShipOrderResponse {
-        foreach ($lineUpserts as $i => $row) {
-            $lineUpserts[$i]['customFields'][Mollie::EXTENSION][$mollieIdKey] = $mollieId;
-        }
-
-        $this->orderLineRepository->upsert($lineUpserts, $context);
-
-        $deliveryIds = array_column($deliveryUpserts, 'id');
-        $deliveryId = $deliveryIds[0] ?? null;
-
-        if (\count($deliveryUpserts) > 0) {
-            foreach ($deliveryUpserts as $i => $row) {
-                $deliveryUpserts[$i]['customFields'][Mollie::EXTENSION][$mollieIdKey] = $mollieId;
-            }
-
-            $this->orderDeliveryRepository->upsert($deliveryUpserts, $context);
-        }
-
-        if ($deliveryId !== null) {
-            $transition = $fullyShipped
-                ? StateMachineTransitionActions::ACTION_SHIP
-                : StateMachineTransitionActions::ACTION_SHIP_PARTIALLY;
-
-            $this->orderService->orderDeliveryStateTransition(
-                $deliveryId,
-                $transition,
-                new ParameterBag(),
-                $context
-            );
-        }
-
-        $this->eventDispatcher->dispatch($orderShippedEvent);
-
-        return new ShipOrderResponse($mollieId, $orderId, $lineUpserts);
-    }
-
-    /**
-     * @param list<string> $targetLineItemIds
-     */
-    private function resolveTracking(string $requestCode, OrderDeliveryCollection $deliveries, array $targetLineItemIds): ?Tracking
-    {
-        foreach ($deliveries as $delivery) {
-            $positions = $delivery->getPositions();
-            if ($positions === null) {
-                continue;
-            }
-
-            $belongs = false;
-            foreach ($positions as $position) {
-                if (in_array($position->getOrderLineItemId(), $targetLineItemIds, true)) {
-                    $belongs = true;
-                    break;
-                }
-            }
-
-            if ($belongs === false) {
-                continue;
-            }
-
-            $shippingMethod = $delivery->getShippingMethod();
-            if ($shippingMethod === null) {
-                continue;
-            }
-
-            $carrier = (string) $shippingMethod->getName();
-            if ($carrier === '') {
-                return null;
-            }
-
-            $code = $requestCode;
-            if ($code === '') {
-                $codes = array_values(array_filter($delivery->getTrackingCodes()));
-                if (count($codes) !== 1) {
-                    return null;
-                }
-                $code = $codes[0];
-            }
-
-            if (mb_strlen($code) > 99) {
-                return null;
-            }
-
-            $urlTemplate = (string) $shippingMethod->getTrackingUrl();
-            if (str_contains($urlTemplate, '%s%')) {
-                $urlTemplate = '';
-            }
-            $url = $urlTemplate !== '' ? trim(sprintf($urlTemplate, $code)) : '';
-            if ($url !== '' && filter_var($url, FILTER_VALIDATE_URL) === false) {
-                $url = '';
-            }
-
-            return new Tracking($carrier, $code, $url);
-        }
-
-        return null;
-    }
-
-    private function findLineItem(OrderLineItemCollection $lineItems, string $idOrProductNumber): ?OrderLineItemEntity
-    {
-        $direct = $lineItems->get(strtolower($idOrProductNumber));
-        if ($direct instanceof OrderLineItemEntity) {
-            return $direct;
-        }
-
-        return $lineItems->firstWhere(function (OrderLineItemEntity $product) use ($idOrProductNumber) {
-            return $product->getProduct()?->getProductNumber() === $idOrProductNumber;
-        });
-    }
-
-    private function hasCancelledItems(OrderLineItemCollection $lineItems): bool
-    {
-        foreach ($lineItems as $lineItem) {
-            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
-            if ((int) ($fields['cancelled_quantity'] ?? 0) > 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks whether all order line items are fully handled (shipped or cancelled) after the current batch.
-     * Items in $lineUpserts carry the updated shipped quantity; all others are read from custom fields.
-     *
-     * @param list<array{id: string, customFields: array<string, mixed>}> $lineUpserts
-     */
-    private function isFullyShipped(OrderLineItemCollection $lineItems, array $lineUpserts): bool
-    {
-        $upsertQuantities = [];
-        foreach ($lineUpserts as $upsert) {
-            $upsertQuantities[$upsert['id']] = (int) ($upsert['customFields'][Mollie::EXTENSION]['quantity'] ?? 0);
-        }
-
-        foreach ($lineItems as $lineItem) {
-            if ($lineItem->getQuantity() <= 0) {
-                continue;
-            }
-
-            $fields = $lineItem->getCustomFields()[Mollie::EXTENSION] ?? [];
-            $shipped = $upsertQuantities[$lineItem->getId()] ?? (int) ($fields['quantity'] ?? 0);
-            $cancelled = (int) ($fields['cancelled_quantity'] ?? 0);
-
-            if (($shipped + $cancelled) < $lineItem->getQuantity()) {
-                return false;
-            }
-        }
-
-        return true;
+        return $shipment->getId();
     }
 }

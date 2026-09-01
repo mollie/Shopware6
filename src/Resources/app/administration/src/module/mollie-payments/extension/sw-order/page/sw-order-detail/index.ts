@@ -1,5 +1,5 @@
 import template from './sw-order-detail.html.twig';
-import getLatestTransaction from '../../getLatestTransaction';
+import OrderAttributes from '../../../../../../core/models/OrderAttributes';
 
 const { Component } = Shopware;
 
@@ -19,9 +19,7 @@ const overrideConfig: ThisType<SwOrderDetailOverride> = {
         },
 
         isMollieOrder() {
-            const latest = getLatestTransaction(this.order?.transactions);
-
-            return !!latest?.paymentMethod?.customFields?.mollie_payment_method_name;
+            return new OrderAttributes(this.order).isMollieOrder();
         },
     },
 };

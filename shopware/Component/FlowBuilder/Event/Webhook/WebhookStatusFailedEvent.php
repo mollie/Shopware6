@@ -9,6 +9,6 @@ final class WebhookStatusFailedEvent extends WebhookEvent
 {
     protected static function getStatus(): string
     {
-        return PaymentStatus::FAILED->value;
+        return 'status.' . PaymentStatus::FAILED->value;
     }
 }

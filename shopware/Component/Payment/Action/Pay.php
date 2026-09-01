@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreateOrderPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentCreatedEvent;
@@ -72,8 +73,14 @@ final class Pay implements PayInterface
         $transactionDataStruct = $this->transactionService->findById($transactionId, $context);
 
         $order = $transactionDataStruct->getOrder();
-        $this->requestStack->getSession()->set(self::SESSION_KEY_PENDING_ORDER, $order->getId());
-        $this->logger->debug('[PendingOrderRedirect] session key set', ['orderId' => $order->getId()]);
+
+        // Bank transfer orders take several days to settle and must not be editable
+        // afterwards, so we skip the pending-order session key that would redirect
+        // the customer onto the edit-order form on browser back.
+        if (! $paymentHandler instanceof BankTransferAwareInterface) {
+            $this->requestStack->getSession()->set(self::SESSION_KEY_PENDING_ORDER, $order->getId());
+            $this->logger->debug('[PendingOrderRedirect] session key set', ['orderId' => $order->getId()]);
+        }
 
         $transaction = $transactionDataStruct->getTransaction();
         $orderNumber = (string) $order->getOrderNumber();
@@ -160,7 +167,7 @@ final class Pay implements PayInterface
     ): RedirectResponse {
         $createPaymentStruct = $this->payloadBuilder->buildPayment($transactionDataStruct, $paymentHandler, $dataBag, $context);
 
-        $countPayments = $this->updatePaymentCounter($transaction, $createPaymentStruct);
+        $countPayments = $this->updatePaymentCounter($transactionDataStruct->getOrder(), $createPaymentStruct);
 
         /** @var RequestDataBag $paymentMethods */
         $paymentMethods = $dataBag->get('paymentMethods', new DataBag());
@@ -172,7 +179,7 @@ final class Pay implements PayInterface
         /** @var ModifyCreatePaymentPayloadEvent $paymentEvent */
         $paymentEvent = $this->eventDispatcher->dispatch($paymentEvent);
         $createPaymentStruct = $paymentEvent->getPayment();
-        $payment = $this->mollieGateway->createPayment($createPaymentStruct, $salesChannel->getId());
+        $payment = $this->createOrReusePayment($transaction, $createPaymentStruct, $orderNumber, $salesChannel->getId());
 
         $payment->setFinalizeUrl($shopwareFinalizeUrl);
         $payment->setCountPayments($countPayments);
@@ -222,13 +229,67 @@ final class Pay implements PayInterface
         }
     }
 
-    private function updatePaymentCounter(OrderTransactionEntity $transaction, CreatePayment $createPaymentStruct): int
+    /**
+     * Shopware reuses the same transaction when the customer retries with the same payment method,
+     * so the transaction may already hold a Mollie payment. To keep a single payment per transaction
+     * we decide, based on the existing payment:
+     * - none yet -> create a new payment (payments API);
+     * - still open/pending and cancelable -> cancel it and create a fresh payment for the current cart;
+     * - still open/pending but not cancelable -> reuse it and update the editable fields;
+     * - already paid/authorized (express checkout) -> reuse it and update the fields Mollie still
+     *   accepts on a finalized payment;
+     * - already dead (failed/expired/cancelled) -> create a fresh payment.
+     *
+     * A changed cart total makes Shopware open a new transaction (no existing payment), so the reuse
+     * paths always operate on an unchanged amount.
+     */
+    private function createOrReusePayment(OrderTransactionEntity $transaction, CreatePayment $createPaymentStruct, string $orderNumber, string $salesChannelId): Payment
     {
-        $countPayments = 1;
-        $oldMollieTransaction = $transaction->getExtension(Mollie::EXTENSION);
-        if ($oldMollieTransaction instanceof Payment) {
-            $countPayments = $oldMollieTransaction->getCountPayments() + 1;
-            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . $countPayments);
+        $existing = $transaction->getExtension(Mollie::EXTENSION);
+        if (! $existing instanceof Payment || $existing->getId() === '') {
+            return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
+        }
+
+        $existingId = $existing->getId();
+        $live = $this->mollieGateway->getPayment($existingId, $orderNumber, $salesChannelId);
+
+        if ($live->isCancelable()) {
+            $this->mollieGateway->cancelPayment($existingId, $orderNumber, $salesChannelId);
+
+            return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
+        }
+
+        if (in_array($live->getStatus(), [PaymentStatus::OPEN, PaymentStatus::PENDING], true)) {
+            return $this->mollieGateway->updatePayment($existingId, $createPaymentStruct, $orderNumber, $salesChannelId);
+        }
+
+        // An express checkout is paid inside the wallet before the order exists, so the payment is
+        // already paid or authorized by the time this runs. Creating a second one would charge the
+        // shopper twice, so the existing payment only gets the data Shopware knows now: description,
+        // webhook url and metadata. The redirect url is not among them - Mollie refuses to update it
+        // on a finalized payment.
+        if (in_array($live->getStatus(), [PaymentStatus::PAID, PaymentStatus::AUTHORIZED], true)) {
+            $createPaymentStruct->omitRedirectUrl();
+
+            return $this->mollieGateway->updatePayment($existingId, $createPaymentStruct, $orderNumber, $salesChannelId);
+        }
+
+        return $this->mollieGateway->createPayment($createPaymentStruct, $salesChannelId);
+    }
+
+    /**
+     * The payment description carries the attempt number so several Mollie payments of the same
+     * order are distinguishable. Deriving it from the number of order transactions is reliable even
+     * though Shopware reuses one transaction per payment method (a stored per-transaction counter
+     * would stay at 1 for every freshly created transaction).
+     */
+    private function updatePaymentCounter(OrderEntity $order, CreatePayment $createPaymentStruct): int
+    {
+        $transactions = $order->getTransactions();
+        $countPayments = $transactions !== null ? $transactions->count() : 1;
+
+        if ($countPayments > 1) {
+            $createPaymentStruct->setDescription($createPaymentStruct->getDescription() . '-' . ($countPayments - 1));
         }
 
         return $countPayments;

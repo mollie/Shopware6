@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Abonnement | Mollie Abonnementen"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Bestelling succesvol",
-            "mollie_checkout_order_failed": " Bestelling mislukt",
-            "mollie_checkout_order_canceled": " Bestelling geannuleerd",
+            "mollie_payment_success": " Bestelling succesvol",
+            "mollie_payment_failed": " Bestelling mislukt",
+            "mollie_payment_cancelled": " Bestelling geannuleerd",
             "mollie_webhook_received_All": " Mollie Webhook Ontvangen (Alle)",
+            "mollie_webhook_received_status_open": " Mollie Webhook Ontvangen (Open)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook Ontvangen (Geautoriseerd)",
             "mollie_webhook_received_status_failed": " Mollie Webhook Ontvangen (Mislukt)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook Ontvangen (Geannuleerd)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook Ontvangen (Voltooid)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook Ontvangen (Terugbetaald)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook Ontvangen (Gedeeltelijk terugbetaald)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook Ontvangen (Terugboeking)",
             "mollie_refund_started": " Mollie terugbetaling gestart",
             "mollie_subscription_started": " Mollie abonnement gestart",
             "mollie_subscription_ended": " Mollie abonnement voltooid",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": " Mollie abonnement hervat",
             "mollie_subscription_skipped": " Mollie abonnement overgeslagen",
             "mollie_subscription_renewed": " Mollie abonnement verlengd",
-            "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging"
+            "mollie_subscription_renewal_reminder": " Mollie herinnering voor abonnementsverlenging",
+            "mollie_subscription_priceChangeNotice": " Mollie abonnement prijswijziging"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Mollie Abonnementen",
                 "description": "Het beheren van uw terugkerende betalingen is eenvoudiger dan ooit met onze handige functies. Breng uw bedrijf naar een hoger niveau met efficiënte trackingopties, eenvoudige integraties en meer. Met Mollie-abonnementen kun je eenvoudig abonnementsproducten maken en terugkerende betalingen plannen die plaatsvinden op het ingestelde interval en de ingestelde periode.",
                 "mollieSubscriptionProduct": "Is dit een abonnementsproduct?",
+                "mollieAllowOneTime": "Ook als eenmalige aankoop aanbieden",
+                "mollieAllowOneTimeHelp": "Toont een extra knop \"In winkelwagen\" op de productpagina zodat het product zonder abonnement kan worden gekocht.",
                 "mollieSubscriptionIntervalAmount": "Herhaal betaling elke",
                 "mollieSubscriptionIntervalType": "Type abonnementsinterval",
                 "mollieSubscriptionRepetitionAmount": "Herhaal betaling",
@@ -501,9 +506,9 @@
             "canceled": "Geannuleerd",
             "expired": "Verlopen",
             "partiallyRefunded": "Terugbetaald (gedeeltelijk)",
-            "orderSuccess": "Bestelling succesvol",
-            "orderFailed": "Bestelling mislukt",
-            "orderCanceled": "Bestelling geannuleerd"
+            "payment": "Betaling",
+            "success": "Succesvol",
+            "priceChangeNotice": "Prijswijziging"
         }
     }
 }

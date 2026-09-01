@@ -16,7 +16,7 @@ jobs:
     name: Install Dev Dependencies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         # -----------------------------------
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -24,7 +24,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
         # -----------------------------------
       - name: Mount Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -65,7 +65,7 @@ jobs:
     needs: install_dev
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -73,7 +73,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -91,10 +91,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -106,16 +106,25 @@ jobs:
       - name: Run Vitest
         run: make vitest -B
 
+      - name: Store Allure Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-Vitest
+          retention-days: 1
+          if-no-files-found: ignore
+          path: .reports/allure/results
+
   eslint:
     name: ESLint
     needs: install_dev
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -154,10 +163,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -175,10 +184,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -199,7 +208,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -215,7 +224,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -223,7 +232,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -241,7 +250,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -249,7 +258,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |
@@ -260,6 +269,19 @@ jobs:
 
       - name: Run PHPUnit
         run: make phpunit -B
+        env:
+          ALLURE_OUTPUT_DIRECTORY: .reports/allure/results
+          ALLURE_LAYER: Unit
+
+      # Consumed by the report job. Uploaded even when the suite fails - a red report is
+      # the one worth looking at.
+      - name: Store Allure Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-results-Unit_Tests
+          retention-days: 1
+          path: .reports/allure/results
 
   phpcsfixer:
     name: PHP CS Fixer
@@ -268,7 +290,7 @@ jobs:
     steps:
 
       - name: Clone Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -276,7 +298,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
 
       - name: Mount Dev Dependency Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           key: cache-dev-dependencies-${{ github.run_id }}
           path: |

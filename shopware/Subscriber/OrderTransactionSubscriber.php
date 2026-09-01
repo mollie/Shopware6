@@ -44,13 +44,17 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             }
 
             $paymentId = $mollieCustomFields['id'] ?? null;
+            $paymentLinkId = $mollieCustomFields['paymentLinkId'] ?? null;
 
-            if ($paymentId === null) {
+            // A "pay by link" transaction only has a payment link id until the customer actually
+            // pays, so still attach the extension when there is no payment id yet.
+            if ($paymentId === null && $paymentLinkId === null) {
                 continue;
             }
 
             $method = $mollieCustomFields['method'] ?? null;
             $countPayments = $mollieCustomFields['countPayments'] ?? 1;
+            $reconciled = $mollieCustomFields['reconciled'] ?? false;
             $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
             $authenticationId = $mollieCustomFields['authenticationId'] ?? null;
             $finalizeUrl = $mollieCustomFields['finalizeUrl'] ?? null;
@@ -58,11 +62,16 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             $creditCardLabel = $mollieCustomFields['creditCardLabel'] ?? null;
             $creditCardNumber = $mollieCustomFields['creditCardNumber'] ?? null;
             $creditCardHolder = $mollieCustomFields['creditCardHolder'] ?? null;
+            $paypalPayerId = $mollieCustomFields['paypalPayerId'] ?? null;
             $checkoutUrl = $mollieCustomFields['checkoutUrl'] ?? null;
             $changePaymentStateUrl = $mollieCustomFields['changePaymentStateUrl'] ?? null;
 
-            $transactionExtension = new Payment($paymentId);
+            $transactionExtension = new Payment((string) ($paymentId ?? ''));
+            if ($paymentLinkId !== null) {
+                $transactionExtension->setPaymentLinkId((string) $paymentLinkId);
+            }
             $transactionExtension->setCountPayments($countPayments);
+            $transactionExtension->setReconciled((bool) $reconciled);
             if ($finalizeUrl !== null) {
                 $transactionExtension->setFinalizeUrl($finalizeUrl);
             }
@@ -87,6 +96,9 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             if ($creditCardHolder !== null) {
                 $transactionExtension->setCreditCardHolder($creditCardHolder);
             }
+            if ($paypalPayerId !== null) {
+                $transactionExtension->setPaypalPayerId($paypalPayerId);
+            }
             if ($checkoutUrl !== null) {
                 $transactionExtension->setCheckoutUrl($checkoutUrl);
             }
@@ -105,7 +117,46 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
                 $transactionExtension->setConsumerBic((string) ($mollieCustomFields['consumerBic'] ?? ''));
             }
 
+            $voucherAmount = $mollieCustomFields['voucherAmount'] ?? null;
+            if ($voucherAmount !== null) {
+                $transactionExtension->setVoucherAmount((float) $voucherAmount);
+            }
+
+            $roundingDiff = $mollieCustomFields['roundingDiff'] ?? null;
+            if ($roundingDiff !== null) {
+                $transactionExtension->setRoundingDiff((float) $roundingDiff);
+            }
+
+            // Keep the ids of the previous refunds, captures and shipments, so saving the payment
+            // again does not drop what an accounting export reads from the order.
+            $transactionExtension->setRefundIds($this->splitIds($mollieCustomFields['refundIds'] ?? ''));
+            $transactionExtension->setCaptureIds($this->splitIds($mollieCustomFields['captureIds'] ?? ''));
+            $transactionExtension->setShipmentIds($this->splitIds($mollieCustomFields['shipmentIds'] ?? ''));
+
+            // Carry the transaction on the payment, so everyone holding the payment can reach it
+            // instead of resolving the current transaction from the order again.
+            $transactionExtension->setShopwareTransaction($orderTransaction);
+
             $orderTransaction->addExtension(Mollie::EXTENSION, $transactionExtension);
         }
+    }
+
+    /**
+     * The ids are stored as one merged string per type, already in the export format. They stay in
+     * that format here, the payment only ever adds new ids to the list.
+     *
+     * @return list<string>
+     */
+    private function splitIds(mixed $storedIds): array
+    {
+        if (! is_string($storedIds)) {
+            return [];
+        }
+
+        $ids = array_map('trim', explode(',', $storedIds));
+
+        return array_values(array_filter($ids, function (string $id): bool {
+            return strlen($id) > 0;
+        }));
     }
 }

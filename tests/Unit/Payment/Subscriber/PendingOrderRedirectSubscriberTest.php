@@ -107,6 +107,35 @@ class PendingOrderRedirectSubscriberTest extends TestCase
         $this->assertSame(self::ORDER_ID, $session->get(Pay::SESSION_KEY_PENDING_ORDER));
     }
 
+    /**
+     * On unrelated routes the subscriber must not touch the session at all.
+     * Accessing it would trigger session_start() and its exclusive lock,
+     * serializing every main request (incl. Admin API) behind the lock.
+     */
+    public function testUnrelatedRoutesDoNotStartTheSession(): void
+    {
+        $sessionStarted = false;
+        $sessionFactory = function () use (&$sessionStarted) {
+            $sessionStarted = true;
+
+            return new Session(new MockArraySessionStorage());
+        };
+
+        $request = new Request();
+        $request->attributes->set('_route', 'frontend.home.page');
+        $request->setSessionFactory($sessionFactory);
+
+        $kernel = $this->createMock(HttpKernelInterface::class);
+        $dummyController = function () {
+            return null;
+        };
+        $event = new ControllerEvent($kernel, $dummyController, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->subscriber->onController($event);
+
+        $this->assertFalse($sessionStarted, 'Session must not be initialized on unrelated routes');
+    }
+
     // ------------------------------------------------------------------
 
     private function createSessionWithPendingOrder(string $orderId): Session

@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie előfizetés | Mollie előfizetések"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " A rendelés sikeres",
-            "mollie_checkout_order_failed": " A rendelés sikertelen",
-            "mollie_checkout_order_canceled": " A rendelés törölve",
+            "mollie_payment_success": " A rendelés sikeres",
+            "mollie_payment_failed": " A rendelés sikertelen",
+            "mollie_payment_cancelled": " A rendelés törölve",
             "mollie_webhook_received_All": " Mollie Webhook beérkezett (Minden)",
+            "mollie_webhook_received_status_open": " Mollie Webhook beérkezett (Nyitott)",
             "mollie_webhook_received_status_authorized": " Mollie Webhook beérkezett (Engedélyezett)",
             "mollie_webhook_received_status_failed": " Mollie Webhook beérkezett (Sikertelen)",
             "mollie_webhook_received_status_canceled": " Mollie Webhook beérkezett (Törölve)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Mollie Webhook beérkezett (Befejezett)",
             "mollie_webhook_received_status_refunded": " Mollie Webhook beérkezett (Visszatérítve)",
             "mollie_webhook_received_status_partially_refunded": " Mollie Webhook beérkezett (Részben visszatérítve)",
+            "mollie_webhook_received_status_chargeback": " Mollie Webhook beérkezett (Visszaterhelés)",
             "mollie_refund_started": " Mollie visszatérítés megkezdődött",
             "mollie_subscription_started": " Mollie előfizetés megkezdődött",
             "mollie_subscription_ended": " Mollie előfizetés befejeződött",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": " Mollie előfizetés folytatva",
             "mollie_subscription_skipped": " Mollie előfizetés átugorva",
             "mollie_subscription_renewed": " Mollie előfizetés megújítva",
-            "mollie_subscription_renewal_reminder": " Mollie emlékeztető az előfizetés megújításához"
+            "mollie_subscription_renewal_reminder": " Mollie emlékeztető az előfizetés megújításához",
+            "mollie_subscription_priceChangeNotice": " Mollie előfizetés árváltozás"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Mollie Előfizetések",
                 "description": "Az általunk kínált funkcióknak köszönhetően nagyon egyszerű az ismétlődő fizetések kezelése. Emelje vállalkozását a következő szintre a nyomkövetési lehetőségekkel, az egyszerű integrációkkal és sok mással. A Mollie Subscriptions segítségével előfizetéseket hozhat létre, és ütemezheti az ismétlődő fizetéseket meghatározott időközönként és időszakonkénti fizetéssel.",
                 "mollieSubscriptionProduct": "Előfizetési termék",
+                "mollieAllowOneTime": "Egyszeri vásárlásként is elérhető",
+                "mollieAllowOneTimeHelp": "Egy további „Kosárba\" gombot jelenít meg a termékoldalon, hogy a termék előfizetés nélkül is megvásárolható legyen.",
                 "mollieSubscriptionIntervalAmount": "Kifizetés ismétlése minden",
                 "mollieSubscriptionIntervalType": "Időköz típusa",
                 "mollieSubscriptionRepetitionAmount": "Ismétlések száma",
@@ -501,9 +506,9 @@
             "canceled": "Törölve",
             "expired": "Lejárt",
             "partiallyRefunded": "Refunded (partially)",
-            "orderSuccess": "A megrendelés sikeres",
-            "orderFailed": "A megrendelés sikertelen",
-            "orderCanceled": "A megrendelés törölve"
+            "payment": "Fizetés",
+            "success": "Sikeres",
+            "priceChangeNotice": "Árváltozás"
         }
     }
 }

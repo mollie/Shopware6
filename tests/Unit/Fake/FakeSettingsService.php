@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
+use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
 use Mollie\Shopware\Component\Settings\Struct\LoggerSettings;
 use Mollie\Shopware\Component\Settings\Struct\OrderStateSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -20,6 +21,9 @@ use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 
 final class FakeSettingsService extends AbstractSettingsService
 {
+    /** @var array<string, PaymentSettings> */
+    private array $paymentSettingsPerSalesChannel = [];
+
     public function __construct(private ?LoggerSettings $loggerSettings = null,
         private ?PaymentSettings $paymentSettings = null,
         private ?ApiSettings $apiSettings = null,
@@ -29,6 +33,10 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?EnvironmentSettings $environmentSettings = null,
         private ?PayPalExpressSettings $paypalExpressSettings = null,
         private ?ApplePaySettings $applePaySettings = null,
+        private ?ExpressComponentsSettings $expressComponentsSettings = null,
+        private ?CreditCardSettings $creditCardSettings = null,
+        private ?RefundSettings $refundSettings = null,
+        private ?AccountSettings $accountSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -49,6 +57,14 @@ final class FakeSettingsService extends AbstractSettingsService
         if ($this->paypalExpressSettings === null) {
             $this->paypalExpressSettings = new PayPalExpressSettings(false);
         }
+        if ($this->expressComponentsSettings === null) {
+            $this->expressComponentsSettings = new ExpressComponentsSettings(false);
+        }
+    }
+
+    public function getExpressComponentsSettings(?string $salesChannelId = null): ExpressComponentsSettings
+    {
+        return $this->expressComponentsSettings;
     }
 
     public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings
@@ -68,7 +84,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getCreditCardSettings(?string $salesChannelId = null): CreditCardSettings
     {
-        // TODO: Implement getCreditCardSettings() method.
+        return $this->creditCardSettings ?? new CreditCardSettings();
     }
 
     public function getApiSettings(?string $salesChannelId = null): ApiSettings
@@ -76,9 +92,26 @@ final class FakeSettingsService extends AbstractSettingsService
         return $this->apiSettings;
     }
 
+    public function setApiSettings(ApiSettings $apiSettings, ?string $salesChannelId = null): ApiSettings
+    {
+        $this->apiSettings = $apiSettings;
+        $this->profileId = $apiSettings->getProfileId();
+
+        return $apiSettings;
+    }
+
+    public function setPaymentSettingsForSalesChannel(string $salesChannelId, PaymentSettings $paymentSettings): void
+    {
+        $this->paymentSettingsPerSalesChannel[$salesChannelId] = $paymentSettings;
+    }
+
     public function getPaymentSettings(?string $salesChannelId = null): PaymentSettings
     {
-        return $this->paymentSettings;
+        if ($salesChannelId === null) {
+            return $this->paymentSettings;
+        }
+
+        return $this->paymentSettingsPerSalesChannel[$salesChannelId] ?? $this->paymentSettings;
     }
 
     public function getLoggerSettings(?string $salesChannelId = null): LoggerSettings
@@ -88,7 +121,7 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getAccountSettings(?string $salesChannelId = null): AccountSettings
     {
-        // TODO: Implement getAccountSettings() method.
+        return $this->accountSettings ?? new AccountSettings(false, false, false, false, false, false);
     }
 
     public function getSubscriptionSettings(?string $salesChannelId = null): SubscriptionSettings
@@ -108,6 +141,6 @@ final class FakeSettingsService extends AbstractSettingsService
 
     public function getRefundSettings(?string $salesChannelId = null): RefundSettings
     {
-        return new RefundSettings();
+        return $this->refundSettings ?? new RefundSettings();
     }
 }

@@ -8,13 +8,14 @@ use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\CreateOrder;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\LineItemCollection;
-use Mollie\Shopware\Component\Mollie\LineItemFilter;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
@@ -23,10 +24,13 @@ use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeManualCaptureModeAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakePhoneAwarePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeRecurringAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakeSubscriptionAwarePaymentHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
@@ -89,9 +93,11 @@ final class PayloadBuilderTest extends TestCase
                 [
                     'type' => 'digital',
                     'vatRate' => '19',
+                    // the fixture tax (19% of the gross 10.99) breaks the vatAmount invariant
+                    // Mollie enforces, so it is derived from the totalAmount: 10.99 * 19 / 119
                     'vatAmount' => [
                         'currency' => 'EUR',
-                        'value' => '2.09',
+                        'value' => '1.75',
                     ],
                     'sku' => 'SW1000',
                     'description' => 'Fake product',
@@ -108,9 +114,10 @@ final class PayloadBuilderTest extends TestCase
                 [
                     'type' => 'shipping_fee',
                     'vatRate' => '19',
+                    // derived like above: 4.99 * 19 / 119
                     'vatAmount' => [
                         'currency' => 'EUR',
-                        'value' => '0.95',
+                        'value' => '0.80',
                     ],
                     'sku' => 'mol-delivery-fake-shipping-method-id',
                     'description' => 'DHL',
@@ -306,6 +313,41 @@ final class PayloadBuilderTest extends TestCase
         $this->assertNull($actual->getMandateId());
     }
 
+    public function testBuildSetsSequenceTypeFirstForSubscriptionLineItemWhenSubscriptionsEnabled(): void
+    {
+        $profileId = 'pfl_test_profile';
+
+        $subscriptionSettings = new SubscriptionSettings(enabled: true);
+        $builder = $this->createBuilder(profileId: $profileId, subscriptionSettings: $subscriptionSettings);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withSubscriptionLineItem();
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakeSubscriptionAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertInstanceOf(CreatePayment::class, $actual);
+        $this->assertSame('first', $actual->getSequenceType()->value);
+    }
+
+    public function testBuildKeepsSequenceTypeOneoffForSubscriptionLineItemWhenSubscriptionsDisabled(): void
+    {
+        $profileId = 'pfl_test_profile';
+
+        $subscriptionSettings = new SubscriptionSettings(enabled: false);
+        $builder = $this->createBuilder(profileId: $profileId, subscriptionSettings: $subscriptionSettings);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withSubscriptionLineItem();
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakeSubscriptionAwarePaymentHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertInstanceOf(CreatePayment::class, $actual);
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+        $this->assertNull($actual->getCustomerId());
+    }
+
     public function testBuildKeepsSequenceTypeOneoffWhenNotRecurringAwareHandler(): void
     {
         $mollieCustomerId = 'cust_test_mollie_id';
@@ -460,6 +502,93 @@ final class PayloadBuilderTest extends TestCase
         }
     }
 
+    public function testBuildKeepsNegativeShippingDiscountDelivery(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withShippingDiscountDelivery();
+
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $discountLine = null;
+        foreach ($actual->getLines() as $line) {
+            if ($line->getAmount()->getValue() < 0) {
+                $discountLine = $line;
+            }
+        }
+
+        $this->assertNotNull($discountLine, 'negative shipping discount delivery must stay in the payload');
+        $this->assertSame('discount', $discountLine->getType()->value);
+        $this->assertSame(-4.99, $discountLine->getAmount()->getValue());
+        $this->assertSame('Mollie test: free shipping', $discountLine->getDescription());
+
+        foreach ($actual->getLines() as $line) {
+            $this->assertNotSame(0.0, $line->getAmount()->getValue(), 'zero-priced delivery promotion placeholder must be filtered out');
+        }
+    }
+
+    public function testBuildKeepsValidE164PhoneNumber(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPhoneNumber('+4930123456789');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+        $this->assertSame('+4930123456789', $array['billingAddress']['phone']);
+        $this->assertSame('+4930123456789', $array['shippingAddress']['phone']);
+    }
+
+    public function testBuildNormalizesNationalPhoneNumber(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPhoneNumber('030 / 123 456');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+        $this->assertSame('+4930123456', $array['billingAddress']['phone']);
+        $this->assertSame('+4930123456', $array['shippingAddress']['phone']);
+    }
+
+    public function testBuildRemovesUnfixablePhoneNumber(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withPhoneNumber('call me maybe');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $array = $actual->toArray();
+        $this->assertArrayNotHasKey('phone', $array['billingAddress']);
+        $this->assertArrayNotHasKey('phone', $array['shippingAddress']);
+    }
+
+    public function testBuildNormalizesPhoneNumberSetByPaymentHandler(): void
+    {
+        $builder = $this->createBuilder();
+
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $dataBag = new RequestDataBag(['molliePayPhone' => '0171 / 2345678']);
+
+        $actual = $builder->buildPayment($transactionData, new FakePhoneAwarePaymentMethodHandler(), $dataBag, $this->context);
+
+        $array = $actual->toArray();
+        $this->assertSame('+491712345678', $array['billingAddress']['phone']);
+    }
+
     public function testBuildOrderReturnsCreateOrderInstance(): void
     {
         $builder = $this->createBuilder();
@@ -542,15 +671,109 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('10000', $array['metadata']['shopwareOrderNumber']);
     }
 
-    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null): PayloadBuilder
+    public function testSubscriptionOrderFallsBackToAOneOffPaymentForAMethodWithoutSubscriptionSupport(): void
+    {
+        $builder = $this->createBuilder(profileId: 'pfl_test_profile', subscriptionSettings: new SubscriptionSettings(enabled: true));
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withSubscriptionLineItem();
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+    }
+
+    public function testRoundingDifferenceLineIsAddedWhenTheMerchantEnabledIt(): void
+    {
+        // The fake order's total deliberately differs from the sum of its lines, so the fixer has a
+        // difference to add under the configured name and SKU.
+        $builder = $this->createBuilder($this->roundingDiffSettings(true));
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertContains('ROUND-1', $this->skusOf($actual));
+    }
+
+    public function testRoundingDifferenceLineIsNotAddedWhenTheMerchantDidNotEnableIt(): void
+    {
+        $builder = $this->createBuilder($this->roundingDiffSettings(false));
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $this->assertNotContains('ROUND-1', $this->skusOf($actual));
+    }
+
+    public function testPaymentLinkPayloadCarriesTheAllowedMethods(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPaymentLink($transactionData, ['ideal', 'creditcard'], null, $this->context);
+
+        $this->assertSame(['ideal', 'creditcard'], $actual->toArray()['allowedMethods']);
+    }
+
+    public function testPaymentLinkReusesTheRegularPaymentPayload(): void
+    {
+        // A link is paid like a regular checkout, so description, amount and lines have to be the
+        // same ones a payment for that order would carry.
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $payment = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+        $link = $builder->buildPaymentLink($transactionData, ['paypal'], new FakePaymentMethodHandler(), $this->context);
+
+        $linkPayload = $link->toArray();
+        $paymentPayload = $payment->toArray();
+        $this->assertSame($paymentPayload['description'], $linkPayload['description']);
+        $this->assertSame($paymentPayload['amount'], $linkPayload['amount']);
+        $this->assertSame($paymentPayload['lines'], $linkPayload['lines']);
+    }
+
+    public function testPaymentLinkCarriesTheMollieCustomerId(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(profileId: $profileId);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cst_test_mollie_id');
+        $transactionData = $transactionService->findById('test', $this->context);
+
+        $actual = $builder->buildPaymentLink($transactionData, ['ideal'], null, $this->context);
+
+        $this->assertSame('cst_test_mollie_id', $actual->toArray()['customerId']);
+    }
+
+    private function roundingDiffSettings(bool $enabled): PaymentSettings
+    {
+        return new PaymentSettings('', 0, fixRoundingDiffEnabled: $enabled, fixRoundingDiffName: 'Rounding', fixRoundingDiffSku: 'ROUND-1');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function skusOf(CreatePayment $createPayment): array
+    {
+        $skus = [];
+        foreach ($createPayment->getLines() as $line) {
+            $skus[] = $line->getSku();
+        }
+
+        return $skus;
+    }
+
+    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null, ?SubscriptionSettings $subscriptionSettings = null, ?LoggerInterface $logger = null): PayloadBuilder
     {
         if ($paymentSettings === null) {
             $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         }
-        $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId);
-        $lineItemFilter = new LineItemFilter();
+        $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId, subscriptionSettings: $subscriptionSettings);
+        $lineItemFilter = LineItemFilterBuilder::build();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
 
-        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), $lineItemFilter, $roundingDifferenceFixer, new NullLogger());
+        return new PayloadBuilder(new FakeRouteBuilder(), $settingsService, new FakeGateway('test'), new LineItemAnalyzer(), new FakeCustomerRepository(), $lineItemFilter, $roundingDifferenceFixer, $logger ?? new NullLogger());
     }
 }

@@ -27,6 +27,11 @@ final class UpdateAddressData
 
     public static function fromRequestData(RequestDataBag $data): self
     {
+        $address = $data->get('address');
+        if ($address instanceof RequestDataBag) {
+            $data = $address;
+        }
+
         return new self(
             salutationId: self::normaliseId((string) $data->get('salutationId', '')),
             title: self::nullableString($data->get('title')),

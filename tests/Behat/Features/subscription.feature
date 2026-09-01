@@ -1,5 +1,5 @@
 @core @subscription
-Feature: Subscription checkout
+Feature: Subscription
   In order to use subscription payment methods
   As a customer
 
@@ -95,7 +95,7 @@ Feature: Subscription checkout
     And select payment status "paid"
     Then i see success page
     And order payment status is "paid"
-    And i remember the subscription with interval "1 days" for renewal
+    And i remember the subscription with interval "1 day" for renewal
     Given product "MOL_REGULAR" with quantity "1" is in cart
     When i start checkout with payment method "belfius"
     And select payment status "paid"
@@ -165,7 +165,8 @@ Feature: Subscription checkout
     And order payment status is "paid"
     And the subscription status is "active"
     When i change the price of product "MOL_SUB_1" to "24"
-    And the subscription price drift detector runs
+    Then the subscription price update state is "dirty"
+    When the subscription price drift detector runs
     Then the subscription price update state is "notified"
     And the subscription next notified price is "28.99"
     And the subscription history contains "price_notified"
@@ -189,11 +190,39 @@ Feature: Subscription checkout
     And order payment status is "paid"
     And the subscription status is "active"
     When i change the price of product "MOL_SUB_1" to "24"
-    And the subscription price drift detector runs
+    Then the subscription price update state is "dirty"
+    When the subscription price drift detector runs
     Then the subscription price update state is "notified"
     And the subscription next notified price is "28.99"
     When the subscription price migration handler runs
     Then the subscription price update state is "none"
     And the subscription amount is "28.99"
     And the subscription history contains "price_migrated"
+
+  Scenario: a subscription product that also allows one-time purchase can be bought once as a subscription and once as a one-off in the same cart
+    Given payment method "eps" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And i select "mollie_fixture_shipment" as shipping method
+    And product "MOL_SUB_7" with quantity "1" is in cart
+    And product "MOL_SUB_7" with quantity "1" is in cart as subscription
+    When i start checkout with payment method "eps"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And the order has "1" subscriptions
+    And the subscription status is "active"
+    And the subscription amount is "23.99"
+
+  Scenario: a subscription product that allows one-time purchase, bought as a one-off via PayPal, is a normal order without any subscription
+    Given payment method "paypal" exists and active
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And i select "mollie_fixture_shipment" as shipping method
+    And product "MOL_SUB_7" with quantity "1" is in cart
+    When i start checkout with payment method "paypal"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And the order has "0" subscriptions
 

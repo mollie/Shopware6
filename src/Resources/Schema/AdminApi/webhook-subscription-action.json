@@ -9,6 +9,7 @@
     "/mollie/webhook/subscription/{subscriptionId}": {
       "get": {
         "summary": "Handle Mollie Subscription Webhook Notification (GET)",
+        "tags": ["Mollie"],
         "operationId": "handleMollieSubscriptionWebhookGet",
         "parameters": [
           {
@@ -51,6 +52,7 @@
       },
       "post": {
         "summary": "Handle Mollie Subscription Webhook Notification (POST)",
+        "tags": ["Mollie"],
         "operationId": "handleMollieSubscriptionWebhookPost",
         "parameters": [
           {

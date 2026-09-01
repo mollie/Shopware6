@@ -10,6 +10,7 @@
       "post": {
         "summary": "Submit Support Request to Mollie",
         "description": "Submits a support request to Mollie.",
+        "tags": ["Mollie"],
         "operationId": "submitSupportRequest",
         "requestBody": {
           "required": true,

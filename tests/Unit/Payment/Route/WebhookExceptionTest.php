@@ -42,11 +42,6 @@ final class WebhookExceptionTest extends TestCase
                 WebhookException::TRANSACTION_WITHOUT_MOLLIE_PAYMENT,
                 Response::HTTP_BAD_REQUEST,
             ],
-            'payment-without-method' => [
-                WebhookException::paymentWithoutMethod('tx-4', 'pay-4'),
-                WebhookException::PAYMENT_WITHOUT_METHOD,
-                Response::HTTP_BAD_REQUEST,
-            ],
             'order-without-state' => [
                 WebhookException::orderWithoutState('tx-5', 'ORD-5'),
                 WebhookException::ORDER_WITHOUT_STATE,

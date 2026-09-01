@@ -65,7 +65,7 @@ export default class BuyBoxRepository {
     }
 
     findPayPalExpressButtons() {
-        return this._document.querySelectorAll('.mollie-paypal-button');
+        return this._document.querySelectorAll('.js-mollie-paypal-button');
     }
 
     findClosestPrivacyBox(expressButton) {

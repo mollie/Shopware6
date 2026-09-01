@@ -26,7 +26,12 @@
                 "selectBank": "Vyberte banku"
             },
             "pos": {
-                "selectTerminal": "Vyberte terminál"
+                "selectTerminal": "Vyberte terminál",
+                "returnToWebsite": "Späť na web",
+                "terminalInstructions": "Postupujte podľa pokynov na termináli",
+                "paymentSuccess": "Vaša platba bola úspešná!",
+                "paymentFailed": "Vaša platba nebola úspešná!",
+                "paymentFailedNoDebit": "Z karty neboli stiahnuté žiadne peniaze"
             },
             "mandate": {
                 "sectionTitle": "Uložené karty",
@@ -48,6 +53,9 @@
             "phoneField": {
                 "headLine": "Telefónne číslo",
                 "phoneErrorMessage": "Telefónne číslo je povinné. Napríklad +31208202070"
+            },
+            "paypalExpress": {
+                "checkout": "Pokladňa"
             }
         },
         "messages": {
@@ -57,7 +65,11 @@
                 "error": "Platba zlyhala",
                 "failed": "Platba zlyhala alebo bola zrušená. Budete presmerovaný na Mollie, kde môžete dokončiť platbu zvolenou metódou. "
             },
-            "redirecting": "Presmerovávame vás na: "
+            "redirecting": "Presmerovávame vás na: ",
+            "paymentLink": {
+                "error": "Túto objednávku už nie je možné zaplatiť.",
+                "alreadyPaid": "Táto objednávka už bola zaplatená."
+            }
         },
         "payments": {
             "applePayDirect": {
@@ -110,7 +122,8 @@
                 "successResume": "Vaše predplatné bude teraz obnovené",
                 "successSkip": "Vaše predplatné bolo preskočené",
                 "successUpdateAddress": "Vaša adresa bola úspešne aktualizovaná",
-                "successUpdatePayment": "Vaša platobná metóda bola úspešne aktualizovaná"
+                "successUpdatePayment": "Vaša platobná metóda bola úspešne aktualizovaná",
+                "actionsMenuLabel": "Akcie predplatného"
             },
             "options": {
                 "everyDay": "Každý deň",

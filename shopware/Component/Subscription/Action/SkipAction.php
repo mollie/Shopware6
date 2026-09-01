@@ -100,9 +100,14 @@ final class SkipAction extends AbstractAction
             $subscriptionHistories['comment'] = 'skipped';
             $subscriptionHistories['statusTo'] = $newStatus->value;
 
-            $mollieSubscription->setStartDate($mollieSubscription->skipPayment());
+            // Mollie has no "skip". The skipped charge only happens because the replacement
+            // subscription starts one interval later, so this date carries the whole feature.
+            // It has to be kept across the cancel call: that call answers with Mollie's own
+            // copy of the subscription, which still holds the original start date.
+            $skippedStartDate = $mollieSubscription->skipPayment();
 
             $mollieSubscription = $this->mollieGateway->cancelSubscription($mollieSubscriptionId, $mollieCustomerId, $orderNumber, $salesChannelId);
+            $mollieSubscription->setStartDate($skippedStartDate);
 
             $newSubscription = $this->mollieGateway->copySubscription($mollieSubscription, $mollieCustomerId, $orderNumber, $salesChannelId);
 

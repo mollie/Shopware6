@@ -53,6 +53,7 @@ const payments = [
     {caseId: 'C4101', key: 'credit-card', name: 'Card', sanity: false},
     {caseId: 'C4111', key: 'paypal', name: 'PayPal', sanity: true},
     {caseId: 'C466903', key: 'billie', name: 'Billie', sanity: false},
+    {caseId: '', key: 'billink', name: 'Billink', sanity: false},
     {caseId: 'C4118', key: 'ideal', name: 'iDEAL', sanity: false},
     {caseId: 'C4237625', key: 'klarna', name: 'Klarna', sanity: false},
     {caseId: 'C4120', key: 'eps', name: 'eps', sanity: false},
@@ -72,6 +73,7 @@ const payments = [
     {caseId: 'C4255360', key: 'bizum', name: 'Bizum', sanity: false},
     {caseId: 'C4553498', key: 'vipps', name: 'Vipps', sanity: false},
     {caseId: 'C4553500', key: 'mobilepay', name: 'MobilePay', sanity: false},
+    {caseId: '', key: 'wero', name: 'Wero', sanity: false},
     // swish requires a specific currency, we cannot add it here for now (will be manually tested)
     // {caseId: '', key: 'swish', name: 'Swish', sanity: false},
     // unfortunately address and product prices need to match, so we cannot do in3 automatically for now
@@ -126,6 +128,9 @@ context("Checkout Tests", () => {
                         checkout.changeBillingCountry('Belgium');
                     } else if (payment.key === 'bizum') {
                         checkout.changeBillingCountry('Spain');
+                    } else if (payment.key === 'billink') {
+                        // Billink no longer works as a B2B order, so the checkout must be private (no company)
+                        checkout.makeBillingAddressPrivate();
                     } else {
                         checkout.changeBillingCountry('Germany');
                     }
@@ -168,7 +173,7 @@ context("Checkout Tests", () => {
 
                     mollieSandbox.initSandboxCookie();
 
-                    if (payment.key === 'billie' || payment.key === 'klarna' || payment.key === 'riverty') {
+                    if (payment.key === 'billie' || payment.key === 'billink' || payment.key === 'klarna' || payment.key === 'riverty') {
 
                         molliePayment.selectAuthorized();
 

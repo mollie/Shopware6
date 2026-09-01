@@ -4,10 +4,11 @@
             "mollie_subscription": "Mollie Συνδρομή | Mollie Συνδρομές"
         },
         "businessEvents": {
-            "mollie_checkout_order_success": " Η παραγγελία ήταν επιτυχής",
-            "mollie_checkout_order_failed": " Η παραγγελία απέτυχε",
-            "mollie_checkout_order_canceled": " Η παραγγελία ακυρώθηκε",
+            "mollie_payment_success": " Η παραγγελία ήταν επιτυχής",
+            "mollie_payment_failed": " Η παραγγελία απέτυχε",
+            "mollie_payment_cancelled": " Η παραγγελία ακυρώθηκε",
             "mollie_webhook_received_All": " Λήφθηκε Webhook Mollie (Όλα)",
+            "mollie_webhook_received_status_open": " Λήφθηκε Webhook Mollie (Ανοιχτό)",
             "mollie_webhook_received_status_authorized": " Λήφθηκε Webhook Mollie (Εγκεκριμένο)",
             "mollie_webhook_received_status_failed": " Λήφθηκε Webhook Mollie (Απέτυχε)",
             "mollie_webhook_received_status_canceled": " Λήφθηκε Webhook Mollie (Ακυρωμένο)",
@@ -17,6 +18,7 @@
             "mollie_webhook_received_status_completed": " Λήφθηκε Webhook Mollie (Ολοκληρωμένο)",
             "mollie_webhook_received_status_refunded": " Λήφθηκε Webhook Mollie (Επιστράφηκε)",
             "mollie_webhook_received_status_partially_refunded": " Λήφθηκε Webhook Mollie (Επιστράφηκε μερικώς)",
+            "mollie_webhook_received_status_chargeback": " Λήφθηκε Webhook Mollie (Αντιλογισμός)",
             "mollie_refund_started": " Η επιστροφή Mollie ξεκίνησε",
             "mollie_subscription_started": " Η συνδρομή Mollie ξεκίνησε",
             "mollie_subscription_ended": " Η συνδρομή Mollie ολοκληρώθηκε",
@@ -25,7 +27,8 @@
             "mollie_subscription_resumed": " Η συνδρομή Mollie συνεχίζεται",
             "mollie_subscription_skipped": " Η συνδρομή Mollie παραλείφθηκε",
             "mollie_subscription_renewed": " Η συνδρομή Mollie ανανεώθηκε",
-            "mollie_subscription_renewal_reminder": " Υπενθύμιση Mollie για ανανέωση συνδρομής"
+            "mollie_subscription_renewal_reminder": " Υπενθύμιση Mollie για ανανέωση συνδρομής",
+            "mollie_subscription_priceChangeNotice": " Η συνδρομή Mollie αλλαγή τιμής"
         }
     },
     "mollie-payments": {
@@ -418,6 +421,8 @@
                 "title": "Συνδρομές Mollie",
                 "description": "Η διαχείριση των επαναλαμβανόμενων πληρωμών σας είναι πιο εύκολη από ποτέ με τις βοηθητικές δυνατότητες μας. Ανεβάστε την επιχείρησή σας σε νέο επίπεδο με αποτελεσματικές επιλογές παρακολούθησης, απλές ενσωματώσεις και πολλά άλλα. Με τις συνδρομές Mollie, μπορείτε εύκολα να δημιουργήσετε προϊόντα συνδρομής και να προγραμματίσετε επαναλαμβανόμενες πληρωμές που θα γίνονται στο καθορισμένο διάστημα και διάρκεια.",
                 "mollieSubscriptionProduct": "Προϊόν Συνδρομής",
+                "mollieAllowOneTime": "Διάθεση και ως εφάπαξ αγορά",
+                "mollieAllowOneTimeHelp": "Εμφανίζει ένα επιπλέον κουμπί «Προσθήκη στο καλάθι» στη σελίδα προϊόντος, ώστε το προϊόν να μπορεί να αγοραστεί χωρίς συνδρομή.",
                 "mollieSubscriptionIntervalAmount": "Επανάληψη πληρωμής κάθε",
                 "mollieSubscriptionIntervalType": "Μονάδα διαστήματος",
                 "mollieSubscriptionRepetitionAmount": "Αριθμός επαναλήψεων",
@@ -501,9 +506,9 @@
             "canceled": "Ακυρωμένο",
             "expired": "Έληξε",
             "partiallyRefunded": "Επιστράφηκε (μερικώς)",
-            "orderSuccess": "Η παραγγελία ήταν επιτυχής",
-            "orderFailed": "Η παραγγελία απέτυχε",
-            "orderCanceled": "Η παραγγελία ακυρώθηκε"
+            "payment": "Πληρωμή",
+            "success": "Επιτυχία",
+            "priceChangeNotice": "Αλλαγή τιμής"
         }
     }
 }

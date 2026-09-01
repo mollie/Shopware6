@@ -1,3 +1,92 @@
+# Unreleased
+
+# 5.5.0
+- Added: Plugins can keep their own line items, such as set product containers, out of the Mollie payload themselves, using the new `FilterLineItemEvent`.
+- Added: Mollie express components (beta) in the cart, off-canvas and checkout.
+- Added: The Mollie refund, capture and shipment ids are available on the order for accounting exports, in the DATEV-compatible format with a hyphen.
+- Added: New "Disable Return Management integration" setting in the Refund Manager, so returns from the Shopware Return Management no longer trigger a refund at Mollie.
+- Changed: Bancontact with status "open" now counts as failed.
+- Changed: Special characters in addresses are removed before the payment.
+- Changed: Synchronising open payments with Mollie is now switched off and can be enabled per sales channel in the Order Management.
+- Fixed: PayPal Express is the only payment method in the checkout right after returning.
+- Fixed: Opening a payment link a second time works again.
+- Fixed: The shipping costs of orders from older plugin versions are refunded, returned and marked as shipped at Mollie correctly again.
+- Fixed: Express checkouts no longer fail when the data protection checkbox is required.
+- Fixed: The Mollie log files no longer contain log entries of other plugins.
+- Fixed: The order state is no longer reset on a second payment attempt.
+- Fixed: Partial refunds via the Shopware Return Manager now use the amount set there.
+
+# 5.4.0
+- Added: The minimum log level of the Mollie log handlers can now be configured via the `mollie.logger.level` container parameter; debug mode overrides it and forces the debug level.
+- Changed: In headless setups the store-api webhook and return URLs are now built from APP_URL instead of the proxy host, so Mollie can reach them.
+- Changed: Webhooks for Mollie payments without a payment method no longer fail; the current payment method is kept.
+- Changed: The capture description now contains the order number instead of the shipped line items.
+- Fixed: Shipment capture now sends the gross amount for net-tax customers.
+- Fixed: The rounding difference is now captured and refunded correctly with a custom rounding SKU.
+- Fixed: Salutations longer than 20 characters no longer abort payment creation; the address title is now truncated to Mollie's 20 character limit.
+- Fixed: Automatic shipment on delivery state change now only runs for orders paid via Mollie.
+- Fixed: Subscription renewals no longer fail for legacy subscriptions and now reliably create the renewal order.
+- Fixed: Opening an order in the administration no longer triggers a duplicate refund for existing returns.
+- Fixed: Additional address lines and companies that only contain whitespaces are no longer used for the Mollie address.
+- Fixed: Reading orders via the API no longer logs `Undefined array key "refunds"` warnings.
+- Fixed: Shipping orders with customized products or product sets no longer fails at Mollie.
+- Fixed: The Mollie tab and order list columns no longer disappear in non-default languages.
+- Fixed: Shipping via the Mollie order tab works again, including partially shipped orders with a manual capture (Klarna, Riverty, ...).
+- Fixed: The Mollie payment methods no longer disappear from the checkout on Shopware 6.6 with `APP_DEBUG=1`.
+
+# 5.3.0
+- Added: Orders can be paid via a Mollie payment link (route `mollie.pay`), which can be used in email templates, e.g. `{{ rawUrl('mollie.pay', { 'orderId': order.id }, salesChannel.domains|first.url) }}`.
+- Added: After a successful payment, older duplicate Mollie payments of the order are automatically cancelled or refunded.
+- Added: Support for NetiNextEasyCoupon voucher products.
+- Changed: Retrying with the same payment method now reuses the existing Mollie payment instead of creating a second one.
+- Changed: The transaction custom fields now also expose `order_id`, `payment_id` and `third_party_payment_id` for external ERP integrations.
+- Changed: Automatic shipment no longer requires the payment to be authorized, so orders manually set to paid are still shipped.
+- Fixed: For legacy orders the Mollie ID is shown again in the order list and detail view, and the Mollie tab can be opened again.
+- Fixed: Address fields are now trimmed before being sent to the Mollie API, preventing errors caused by leading or trailing whitespace.
+
+# 5.2.0
+- Added: Subscription products can also be offered as a one-time purchase, configurable in the product's Mollie tab.
+- Added: The add-to-cart route accepts a new `mollieSubscribe` parameter to add a product as a subscription (for headless usage).
+- Added: Billink payment method.
+- Added: E-invoices (ZUGFeRD/XRechnung) now contain the payment means for Mollie payment methods.
+- Changed: Auto-cancellation now logs a warning instead of an error when Mollie can no longer cancel the payment/order.
+- Changed: The storefront now loads and stores the Mollie profile ID when it is missing.
+- Changed: The payment status is no longer changed when the transaction is already in the target status.
+- Changed: The pending-order redirect only starts the session on relevant storefront routes.
+- Fixed: Digital products (downloads) without a delivery address can now be paid for.
+- Fixed: Activating the plugin no longer fails with a "should not be blank" error when duplicate payment method icons exist in the media library.
+- Fixed: The order status change no longer runs into an infinite recursion.
+- Fixed: The order custom fields now also expose `order_id`, `payment_id` and `third_party_payment_id` for the JTL connector. Existing orders are backfilled.
+- Fixed: Apple Pay Direct no longer fails with "Invalid domain passed" when the sales channel domain contains a protocol or path. Only the host is now sent to Mollie.
+- Fixed: Checkout on sales channel domains with a path prefix now returns and finalizes correctly instead of showing "Sales Channel Not Found", and Mollie webhooks resolve.
+- Fixed: No second Mollie payment is created for an order that is already paid or authorized, preventing double charges.
+- Fixed: The Mollie order detail tab no longer removes tabs added by other plugins to the same extension point.
+- Fixed: The product Mollie tab is read-only without the product edit permission.
+- Fixed: Partial refunds in the refund manager now work correctly across multiple refunds per line item, with the correct refunded quantity, composition and remaining order amount.
+- Fixed: The Mollie ship and refund actions are available again in the Flow Builder.
+- Fixed: Bank transfer orders no longer redirect to the edit-order form on browser back, since they must not be edited while settling.
+- Fixed: Orders from older plugin versions can be shipped, refunded and cancelled again.
+
+# 5.1.0
+- Added: Wero payment method.
+- Added: Apple Pay is now available in all browsers, not only in Safari.
+- Added: The Mollie payment data is now also stored in the order custom fields (not just the transaction) so ERP systems like the JTL connector can read it. Existing orders are backfilled.
+- Changed: The payment status webhook skips the transition when the transaction is already in the target state.
+- Fixed: Returning from the payment page no longer shows a token error when the payment was already completed. Customers are now sent to the confirmation or edit-order page based on the payment status.
+- Fixed: The Mollie order tab no longer crashes on Shopware versions that don't register the order detail as a Pinia store.
+- Fixed: Automatic shipment now only captures an authorized Mollie payment and no longer breaks the delivery status change in the admin if the Mollie call fails.
+- Fixed: A paid order is no longer downgraded by a later webhook with a lower status; a second payment that also completes as paid now updates the order.
+- Fixed: Refunds, order cancellation and the Mollie order tab now select the correct Mollie transaction on orders with multiple transactions.
+- Fixed: An invalid phone number in the address no longer makes the payment fail. Numbers in national format are now normalized to E.164 (including numbers entered for Bancomat Pay / Bizum); numbers that cannot be normalized are removed from the payload.
+- Fixed: Payments no longer fail when the shipping method name is empty. "Shipping" is used as a fallback.
+- Fixed: Plugin updates no longer fail with a 500 error on Shopware 6.5.
+- Fixed: The storefront no longer breaks with a "Plugin is already registered" error on Shopware 6.5.
+- Fixed: Apple Pay Direct display restrictions are now applied, so the button is hidden on the configured pages.
+- Fixed: Storefront pages no longer break on locales that Mollie does not support (e.g. cs_CZ, sk_SK). The locale now falls back to a supported one, or to en_GB.
+- Fixed: Payments no longer fail when the cart contains a discount from a third-party plugin (custom line item type with a negative price). Such line items are now sent to Mollie as type 'discount'.
+- Fixed: The shipping line sent to Mollie now uses the translated shipping method name. Storefront languages without an own shipping method translation no longer fail (before the 'Shipping' fallback) or show the generic 'Shipping' label; the name now falls back through the language chain.
+- Fixed: Payments no longer fail with "The 'vatAmount' field is off" in currencies that Shopware rounds to whole amounts (zero item-rounding decimals, e.g. PLN, SEK, CZK). When the rounded Shopware tax breaks Mollie's vatAmount validation, the vatAmount is now derived from the transmitted totalAmount.
+
 # 5.0.0
 - Note: Due to autoloader caching, an error can appear when uploading/updating the plugin. It can be ignored.
 - Added: Uninstalling the plugin with the "Remove all data" option now deletes all Mollie data.

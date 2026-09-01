@@ -5,7 +5,7 @@ namespace Mollie\Shopware\Component\Order\Admin\Response;
 
 use Shopware\Core\Framework\Struct\JsonSerializableTrait;
 
-final readonly class ShippingData implements \JsonSerializable
+final class ShippingData implements \JsonSerializable
 {
     use JsonSerializableTrait;
 
@@ -13,8 +13,8 @@ final readonly class ShippingData implements \JsonSerializable
      * @param array<string, ShippingStatusEntry> $status
      */
     public function __construct(
-        public ShippingTotal $total,
-        public array $status,
+        public readonly ShippingTotal $total,
+        public readonly array $status,
     ) {
     }
 }

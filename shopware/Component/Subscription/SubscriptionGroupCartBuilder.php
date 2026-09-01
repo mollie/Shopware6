@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Subscription;
 
+use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\LineItemFactoryRegistry;
 use Shopware\Core\Checkout\Cart\Order\OrderConverter;
@@ -67,12 +68,19 @@ final class SubscriptionGroupCartBuilder implements SubscriptionGroupCartBuilder
             if ($productId === null || $productId === '') {
                 continue;
             }
-            $cartLineItems[] = $this->lineItemFactoryRegistry->create([
+            $cartLineItem = $this->lineItemFactoryRegistry->create([
                 'id' => $productId,
                 'referencedId' => $productId,
                 'type' => LineItem::PRODUCT_LINE_ITEM_TYPE,
                 'quantity' => $orderLineItem->getQuantity(),
             ], $salesChannelContext);
+
+            // mirror the storefront "Subscribe" flow so the renewal cart keeps its subscription marker;
+            // without it the payment method availability rule drops the Mollie method during renewal
+            $cartLineItem->setId(Mollie::SUBSCRIPTION_LINE_ITEM_PREFIX . $productId);
+            $cartLineItem->setPayloadValue(Mollie::SUBSCRIPTION_PAYLOAD_KEY, true);
+
+            $cartLineItems[] = $cartLineItem;
         }
 
         if (count($cartLineItems) === 0) {

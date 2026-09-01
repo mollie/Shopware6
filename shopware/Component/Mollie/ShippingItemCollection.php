@@ -30,16 +30,6 @@ final class ShippingItemCollection implements \JsonSerializable
         return $total;
     }
 
-    public function getDescription(): string
-    {
-        $parts = [];
-        foreach ($this->items as $item) {
-            $parts[] = $item->getDescription();
-        }
-
-        return implode(', ', $parts);
-    }
-
     /** @return list<ShippingItem> */
     public function jsonSerialize(): array
     {

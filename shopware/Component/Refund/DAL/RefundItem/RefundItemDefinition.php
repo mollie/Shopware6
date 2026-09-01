@@ -51,6 +51,7 @@ final class RefundItemDefinition extends EntityDefinition
             (new StringField('mollie_line_id', 'mollieLineId'))->addFlags(new ApiAware()),
             (new FkField('order_line_item_id', 'orderLineItemId', OrderLineItemDefinition::class))->addFlags(new ApiAware()),
             new ReferenceVersionField(OrderLineItemDefinition::class, 'order_line_item_version_id'),
+            (new StringField('order_delivery_id', 'orderDeliveryId'))->addFlags(new ApiAware()),
             (new ManyToOneAssociationField('orderLineItem', 'order_line_item_id', OrderLineItemDefinition::class))->addFlags(new ApiAware()),
         ]);
     }

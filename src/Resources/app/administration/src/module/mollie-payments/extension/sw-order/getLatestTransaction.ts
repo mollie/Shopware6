@@ -7,8 +7,7 @@ export interface OrderTransactionLike {
 /**
  * Returns the most recently created transaction from a list of order
  * transactions (an array or a DAL EntityCollection), or null when the list is
- * empty. Both the sw-order-detail override and the mollie-order-tab view need
- * the latest transaction, so the logic lives here to stay testable and DRY.
+ * empty. Kept out of the component so it stays testable on its own.
  */
 export default function getLatestTransaction(
     transactions: Iterable<OrderTransactionLike> | null | undefined,

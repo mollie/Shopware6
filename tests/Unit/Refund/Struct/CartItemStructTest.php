@@ -29,6 +29,29 @@ final class CartItemStructTest extends TestCase
         $this->assertSame(0, $struct->getRefunded());
     }
 
+    public function testSetRefunded(): void
+    {
+        $struct = new CartItemStruct($this->shopware);
+        $struct->setRefunded(3);
+
+        $this->assertSame(3, $struct->getRefunded());
+    }
+
+    public function testRefundedAmountDefaultsToZero(): void
+    {
+        $struct = new CartItemStruct($this->shopware);
+
+        $this->assertSame(0.0, $struct->getRefundedAmount());
+    }
+
+    public function testSetRefundedAmount(): void
+    {
+        $struct = new CartItemStruct($this->shopware);
+        $struct->setRefundedAmount(4.5);
+
+        $this->assertSame(4.5, $struct->getRefundedAmount());
+    }
+
     public function testGetShopware(): void
     {
         $struct = new CartItemStruct($this->shopware);
@@ -45,5 +68,7 @@ final class CartItemStructTest extends TestCase
         $this->assertArrayHasKey('shopware', $data);
         $this->assertArrayHasKey('refunded', $data);
         $this->assertSame(0, $data['refunded']);
+        $this->assertArrayHasKey('refundedAmount', $data);
+        $this->assertSame(0.0, $data['refundedAmount']);
     }
 }
