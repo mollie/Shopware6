@@ -12,9 +12,39 @@ final class FakeCartService extends CartService
 {
     private Cart $storedCart;
 
+    /** @var array<string, Cart> */
+    private array $cartsByToken = [];
+
+    /** @var list<Cart> */
+    private array $setCarts = [];
+
     public function __construct(Cart $cart)
     {
         $this->storedCart = $cart;
+    }
+
+    /**
+     * A shop holds one cart per token. Tests that work with two of them at once - a checkout
+     * cart and its backup - put the second one here; everything else keeps getting the cart
+     * from the constructor.
+     */
+    public function addCart(string $token, Cart $cart): void
+    {
+        $this->cartsByToken[$token] = $cart;
+    }
+
+    public function getSetCartCount(): int
+    {
+        return count($this->setCarts);
+    }
+
+    public function getLastSetCart(): Cart
+    {
+        if ($this->setCarts === []) {
+            throw new \RuntimeException('FakeCartService has no cart recorded that was set.');
+        }
+
+        return $this->setCarts[array_key_last($this->setCarts)];
     }
 
     /**
@@ -26,7 +56,12 @@ final class FakeCartService extends CartService
     {
         $context->setRuleIds([]);
 
-        return $this->storedCart;
+        return $this->cartsByToken[$token] ?? $this->storedCart;
+    }
+
+    public function setCart(Cart $cart): void
+    {
+        $this->setCarts[] = $cart;
     }
 
     public function recalculate(Cart $cart, SalesChannelContext $context): Cart

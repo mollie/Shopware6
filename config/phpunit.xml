@@ -35,6 +35,12 @@
                 reaches the Mollie payload, not value carriers. -->
            <directory>./../src/Migration</directory>
            <directory>./../shopware/Component/Fixture</directory>
+           <!-- Maps the Return Management entity of SwagCommercial onto OrderReturnStruct.
+                SwagCommercial is a paid plugin and not in the plugin's own vendor/, so its
+                classes do not exist in the unit bootstrap and this file cannot be loaded here.
+                It stays a pure mapper for that reason - the actions next to it hold the
+                decisions and are measured. -->
+           <file>./../shopware/Component/Refund/Return/OrderReturnLoader.php</file>
        </exclude>
    </source>
 </phpunit>

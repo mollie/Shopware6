@@ -20,6 +20,8 @@ final class FakeRefundGateway implements RefundGatewayInterface
 
     private ?Refund $refund = null;
 
+    private ?RefundCollection $refundList = null;
+
     /**
      * The refund Mollie answers the create call with. Mollie returns a new resource with its own
      * id, status and amount, so the answer must not be derived from the request payload.
@@ -53,9 +55,17 @@ final class FakeRefundGateway implements RefundGatewayInterface
         return $this->cancelledRefunds;
     }
 
+    /**
+     * The refunds Mollie reports for the payment. Needed to find the one that belongs to a return.
+     */
+    public function withRefundList(RefundCollection $refunds): void
+    {
+        $this->refundList = $refunds;
+    }
+
     public function listRefunds(string $paymentId, string $orderNumber, string $salesChannelId): RefundCollection
     {
-        return new RefundCollection();
+        return $this->refundList ?? new RefundCollection();
     }
 
     /**

@@ -1,14 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Mollie\Shopware\Component\Refund;
+namespace Mollie\Shopware\Component\Refund\Return;
 
 use Shopware\Core\Defaults;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityWriteResult;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenEvent;
 use Shopware\Core\System\StateMachine\Event\StateMachineStateChangeEvent;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class OrderReturnSubscriber implements EventSubscriberInterface
@@ -18,8 +17,8 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
     private const STATE_CANCELLED = 'cancelled';
 
     public function __construct(
-        #[Autowire(service: OrderReturnHandler::class)]
-        private readonly OrderReturnHandlerInterface $orderReturnHandler,
+        private readonly RefundAction $refundAction,
+        private readonly CancelAction $cancelAction,
     ) {
     }
 
@@ -49,7 +48,7 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $this->orderReturnHandler->returnOnCreatedAsDone($returnId, $event->getContext());
+            $this->refundAction->executeOnCreate($returnId, $event->getContext());
         }
     }
 
@@ -67,10 +66,10 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
 
         switch ($event->getStateName()) {
             case self::STATE_DONE:
-                $this->orderReturnHandler->return($returnId, $context);
+                $this->refundAction->execute($returnId, $context);
                 break;
             case self::STATE_CANCELLED:
-                $this->orderReturnHandler->cancel($returnId, $context);
+                $this->cancelAction->execute($returnId, $context);
                 break;
         }
     }

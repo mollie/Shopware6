@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Fake;
 
+use Shopware\Core\Checkout\Cart\Delivery\Struct\ShippingLocation;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
@@ -21,6 +22,7 @@ final class FakeSalesChannelContext extends SalesChannelContext
 
     private ?ShippingMethodEntity $fakeShippingMethod = null;
     private ?CurrencyEntity $fakeCurrency = null;
+    private ?ShippingLocation $fakeShippingLocation = null;
 
     public function __construct(
         string $salesChannelId = 'sales-channel-id',
@@ -144,5 +146,19 @@ final class FakeSalesChannelContext extends SalesChannelContext
         }
 
         return $this->fakePaymentMethod;
+    }
+
+    public function setShippingLocation(ShippingLocation $shippingLocation): void
+    {
+        $this->fakeShippingLocation = $shippingLocation;
+    }
+
+    public function getShippingLocation(): ShippingLocation
+    {
+        if ($this->fakeShippingLocation === null) {
+            throw new \LogicException('FakeSalesChannelContext::getShippingLocation() called without configured shipping location. Use setShippingLocation() in the test.');
+        }
+
+        return $this->fakeShippingLocation;
     }
 }

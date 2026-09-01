@@ -12,6 +12,8 @@ final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterf
 {
     private ?\Throwable $findAllFailure = null;
 
+    private ?\Throwable $lookupFailure = null;
+
     public function __construct(
         private ?string $fakeId = null,
         private PaymentMethodCollection $methods = new PaymentMethodCollection(),
@@ -26,8 +28,20 @@ final class FakePaymentMethodRepository implements PaymentMethodRepositoryInterf
         $this->findAllFailure = $failure;
     }
 
+    /**
+     * The same error on the single-method lookup, which is what callers on a rendered page use.
+     */
+    public function withLookupFailure(\Throwable $failure): void
+    {
+        $this->lookupFailure = $failure;
+    }
+
     public function getIdByPaymentHandler(string $handlerIdentifier, string $salesChannelId, Context $context): ?string
     {
+        if ($this->lookupFailure !== null) {
+            throw $this->lookupFailure;
+        }
+
         return $this->fakeId;
     }
 

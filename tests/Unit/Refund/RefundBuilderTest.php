@@ -247,7 +247,7 @@ final class RefundBuilderTest extends TestCase
 
         $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(), new FakeLogger());
 
-        // the request the OrderReturnHandler builds: the positions plus the total of the return
+        // the request RefundAction builds: the positions plus the total of the return
         $createRefund = $builder->build($payment, $order, [
             ['id' => 'line-1', 'quantity' => 1, 'amount' => 22.4925, 'resetStock' => 1],
             ['id' => 'line-2', 'quantity' => 1, 'amount' => 29.9925, 'resetStock' => 1],
