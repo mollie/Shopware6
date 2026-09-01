@@ -22,6 +22,8 @@ import './module/mollie-payments/components/mollie-refund-manager';
 import './module/mollie-payments/components/mollie-ship-order';
 import './module/mollie-payments/components/mollie-cancel-item';
 import './module/mollie-payments/components/mollie-order-line-items-grid';
+import './module/mollie-payments/components/mollie-payment-overview-card';
+import './init/payment-overview-card.init';
 
 import deDE from './snippet/de-DE.json';
 import enGB from './snippet/en-GB.json';
