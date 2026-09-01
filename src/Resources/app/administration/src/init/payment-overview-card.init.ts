@@ -33,7 +33,7 @@ function registerOverviewCard(): void {
         return;
     }
 
-    Shopware.State.commit(`${VUEX_MODULE}/add`, overviewCard);
+    Shopware.State?.commit(`${VUEX_MODULE}/add`, overviewCard);
 }
 
 registerOverviewCard();
