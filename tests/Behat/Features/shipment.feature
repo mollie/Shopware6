@@ -11,6 +11,7 @@ Feature: Shipment
 
   Scenario: shipping line item is working
     Given payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And i select "DE" as billing country
     And i select "EUR" as currency
     And product "MOL_REGULAR" with quantity "2" is in cart
@@ -34,6 +35,7 @@ Feature: Shipment
 
   Scenario: automatic shipment is working
     Given payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And plugin configuration "automaticShipping" is set to "true"
     And i select "DE" as billing country
     And i select "EUR" as currency
@@ -49,6 +51,7 @@ Feature: Shipment
   Scenario: automatic shipment captures the gross amount for a net customer
     Given iam logged in as user "cypress-net@mollie.com"
     And payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And plugin configuration "automaticShipping" is set to "true"
     And i select "DE" as billing country
     And i select "EUR" as currency
@@ -65,6 +68,7 @@ Feature: Shipment
   Scenario: shipping a line item captures the gross shipping costs for a net customer
     Given iam logged in as user "cypress-net@mollie.com"
     And payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And i select "DE" as billing country
     And i select "EUR" as currency
     And product "MOL_REGULAR" with quantity "2" is in cart
@@ -82,6 +86,7 @@ Feature: Shipment
   Scenario: cancelling a line item still captures the gross amount of the shipped items for a net customer
     Given iam logged in as user "cypress-net@mollie.com"
     And payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And plugin configuration "automaticShipping" is set to "true"
     And i select "DE" as billing country
     And i select "EUR" as currency
@@ -99,6 +104,7 @@ Feature: Shipment
   Scenario: shipping a legacy order that was captured with the net amount only reconciles the missing tax
     Given iam logged in as user "cypress-net@mollie.com"
     And payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And i select "DE" as billing country
     And i select "EUR" as currency
     And product "MOL_REGULAR" with quantity "2" is in cart
@@ -113,6 +119,7 @@ Feature: Shipment
 
     Scenario: automatic shipment is disabled
       Given payment method "klarna" exists and active
+      And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
       And plugin configuration "automaticShipping" is set to "false"
       And i select "DE" as billing country
       And i select "EUR" as currency

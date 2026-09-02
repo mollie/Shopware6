@@ -2,6 +2,7 @@ import './module/mollie-payments/components/mollie-pluginconfig-section-info';
 import './module/mollie-payments/components/mollie-pluginconfig-section-api';
 import './module/mollie-payments/components/mollie-pluginconfig-section-payments';
 import './module/mollie-payments/components/mollie-pluginconfig-section-payments-format';
+import './module/mollie-payments/components/mollie-pluginconfig-section-capture';
 import './module/mollie-payments/components/mollie-pluginconfig-section-rounding';
 import './module/mollie-payments/components/mollie-pluginconfig-support-modal';
 import './module/mollie-payments/components/mollie-pluginconfig-section-order-lifetime-warning';

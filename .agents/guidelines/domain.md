@@ -54,6 +54,18 @@ Some methods never jump straight to `paid`. Klarna, Billie, Billink and Riverty 
 once the merchant has shipped the order. Handlers of such methods carry
 `Component/Payment/Handler/ManualCaptureModeAwareInterface`.
 
+**`captureMode: automatic` skips `authorized` entirely.** Confirmed against the Mollie test
+checkout: a Klarna payment created with an automatic capture mode never rests in `authorized`, it
+reports `paid` right away and Mollie collects the money itself. So nothing in the shop has to
+capture afterwards, and everything gated on the `authorized` status - the digital auto-capture in
+the webhook, "cancel item through Mollie" in the admin - simply never triggers for such an order.
+Mollie supports both capture modes for card, Klarna, Billie, Vipps and MobilePay; Riverty is manual
+only, and PayPal's manual capture is still in beta
+([support table](https://docs.mollie.com/docs/place-a-hold-for-a-payment#payment-method-support)).
+Which methods the merchant may switch is therefore expressed by
+`Component/Payment/Handler/AutomaticCaptureAwareInterface`, and a Behat scenario that captures on
+shipment has to switch the direct payment off first, or its order is already `paid`.
+
 **Digital products are the exception.** They cannot be shipped, and Shopware has no delivery
 state for an order consisting only of downloads, so no shipment event would ever capture them.
 The webhook therefore captures digital line items itself as soon as the payment is `authorized`:

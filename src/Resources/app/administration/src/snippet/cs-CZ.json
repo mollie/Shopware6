@@ -44,6 +44,11 @@
             "cancelMollieItem": "Zrušit přes Mollie"
         },
         "config": {
+            "capture": {
+                "description": "Mollie částku strhne ihned při nákupu, nebo ji pouze rezervuje. Při rezervaci se částka blokuje na účtu zákazníka a strhne se, jakmile označíte objednávku jako odeslanou, nebo se uvolní, pokud objednávku nemůžete splnit. Tím se snižuje riziko zpětných zúčtování a ušetříte si vracení peněz za objednávky, které nemůžete doručit.",
+                "hint": "Přímá platba je zapnutá u všech metod níže, což je obvyklé chování. Vypněte ji u metody, aby Mollie částku místo toho rezervovala - objednávka pak zůstane autorizovaná, dokud ji neoznačíte jako odeslanou.",
+                "link": "Rezervace částky pro platbu"
+            },
             "info": {
                 "title": "Ahoj {userName}, vítejte v Mollie!",
                 "descriptionTop": "Onboarding je s Mollie snadný!",

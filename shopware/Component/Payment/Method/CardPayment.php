@@ -7,12 +7,13 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentParameterInterface;
 use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\AutomaticCaptureAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
-final class CardPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, RecurringAwareInterface
+final class CardPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, RecurringAwareInterface, AutomaticCaptureAwareInterface
 {
     public function applyPaymentSpecificParameters(PaymentParameterInterface $payment, RequestDataBag $dataBag, CustomerEntity $customer): PaymentParameterInterface
     {

@@ -44,6 +44,11 @@
             "cancelMollieItem": "Törlés Mollie-n keresztül"
         },
         "config": {
+            "capture": {
+                "description": "A Mollie az összeget vagy azonnal a vásárláskor beszedi, vagy csak zárolja. Zárolás esetén az összeg az ügyfél számláján marad fenntartva, és akkor kerül beszedésre, amikor a rendelést kiszállítottként jelöli meg, illetve felszabadul, ha nem tudja teljesíteni a rendelést. Ez csökkenti a visszaterhelés kockázatát, és megkíméli a nem teljesíthető rendelések visszatérítésétől.",
+                "hint": "A közvetlen fizetés az alábbi összes fizetési módnál be van kapcsolva, ez a szokásos működés. Kapcsolja ki egy fizetési módnál, hogy a Mollie inkább zárolja az összeget - a rendelés ekkor engedélyezett marad, amíg kiszállítottként nem jelöli meg.",
+                "link": "Összeg zárolása egy fizetéshez"
+            },
             "info": {
                 "title": "Szia {userName}, üdvözöljük a Mollie-nál!",
                 "descriptionTop": "A Mollie-nál könnyű a bevezetés!",

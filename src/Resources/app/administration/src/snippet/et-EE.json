@@ -44,6 +44,11 @@
             "cancelMollieItem": "Tühista läbi Mollie"
         },
         "config": {
+            "capture": {
+                "description": "Mollie kas nõuab summa kohe ostu ajal sisse või üksnes broneerib selle. Broneeringu korral hoitakse summa kliendi kontol kinni ja nõutakse sisse siis, kui märgite tellimuse saadetuks, või vabastatakse, kui te ei saa tellimust täita. See vähendab tagasinõuete riski ja säästab teid tellimuste tagasimaksetest, mida te tarnida ei saa.",
+                "hint": "Otsemakse on sisse lülitatud kõigi allolevate makseviiside puhul, mis on tavapärane käitumine. Lülitage see makseviisi puhul välja, et Mollie summa hoopis broneeriks - tellimus jääb siis autoriseerituks, kuni märgite selle saadetuks.",
+                "link": "Summa broneerimine makse jaoks"
+            },
             "info": {
                 "title": "Tere {userName}, Tere tulemast Molliesse!",
                 "descriptionTop": "Molliega liitumine on lihtne!",

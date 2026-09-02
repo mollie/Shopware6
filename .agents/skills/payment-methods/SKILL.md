@@ -1,6 +1,6 @@
 ---
 name: payment-methods
-description: Add or remove a Mollie payment method in this Shopware 6 plugin. Adding = new enum case plus a handler with marker interfaces (manual capture, bank transfer, B2B-only, subscriptions, recurring mandate, Orders API); registration is automatic, no migration or icon needed. Removing = add DeprecatedMethodAwareInterface so the method is deactivated but stays in the shop, keeping old orders intact — never delete a handler. Use when asked to add, implement, register, remove, deprecate or disable a payment method such as Blik, Twint, Pay by Bank, Payconiq, Trustly.
+description: Add or remove a Mollie payment method in this Shopware 6 plugin. Adding = new enum case plus a handler with marker interfaces (manual capture, automatic capture, bank transfer, B2B-only, subscriptions, recurring mandate, Orders API); registration is automatic, no migration or icon needed. Removing = add DeprecatedMethodAwareInterface so the method is deactivated but stays in the shop, keeping old orders intact — never delete a handler. Use when asked to add, implement, register, remove, deprecate or disable a payment method such as Blik, Twint, Pay by Bank, Payconiq, Trustly.
 ---
 
 # Skill: Add or Remove a Mollie Payment Method
@@ -13,9 +13,17 @@ collects it, `PaymentMethodInstaller` upserts it on install and update.
 
 ### 1. Ask all of this in one message
 
-API name (`blik`, `paybybank`), display name, and yes/no for: manual capture · bank
-transfer style · B2B only · subscriptions · rechargeable from a stored mandate · needs the
-Orders API instead of the Payments API · allowed in payment links · Behat-testable (see 4).
+API name (`blik`, `paybybank`), display name, and yes/no for: manual capture · automatic
+capture · bank transfer style · B2B only · subscriptions · rechargeable from a stored
+mandate · needs the Orders API instead of the Payments API · allowed in payment links ·
+Behat-testable (see 4).
+
+**The two capture answers come from one Mollie table**, so look them up together in
+[Payment method support](https://docs.mollie.com/docs/place-a-hold-for-a-payment#payment-method-support)
+and confirm them rather than guessing: a method can support both modes (card, Klarna,
+Billie, Vipps, MobilePay), manual only (Riverty) or neither. Only a method Mollie can capture
+automatically **and** that is generally available gets the automatic marker — PayPal supports
+it on paper but its manual capture is still in beta, so it is deliberately left out.
 
 **If it is not a standard Payments-API method** — an express flow, a terminal, a wallet with
 its own SDK, anything needing extra checkout UI — stop and say what the special integration
@@ -42,7 +50,8 @@ Marker interfaces from `Component\Payment\Handler\`, added per answer:
 
 | Answer | Interface | Effect |
 |---|---|---|
-| manual capture | `ManualCaptureModeAwareInterface` | payload gets `CaptureMode::MANUAL` |
+| manual capture | `ManualCaptureModeAwareInterface` | payload gets `CaptureMode::MANUAL`, so Mollie only holds the money until the merchant ships |
+| automatic capture | `AutomaticCaptureAwareInterface` | the method shows up in the "Authorization and capture" plugin configuration and the merchant decides: direct payment (default) sends `CaptureMode::AUTOMATIC` and the payment goes straight to `paid`, switched off it sends `CaptureMode::MANUAL`. No config.xml change is needed - `PaymentHandlerLocator::getDirectPaymentMethods()` builds that list from this interface |
 | bank transfer | `BankTransferAwareInterface` | due date from the `dueDateDays` setting; `process`/`in_progress` instead of `processUnconfirmed`/`unconfirmed`; no pending-order session key, so browser-back does not hit the edit-order form |
 | B2B only | `BusinessCustomerAwareInterface` | hidden unless the billing address has a company |
 | subscriptions | `SubscriptionAwareInterface` | keeps `SequenceType::FIRST`. **Without it nothing fails** — the payload drops to `ONEOFF` and the subscription never gets a mandate |
@@ -54,6 +63,10 @@ suffix. `TestOnlyAwareInterface` (never installed) and `DeprecatedMethodAwareInt
 (installed inactive) exist but are normally not wanted.
 
 ### 4. Tests — after the review, not before
+
+**A method with `AutomaticCaptureAwareInterface` is `paid` in Behat, not `authorized`**,
+because a direct payment is the default. A scenario that wants the hold - anything about the
+shipment capture - has to start with `And plugin configuration "directPaymentDisabledMethods" is set to "<method>"`.
 
 **Unit:** no new file. `tests/Unit/Payment/Method/PaymentMethodsTest.php` covers all
 handlers — add the `use` import, a `#[CoversClass]` attribute, and one row in

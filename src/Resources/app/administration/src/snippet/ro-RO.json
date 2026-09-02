@@ -44,6 +44,11 @@
             "cancelMollieItem": "Anulare prin Mollie"
         },
         "config": {
+            "capture": {
+                "description": "Mollie fie încasează suma imediat la cumpărare, fie doar o rezervă. La o rezervare, suma rămâne blocată în contul clientului și este încasată atunci când marchezi comanda ca expediată, sau este eliberată dacă nu poți onora comanda. Astfel scade riscul de rambursări forțate și îți economisești restituirile pentru comenzile pe care nu le poți livra.",
+                "hint": "Plata directă este activată pentru toate metodele de mai jos, ceea ce este comportamentul obișnuit. Dezactiveaz-o pentru o metodă astfel încât Mollie să rezerve suma - comanda rămâne atunci autorizată până când o marchezi ca expediată.",
+                "link": "Rezervarea unei sume pentru o plată"
+            },
             "info": {
                 "title": "Bună {userName}, Bine ai venit la Mollie!",
                 "descriptionTop": "Onboardingul este ușor cu Mollie!",

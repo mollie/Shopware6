@@ -44,6 +44,11 @@
             "cancelMollieItem": "Atcelt caur Mollie"
         },
         "config": {
+            "capture": {
+                "description": "Mollie summu vai nu iekasē uzreiz pirkuma laikā, vai arī to tikai rezervē. Rezervācijas gadījumā summa tiek aizturēta klienta kontā un iekasēta, kad atzīmējat pasūtījumu kā nosūtītu, vai atbrīvota, ja nevarat izpildīt pasūtījumu. Tas samazina atmaksas pieprasījumu risku un ietaupa jums atmaksas par pasūtījumiem, kurus nevarat piegādāt.",
+                "hint": "Tiešais maksājums ir ieslēgts visām zemāk norādītajām metodēm, un tā ir ierastā darbība. Izslēdziet to metodei, lai Mollie summu tā vietā rezervētu - pasūtījums tad paliek autorizēts, līdz atzīmējat to kā nosūtītu.",
+                "link": "Summas rezervēšana maksājumam"
+            },
             "info": {
                 "title": "Sveiks {userName}, laipni lūdzam Mollie!",
                 "descriptionTop": "Iepazīšanās ar Mollie ir vienkārša!",

@@ -1,0 +1,22 @@
+<div class="mollie-pluginconfig-capture">
+    <div class="mollie-pluginconfig-capture-description">{{ $tc('mollie-payments.config.capture.description') }}</div>
+    <div class="mollie-pluginconfig-capture-description">{{ $tc('mollie-payments.config.capture.hint') }}</div>
+
+    <sw-external-link
+        class="mollie-pluginconfig-capture-link"
+        href="https://docs.mollie.com/docs/place-a-hold-for-a-payment"
+    >
+        {{ $tc('mollie-payments.config.capture.link') }}
+    </sw-external-link>
+
+    <sw-loader v-if="isLoading" />
+
+    <sw-switch-field
+        v-for="paymentMethod in paymentMethods"
+        :key="paymentMethod.name"
+        :class="'mollie-pluginconfig-capture-' + paymentMethod.name"
+        :label="paymentMethod.label"
+        :value="isDirectPaymentEnabled(paymentMethod.name)"
+        @update:value="setDirectPaymentEnabled(paymentMethod.name, $event)"
+    />
+</div>

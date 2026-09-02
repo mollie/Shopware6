@@ -5,8 +5,9 @@ namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\AutomaticCaptureAwareInterface;
 
-final class VippsPayment extends AbstractMolliePaymentHandler
+final class VippsPayment extends AbstractMolliePaymentHandler implements AutomaticCaptureAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {
