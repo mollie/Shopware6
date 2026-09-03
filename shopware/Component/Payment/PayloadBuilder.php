@@ -23,6 +23,7 @@ use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixerInterface;
 use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\AutomaticCaptureAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
@@ -96,6 +97,19 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
         if ($paymentHandler instanceof ManualCaptureModeAwareInterface) {
             $createPaymentStruct->setCaptureMode(CaptureMode::MANUAL);
+        }
+
+        // Mollie supports both capture modes for these methods, so the merchant decides per method and
+        // this overrides the hold set above: a direct payment collects the money right at the checkout,
+        // otherwise Mollie only holds it until the merchant marks the order as shipped.
+        $captureSettings = $this->settingsService->getCaptureSettings($salesChannelId);
+        if ($paymentHandler instanceof AutomaticCaptureAwareInterface) {
+            $captureMode = CaptureMode::MANUAL;
+            if ($captureSettings->isDirectPaymentEnabled($paymentHandler->getPaymentMethod())) {
+                $captureMode = CaptureMode::AUTOMATIC;
+            }
+
+            $createPaymentStruct->setCaptureMode($captureMode);
         }
 
         if ($paymentHandler instanceof BankTransferAwareInterface && $paymentSettings->getDueDateDays() > 0) {

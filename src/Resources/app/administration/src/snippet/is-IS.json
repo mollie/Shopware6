@@ -44,6 +44,11 @@
             "cancelMollieItem": "Aflýsa í gegnum Mollie"
         },
         "config": {
+            "capture": {
+                "description": "Mollie innheimtir upphæðina annaðhvort strax við kaupin eða tekur hana aðeins frá. Við frátekt er upphæðin geymd á reikningi viðskiptavinarins og innheimt þegar þú merkir pöntunina sem senda, eða losuð ef þú getur ekki afgreitt pöntunina. Þetta dregur úr hættu á endurkröfum og sparar þér endurgreiðslur á pöntunum sem þú getur ekki afhent.",
+                "hint": "Bein greiðsla er kveikt fyrir alla greiðslumáta hér að neðan, sem er venjuleg hegðun. Slökktu á henni fyrir greiðslumáta svo Mollie taki upphæðina frá í staðinn - pöntunin helst þá heimiluð þar til þú merkir hana sem senda.",
+                "link": "Taka frá upphæð fyrir greiðslu"
+            },
             "info": {
                 "title": "Halló {userName}, velkomin/n til Mollie!",
                 "descriptionTop": "Innleiðsla er auðveld hjá Mollie!",

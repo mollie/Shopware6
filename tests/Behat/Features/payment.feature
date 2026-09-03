@@ -23,6 +23,7 @@ Feature: Payment
 
   Scenario: digital product with klarna is captured automatically and becomes paid
     Given payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And i select "DE" as billing country
     And i select "EUR" as currency
     And product "MOL_DIGITAL" with quantity "1" is in cart
@@ -33,6 +34,7 @@ Feature: Payment
 
   Scenario: mixed digital and physical order with klarna captures only the digital part
     Given payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And i select "DE" as billing country
     And i select "EUR" as currency
     And product "MOL_REGULAR" with quantity "1" is in cart
@@ -42,6 +44,37 @@ Feature: Payment
     Then i see success page
     And order payment status is "authorized"
     And delivery status is "open"
+
+  Scenario Outline: direct payment collects the money right at the checkout
+    Given payment method "<paymentMethod>" exists and active
+    And i select "<billingCountry>" as billing country
+    And i select "<currency>" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    When i start checkout with payment method "<paymentMethod>"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+
+    Examples:
+      | paymentMethod | billingCountry | currency |
+      | klarna        | DE             | EUR      |
+      | billie        | DE             | EUR      |
+
+  Scenario Outline: without direct payment the money is only held until the shipment
+    Given payment method "<paymentMethod>" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "<paymentMethod>"
+    And i select "<billingCountry>" as billing country
+    And i select "<currency>" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    When i start checkout with payment method "<paymentMethod>"
+    And select payment status "authorized"
+    Then i see success page
+    And order payment status is "authorized"
+
+    Examples:
+      | paymentMethod | billingCountry | currency |
+      | klarna        | DE             | EUR      |
+      | billie        | DE             | EUR      |
 
   Scenario Outline: payment success
     Given payment method "<paymentMethod>" exists and active
@@ -60,12 +93,10 @@ Feature: Payment
       | bancontact    | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | banktransfer  | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | belfius       | MOL_REGULAR   | 1        | paid          | BE             | EUR      |
-      | billie        | MOL_REGULAR   | 1        | authorized    | DE             | EUR      |
       | bizum         | MOL_REGULAR   | 1        | paid          | ES             | EUR      |
       | blik          | MOL_REGULAR   | 1        | paid          | DE             | PLN      |
       | eps           | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | in3           | MOL_REGULAR   | 2        | paid          | NL             | EUR      |
-      | klarna        | MOL_REGULAR   | 1        | authorized    | DE             | EUR      |
       | mbway         | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | multibanco    | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | mybank        | MOL_REGULAR   | 1        | paid          | IT             | EUR      |

@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollect
 use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
+use Mollie\Shopware\Component\Settings\Struct\CaptureSettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
@@ -284,6 +285,20 @@ final class SettingsService extends AbstractSettingsService
         $shopwareSettings = $this->getMollieSettings($salesChannelId);
 
         $settings = RefundSettings::createFromShopwareArray($shopwareSettings);
+        $this->settingsCache[$cacheKey] = $settings;
+
+        return $settings;
+    }
+
+    public function getCaptureSettings(?string $salesChannelId = null): CaptureSettings
+    {
+        $cacheKey = CaptureSettings::class . '_' . ($salesChannelId ?? 'all');
+        if (isset($this->settingsCache[$cacheKey])) {
+            return $this->settingsCache[$cacheKey];
+        }
+        $shopwareSettings = $this->getMollieSettings($salesChannelId);
+
+        $settings = CaptureSettings::createFromShopwareArray($shopwareSettings);
         $this->settingsCache[$cacheKey] = $settings;
 
         return $settings;

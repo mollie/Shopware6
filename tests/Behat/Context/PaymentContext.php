@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Behat\Context;
 
 use Behat\Step\Given;
 use Mollie\Shopware\Component\Settings\SettingsService;
+use Mollie\Shopware\Component\Settings\Struct\CaptureSettings;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
@@ -28,6 +29,15 @@ final class PaymentContext extends ShopwareContext
          * @var SystemConfigService $systemConfigService
          */
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
+
+        // The capture setting holds the methods that keep the hold, so its value is a list and is
+        // written as one: "klarna" or "klarna,billie".
+        if ($configKey === CaptureSettings::KEY_DISABLED_METHODS) {
+            $systemConfigService->set(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . $configKey, explode(',', $configValue));
+            $this->getContainer()->get(SettingsService::class)->clearCache();
+
+            return;
+        }
 
         if ($configValue === 'true') {
             $configValue = true;

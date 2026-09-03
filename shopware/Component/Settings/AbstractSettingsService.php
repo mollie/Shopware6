@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Settings;
 use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
+use Mollie\Shopware\Component\Settings\Struct\CaptureSettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
@@ -45,4 +46,6 @@ abstract class AbstractSettingsService
     abstract public function getOrderStateSettings(?string $salesChannelId = null): OrderStateSettings;
 
     abstract public function getRefundSettings(?string $salesChannelId = null): RefundSettings;
+
+    abstract public function getCaptureSettings(?string $salesChannelId = null): CaptureSettings;
 }

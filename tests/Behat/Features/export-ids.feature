@@ -12,6 +12,7 @@ Feature: Export IDs
 
   Scenario: every capture and refund of a Payments API order is listed on the order
     Given payment method "klarna" exists and active
+    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
     And product "MOL_REGULAR" with quantity "1" is in cart
     And product "MOL_REDUCED_TAX" with quantity "1" is in cart
     When i start checkout with payment method "klarna"

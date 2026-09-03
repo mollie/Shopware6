@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\Struct\AccountSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\ApplePaySettings;
+use Mollie\Shopware\Component\Settings\Struct\CaptureSettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\EnvironmentSettings;
 use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
@@ -37,6 +38,7 @@ final class FakeSettingsService extends AbstractSettingsService
         private ?CreditCardSettings $creditCardSettings = null,
         private ?RefundSettings $refundSettings = null,
         private ?AccountSettings $accountSettings = null,
+        private ?CaptureSettings $captureSettings = null,
     ) {
         if ($this->loggerSettings === null) {
             $this->loggerSettings = new LoggerSettings(true, 0);
@@ -142,5 +144,10 @@ final class FakeSettingsService extends AbstractSettingsService
     public function getRefundSettings(?string $salesChannelId = null): RefundSettings
     {
         return $this->refundSettings ?? new RefundSettings();
+    }
+
+    public function getCaptureSettings(?string $salesChannelId = null): CaptureSettings
+    {
+        return $this->captureSettings ?? new CaptureSettings();
     }
 }

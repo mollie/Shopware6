@@ -5,9 +5,10 @@ namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\AutomaticCaptureAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 
-final class KlarnaPayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface
+final class KlarnaPayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface, AutomaticCaptureAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

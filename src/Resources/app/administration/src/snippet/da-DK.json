@@ -44,6 +44,11 @@
             "cancelMollieItem": "Annuller gennem Mollie"
         },
         "config": {
+            "capture": {
+                "description": "Mollie opkræver beløbet med det samme ved købet eller reserverer det kun. Ved en reservation holdes beløbet på kundens konto og opkræves, når du markerer ordren som afsendt, eller frigives, hvis du ikke kan opfylde ordren. Det mindsker risikoen for tilbageførsler og sparer dig for at refundere ordrer, du ikke kan levere.",
+                "hint": "Direkte betaling er slået til for alle metoder nedenfor, hvilket er den sædvanlige adfærd. Slå det fra for en metode, så Mollie reserverer beløbet i stedet - ordren forbliver da autoriseret, indtil du markerer den som afsendt.",
+                "link": "Reservér et beløb til en betaling"
+            },
             "info": {
                 "title": "Hej {userName}, Velkommen til Mollie!",
                 "descriptionTop": "Onboarding er enkelt med Mollie!",

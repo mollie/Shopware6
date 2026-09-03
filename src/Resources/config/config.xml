@@ -664,6 +664,34 @@
         </component>
     </card>
     <card>
+        <title>Authorization and capture</title>
+        <title lang="de-DE">Autorisierung und Einzug</title>
+        <title lang="nl-NL">Autorisatie en incasso</title>
+        <title lang="it-IT">Autorizzazione e incasso</title>
+        <title lang="pt-PT">Autorização e cobrança</title>
+        <title lang="es-ES">Autorización y cobro</title>
+        <title lang="sv-SE">Auktorisering och inlösen</title>
+        <title lang="nb-NO">Autorisering og trekk</title>
+        <title lang="pl-PL">Autoryzacja i pobranie środków</title>
+        <title lang="cs-CZ">Autorizace a stržení částky</title>
+        <title lang="sl-SI">Avtorizacija in zaračunavanje</title>
+        <title lang="hu-HU">Engedélyezés és beszedés</title>
+        <title lang="fi-FI">Valtuutus ja veloitus</title>
+        <title lang="da-DK">Autorisation og opkrævning</title>
+        <title lang="el-GR">Έγκριση και είσπραξη</title>
+        <title lang="hr-HR">Autorizacija i naplata</title>
+        <title lang="et-EE">Autoriseerimine ja sissenõudmine</title>
+        <title lang="is-IS">Heimild og innheimta</title>
+        <title lang="lt-LT">Autorizavimas ir nuskaitymas</title>
+        <title lang="lv-LV">Autorizācija un iekasēšana</title>
+        <title lang="ro-RO">Autorizare și încasare</title>
+        <title lang="sk-SK">Autorizácia a stiahnutie sumy</title>
+        <title lang="bg-BG">Оторизация и събиране</title>
+        <component name="mollie-pluginconfig-section-capture">
+            <name>directPaymentDisabledMethods</name>
+        </component>
+    </card>
+    <card>
         <title>Credit card</title>
         <title lang="de-DE">Kreditkarte</title>
         <title lang="nl-NL">Credit card</title>

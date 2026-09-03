@@ -164,6 +164,11 @@ ignored where money is involved is a defect, not defensiveness.
 
 ## Performance
 
+**A heredoc goes into a variable, never into an argument.** `$sql = <<<'SQL' … SQL;` then
+`$connection->prepare($sql)` - not the heredoc inside the `prepare()` call, where the closing
+marker breaks the reading flow of the statement it belongs to. Same for any other multi-line
+string handed to a method.
+
 **No SQL or DAL query inside a loop.** Collect the criteria, run one query, index the
 result.
 
