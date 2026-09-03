@@ -39,8 +39,7 @@ final class CreateSessionTest extends TestCase
         $this->assertArrayNotHasKey('shippingAddress', $body);
         $this->assertArrayNotHasKey('customerId', $body);
         $this->assertArrayNotHasKey('requiredCustomerDetails', $body);
-        $this->assertArrayNotHasKey('shippingOptions', $body);
-        $this->assertArrayNotHasKey('shippingCallbackUrl', $body);
+        $this->assertArrayNotHasKey('shipping', $body);
         $this->assertArrayNotHasKey('payment', $body);
     }
 
@@ -74,7 +73,11 @@ final class CreateSessionTest extends TestCase
         $this->assertSame(['value' => '19.98', 'currency' => 'EUR'], $body['lines'][0]['totalAmount']);
     }
 
-    public function testShippingOptionsAndCallbackUrl(): void
+    /**
+     * Mollie takes the options and their callback url inside a shipping sub object; at root
+     * level they are rejected with "Non-existent body parameter shippingOptions.description".
+     */
+    public function testShippingOptionsAndCallbackUrlMoveIntoTheShippingObject(): void
     {
         $shippingOptions = new ShippingOptionCollection();
         $shippingOptions->add(new ShippingOption('Express', 'shipping-method-id', new Money(3.99, 'EUR')));
@@ -85,11 +88,40 @@ final class CreateSessionTest extends TestCase
 
         $body = $createSession->toArray();
 
-        $this->assertSame('https://shop.example/shipping-options', $body['shippingCallbackUrl']);
-        $this->assertCount(1, $body['shippingOptions']);
-        $this->assertSame('Express', $body['shippingOptions'][0]['description']);
-        $this->assertSame('shipping-method-id', $body['shippingOptions'][0]['reference']);
-        $this->assertSame(['value' => '3.99', 'currency' => 'EUR'], $body['shippingOptions'][0]['amount']);
+        $this->assertArrayNotHasKey('shippingOptions', $body);
+        $this->assertArrayNotHasKey('shippingCallbackUrl', $body);
+        $this->assertSame('https://shop.example/shipping-options', $body['shipping']['callbackUrl']);
+        $this->assertCount(1, $body['shipping']['options']);
+        $this->assertSame('Express', $body['shipping']['options'][0]['description']);
+        $this->assertSame('shipping-method-id', $body['shipping']['options'][0]['reference']);
+        $this->assertSame(['value' => '3.99', 'currency' => 'EUR'], $body['shipping']['options'][0]['amount']);
+    }
+
+    /**
+     * SessionBuilder never sets the callback url, so this is the shipping object that reaches
+     * Mollie today. An empty callbackUrl beside the options is rejected.
+     */
+    public function testTheCallbackUrlIsLeftOutWhenOnlyOptionsAreSet(): void
+    {
+        $shippingOptions = new ShippingOptionCollection();
+        $shippingOptions->add(new ShippingOption('Express', 'shipping-method-id', new Money(3.99, 'EUR')));
+
+        $createSession = $this->createSession();
+        $createSession->setShippingOptions($shippingOptions);
+
+        $body = $createSession->toArray();
+
+        $this->assertSame(['options'], array_keys($body['shipping']));
+    }
+
+    /**
+     * Only the options moved, the shipping address stays at root level.
+     */
+    public function testTheShippingAddressStaysAtRootLevel(): void
+    {
+        $body = $this->createFullSession()->toArray();
+
+        $this->assertSame('Shipping City', $body['shippingAddress']['city']);
     }
 
     public function testRequiredCustomerDetails(): void
@@ -120,7 +152,7 @@ final class CreateSessionTest extends TestCase
         $this->assertSame($body['sequenceType'], $createSession->getSequenceType()->value);
         $this->assertSame($body['customerId'], $createSession->getCustomerId());
         $this->assertSame($body['profileId'], $createSession->getProfileId());
-        $this->assertSame($body['shippingCallbackUrl'], $createSession->getShippingCallbackUrl());
+        $this->assertSame($body['shipping']['callbackUrl'], $createSession->getShippingCallbackUrl());
         $this->assertSame($body['requiredCustomerDetails'], $createSession->getRequiredCustomerDetails());
         $this->assertSame($body['metadata'], $createSession->getMetadata());
         $this->assertSame($body['payment']['webhookUrl'], $createSession->getWebhookUrl());
@@ -141,7 +173,7 @@ final class CreateSessionTest extends TestCase
 
     public function testTheShippingOptionsAreReportedAsTheyWereSet(): void
     {
-        $this->assertSame('Express', $this->createFullSession()->getShippingOptions()?->first()?->getDescription());
+        $this->assertSame('Express', $this->createFullSession()->getShippingOptions()->first()?->getDescription());
     }
 
     private function createSession(): CreateSession

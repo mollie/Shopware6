@@ -315,3 +315,18 @@ them for use, so they stay out of the merchant-facing dropdown until that approv
 For tests: assert that every offered value *is* a valid `VoucherCategory` — never assert
 equality with `VoucherCategory::cases()`, or the test breaks on the day the remaining three
 are switched on.
+
+## Sessions: the shipping options part of the API is still being built
+
+Mollie's session endpoint is not finished where the express-components shipping options are
+concerned, and its body parameters keep changing under us. The options and their callback url
+moved from the root level (`shippingOptions`, `shippingCallbackUrl`) into a `shipping` sub
+object (`shipping.options`, `shipping.callbackUrl`); the shipping address stayed at root level.
+An unknown parameter is answered with a 422 that names the replacement — *Non-existent body
+parameter "shippingOptions.description" ... Did you mean: "shipping.options.description"?* — so
+the error message itself is the migration instruction.
+
+Expect the next rename. A change that only follows Mollie here is not merchant-facing and gets
+no changelog entry, because the feature has not reached merchants yet. For the same reason the
+response is read from both shapes: nothing guarantees that request and resource move in the
+same release.
