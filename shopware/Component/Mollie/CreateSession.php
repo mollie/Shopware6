@@ -22,8 +22,8 @@ final class CreateSession implements \JsonSerializable
     private ?string $customerId = null;
     private ?string $profileId = null;
     private ?string $webhookUrl = null;
-    private ?string $shippingCallbackUrl = null;
-    private ?ShippingOptionCollection $shippingOptions = null;
+    private string $shippingCallbackUrl = '';
+    private ShippingOptionCollection $shippingOptions;
 
     /**
      * @var array<mixed>
@@ -39,6 +39,7 @@ final class CreateSession implements \JsonSerializable
     {
         $this->lines = new LineItemCollection();
         $this->sequenceType = SequenceType::ONEOFF;
+        $this->shippingOptions = new ShippingOptionCollection();
     }
 
     public function getDescription(): string
@@ -141,7 +142,7 @@ final class CreateSession implements \JsonSerializable
         $this->webhookUrl = $webhookUrl;
     }
 
-    public function getShippingCallbackUrl(): ?string
+    public function getShippingCallbackUrl(): string
     {
         return $this->shippingCallbackUrl;
     }
@@ -151,7 +152,7 @@ final class CreateSession implements \JsonSerializable
         $this->shippingCallbackUrl = $shippingCallbackUrl;
     }
 
-    public function getShippingOptions(): ?ShippingOptionCollection
+    public function getShippingOptions(): ShippingOptionCollection
     {
         return $this->shippingOptions;
     }
@@ -205,6 +206,14 @@ final class CreateSession implements \JsonSerializable
         if ($this->webhookUrl !== null) {
             $body['payment'] = ['webhookUrl' => $this->webhookUrl];
         }
+
+        // the shipping options and their callback url are nested in a shipping sub object,
+        // while the shipping address stays at root level
+        unset($body['shippingOptions'], $body['shippingCallbackUrl']);
+        $body['shipping'] = array_filter([
+            'options' => $this->shippingOptions->toArray(),
+            'callbackUrl' => $this->shippingCallbackUrl,
+        ]);
 
         return array_filter($body, function ($entry) {
             if (is_array($entry)) {

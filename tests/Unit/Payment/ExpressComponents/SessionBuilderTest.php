@@ -251,7 +251,7 @@ final class SessionBuilderTest extends TestCase
         $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $context);
 
         $this->assertSame('NL', $this->shippingOptionsResolver->getLastAddress()->getCountry());
-        $this->assertSame(1, $this->sessionGateway->getLastCreateSession()->getShippingOptions()?->count());
+        $this->assertSame(1, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
     }
 
     public function testGuestCartSessionCarriesNoAddresses(): void
@@ -499,7 +499,7 @@ final class SessionBuilderTest extends TestCase
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
         $shippingOptions = $this->sessionGateway->getLastCreateSession()->getShippingOptions();
-        $shippingOption = $shippingOptions?->first();
+        $shippingOption = $shippingOptions->first();
         $this->assertSame('DHL Express', $shippingOption?->getDescription());
         $this->assertSame('shipping-method-id', $shippingOption?->getReference());
         $this->assertSame(5.95, $shippingOption?->getAmount()->getValue());
@@ -512,7 +512,7 @@ final class SessionBuilderTest extends TestCase
 
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
-        $this->assertSame('Shipping', $this->sessionGateway->getLastCreateSession()->getShippingOptions()?->first()?->getDescription());
+        $this->assertSame('Shipping', $this->sessionGateway->getLastCreateSession()->getShippingOptions()->first()?->getDescription());
     }
 
     public function testOrderDeliveryWithoutAShippingMethodIsNotOfferedAsAnOption(): void
@@ -526,7 +526,7 @@ final class SessionBuilderTest extends TestCase
 
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
-        $this->assertSame(0, $this->sessionGateway->getLastCreateSession()->getShippingOptions()?->count());
+        $this->assertSame(0, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
     }
 
     public function testOrderWithoutDeliveriesOffersNoShippingOption(): void
@@ -538,7 +538,7 @@ final class SessionBuilderTest extends TestCase
 
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
-        $this->assertSame(0, $this->sessionGateway->getLastCreateSession()->getShippingOptions()?->count());
+        $this->assertSame(0, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
     }
 
     /**

@@ -73,7 +73,10 @@ final class Session extends Struct implements \JsonSerializable
             $session->lines->add(LineItem::createFromClientResponse($line));
         }
 
-        $session->shippingOptions = ShippingOptionCollection::fromArray($body['shippingOptions'] ?? []);
+        // the request nests the options in a shipping sub object; older sessions still carry
+        // them at root level, so both shapes are read
+        $shippingOptions = $body['shipping']['options'] ?? $body['shippingOptions'] ?? [];
+        $session->shippingOptions = ShippingOptionCollection::fromArray($shippingOptions);
 
         $shippingAddress = $body['shippingAddress'] ?? null;
         $billingAddress = $body['billingAddress'] ?? null;

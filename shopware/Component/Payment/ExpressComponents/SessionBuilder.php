@@ -337,8 +337,9 @@ final class SessionBuilder implements SessionBuilderInterface
      */
     private function applyShippingOptions(CreateSession $createSession, SalesChannelContext $salesChannelContext): void
     {
-        // The callback url is not sent yet: sessions reject it with "Non-existent body parameter
-        // shippingCallbackUrl" until the feature is released for the account. Everything behind it
+        // The callback url is not sent yet: sessions rejected it as a non-existent body parameter
+        // until the feature is released for the account, and it has not been retested since it
+        // became shipping.callbackUrl. Everything behind it
         // (RouteBuilder::getExpressComponentsShippingCallbackUrl and the api route) is in place, so
         // enabling it is a one line change here.
         $country = $salesChannelContext->getShippingLocation()->getCountry();

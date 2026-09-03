@@ -56,6 +56,42 @@ final class SessionTest extends TestCase
         $this->assertSame('18a749392801df0f024c86fbac59b2b4', $shippingOption->getReference());
     }
 
+    /**
+     * The options moved into a shipping sub object on the request, so a response may carry
+     * them there too. Reading only the root level would leave the collection empty and the
+     * express checkout would fall back to the shipping method of the context.
+     */
+    public function testResolvesTheSelectedShippingOptionFromTheShippingSubObject(): void
+    {
+        $body = $this->completedSessionBody();
+        $body['shipping'] = ['options' => $body['shippingOptions']];
+        unset($body['shippingOptions']);
+
+        $session = Session::createFromClientResponse($body);
+
+        $this->assertCount(2, $session->getShippingOptions());
+        $this->assertSame('18a749392801df0f024c86fbac59b2b4', $session->getSelectedShippingOption()?->getReference());
+    }
+
+    /**
+     * During the rollout a response can carry both shapes; the nested one is the current
+     * contract and has to win.
+     */
+    public function testTheNestedShippingOptionsWinOverTheRootLevelOnes(): void
+    {
+        $body = $this->completedSessionBody();
+        $body['shipping'] = ['options' => [[
+            'reference' => 'nested-shipping-method-id',
+            'description' => 'Mollie Cheap Test Shipment',
+            'amount' => ['value' => '0.01', 'currency' => 'EUR'],
+        ]]];
+
+        $session = Session::createFromClientResponse($body);
+
+        $this->assertCount(1, $session->getShippingOptions());
+        $this->assertSame('nested-shipping-method-id', $session->getSelectedShippingOption()?->getReference());
+    }
+
     public function testNoShippingOptionWithoutAShippingLine(): void
     {
         $body = $this->completedSessionBody();
