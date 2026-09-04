@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie drar in beloppet direkt vid köpet eller reserverar det bara. Vid en reservation hålls beloppet på kundens konto och dras in när du markerar beställningen som skickad, eller frisläpps om du inte kan leverera beställningen. Det minskar risken för återkrav och besparar dig återbetalningar för beställningar du inte kan leverera.",
-                "hint": "Direktbetalning är på för alla betalsätt nedan, vilket är det vanliga beteendet. Stäng av det för ett betalsätt så att Mollie reserverar beloppet i stället - beställningen förblir då auktoriserad tills du markerar den som skickad.",
+                "hint": "Direktbetalning ställs in per betalsätt nedan. Stäng av det för ett betalsätt så att Mollie reserverar beloppet i stället - beställningen förblir då auktoriserad tills du markerar den som skickad.",
                 "link": "Reservera ett belopp för en betalning"
             },
             "info": {

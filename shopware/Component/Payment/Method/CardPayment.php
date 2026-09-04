@@ -15,6 +15,11 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
 final class CardPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, RecurringAwareInterface, AutomaticCaptureAwareInterface
 {
+    /**
+     * The order form field mollie.js writes the card token into.
+     */
+    public const FIELD_CREDIT_CARD_TOKEN = 'creditCardToken';
+
     public function applyPaymentSpecificParameters(PaymentParameterInterface $payment, RequestDataBag $dataBag, CustomerEntity $customer): PaymentParameterInterface
     {
         if ($payment->getMandateId() !== null) {
@@ -23,7 +28,7 @@ final class CardPayment extends AbstractMolliePaymentHandler implements Subscrip
             return $payment;
         }
 
-        $cardToken = $dataBag->get('creditCardToken');
+        $cardToken = $dataBag->get(self::FIELD_CREDIT_CARD_TOKEN);
         if ($cardToken === null) {
             return $payment;
         }

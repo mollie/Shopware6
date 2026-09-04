@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie pobiera środki od razu przy zakupie albo tylko je blokuje. Przy blokadzie kwota zostaje zarezerwowana na koncie klienta i jest pobierana, gdy oznaczysz zamówienie jako wysłane, albo zwalniana, jeśli nie możesz zrealizować zamówienia. Zmniejsza to ryzyko obciążeń zwrotnych i oszczędza zwracania środków za zamówienia, których nie możesz dostarczyć.",
-                "hint": "Płatność bezpośrednia jest włączona dla wszystkich metod poniżej, co jest zwykłym zachowaniem. Wyłącz ją dla danej metody, aby Mollie zamiast tego zablokowało kwotę - zamówienie pozostaje wtedy autoryzowane, dopóki nie oznaczysz go jako wysłane.",
+                "hint": "Płatność bezpośrednia jest ustawiana osobno dla każdej metody poniżej. Wyłącz ją dla danej metody, aby Mollie zamiast tego zablokowało kwotę - zamówienie pozostaje wtedy autoryzowane, dopóki nie oznaczysz go jako wysłane.",
                 "link": "Blokada środków dla płatności"
             },
             "info": {

@@ -3,55 +3,12 @@
 
     <card>
         <title> </title>
-        <title lang="de-DE"> </title>
-        <title lang="nl-NL"> </title>
-        <title lang="it-IT"> </title>
-        <title lang="pt-PT"> </title>
-        <title lang="es-ES"> </title>
-        <title lang="sv-SE"> </title>
-        <title lang="nb-NO"> </title>
-        <title lang="pl-PL"> </title>
-        <title lang="cs-CZ"> </title>
-        <title lang="sl-SI"> </title>
-        <title lang="hu-HU"> </title>
-        <title lang="fi-FI"> </title>
-        <title lang="da-DK"> </title>
-        <title lang="el-GR"> </title>
-        <title lang="hr-HR"> </title>
-        <title lang="et-EE"> </title>
-        <title lang="is-IS"> </title>
-        <title lang="lt-LT"> </title>
-        <title lang="lv-LV"> </title>
-        <title lang="ro-RO"> </title>
-        <title lang="sk-SK"> </title>
-        <title lang="bg-BG"> </title>
         <component name="mollie-pluginconfig-section-info">
             <name>molliePluginConfigSectionInfo</name>
         </component>
     </card>
     <card>
         <title>API</title>
-        <title lang="de-DE">API</title>
-        <title lang="nl-NL">API</title>
-        <title lang="it-IT">API</title>
-        <title lang="pt-PT">API</title>
-        <title lang="es-ES">API</title>
-        <title lang="sv-SE">API</title>
-        <title lang="nb-NO">API</title>
-        <title lang="pl-PL">API</title>
-        <title lang="cs-CZ">API</title>
-        <title lang="sl-SI">API</title>
-        <title lang="hu-HU">API</title>
-        <title lang="fi-FI">API</title>
-        <title lang="da-DK">API</title>
-        <title lang="el-GR">API</title>
-        <title lang="hr-HR">API</title>
-        <title lang="et-EE">API</title>
-        <title lang="is-IS">API</title>
-        <title lang="lt-LT">API</title>
-        <title lang="lv-LV">API</title>
-        <title lang="ro-RO">API</title>
-        <title lang="sk-SK">API</title><title lang="bg-BG">API</title>
 
         <input-field type="password">
             <name>liveApiKey</name>
@@ -159,27 +116,6 @@
     </card>
     <card>
         <title>Logger</title>
-        <title lang="de-DE">Logger</title>
-        <title lang="nl-NL">Logger</title>
-        <title lang="it-IT">Logger</title>
-        <title lang="pt-PT">Logger</title>
-        <title lang="es-ES">Logger</title>
-        <title lang="sv-SE">Logger</title>
-        <title lang="nb-NO">Logger</title>
-        <title lang="pl-PL">Logger</title>
-        <title lang="cs-CZ">Logger</title>
-        <title lang="sl-SI">Logger</title>
-        <title lang="hu-HU">Logger</title>
-        <title lang="fi-FI">Logger</title>
-        <title lang="da-DK">Logger</title>
-        <title lang="el-GR">Logger</title>
-        <title lang="hr-HR">Logger</title>
-        <title lang="et-EE">Logger</title>
-        <title lang="is-IS">Logger</title>
-        <title lang="lt-LT">Logger</title>
-        <title lang="lv-LV">Logger</title>
-        <title lang="ro-RO">Logger</title>
-        <title lang="sk-SK">Logger</title><title lang="bg-BG">Logger</title>
         <input-field type="bool">
             <name>debugMode</name>
             <label>Debug Mode</label>
@@ -688,8 +624,33 @@
         <title lang="sk-SK">Autorizácia a stiahnutie sumy</title>
         <title lang="bg-BG">Оторизация и събиране</title>
         <component name="mollie-pluginconfig-section-capture">
-            <name>directPaymentDisabledMethods</name>
+            <name>molliePluginConfigSectionCapture</name>
         </component>
+        <input-field type="bool">
+            <name>directPaymentBillie</name>
+            <label>Billie</label>
+            <defaultValue>false</defaultValue>
+        </input-field>
+        <input-field type="bool">
+            <name>directPaymentCreditcard</name>
+            <label>Card</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
+        <input-field type="bool">
+            <name>directPaymentKlarna</name>
+            <label>Klarna</label>
+            <defaultValue>false</defaultValue>
+        </input-field>
+        <input-field type="bool">
+            <name>directPaymentMobilepay</name>
+            <label>MobilePay</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
+        <input-field type="bool">
+            <name>directPaymentVipps</name>
+            <label>Vipps</label>
+            <defaultValue>true</defaultValue>
+        </input-field>
     </card>
     <card>
         <title>Credit card</title>
@@ -1001,27 +962,6 @@
     </card -->
     <card>
         <title>Apple Pay</title>
-        <title lang="de-DE">Apple Pay</title>
-        <title lang="nl-NL">Apple Pay</title>
-        <title lang="it-IT">Apple Pay</title>
-        <title lang="pt-PT">Apple Pay</title>
-        <title lang="es-ES">Apple Pay</title>
-        <title lang="sv-SE">Apple Pay</title>
-        <title lang="nb-NO">Apple Pay</title>
-        <title lang="pl-PL">Apple Pay</title>
-        <title lang="cs-CZ">Apple Pay</title>
-        <title lang="sl-SI">Apple Pay</title>
-        <title lang="hu-HU">Apple Pay</title>
-        <title lang="fi-FI">Apple Pay</title>
-        <title lang="da-DK">Apple Pay</title>
-        <title lang="el-GR">Apple Pay</title>
-        <title lang="hr-HR">Apple Pay</title>
-        <title lang="et-EE">Apple Pay</title>
-        <title lang="is-IS">Apple Pay</title>
-        <title lang="lt-LT">Apple Pay</title>
-        <title lang="lv-LV">Apple Pay</title>
-        <title lang="ro-RO">Apple Pay</title>
-        <title lang="sk-SK">Apple Pay</title><title lang="bg-BG">Apple Pay</title>
         <input-field type="bool">
             <name>enableApplePayDirect</name>
             <label>Enable Apple Pay Direct</label>

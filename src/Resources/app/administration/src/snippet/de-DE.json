@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie zieht das Geld entweder direkt beim Kauf ein oder reserviert es zunächst nur. Bei einer Reservierung wird der Betrag auf dem Konto Ihres Kunden vorgemerkt und erst eingezogen, wenn Sie die Bestellung als versendet markieren - oder wieder freigegeben, wenn Sie die Bestellung nicht erfüllen können. Das senkt das Rückbuchungsrisiko und erspart Ihnen Rückerstattungen für Bestellungen, die Sie nicht ausliefern können.",
-                "hint": "Die Direktzahlung ist bei allen Zahlarten unten aktiv, das ist das übliche Verhalten. Schalten Sie sie für eine Zahlart ab, damit Mollie den Betrag stattdessen reserviert - die Bestellung bleibt dann autorisiert, bis Sie sie als versendet markieren.",
+                "hint": "Die Direktzahlung wird unten pro Zahlart eingestellt. Schalten Sie sie für eine Zahlart ab, damit Mollie den Betrag stattdessen reserviert - die Bestellung bleibt dann autorisiert, bis Sie sie als versendet markieren.",
                 "link": "Zahlungsbetrag reservieren"
             },
             "info": {

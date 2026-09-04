@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Controller;
 
-use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Payment\PaymentMethodInstaller;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Framework\Context;
@@ -18,28 +17,9 @@ final class PaymentMethodController extends AbstractController
 {
     public function __construct(
         private PaymentMethodInstaller $paymentMethodInstaller,
-        private PaymentHandlerLocator $paymentHandlerLocator,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
-    }
-
-    /**
-     * The plugin configuration renders one "direct payment" switch per method returned here, so a
-     * method that gains the capture marker interfaces shows up without touching config.xml.
-     */
-    #[Route(path: '/api/_action/mollie/payment-method/direct-payment-methods', name: 'api.mollie.payment-method.direct-payment-methods', methods: ['GET'])]
-    public function directPaymentMethods(): JsonResponse
-    {
-        $methods = [];
-        foreach ($this->paymentHandlerLocator->getDirectPaymentMethods() as $paymentHandler) {
-            $methods[] = [
-                'name' => $paymentHandler->getPaymentMethod()->value,
-                'label' => $paymentHandler->getName(),
-            ];
-        }
-
-        return new JsonResponse(['methods' => $methods]);
     }
 
     #[Route(path: '/api/_action/mollie/payment-method/update-methods', name: 'api.mollie.payment-method.update-methods', methods: ['GET'])]

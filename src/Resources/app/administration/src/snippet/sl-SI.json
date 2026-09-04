@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie znesek zaračuna takoj ob nakupu ali pa ga le rezervira. Pri rezervaciji se znesek zadrži na računu stranke in se zaračuna, ko naročilo označite kot odposlano, ali pa se sprosti, če naročila ne morete izpolniti. To zmanjša tveganje povratnih bremenitev in vam prihrani vračila za naročila, ki jih ne morete dostaviti.",
-                "hint": "Neposredno plačilo je vklopljeno pri vseh spodnjih načinih, kar je običajno vedenje. Izklopite ga pri načinu, da Mollie znesek namesto tega rezervira - naročilo tako ostane avtorizirano, dokler ga ne označite kot odposlano.",
+                "hint": "Neposredno plačilo se nastavi pri vsakem načinu spodaj. Izklopite ga pri načinu, da Mollie znesek namesto tega rezervira - naročilo tako ostane avtorizirano, dokler ga ne označite kot odposlano.",
                 "link": "Rezervacija zneska za plačilo"
             },
             "info": {

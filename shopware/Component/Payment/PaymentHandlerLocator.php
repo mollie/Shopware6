@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment;
 
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
-use Mollie\Shopware\Component\Payment\Handler\AutomaticCaptureAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -47,26 +46,6 @@ final class PaymentHandlerLocator
         }
 
         return $subscriptionMethods;
-    }
-
-    /**
-     * The methods the merchant can switch between a direct payment and a hold - everything Mollie
-     * supports both capture modes for. A method Mollie only holds, such as Riverty, has nothing to
-     * choose and is therefore not offered in the plugin configuration.
-     *
-     * @return AbstractMolliePaymentHandler[]
-     */
-    public function getDirectPaymentMethods(): array
-    {
-        $directPaymentMethods = [];
-        foreach ($this->paymentMethods as $paymentMethod) {
-            if (! $paymentMethod instanceof AutomaticCaptureAwareInterface) {
-                continue;
-            }
-            $directPaymentMethods[] = $paymentMethod;
-        }
-
-        return $directPaymentMethods;
     }
 
     public function findByPaymentMethod(string $paymentMethodName): ?AbstractMolliePaymentHandler

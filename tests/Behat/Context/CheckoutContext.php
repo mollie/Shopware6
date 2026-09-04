@@ -14,12 +14,15 @@ use Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
+use Mollie\Shopware\Component\Payment\Method\CardPayment;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Shipment\Route\CancelItemRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipmentApiRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Integration\Data\CheckoutTestBehaviour;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
+use Mollie\Shopware\Integration\Mollie\CardTokenizer;
 use Mollie\Shopware\Integration\MolliePage\MolliePage;
 use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
@@ -44,6 +47,7 @@ final class CheckoutContext extends ShopwareContext
     public const STORAGE_ORDER_ID = 'orderId';
     public const STORAGE_RETURN_URL = 'shopwareReturnUrl';
     public const STORAGE_REMEMBERED_PAYMENT_ID = 'rememberedMolliePaymentId';
+    public const STORAGE_CARD_TOKEN = 'creditCardToken';
 
     /**
      * Custom field and Mollie prefix per id type, as an accounting export reads them from the order.
@@ -80,6 +84,35 @@ final class CheckoutContext extends ShopwareContext
         $this->addPromotionToCart($code, $salesChannelContext);
     }
 
+    /**
+     * In the storefront mollie.js exchanges the card data for this token inside an iframe, so the
+     * shop never holds a card number - it is not allowed to. Behat has no browser to run mollie.js
+     * in, so CardTokenizer does that one step for a published test card. See its warning.
+     */
+    #[Given('i use the test credit card :arg1')]
+    public function iUseTheTestCreditCard(string $cardBrand): void
+    {
+        $salesChannelId = $this->getCurrentSalesChannelContext()->getSalesChannelId();
+
+        /** @var SettingsService $settingsService */
+        $settingsService = $this->getContainer()->get(SettingsService::class);
+        $apiSettings = $settingsService->getApiSettings($salesChannelId);
+
+        // The order PayloadBuilder uses, so the token belongs to the profile the payment is created
+        // on - Mollie rejects a token from another profile.
+        $profileId = $apiSettings->getProfileId();
+        if (mb_strlen($profileId) === 0) {
+            /** @var CachedMollieGateway $mollieGateway */
+            $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+            $profileId = $mollieGateway->getCurrentProfile($salesChannelId)->getId();
+        }
+
+        $cardTokenizer = new CardTokenizer();
+        $cardToken = $cardTokenizer->createCardToken($cardBrand, $profileId, $apiSettings->isTestMode(), $_ENV['APP_URL']);
+
+        Storage::set(self::STORAGE_CARD_TOKEN, $cardToken);
+    }
+
     #[When('i start checkout with payment method :arg1')]
     public function iStartCheckoutWithPaymentMethod(string $paymentMethodTechnicalName): void
     {
@@ -87,8 +120,14 @@ final class CheckoutContext extends ShopwareContext
 
         $this->setOptions(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethod->getId());
 
+        $paymentData = [];
+        $cardToken = Storage::get(self::STORAGE_CARD_TOKEN, '');
+        if ($cardToken !== '') {
+            $paymentData[CardPayment::FIELD_CREDIT_CARD_TOKEN] = $cardToken;
+        }
+
         /** @var RedirectResponse $response */
-        $response = $this->startCheckout($this->getCurrentSalesChannelContext());
+        $response = $this->startCheckout($this->getCurrentSalesChannelContext(), $paymentData);
 
         $mollieSandboxPage = $response->getTargetUrl();
 

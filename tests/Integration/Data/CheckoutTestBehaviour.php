@@ -106,13 +106,23 @@ trait CheckoutTestBehaviour
         return $this->getSalesChannelContext($salesChannelContext->getSalesChannel(), $options);
     }
 
-    public function startCheckout(SalesChannelContext $salesChannelContext): Response
+    /**
+     * @param array<string, string> $paymentData the payment specific fields the storefront form submits, such as the credit card token
+     */
+    public function startCheckout(SalesChannelContext $salesChannelContext, array $paymentData = []): Response
     {
         $request = $this->createStoreFrontRequest($salesChannelContext);
         $checkoutController = $this->getContainer()->get(CheckoutController::class);
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('tos', true);
         $requestDataBag->set('revocation', true);
+
+        // Shopware 6.7 hands the payment handler the http request, 6.5 and 6.6 the data bag, so a
+        // payment specific field has to be in both to arrive.
+        foreach ($paymentData as $fieldName => $fieldValue) {
+            $requestDataBag->set($fieldName, $fieldValue);
+            $request->request->set($fieldName, $fieldValue);
+        }
 
         $response = $checkoutController->order($requestDataBag, $salesChannelContext, $request);
 

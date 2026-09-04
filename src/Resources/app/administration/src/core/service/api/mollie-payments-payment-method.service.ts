@@ -5,16 +5,6 @@ export default class MolliePaymentsPaymentMethodService extends ApiService {
         super(httpClient, loginService, apiEndpoint);
     }
 
-    getDirectPaymentMethods(): Promise<any> {
-        const headers = this.getBasicHeaders();
-
-        return this.httpClient
-            .get(`_action/${this.getApiBasePath()}/payment-method/direct-payment-methods`, {
-                headers: headers,
-            })
-            .then((response: any) => ApiService.handleResponse(response));
-    }
-
     updatePaymentMethods(): Promise<any> {
         const headers = this.getBasicHeaders();
 

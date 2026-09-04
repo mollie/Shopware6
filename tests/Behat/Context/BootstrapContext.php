@@ -30,11 +30,23 @@ final class BootstrapContext implements Context
     #[BeforeScenario]
     public function clearStorage(): void
     {
-        // A scenario that needs a hold switches the direct payment off. That value outlives the
-        // scenario, so without this reset the next one silently runs with the wrong capture mode.
+        // A scenario that switches a direct payment on or off writes the global configuration value
+        // and outlives itself, so without this reset the next one silently runs with whatever the
+        // last one wanted. A deleted key means "no choice stored", which leaves exactly the capture
+        // mode the marker interfaces of the handler imply - the same behaviour as the default value
+        // in config.xml. Every scenario that cares therefore names its switch.
         /** @var SystemConfigService $systemConfigService */
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
-        $systemConfigService->delete(SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . CaptureSettings::KEY_DISABLED_METHODS);
+
+        $directPaymentPrefix = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . CaptureSettings::KEY_PREFIX_DIRECT_PAYMENT;
+        $molliePaymentsSettings = $systemConfigService->getDomain(SettingsService::SYSTEM_CONFIG_DOMAIN);
+        foreach (array_keys($molliePaymentsSettings) as $configKey) {
+            if (! str_starts_with((string) $configKey, $directPaymentPrefix)) {
+                continue;
+            }
+
+            $systemConfigService->delete((string) $configKey);
+        }
 
         /** @var SettingsService $settingsService */
         $settingsService = $this->getContainer()->get(SettingsService::class);

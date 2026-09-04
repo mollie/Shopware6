@@ -99,11 +99,13 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $createPaymentStruct->setCaptureMode(CaptureMode::MANUAL);
         }
 
-        // Mollie supports both capture modes for these methods, so the merchant decides per method and
-        // this overrides the hold set above: a direct payment collects the money right at the checkout,
-        // otherwise Mollie only holds it until the merchant marks the order as shipped.
+        // Mollie supports both capture modes for these methods, so the merchant decides per method
+        // and per sales channel, and that overrides the hold set above: a direct payment collects
+        // the money right at the checkout, otherwise Mollie only holds it until the shipment.
+        // Without a stored choice - Shopware writes the config.xml default on install and update -
+        // the payload keeps the mode the method had before the setting existed.
         $captureSettings = $this->settingsService->getCaptureSettings($salesChannelId);
-        if ($paymentHandler instanceof AutomaticCaptureAwareInterface) {
+        if ($paymentHandler instanceof AutomaticCaptureAwareInterface && $captureSettings->hasDirectPaymentChoice($paymentHandler->getPaymentMethod())) {
             $captureMode = CaptureMode::MANUAL;
             if ($captureSettings->isDirectPaymentEnabled($paymentHandler->getPaymentMethod())) {
                 $captureMode = CaptureMode::AUTOMATIC;

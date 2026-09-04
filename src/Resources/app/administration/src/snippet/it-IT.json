@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie incassa l'importo subito all'acquisto oppure lo blocca soltanto. Con un blocco l'importo resta riservato sul conto del cliente e viene incassato quando contrassegni l'ordine come spedito, oppure sbloccato se non puoi evadere l'ordine. Questo riduce il rischio di storni e ti evita di rimborsare ordini che non puoi consegnare.",
-                "hint": "Il pagamento diretto è attivo per tutti i metodi qui sotto, ed è il comportamento abituale. Disattivalo per un metodo affinché Mollie blocchi l'importo: l'ordine resta allora autorizzato finché non lo contrassegni come spedito.",
+                "hint": "Il pagamento diretto si imposta per ogni metodo qui sotto. Disattivalo per un metodo affinché Mollie blocchi l'importo: l'ordine resta allora autorizzato finché non lo contrassegni come spedito.",
                 "link": "Bloccare un importo per un pagamento"
             },
             "info": {

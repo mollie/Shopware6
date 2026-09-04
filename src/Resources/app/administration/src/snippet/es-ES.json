@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie cobra el importe justo en la compra o solo lo retiene. Con una retención, el importe queda reservado en la cuenta de tu cliente y se cobra cuando marcas el pedido como enviado, o se libera si no puedes completar el pedido. Esto reduce el riesgo de contracargos y te ahorra reembolsar pedidos que no puedes entregar.",
-                "hint": "El pago directo está activado para todos los métodos de abajo, que es el comportamiento habitual. Desactívalo en un método para que Mollie retenga el importe: el pedido queda entonces autorizado hasta que lo marcas como enviado.",
+                "hint": "El pago directo se configura por método abajo. Desactívalo en un método para que Mollie retenga el importe: el pedido queda entonces autorizado hasta que lo marcas como enviado.",
                 "link": "Retener un importe para un pago"
             },
             "info": {

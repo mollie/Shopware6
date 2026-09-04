@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie trekker beløpet med en gang ved kjøpet eller reserverer det bare. Ved en reservasjon holdes beløpet på kundens konto og trekkes når du markerer bestillingen som sendt, eller frigis hvis du ikke kan levere bestillingen. Det reduserer risikoen for tilbakeføringer og sparer deg for refusjoner av bestillinger du ikke kan levere.",
-                "hint": "Direktebetaling er på for alle betalingsmåtene nedenfor, som er den vanlige oppførselen. Slå det av for en betalingsmåte slik at Mollie reserverer beløpet i stedet - bestillingen forblir da autorisert til du markerer den som sendt.",
+                "hint": "Direktebetaling stilles inn per betalingsmåte nedenfor. Slå det av for en betalingsmåte slik at Mollie reserverer beløpet i stedet - bestillingen forblir da autorisert til du markerer den som sendt.",
                 "link": "Reserver et beløp for en betaling"
             },
             "info": {

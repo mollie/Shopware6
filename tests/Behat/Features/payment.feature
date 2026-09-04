@@ -23,7 +23,7 @@ Feature: Payment
 
   Scenario: digital product with klarna is captured automatically and becomes paid
     Given payment method "klarna" exists and active
-    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
+    And plugin configuration "directPaymentKlarna" is set to "false"
     And i select "DE" as billing country
     And i select "EUR" as currency
     And product "MOL_DIGITAL" with quantity "1" is in cart
@@ -34,7 +34,7 @@ Feature: Payment
 
   Scenario: mixed digital and physical order with klarna captures only the digital part
     Given payment method "klarna" exists and active
-    And plugin configuration "directPaymentDisabledMethods" is set to "klarna"
+    And plugin configuration "directPaymentKlarna" is set to "false"
     And i select "DE" as billing country
     And i select "EUR" as currency
     And product "MOL_REGULAR" with quantity "1" is in cart
@@ -47,6 +47,7 @@ Feature: Payment
 
   Scenario Outline: direct payment collects the money right at the checkout
     Given payment method "<paymentMethod>" exists and active
+    And plugin configuration "<directPaymentConfig>" is set to "true"
     And i select "<billingCountry>" as billing country
     And i select "<currency>" as currency
     And product "MOL_REGULAR" with quantity "1" is in cart
@@ -56,13 +57,15 @@ Feature: Payment
     And order payment status is "paid"
 
     Examples:
-      | paymentMethod | billingCountry | currency |
-      | klarna        | DE             | EUR      |
-      | billie        | DE             | EUR      |
+      | paymentMethod | directPaymentConfig    | billingCountry | currency |
+      | klarna        | directPaymentKlarna    | DE             | EUR      |
+      | billie        | directPaymentBillie    | DE             | EUR      |
+      | vipps         | directPaymentVipps     | NO             | NOK      |
+      | mobilepay     | directPaymentMobilepay | DK             | DKK      |
 
   Scenario Outline: without direct payment the money is only held until the shipment
     Given payment method "<paymentMethod>" exists and active
-    And plugin configuration "directPaymentDisabledMethods" is set to "<paymentMethod>"
+    And plugin configuration "<directPaymentConfig>" is set to "false"
     And i select "<billingCountry>" as billing country
     And i select "<currency>" as currency
     And product "MOL_REGULAR" with quantity "1" is in cart
@@ -72,9 +75,35 @@ Feature: Payment
     And order payment status is "authorized"
 
     Examples:
-      | paymentMethod | billingCountry | currency |
-      | klarna        | DE             | EUR      |
-      | billie        | DE             | EUR      |
+      | paymentMethod | directPaymentConfig    | billingCountry | currency |
+      | klarna        | directPaymentKlarna    | DE             | EUR      |
+      | billie        | directPaymentBillie    | DE             | EUR      |
+      | vipps         | directPaymentVipps     | NO             | NOK      |
+      | mobilepay     | directPaymentMobilepay | DK             | DKK      |
+
+  Scenario: direct payment with a credit card collects the money right at the checkout
+    Given payment method "creditcard" exists and active
+    And plugin configuration "directPaymentCreditcard" is set to "true"
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And i use the test credit card "VISA"
+    When i start checkout with payment method "creditcard"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+
+  Scenario: without direct payment a credit card is only held until the shipment
+    Given payment method "creditcard" exists and active
+    And plugin configuration "directPaymentCreditcard" is set to "false"
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And product "MOL_REGULAR" with quantity "1" is in cart
+    And i use the test credit card "VISA"
+    When i start checkout with payment method "creditcard"
+    And select payment status "authorized"
+    Then i see success page
+    And order payment status is "authorized"
 
   Scenario Outline: payment success
     Given payment method "<paymentMethod>" exists and active
@@ -107,8 +136,6 @@ Feature: Payment
       | satispay      | MOL_REGULAR   | 1        | paid          | DE             | EUR      |
       | swish         | MOL_REGULAR   | 1        | paid          | SE             | SEK      |
       | twint         | MOL_REGULAR   | 1        | paid          | DE             | CHF      |
-      | vipps         | MOL_REGULAR   | 1        | paid          | NO             | NOK      |
-      | mobilepay     | MOL_REGULAR   | 1        | paid          | DK             | DKK      |
 
   Scenario: billink payment success with a private address
     Given payment method "billink" exists and active
