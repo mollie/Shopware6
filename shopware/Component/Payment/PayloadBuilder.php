@@ -28,6 +28,7 @@ use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
+use Mollie\Shopware\Component\Payment\Method\CardPayment;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -41,6 +42,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -90,6 +92,8 @@ final class PayloadBuilder implements PayloadBuilderInterface
             'taxStatus' => $taxStatus,
         ];
 
+        $dataBag = $this->removeIgnoredPaymentData($dataBag, $paymentHandler, $transactionData, $logData);
+
         // buildBaseCreatePayment already sets the existing Mollie customer id (if any).
         $createPaymentStruct = $this->buildBaseCreatePayment($transactionData);
 
@@ -99,11 +103,13 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $createPaymentStruct->setCaptureMode(CaptureMode::MANUAL);
         }
 
-        // Mollie supports both capture modes for these methods, so the merchant decides per method and
-        // this overrides the hold set above: a direct payment collects the money right at the checkout,
-        // otherwise Mollie only holds it until the merchant marks the order as shipped.
+        // Mollie supports both capture modes for these methods, so the merchant decides per method
+        // and per sales channel, and that overrides the hold set above: a direct payment collects
+        // the money right at the checkout, otherwise Mollie only holds it until the shipment.
+        // Without a stored choice - Shopware writes the config.xml default on install and update -
+        // the payload keeps the mode the method had before the setting existed.
         $captureSettings = $this->settingsService->getCaptureSettings($salesChannelId);
-        if ($paymentHandler instanceof AutomaticCaptureAwareInterface) {
+        if ($paymentHandler instanceof AutomaticCaptureAwareInterface && $captureSettings->hasDirectPaymentChoice($paymentHandler->getPaymentMethod())) {
             $captureMode = CaptureMode::MANUAL;
             if ($captureSettings->isDirectPaymentEnabled($paymentHandler->getPaymentMethod())) {
                 $captureMode = CaptureMode::AUTOMATIC;
@@ -135,6 +141,12 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
     public function buildOrder(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreateOrder
     {
+        // Also filtered here, so the second applyPaymentSpecificParameters() call below cannot see a
+        // field buildPayment() dropped.
+        $dataBag = $this->removeIgnoredPaymentData($dataBag, $paymentHandler, $transactionData, [
+            'orderNumber' => (string) $transactionData->getOrder()->getOrderNumber(),
+        ]);
+
         $createPayment = $this->buildPayment($transactionData, $paymentHandler, $dataBag, $context);
 
         $createOrder = new CreateOrder(
@@ -255,15 +267,13 @@ final class PayloadBuilder implements PayloadBuilderInterface
         $lineItemCollection = new LineItemCollection();
         $orderLineItems = $order->getLineItems();
         $shippingDiscountLabel = $orderLineItems !== null ? LineItem::resolveDeliveryDiscountLabel($orderLineItems) : null;
-        $hasSubscriptionLineItem = false;
         if ($orderLineItems !== null) {
             $filteredLineItems = $orderLineItems->filter($this->lineItemFilter->isItemAllowed(...));
             foreach ($filteredLineItems as $lineItem) {
                 $lineItemCollection->add(LineItem::fromOrderLine($lineItem, $currency, $taxStatus));
             }
-            $subscriptionsEnabled = $this->settingsService->getSubscriptionSettings($salesChannelId)->isEnabled();
-            $hasSubscriptionLineItem = $subscriptionsEnabled && $this->lineItemAnalyzer->hasSubscriptionProduct($orderLineItems);
         }
+        $hasSubscriptionLineItem = $this->hasSubscriptionProduct($order, $salesChannelId);
 
         $shippingAddress = Address::fromAddress($customer, $shippingOrderAddress);
 
@@ -373,6 +383,71 @@ final class PayloadBuilder implements PayloadBuilderInterface
         return $createPaymentStruct;
     }
 
+    /**
+     * A switched-off setting has to hold for the payload, not only for the template that renders the
+     * field. Read with the same truthiness the consumers use, so an unchecked checkbox a frontend
+     * always posts is not reported as ignored.
+     *
+     * @param array<string, mixed> $logData
+     */
+    private function removeIgnoredPaymentData(RequestDataBag $dataBag, AbstractMolliePaymentHandler $paymentHandler, TransactionDataStruct $transactionData, array $logData): RequestDataBag
+    {
+        $filteredDataBag = clone $dataBag;
+
+        $salesChannelId = $transactionData->getOrder()->getSalesChannelId();
+        $isCardPayment = $paymentHandler instanceof CardPayment;
+
+        // An absent config key reads as "components off" while config.xml declares them on, so a
+        // Store-API client posting a token to a shop that never saved the config loses it.
+        $creditCardSettings = $this->settingsService->getCreditCardSettings($salesChannelId);
+        if ($filteredDataBag->get(CardPayment::FIELD_CREDIT_CARD_TOKEN) && $isCardPayment && ! $creditCardSettings->isCreditCardComponentsEnabled()) {
+            $filteredDataBag->remove(CardPayment::FIELD_CREDIT_CARD_TOKEN);
+            $this->logger->warning('Credit card components are disabled, the submitted card token is ignored', $logData);
+        }
+
+        $oneClickDisabled = ! $this->settingsService->getPaymentSettings($salesChannelId)->isOneClickPayment();
+
+        if ($filteredDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false) && $oneClickDisabled) {
+            $filteredDataBag->remove(CardPayment::FIELD_SAVE_PAYMENT_DETAILS);
+            $this->logger->warning('One click payments are disabled, the request to store the payment details is ignored', $logData);
+        }
+
+        if ($filteredDataBag->get(CardPayment::FIELD_MANDATE_ID) && $oneClickDisabled) {
+            $filteredDataBag->remove(CardPayment::FIELD_MANDATE_ID);
+            $this->logger->warning('One click payments are disabled, the submitted mandate is ignored', $logData);
+        }
+
+        // A guest gets no account to pay from later, and with createCustomersAtMollie the mandate
+        // would be stored on a Mollie customer the guest can never see or revoke.
+        if ($filteredDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false) && $transactionData->getCustomer()->getGuest()) {
+            $filteredDataBag->remove(CardPayment::FIELD_SAVE_PAYMENT_DETAILS);
+            $this->logger->warning('Customer is a guest, the request to store the payment details is ignored', $logData);
+        }
+
+        // CardPayment would turn the subscription's "first" payment into a one-off, leaving the
+        // renewal without a mandate.
+        if ($filteredDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false) && $isCardPayment && $this->hasSubscriptionProduct($transactionData->getOrder(), $salesChannelId)) {
+            $filteredDataBag->remove(CardPayment::FIELD_SAVE_PAYMENT_DETAILS);
+            $this->logger->info('Order contains a subscription, the request to store the payment details is ignored', $logData);
+        }
+
+        return $filteredDataBag;
+    }
+
+    private function hasSubscriptionProduct(OrderEntity $order, string $salesChannelId): bool
+    {
+        $orderLineItems = $order->getLineItems();
+        if ($orderLineItems === null) {
+            return false;
+        }
+
+        if (! $this->settingsService->getSubscriptionSettings($salesChannelId)->isEnabled()) {
+            return false;
+        }
+
+        return $this->lineItemAnalyzer->hasSubscriptionProduct($orderLineItems);
+    }
+
     private function resolveProfileId(string $salesChannelId): string
     {
         $apiSettings = $this->settingsService->getApiSettings($salesChannelId);
@@ -393,12 +468,12 @@ final class PayloadBuilder implements PayloadBuilderInterface
         }
 
         // Storing payment details for later (customer-initiated) use also needs a first payment.
-        $savePaymentDetails = $dataBag->get('savePaymentDetails', false);
+        $savePaymentDetails = $dataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false);
         if ($savePaymentDetails) {
             $createPaymentStruct->setSequenceType(SequenceType::FIRST);
         }
 
-        $mandateId = $dataBag->get('mandateId');
+        $mandateId = $dataBag->get(CardPayment::FIELD_MANDATE_ID);
         $mollieCustomerId = $createPaymentStruct->getCustomerId();
 
         if (

@@ -51,12 +51,33 @@ Marker interfaces from `Component\Payment\Handler\`, added per answer:
 | Answer | Interface | Effect |
 |---|---|---|
 | manual capture | `ManualCaptureModeAwareInterface` | payload gets `CaptureMode::MANUAL`, so Mollie only holds the money until the merchant ships |
-| automatic capture | `AutomaticCaptureAwareInterface` | the method shows up in the "Authorization and capture" plugin configuration and the merchant decides: direct payment (default) sends `CaptureMode::AUTOMATIC` and the payment goes straight to `paid`, switched off it sends `CaptureMode::MANUAL`. No config.xml change is needed - `PaymentHandlerLocator::getDirectPaymentMethods()` builds that list from this interface |
+| automatic capture | `AutomaticCaptureAwareInterface` | the merchant decides per sales channel: direct payment sends `CaptureMode::AUTOMATIC` and the payment goes straight to `paid`, switched off it sends `CaptureMode::MANUAL`. **This one needs a config.xml entry** - see below |
 | bank transfer | `BankTransferAwareInterface` | due date from the `dueDateDays` setting; `process`/`in_progress` instead of `processUnconfirmed`/`unconfirmed`; no pending-order session key, so browser-back does not hit the edit-order form |
 | B2B only | `BusinessCustomerAwareInterface` | hidden unless the billing address has a company |
 | subscriptions | `SubscriptionAwareInterface` | keeps `SequenceType::FIRST`. **Without it nothing fails** — the payload drops to `ONEOFF` and the subscription never gets a mandate |
 | stored mandate | `RecurringAwareInterface` | may reuse a mandate and set `SequenceType::RECURRING` |
 | Orders API | `OrdersApiAwareInterface` | `Pay` routes to `executeOrdersApi()` |
+
+### 3a. `AutomaticCaptureAwareInterface` also needs a switch in config.xml
+
+Without it the method has no switch, and `CaptureSettings` then keeps the hold. Add one
+`input-field` to the "Authorization and capture" card of `src/Resources/config/config.xml`,
+in alphabetical order among the others:
+
+```xml
+<input-field type="bool">
+    <name>directPaymentPaybybank</name>
+    <label>Pay by Bank</label>
+    <defaultValue>true</defaultValue>
+</input-field>
+```
+
+- The name is `directPayment` + the API name with a capital first letter, the same key
+  `CaptureSettings::buildConfigKey()` builds. Get it wrong and the switch does nothing.
+- One `<label>` in English is enough - it is the brand name, the same in every language.
+- `defaultValue` is `false` when the method also carries `ManualCaptureModeAwareInterface`,
+  so a shop that updates keeps the hold its merchant knows. `true` for a method Mollie
+  collected right away all along.
 
 Exact spelling: `BusinessCustomer…`, `Subscription…` singular, all with the `Interface`
 suffix. `TestOnlyAwareInterface` (never installed) and `DeprecatedMethodAwareInterface`
@@ -64,9 +85,12 @@ suffix. `TestOnlyAwareInterface` (never installed) and `DeprecatedMethodAwareInt
 
 ### 4. Tests — after the review, not before
 
-**A method with `AutomaticCaptureAwareInterface` is `paid` in Behat, not `authorized`**,
-because a direct payment is the default. A scenario that wants the hold - anything about the
-shipment capture - has to start with `And plugin configuration "directPaymentDisabledMethods" is set to "<method>"`.
+**A method with `AutomaticCaptureAwareInterface` gets a row in both capture outlines instead of
+in the `payment success` table** - "direct payment collects the money right at the checkout"
+(switch `true`, `paid`) and "without direct payment the money is only held until the shipment"
+(switch `false`, `authorized`). Naming the switch is not optional: `BootstrapContext` deletes
+every `directPayment*` value before each scenario, so a row that stays silent runs on the capture
+mode the marker interfaces imply. The generic table would only order the same payment twice.
 
 **Unit:** no new file. `tests/Unit/Payment/Method/PaymentMethodsTest.php` covers all
 handlers — add the `use` import, a `#[CoversClass]` attribute, and one row in
@@ -84,9 +108,14 @@ API. Add one row to the `payment success` Examples table:
   riverty).
 - Country and currency must be ones the method actually supports — `blik`/`przelewy24` PLN,
   `swish` SEK, `twint` CHF, `vipps` NOK/NO, `mobilepay` DKK/DK, `alma` FR, `bizum` ES.
-- Methods needing a JS-rendered form (**creditcard**), a physical terminal (pointofsale) or
-  a wallet SDK (applepay) **cannot** be Behat-tested — skip the row and say why. Also
-  currently absent: bacs, directdebit, payconiq, paysafecard, trustly, voucher.
+- Credit card needs a card token, which mollie.js normally builds in the browser. Put
+  `And i use the test credit card "VISA"` before the checkout step; `CardTokenizer` in
+  `tests/Integration/Mollie/` does that one step for a published test card. It stays in `tests/`
+  — handing raw card data to the shop is forbidden in a live shop, so nothing like it may move
+  into `shopware/`.
+- A physical terminal (pointofsale) or a wallet SDK (applepay) **cannot** be Behat-tested —
+  skip the row and say why. Also currently absent: bacs, directdebit, payconiq, paysafecard,
+  trustly, voucher.
 - A method with non-standard flow gets its own `Scenario` instead of a table row — see
   `billink` (private address) and `wero` (pending → unconfirmed).
 

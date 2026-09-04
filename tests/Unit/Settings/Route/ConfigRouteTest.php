@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Unit\Settings\Route;
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Settings\Route\ConfigRoute;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Unit\Fake\FakeLanguageRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
@@ -55,6 +56,28 @@ final class ConfigRouteTest extends TestCase
 
         self::assertTrue($payload['testMode']);
         self::assertTrue($payload['oneClickPayments']);
+    }
+
+    /**
+     * A headless frontend cannot tell that its card token would be dropped unless the route answers
+     * this, so the wiring to the credit card settings matters, not only the response struct.
+     */
+    public function testTheCreditCardComponentsFlagIsAnswered(): void
+    {
+        $route = $this->buildRoute(creditCardSettings: new CreditCardSettings(true));
+
+        $payload = $route->getConfig(new FakeSalesChannelContext())->getObject()->all();
+
+        self::assertTrue($payload['creditCardComponents']);
+    }
+
+    public function testTheCreditCardComponentsFlagIsAnsweredWhenTheyAreDisabled(): void
+    {
+        $route = $this->buildRoute(creditCardSettings: new CreditCardSettings(false));
+
+        $payload = $route->getConfig(new FakeSalesChannelContext())->getObject()->all();
+
+        self::assertFalse($payload['creditCardComponents']);
     }
 
     public function testTheLocaleComesFromTheSalesChannelLanguage(): void
@@ -107,10 +130,12 @@ final class ConfigRouteTest extends TestCase
         ?ApiSettings $apiSettings = null,
         ?PaymentSettings $paymentSettings = null,
         ?FakeLanguageRepository $languageRepository = null,
+        ?CreditCardSettings $creditCardSettings = null,
     ): ConfigRoute {
         $settings = new FakeSettingsService(
             paymentSettings: $paymentSettings,
             apiSettings: $apiSettings ?? new ApiSettings('test_key', 'live_key', Mode::TEST, 'pfl_configured'),
+            creditCardSettings: $creditCardSettings,
         );
 
         return new ConfigRoute($settings, $this->gateway, $languageRepository ?? new FakeLanguageRepository('en-GB'));

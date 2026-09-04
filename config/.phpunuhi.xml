@@ -71,13 +71,19 @@
         </set>
 
         <set name="plugin-settings">
-            <rules>
-                <emptyContent>
-                    <key name="card.0.title">
-                        <locale>*</locale>
-                    </key>
-                </emptyContent>
-            </rules>
+            <filter>
+                <exclude>
+                    <!-- Nothing to translate: a blank title, product names, and the direct payment
+                         switches carry the brand name of the payment method. These keys exist in
+                         en-GB only, so they are taken out before validation - a key that is simply
+                         missing in the other locales would be reported as a structure error. -->
+                    <key>card.0.title</key>
+                    <key>card.1.title</key>
+                    <key>card.2.title</key>
+                    <key>card.6.title</key>
+                    <key>*.input.directPayment*.label</key>
+                </exclude>
+            </filter>
             <format>
                 <shopware6 type="config" file="../src/Resources/config/config.xml"/>
             </format>

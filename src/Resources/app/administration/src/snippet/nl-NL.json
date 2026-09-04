@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie int het geld direct bij de aankoop of reserveert het eerst alleen. Bij een reservering wordt het bedrag op de rekening van uw klant vastgehouden en pas geïnd zodra u de bestelling als verzonden markeert, of weer vrijgegeven als u de bestelling niet kunt uitvoeren. Dat verlaagt het risico op terugboekingen en bespaart u terugbetalingen voor bestellingen die u niet kunt leveren.",
-                "hint": "Directe betaling staat aan voor alle methoden hieronder, dat is het gebruikelijke gedrag. Schakel het uit voor een methode zodat Mollie het bedrag in plaats daarvan reserveert - de bestelling blijft dan geautoriseerd tot u haar als verzonden markeert.",
+                "hint": "De directe betaling wordt hieronder per methode ingesteld. Schakel het uit voor een methode zodat Mollie het bedrag in plaats daarvan reserveert - de bestelling blijft dan geautoriseerd tot u haar als verzonden markeert.",
                 "link": "Een bedrag reserveren voor een betaling"
             },
             "info": {

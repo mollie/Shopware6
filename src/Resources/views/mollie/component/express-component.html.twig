@@ -6,14 +6,20 @@
    `applePayVisible` and `paypalExpressVisible` are the visibility flags the surrounding
    template already computed for the plugin's own express buttons. Wherever such a button is
    rendered, the matching button inside the component is hidden so the shopper is not offered
-   the same payment method twice. #}
+   the same payment method twice.
+
+   PayPal ignores its flag for now and stays hidden, because the component's own PayPal button
+   misbehaves - the shopper only gets the plugin's PayPal Express button. Everything else is
+   still wired up, so this is the one line to put back once Mollie has it working:
+
+       paypal: { visibility: paypalExpressVisible|default(false) ? 'hidden' : 'automatic' } #}
 {% set mollieExpress = page.extensions.mollieExpressComponents|default(null) %}
 
 {% if mollieExpress is not null and mollieExpress.clientAccessToken is not empty %}
     {% set mollieExpressOptions = {
         buttons: {
             applepay: { visibility: applePayVisible|default(false) ? 'hidden' : 'automatic' },
-            paypal: { visibility: paypalExpressVisible|default(false) ? 'hidden' : 'automatic' }
+            paypal: { visibility: 'hidden' }
         }
     } %}
 

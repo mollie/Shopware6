@@ -18,4 +18,6 @@ it('C2040032: Mollie Config can be retrieved using Store-API', async () => {
     expect(response.data.locale).to.not.eq('');
     expect(response.data.oneClickPayments).to.exist;
     expect(response.data.oneClickPayments).to.not.eq('');
+    expect(response.data.creditCardComponents).to.exist;
+    expect(response.data.creditCardComponents).to.not.eq('');
 });

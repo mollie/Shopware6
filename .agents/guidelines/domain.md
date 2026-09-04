@@ -63,8 +63,8 @@ Mollie supports both capture modes for card, Klarna, Billie, Vipps and MobilePay
 only, and PayPal's manual capture is still in beta
 ([support table](https://docs.mollie.com/docs/place-a-hold-for-a-payment#payment-method-support)).
 Which methods the merchant may switch is therefore expressed by
-`Component/Payment/Handler/AutomaticCaptureAwareInterface`, and a Behat scenario that captures on
-shipment has to switch the direct payment off first, or its order is already `paid`.
+`Component/Payment/Handler/AutomaticCaptureAwareInterface`, and a Behat scenario has to set that
+switch explicitly, or it depends on a default it does not name.
 
 **Digital products are the exception.** They cannot be shipped, and Shopware has no delivery
 state for an order consisting only of downloads, so no shipment event would ever capture them.
@@ -246,6 +246,51 @@ methods are usable for this cart amount, currency and billing country, and remov
 
 So "why is method X missing although the rules are switched on" is answered at the Mollie
 dashboard, at the amount limits or at the billing country — rarely in the plugin.
+
+## The shop must never hold card data
+
+Card number and CVV may not pass through the shop. mollie.js collects them in an iframe on Mollie's
+domain and hands the shop nothing but a card token, which `CardPayment` reads from the order form
+field `creditCardToken`. Nothing that takes raw card data belongs in `shopware/` - not even behind a
+setting.
+
+The tokenisation itself is a separate endpoint, `POST https://api.cc.mollie.com/v1/card-tokens`, and
+it is not the regular API: it takes no API key, the profile id in the body (`profileToken`) is the
+credential, and it answers `{"cardToken": "tkn_…"}`. `hostname` and the `parentUri` inside the
+`tokenisation-agent` header are the shop URL including the scheme, and that header is no secret -
+only base64 encoded JSON naming the caller. A token is bound to the profile it was created for, so
+it has to be the profile the payment is created on. Because of all this the test suite can do the
+step mollie.js would do, with Mollie's published test cards - `tests/Integration/Mollie/CardTokenizer`,
+which stays in `tests/` for the reason above.
+
+A stored card is a `storeCredentials` payment, not a `first` one. Mollie creates the mandate for a
+saved card from `storeCredentials: true` plus a `customerId` on an ordinary `oneoff` payment
+([create payment](https://docs.mollie.com/reference/create-payment)); `sequenceType: first` is for a
+recurring sequence the merchant starts later. That is why `PayloadBuilder` sets `first` when
+`savePaymentDetails` arrives and `CardPayment` sets it back to `oneoff`: the `first` is only there to
+make `ensureMollieCustomerId()` create the Mollie customer that `storeCredentials` needs. Without a
+`customerId` the flag stores nothing, so a guest cannot save a card.
+
+The one-click checkout submits an **empty** `creditCardToken` alongside the `mandateId`: the card
+template always renders the hidden token field and mollie.js skips the tokenisation when a stored
+card is selected. An empty token therefore means "no card entered", never "pay with an empty card".
+
+Paying an existing mandate still redirects to Mollie. A `recurring` payment against a `mandateId`
+gets a checkout url like `https://www.mollie.com/checkout/credit-card/session/…`, which in test mode
+is the page that picks the payment status - so the customer is sent to Mollie for a stored card just
+as for a new one, and `Pay` never has to fall back to the shop's return url. In test mode that page
+currently asks for the card data again although the payment carries a valid mandate, and entering it
+creates a second mandate. That is a Mollie defect, which is why the Behat scenario for it carries
+`@mollie-broken` and is excluded from `make behat`.
+
+**Mollie decides on its own whether a card is stored.** Any card payment carrying a `customerId`
+leaves a `customer-present` mandate behind, even with `sequenceType: oneoff` and
+`storeCredentials: false` - and that mandate is not linked to the payment
+(`payment.mandateId` stays empty). Since `buildBaseCreatePayment()` attaches an already known Mollie
+customer id to every payment, switching one-click payments off cannot mean "no card is stored at
+Mollie". What the setting does guarantee is that the shop never offers or charges a stored card:
+`ListMandatesRoute` and `StoreFrontDataSubscriber` return nothing, and `PayloadBuilder` drops
+`savePaymentDetails` and `mandateId`. Word merchant-facing texts accordingly.
 
 ## Apple Pay Direct: it is almost always the `.well-known` file
 

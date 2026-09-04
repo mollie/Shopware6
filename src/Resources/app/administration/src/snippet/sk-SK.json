@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie sumu buď strhne ihneď pri nákupe, alebo ju iba rezervuje. Pri rezervácii sa suma blokuje na účte zákazníka a strhne sa, keď označíte objednávku ako odoslanú, alebo sa uvoľní, ak objednávku nemôžete splniť. Znižuje to riziko spätných zúčtovaní a ušetrí vám vracanie peňazí za objednávky, ktoré nemôžete doručiť.",
-                "hint": "Priama platba je zapnutá pri všetkých metódach nižšie, čo je obvyklé správanie. Vypnite ju pri metóde, aby Mollie sumu namiesto toho rezervovala - objednávka potom zostane autorizovaná, kým ju neoznačíte ako odoslanú.",
+                "hint": "Priama platba sa nastavuje pri každej metóde nižšie. Vypnite ju pri metóde, aby Mollie sumu namiesto toho rezervovala - objednávka potom zostane autorizovaná, kým ju neoznačíte ako odoslanú.",
                 "link": "Rezervácia sumy pre platbu"
             },
             "info": {

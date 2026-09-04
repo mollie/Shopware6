@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie either collects the money right at the checkout or only places a hold on it. With a hold, the amount is reserved on your customer's account and is collected when you mark the order as shipped, or released again if you cannot fulfil the order. That lowers the risk of chargebacks and saves you refunding orders you cannot deliver.",
-                "hint": "Direct payment is on for every method below, which is the usual behaviour. Switch it off for a method to have Mollie place a hold instead - the order then stays authorized until you mark it as shipped.",
+                "hint": "Direct payment is set per method below. Switch it off for a method to have Mollie place a hold instead - the order then stays authorized until you mark it as shipped.",
                 "link": "Place a hold for a payment"
             },
             "info": {

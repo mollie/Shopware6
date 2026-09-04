@@ -17,6 +17,11 @@ final class MolliePage
     private const MAX_RETRIES = 3;
     private const RETRY_DELAY_MS = 500;
 
+    /**
+     * The radio group the test mode checkout uses to pick the outcome of the payment.
+     */
+    private const FIELD_FINAL_STATE = 'final_state';
+
     private Client $client;
 
     public function __construct(private readonly string $url)
@@ -75,10 +80,27 @@ final class MolliePage
             $formData[$inputName] = $inputValue;
         }
 
-        Assert::assertTrue(isset($formData['final_state']));
-        Assert::assertEquals($paymentStatus, $formData['final_state']);
+        Assert::assertTrue(isset($formData[self::FIELD_FINAL_STATE]));
+        Assert::assertEquals($paymentStatus, $formData[self::FIELD_FINAL_STATE]);
 
         return $this->submit($page->getUrl(), $formData);
+    }
+
+    /**
+     * Mollie only offers the status radios once it has a payment it can complete. When the shop
+     * sends no card token, the page is Mollie's own card form instead.
+     */
+    public function hasPaymentStatusSelection(): bool
+    {
+        $page = $this->loadPage($this->url);
+
+        foreach ($page->getDom()->getElementsByTagName('input') as $input) {
+            if ($input->getAttribute('name') === self::FIELD_FINAL_STATE) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function selectPaymentMethod(string $molliePaymentMethod): ResponseInterface
@@ -129,7 +151,9 @@ final class MolliePage
 
         $dom = new \DOMDocument();
         try {
-            $dom = $dom->loadHTML($htmlContent);
+            // Not assigned back: loadHTML() fills $dom and returns a bool. Mollie sends HTML5, which
+            // libxml reports as invalid tags, so swallow that and read what it did parse.
+            $dom->loadHTML($htmlContent);
         } catch (\Throwable $exception) {
         }
 

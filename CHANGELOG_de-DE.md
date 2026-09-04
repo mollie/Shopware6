@@ -1,5 +1,6 @@
 # Unreleased
-- Hinzugefügt: Neuer Bereich "Autorisierung und Einzug": pro Zahlart lässt sich der Status "Autorisiert" überspringen, das Geld wird dann direkt beim Kauf bezahlt statt erst nach dem Versand.
+- Hinzugefügt: Neuer Bereich "Autorisierung und Einzug": pro Zahlart und Verkaufskanal lässt sich der Status "Autorisiert" überspringen, das Geld wird dann direkt beim Kauf bezahlt statt erst nach dem Versand.
+- Hinzugefügt: Die Konfigurationsroute liefert das neue Feld "creditCardComponents", damit Headless-Shops die Einstellung auswerten können.
 - Geändert: Die Mollie-Zahlarten stehen in der Zahlarten-Übersicht nun gesammelt in einer Kachel.
 
 # 5.5.0

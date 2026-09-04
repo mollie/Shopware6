@@ -8,15 +8,4 @@
     >
         {{ $tc('mollie-payments.config.capture.link') }}
     </sw-external-link>
-
-    <sw-loader v-if="isLoading" />
-
-    <sw-switch-field
-        v-for="paymentMethod in paymentMethods"
-        :key="paymentMethod.name"
-        :class="'mollie-pluginconfig-capture-' + paymentMethod.name"
-        :label="paymentMethod.label"
-        :value="isDirectPaymentEnabled(paymentMethod.name)"
-        @update:value="setDirectPaymentEnabled(paymentMethod.name, $event)"
-    />
 </div>

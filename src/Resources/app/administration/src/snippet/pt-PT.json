@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "A Mollie cobra o valor logo na compra ou apenas o reserva. Com uma reserva, o valor fica retido na conta do cliente e só é cobrado quando marca a encomenda como enviada, ou é libertado se não puder satisfazer a encomenda. Isto reduz o risco de estornos e poupa-lhe reembolsos de encomendas que não consegue entregar.",
-                "hint": "O pagamento direto está ligado para todos os métodos abaixo, o que é o comportamento habitual. Desligue-o num método para que a Mollie reserve o valor - a encomenda fica então autorizada até a marcar como enviada.",
+                "hint": "O pagamento direto é definido por método abaixo. Desligue-o num método para que a Mollie reserve o valor - a encomenda fica então autorizada até a marcar como enviada.",
                 "link": "Reservar um valor para um pagamento"
             },
             "info": {

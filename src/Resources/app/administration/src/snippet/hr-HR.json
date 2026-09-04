@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie iznos naplaćuje odmah pri kupnji ili ga samo rezervira. Kod rezervacije iznos ostaje zadržan na računu kupca i naplaćuje se kada narudžbu označite kao poslanu, ili se oslobađa ako narudžbu ne možete ispuniti. To smanjuje rizik od povrata sredstava i štedi vam povrate za narudžbe koje ne možete isporučiti.",
-                "hint": "Izravno plaćanje uključeno je za sve načine u nastavku, što je uobičajeno ponašanje. Isključite ga za pojedini način kako bi Mollie umjesto toga rezervirao iznos - narudžba tada ostaje autorizirana dok je ne označite kao poslanu.",
+                "hint": "Izravno plaćanje postavlja se za svaki način u nastavku. Isključite ga za pojedini način kako bi Mollie umjesto toga rezervirao iznos - narudžba tada ostaje autorizirana dok je ne označite kao poslanu.",
                 "link": "Rezervacija iznosa za plaćanje"
             },
             "info": {

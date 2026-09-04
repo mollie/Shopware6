@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "„Mollie“ arba nuskaičiuoja sumą iš karto perkant, arba ją tik rezervuoja. Rezervavimo atveju suma lieka užblokuota kliento sąskaitoje ir nuskaičiuojama, kai pažymite užsakymą kaip išsiųstą, arba atlaisvinama, jei užsakymo įvykdyti negalite. Tai sumažina lėšų grąžinimo riziką ir sutaupo jums grąžinimų už užsakymus, kurių negalite pristatyti.",
-                "hint": "Tiesioginis mokėjimas įjungtas visiems toliau nurodytiems būdams, tai įprasta elgsena. Išjunkite jį būdui, kad „Mollie“ sumą rezervuotų - užsakymas tada lieka autorizuotas, kol nepažymėsite jo kaip išsiųsto.",
+                "hint": "Tiesioginis mokėjimas nustatomas kiekvienam būdui atskirai. Išjunkite jį būdui, kad „Mollie“ sumą rezervuotų - užsakymas tada lieka autorizuotas, kol nepažymėsite jo kaip išsiųsto.",
                 "link": "Sumos rezervavimas mokėjimui"
             },
             "info": {

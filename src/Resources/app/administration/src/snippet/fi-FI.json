@@ -46,7 +46,7 @@
         "config": {
             "capture": {
                 "description": "Mollie joko veloittaa summan heti ostoksen yhteydessä tai vain varaa sen. Varauksessa summa pidätetään asiakkaan tilillä ja veloitetaan, kun merkitset tilauksen lähetetyksi, tai vapautetaan, jos et pysty toimittamaan tilausta. Tämä pienentää takaisinperinnän riskiä ja säästää sinut niiden tilausten hyvityksiltä, joita et voi toimittaa.",
-                "hint": "Suoramaksu on käytössä kaikilla alla olevilla maksutavoilla, mikä on tavanomainen toiminta. Poista se käytöstä maksutavalta, jotta Mollie varaa summan sen sijaan - tilaus pysyy silloin valtuutettuna, kunnes merkitset sen lähetetyksi.",
+                "hint": "Suoramaksu asetetaan alla maksutavoittain. Poista se käytöstä maksutavalta, jotta Mollie varaa summan sen sijaan - tilaus pysyy silloin valtuutettuna, kunnes merkitset sen lähetetyksi.",
                 "link": "Summan varaaminen maksua varten"
             },
             "info": {

@@ -250,6 +250,23 @@ final class PaymentMethodsTest extends TestCase
         $this->assertFalse($payment->isStoreCredentials());
     }
 
+    /**
+     * The card form always posts the hidden token field, and the storefront leaves it empty when a
+     * stored card is selected. Sending that empty string on to Mollie fails the payment instead of
+     * letting Mollie collect the card itself.
+     */
+    public function testCardPaymentIgnoresAnEmptyCardToken(): void
+    {
+        $handler = new CardPayment(new FakePay(), new FakeFinalize(), new NullLogger());
+        $payment = $this->createPayment();
+        $dataBag = new RequestDataBag(['creditCardToken' => '']);
+        $customer = new CustomerEntity();
+
+        $handler->applyPaymentSpecificParameters($payment, $dataBag, $customer);
+
+        $this->assertNull($payment->getCardToken());
+    }
+
     public function testCardPaymentStoresCredentialsWhenSavePaymentDetailsIsSet(): void
     {
         $handler = new CardPayment(new FakePay(), new FakeFinalize(), new NullLogger());

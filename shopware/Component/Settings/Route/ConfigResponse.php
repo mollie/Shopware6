@@ -7,11 +7,11 @@ use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\SalesChannel\StoreApiResponse;
 
 /**
- * @extends StoreApiResponse<ArrayStruct<array{profileId:string,testMode:bool,locale:string,oneClickPayments:bool}>>
+ * @extends StoreApiResponse<ArrayStruct<array{profileId:string,testMode:bool,locale:string,oneClickPayments:bool,creditCardComponents:bool}>>
  */
 final class ConfigResponse extends StoreApiResponse
 {
-    public function __construct(string $profileId, bool $testMode, string $locale, bool $oneClickPayments)
+    public function __construct(string $profileId, bool $testMode, string $locale, bool $oneClickPayments, bool $creditCardComponents)
     {
         parent::__construct(new ArrayStruct(
             [
@@ -19,6 +19,7 @@ final class ConfigResponse extends StoreApiResponse
                 'testMode' => $testMode,
                 'locale' => $locale,
                 'oneClickPayments' => $oneClickPayments,
+                'creditCardComponents' => $creditCardComponents,
             ],
             'mollie_payments_config'
         ));

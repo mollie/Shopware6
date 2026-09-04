@@ -1,5 +1,6 @@
 # Unreleased
-- Added: New "Authorization and capture" section: the authorized status can be skipped per payment method, so the money is paid right at the purchase instead of only after the shipment.
+- Added: New "Authorization and capture" section: the authorized status can be skipped per payment method and sales channel, so the money is paid right at the purchase instead of only after the shipment.
+- Added: The config route returns the new "creditCardComponents" field, so headless setups can read the setting.
 - Changed: The Mollie payment methods are now grouped in a single card in the payment method overview.
 
 # 5.5.0
