@@ -207,7 +207,10 @@ in `shopware/`. The short version:
 - Domain exceptions from `shopware/Component/<Domain>/Exception/`, never bare `\Exception`.
 - No query and no API call inside a loop.
 - Services, tags and subscribers wired with **PHP attributes**, not `services.xml`.
-- Descriptive names, no abbreviations. Comments only where the code cannot carry the intent.
+- Descriptive names, no abbreviations. Comments are the exception, not the habit: only where
+  the code cannot carry the intent — a Mollie constraint, a Shopware workaround, a deliberate
+  rule violation — and only a few per change. If the code already says what happens, no
+  comment. Explaining your own new code back to the reader is the usual way this goes wrong.
 - Snippets: every storefront/admin string goes through the snippet files, never hardcoded.
 
 A rule may be broken, but never silently: say which one and why.

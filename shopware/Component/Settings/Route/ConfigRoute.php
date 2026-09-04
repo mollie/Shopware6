@@ -41,6 +41,7 @@ final class ConfigRoute
 
         $apiSettings = $this->settingsService->getApiSettings($salesChannelId);
         $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelId);
+        $creditCardSettings = $this->settingsService->getCreditCardSettings($salesChannelId);
 
         $profileId = $apiSettings->getProfileId();
         if ($profileId === '') {
@@ -52,7 +53,8 @@ final class ConfigRoute
             $profileId,
             $apiSettings->isTestMode(),
             $this->resolveLocale($context),
-            $paymentSettings->isOneClickPayment()
+            $paymentSettings->isOneClickPayment(),
+            $creditCardSettings->isCreditCardComponentsEnabled()
         );
     }
 

@@ -263,6 +263,35 @@ it has to be the profile the payment is created on. Because of all this the test
 step mollie.js would do, with Mollie's published test cards - `tests/Integration/Mollie/CardTokenizer`,
 which stays in `tests/` for the reason above.
 
+A stored card is a `storeCredentials` payment, not a `first` one. Mollie creates the mandate for a
+saved card from `storeCredentials: true` plus a `customerId` on an ordinary `oneoff` payment
+([create payment](https://docs.mollie.com/reference/create-payment)); `sequenceType: first` is for a
+recurring sequence the merchant starts later. That is why `PayloadBuilder` sets `first` when
+`savePaymentDetails` arrives and `CardPayment` sets it back to `oneoff`: the `first` is only there to
+make `ensureMollieCustomerId()` create the Mollie customer that `storeCredentials` needs. Without a
+`customerId` the flag stores nothing, so a guest cannot save a card.
+
+The one-click checkout submits an **empty** `creditCardToken` alongside the `mandateId`: the card
+template always renders the hidden token field and mollie.js skips the tokenisation when a stored
+card is selected. An empty token therefore means "no card entered", never "pay with an empty card".
+
+Paying an existing mandate still redirects to Mollie. A `recurring` payment against a `mandateId`
+gets a checkout url like `https://www.mollie.com/checkout/credit-card/session/…`, which in test mode
+is the page that picks the payment status - so the customer is sent to Mollie for a stored card just
+as for a new one, and `Pay` never has to fall back to the shop's return url. In test mode that page
+currently asks for the card data again although the payment carries a valid mandate, and entering it
+creates a second mandate. That is a Mollie defect, which is why the Behat scenario for it carries
+`@mollie-broken` and is excluded from `make behat`.
+
+**Mollie decides on its own whether a card is stored.** Any card payment carrying a `customerId`
+leaves a `customer-present` mandate behind, even with `sequenceType: oneoff` and
+`storeCredentials: false` - and that mandate is not linked to the payment
+(`payment.mandateId` stays empty). Since `buildBaseCreatePayment()` attaches an already known Mollie
+customer id to every payment, switching one-click payments off cannot mean "no card is stored at
+Mollie". What the setting does guarantee is that the shop never offers or charges a stored card:
+`ListMandatesRoute` and `StoreFrontDataSubscriber` return nothing, and `PayloadBuilder` drops
+`savePaymentDetails` and `mandateId`. Word merchant-facing texts accordingly.
+
 ## Apple Pay Direct: it is almost always the `.well-known` file
 
 The most frequent cause of "Apple Pay Direct does not work" is the domain verification file.

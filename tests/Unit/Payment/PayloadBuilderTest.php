@@ -11,18 +11,23 @@ use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
+use Mollie\Shopware\Component\Payment\Method\CardPayment;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
+use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
+use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakeFinalize;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeManualCaptureModeAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrdersApiAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakePay;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePhoneAwarePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeRecurringAwarePaymentHandler;
@@ -241,7 +246,7 @@ final class PayloadBuilderTest extends TestCase
         $mollieCustomerId = 'cust_test_mollie_id';
         $profileId = 'pfl_test_profile';
 
-        $builder = $this->createBuilder(profileId: $profileId);
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('savePaymentDetails', true);
 
@@ -257,7 +262,7 @@ final class PayloadBuilderTest extends TestCase
 
     public function testBuildKeepsSequenceTypeOneoffWhenGuestEvenIfSavePaymentDetails(): void
     {
-        $builder = $this->createBuilder();
+        $builder = $this->createBuilder($this->oneClickSettings());
 
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('savePaymentDetails', true);
@@ -271,13 +276,201 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('oneoff', $actual->getSequenceType()->value);
     }
 
+    public function testBuildKeepsTheCardTokenWhenTheComponentsAreEnabled(): void
+    {
+        $builder = $this->createBuilder(creditCardSettings: new CreditCardSettings(true));
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card']);
+
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertSame('tkn_test_card', $actual->getCardToken());
+    }
+
+    public function testBuildIgnoresTheCardTokenWhenTheComponentsAreDisabled(): void
+    {
+        $builder = $this->createBuilder(creditCardSettings: new CreditCardSettings(false));
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card']);
+
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+
+        $actual = $builder->buildPayment($transactionData, $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertNull($actual->getCardToken());
+    }
+
+    public function testBuildStoresTheCredentialsWhenOneClickPaymentsAreEnabled(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, true), profileId: $profileId);
+        $requestDataBag = new RequestDataBag([
+            CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
+            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+        ]);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+
+        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertTrue($actual->isStoreCredentials());
+    }
+
+    public function testBuildDoesNotStoreTheCredentialsWhenOneClickPaymentsAreDisabled(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), profileId: $profileId);
+        $requestDataBag = new RequestDataBag([
+            CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
+            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+        ]);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+
+        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertFalse($actual->isStoreCredentials());
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+    }
+
+    public function testBuildDoesNotStoreTheCredentialsForAGuest(): void
+    {
+        $builder = $this->createBuilder();
+        $requestDataBag = new RequestDataBag([
+            CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
+            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+        ]);
+
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+        $transactionData->getCustomer()->setGuest(true);
+
+        $actual = $builder->buildPayment($transactionData, $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertFalse($actual->isStoreCredentials());
+    }
+
+    /**
+     * The mandate a subscription needs comes from its first payment, and storing the credentials
+     * would turn that back into a one-off.
+     */
+    public function testBuildDoesNotStoreTheCredentialsForASubscriptionOrder(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(profileId: $profileId, subscriptionSettings: new SubscriptionSettings(enabled: true));
+        $requestDataBag = new RequestDataBag([
+            CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
+            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+        ]);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+        $transactionService->withSubscriptionLineItem();
+
+        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertFalse($actual->isStoreCredentials());
+        $this->assertSame('first', $actual->getSequenceType()->value);
+    }
+
+    /**
+     * The only case where no strip applies, so the guest guard around modifySequenceType() is the
+     * single reason the sequence type survives.
+     */
+    public function testBuildKeepsSequenceTypeOneoffForAGuestWithAMandate(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+
+        $transactionData = $transactionService->findById('test', $this->context);
+        $transactionData->getCustomer()->setGuest(true);
+
+        $actual = $builder->buildPayment($transactionData, new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
+
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+        $this->assertNull($actual->getMandateId());
+    }
+
+    /**
+     * The one click guard is handler agnostic, so it has to hold for a method that is not a card.
+     */
+    public function testBuildDoesNotPromoteToFirstForAnyHandlerWhenOneClickPaymentsAreDisabled(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), profileId: $profileId);
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true]);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+
+        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), new FakePaymentMethodHandler(), $requestDataBag, $this->context);
+
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+    }
+
+    /**
+     * The log line is the only signal a merchant gets that a submitted field was discarded.
+     */
+    public function testBuildWarnsWhenTheSubmittedCardTokenIsDropped(): void
+    {
+        $logger = new FakeLogger();
+        $builder = $this->createBuilder(logger: $logger, creditCardSettings: new CreditCardSettings(false));
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card']);
+
+        $builder->buildPayment((new FakeTransactionService())->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertTrue($logger->hasRecordThatContains('warning', 'Credit card components are disabled'));
+    }
+
+    public function testBuildIgnoresTheMandateWhenOneClickPaymentsAreDisabled(): void
+    {
+        $mollieCustomerId = 'cust_test_mollie_id';
+        $profileId = 'pfl_test_profile';
+
+        $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), profileId: $profileId);
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, $mollieCustomerId);
+
+        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
+
+        $this->assertNull($actual->getMandateId());
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+    }
+
+    /**
+     * The bag reaches PaymentCreatedEvent, so the listeners there must still see what the customer
+     * submitted rather than what the payload kept.
+     */
+    public function testBuildLeavesTheSubmittedRequestDataUntouched(): void
+    {
+        $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), creditCardSettings: new CreditCardSettings(false));
+        $requestDataBag = new RequestDataBag([
+            CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
+            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+            CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id',
+        ]);
+
+        $builder->buildPayment((new FakeTransactionService())->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertSame('tkn_test_card', $requestDataBag->get(CardPayment::FIELD_CREDIT_CARD_TOKEN));
+        $this->assertTrue($requestDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS));
+        $this->assertSame('tr_test_mandate_id', $requestDataBag->get(CardPayment::FIELD_MANDATE_ID));
+    }
+
     public function testBuildSetsSequenceTypeRecurringWhenAllConditionsMet(): void
     {
         $mollieCustomerId = 'cust_test_mollie_id';
         $profileId = 'pfl_test_profile';
         $mandateId = 'tr_test_mandate_id';
 
-        $builder = $this->createBuilder(profileId: $profileId);
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('mandateId', $mandateId);
 
@@ -298,7 +491,7 @@ final class PayloadBuilderTest extends TestCase
         $mollieCustomerId = 'cust_test_mollie_id';
         $profileId = 'pfl_test_profile';
 
-        $builder = $this->createBuilder(profileId: $profileId);
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('savePaymentDetails', true);
 
@@ -354,7 +547,7 @@ final class PayloadBuilderTest extends TestCase
         $profileId = 'pfl_test_profile';
         $mandateId = 'tr_test_mandate_id';
 
-        $builder = $this->createBuilder(profileId: $profileId);
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
 
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('mandateId', $mandateId);
@@ -374,7 +567,7 @@ final class PayloadBuilderTest extends TestCase
     {
         $profileId = 'pfl_test_profile';
 
-        $builder = $this->createBuilder(profileId: $profileId);
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
 
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('savePaymentDetails', true);
@@ -407,7 +600,7 @@ final class PayloadBuilderTest extends TestCase
         $mollieCustomerId = 'cust_existing_mollie_id';
         $profileId = 'pfl_test_profile';
 
-        $builder = $this->createBuilder(profileId: $profileId);
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('savePaymentDetails', true);
 
@@ -427,7 +620,7 @@ final class PayloadBuilderTest extends TestCase
     {
         $profileId = 'pfl_test_profile';
 
-        $builder = $this->createBuilder(profileId: $profileId);
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
         $requestDataBag = new RequestDataBag();
         $requestDataBag->set('savePaymentDetails', true);
 
@@ -747,6 +940,15 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('cst_test_mollie_id', $actual->toArray()['customerId']);
     }
 
+    /**
+     * Without one click payments the builder drops savePaymentDetails and mandateId, so every test
+     * that expects either to be honoured has to switch it on.
+     */
+    private function oneClickSettings(): PaymentSettings
+    {
+        return new PaymentSettings('test_{ordernumber}-{customernumber}', 0, true);
+    }
+
     private function roundingDiffSettings(bool $enabled): PaymentSettings
     {
         return new PaymentSettings('', 0, fixRoundingDiffEnabled: $enabled, fixRoundingDiffName: 'Rounding', fixRoundingDiffSku: 'ROUND-1');
@@ -765,12 +967,20 @@ final class PayloadBuilderTest extends TestCase
         return $skus;
     }
 
-    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null, ?SubscriptionSettings $subscriptionSettings = null, ?LoggerInterface $logger = null): PayloadBuilder
+    /**
+     * The real handler, because the guards are only observable through what it does with the fields.
+     */
+    private function createCardPayment(): CardPayment
+    {
+        return new CardPayment(new FakePay(), new FakeFinalize(), new NullLogger());
+    }
+
+    private function createBuilder(?PaymentSettings $paymentSettings = null, ?string $profileId = null, ?SubscriptionSettings $subscriptionSettings = null, ?LoggerInterface $logger = null, ?CreditCardSettings $creditCardSettings = null): PayloadBuilder
     {
         if ($paymentSettings === null) {
             $paymentSettings = new PaymentSettings('test_{ordernumber}-{customernumber}', 0);
         }
-        $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId, subscriptionSettings: $subscriptionSettings);
+        $settingsService = new FakeSettingsService(paymentSettings: $paymentSettings,profileId: $profileId, subscriptionSettings: $subscriptionSettings, creditCardSettings: $creditCardSettings ?? new CreditCardSettings(true));
         $lineItemFilter = LineItemFilterBuilder::build();
         $roundingDifferenceFixer = new RoundingDifferenceFixer();
 

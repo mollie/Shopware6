@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Behat\Context;
 
+use Behat\Hook\AfterScenario;
 use Behat\Hook\BeforeScenario;
 use Behat\Step\Given;
 use Behat\Step\Then;
@@ -12,8 +13,11 @@ use Mollie\Shopware\Behat\Storage;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Money;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
+use Mollie\Shopware\Component\Payment\Mandate\Route\ListMandatesRoute;
 use Mollie\Shopware\Component\Payment\Method\CardPayment;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Settings\SettingsService;
@@ -28,6 +32,7 @@ use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -35,6 +40,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Api\OrderActionController;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,6 +54,11 @@ final class CheckoutContext extends ShopwareContext
     public const STORAGE_RETURN_URL = 'shopwareReturnUrl';
     public const STORAGE_REMEMBERED_PAYMENT_ID = 'rememberedMolliePaymentId';
     public const STORAGE_CARD_TOKEN = 'creditCardToken';
+    public const STORAGE_SAVE_PAYMENT_DETAILS = 'savePaymentDetails';
+    public const STORAGE_MANDATE_ID = 'mandateId';
+    public const STORAGE_MANDATE_IDS = 'mandateIds';
+    public const STORAGE_CREATED_MANDATE_ID = 'createdMandateId';
+    public const STORAGE_MOLLIE_CUSTOMER_ID = 'mollieCustomerId';
 
     /**
      * Custom field and Mollie prefix per id type, as an accounting export reads them from the order.
@@ -98,19 +109,21 @@ final class CheckoutContext extends ShopwareContext
         $settingsService = $this->getContainer()->get(SettingsService::class);
         $apiSettings = $settingsService->getApiSettings($salesChannelId);
 
-        // The order PayloadBuilder uses, so the token belongs to the profile the payment is created
-        // on - Mollie rejects a token from another profile.
-        $profileId = $apiSettings->getProfileId();
-        if (mb_strlen($profileId) === 0) {
-            /** @var CachedMollieGateway $mollieGateway */
-            $mollieGateway = $this->getContainer()->get(MollieGateway::class);
-            $profileId = $mollieGateway->getCurrentProfile($salesChannelId)->getId();
-        }
+        $profileId = $this->resolveProfileId();
 
         $cardTokenizer = new CardTokenizer();
         $cardToken = $cardTokenizer->createCardToken($cardBrand, $profileId, $apiSettings->isTestMode(), $_ENV['APP_URL']);
 
         Storage::set(self::STORAGE_CARD_TOKEN, $cardToken);
+    }
+
+    /**
+     * The checkbox the card template renders next to the card fields.
+     */
+    #[Given('i want to save the credit card')]
+    public function iWantToSaveTheCreditCard(): void
+    {
+        Storage::set(self::STORAGE_SAVE_PAYMENT_DETAILS, true);
     }
 
     #[When('i start checkout with payment method :arg1')]
@@ -120,19 +133,31 @@ final class CheckoutContext extends ShopwareContext
 
         $this->setOptions(SalesChannelContextService::PAYMENT_METHOD_ID, $paymentMethod->getId());
 
-        $paymentData = [];
-        $cardToken = Storage::get(self::STORAGE_CARD_TOKEN, '');
-        if ($cardToken !== '') {
-            $paymentData[CardPayment::FIELD_CREDIT_CARD_TOKEN] = $cardToken;
-        }
-
         /** @var RedirectResponse $response */
-        $response = $this->startCheckout($this->getCurrentSalesChannelContext(), $paymentData);
+        $response = $this->startCheckout($this->getCurrentSalesChannelContext(), $this->buildPaymentData());
 
         $mollieSandboxPage = $response->getTargetUrl();
 
         Storage::set(self::STORAGE_MOLLIE_URL, $mollieSandboxPage);
         Assert::assertStringContainsString('mollie.com', $mollieSandboxPage);
+    }
+
+    /**
+     * Paying a mandate still goes through Mollie, so the status is picked on the sandbox page as in
+     * any other checkout.
+     */
+    #[When('i pay with the stored mandate for payment method :arg1')]
+    public function iPayWithTheStoredMandateForPaymentMethod(string $paymentMethodTechnicalName): void
+    {
+        $mandateId = Storage::get(self::STORAGE_MANDATE_ID, '');
+        Assert::assertNotSame('', $mandateId, 'No mandate was remembered to pay with');
+
+        // A stored card is paid without entering card data again, which is the whole point of the
+        // mandate - so the token of the previous order must not be sent along.
+        Storage::set(self::STORAGE_CARD_TOKEN, '');
+        Storage::set(self::STORAGE_SAVE_PAYMENT_DETAILS, false);
+
+        $this->iStartCheckoutWithPaymentMethod($paymentMethodTechnicalName);
     }
 
     #[When('select payment status :arg1')]
@@ -239,6 +264,94 @@ final class CheckoutContext extends ShopwareContext
         }
 
         Assert::assertSame($expectedPaymentStatus, $actualOrderState);
+    }
+
+    /**
+     * What the setting actually promises. Mollie creates a customer-present mandate for any card
+     * payment that carries a customer id, so the mandates at Mollie are not ours to assert - but
+     * whether the shop lets the customer pay with one is.
+     */
+    #[Then('the shop offers no stored cards for payment method :arg1')]
+    public function theShopOffersNoStoredCardsForPaymentMethod(string $paymentMethodTechnicalName): void
+    {
+        /** @var ListMandatesRoute $listMandatesRoute */
+        $listMandatesRoute = $this->getContainer()->get(ListMandatesRoute::class);
+
+        $mandates = $listMandatesRoute->list('', $this->getCurrentSalesChannelContext())
+            ->getMandates()
+            ->filterByPaymentMethod(PaymentMethod::from($paymentMethodTechnicalName))
+        ;
+
+        Assert::assertCount(0, $mandates, sprintf('The shop offers %d stored cards', $mandates->count()));
+    }
+
+    #[Then('the mollie page offers no payment status selection')]
+    public function theMolliePageOffersNoPaymentStatusSelection(): void
+    {
+        $molliePage = new MolliePage(Storage::get(self::STORAGE_MOLLIE_URL));
+
+        Assert::assertFalse(
+            $molliePage->hasPaymentStatusSelection(),
+            'Mollie offered a payment status selection, so it got a card token instead of collecting the card itself'
+        );
+    }
+
+    /**
+     * The mandates of the fixture customer survive a test run, so only the change a scenario causes
+     * can be asserted, never an absolute count. The ids are kept as well, because Mollie does not
+     * promise an order for the list and the new mandate is the one that was not there before.
+     */
+    #[Given('i remember the number of mandates for payment method :arg1')]
+    public function iRememberTheNumberOfMandatesForPaymentMethod(string $paymentMethodTechnicalName): void
+    {
+        Storage::set(self::STORAGE_MANDATE_IDS, $this->findMandates($paymentMethodTechnicalName)->getKeys());
+    }
+
+    #[Then('the number of mandates for payment method :arg1 increased by :arg2')]
+    public function theNumberOfMandatesForPaymentMethodIncreasedBy(string $paymentMethodTechnicalName, int $expectedIncrease): void
+    {
+        $idsBefore = Storage::get(self::STORAGE_MANDATE_IDS);
+        Assert::assertIsArray($idsBefore, 'The mandates were not remembered before the payment');
+
+        // Mollie creates the mandate while it finishes the payment, so it can show up a moment late.
+        // "No new mandate" therefore has to hold for a while, not just at the first look.
+        $newIds = [];
+        for ($attempt = 0; $attempt < 5; ++$attempt) {
+            $newIds = array_values(array_diff($this->findMandates($paymentMethodTechnicalName)->getKeys(), $idsBefore));
+            if (count($newIds) === $expectedIncrease && $expectedIncrease > 0) {
+                break;
+            }
+            sleep(2);
+        }
+
+        Assert::assertCount(
+            $expectedIncrease,
+            $newIds,
+            sprintf('Expected %d new mandates, got "%s"', $expectedIncrease, implode(',', $newIds))
+        );
+
+        if (count($newIds) === 1) {
+            Storage::set(self::STORAGE_MANDATE_ID, $newIds[0]);
+            Storage::set(self::STORAGE_CREATED_MANDATE_ID, $newIds[0]);
+        }
+    }
+
+    /**
+     * Every run would otherwise leave the fixture customer one mandate richer, until the list Mollie
+     * returns is paginated and the comparison above stops seeing the mandates it counted.
+     */
+    #[AfterScenario]
+    public function revokeTheCreatedMandate(): void
+    {
+        $mandateId = Storage::get(self::STORAGE_CREATED_MANDATE_ID, '');
+        $mollieCustomerId = Storage::get(self::STORAGE_MOLLIE_CUSTOMER_ID, '');
+        if ($mandateId === '' || $mollieCustomerId === '') {
+            return;
+        }
+
+        /** @var CachedMollieGateway $mollieGateway */
+        $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+        $mollieGateway->revokeMandate($mollieCustomerId, $mandateId, $this->getCurrentSalesChannelContext()->getSalesChannelId());
     }
 
     #[Then('order total is :arg1')]
@@ -591,6 +704,84 @@ final class CheckoutContext extends ShopwareContext
             Assert::assertStringStartsWith($prefix, $id, sprintf('Id "%s" is not a %s id in export format', $id, $idType));
             Assert::assertStringNotContainsString('_', $id, sprintf('Id "%s" still carries the Mollie underscore', $id));
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildPaymentData(): array
+    {
+        $paymentData = [];
+
+        $cardToken = Storage::get(self::STORAGE_CARD_TOKEN, '');
+        if ($cardToken !== '') {
+            $paymentData[CardPayment::FIELD_CREDIT_CARD_TOKEN] = $cardToken;
+        }
+
+        if (Storage::get(self::STORAGE_SAVE_PAYMENT_DETAILS, false)) {
+            $paymentData[CardPayment::FIELD_SAVE_PAYMENT_DETAILS] = true;
+        }
+
+        $mandateId = Storage::get(self::STORAGE_MANDATE_ID, '');
+        if ($mandateId !== '') {
+            $paymentData[CardPayment::FIELD_MANDATE_ID] = $mandateId;
+        }
+
+        return $paymentData;
+    }
+
+    /**
+     * The profile the payment is created on. A card token belongs to one profile and Mollie rejects
+     * it on another, and the Mollie customer id is stored per profile as well.
+     */
+    private function resolveProfileId(): string
+    {
+        $salesChannelId = $this->getCurrentSalesChannelContext()->getSalesChannelId();
+
+        /** @var SettingsService $settingsService */
+        $settingsService = $this->getContainer()->get(SettingsService::class);
+        $profileId = $settingsService->getApiSettings($salesChannelId)->getProfileId();
+        if (mb_strlen($profileId) > 0) {
+            return $profileId;
+        }
+
+        /** @var CachedMollieGateway $mollieGateway */
+        $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+
+        return $mollieGateway->getCurrentProfile($salesChannelId)->getId();
+    }
+
+    private function findMandates(string $paymentMethodTechnicalName): MandateCollection
+    {
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+        $salesChannelId = $salesChannelContext->getSalesChannelId();
+
+        /** @var SettingsService $settingsService */
+        $settingsService = $this->getContainer()->get(SettingsService::class);
+        $mode = $settingsService->getApiSettings($salesChannelId)->getMode();
+
+        // Read fresh: the sales channel context is built once per scenario, so its customer does not
+        // carry the Mollie customer id the payment just wrote.
+        /** @var EntityRepository $customerRepository */
+        $customerRepository = $this->getContainer()->get('customer.repository');
+        /** @var ?CustomerEntity $customer */
+        $customer = $customerRepository->search(new Criteria([(string) $salesChannelContext->getCustomer()?->getId()]), $salesChannelContext->getContext())->first();
+        Assert::assertNotNull($customer, 'The logged in customer was not found');
+
+        $customerIds = ($customer->getCustomFields() ?? [])[Mollie::EXTENSION]['customer_ids'] ?? [];
+        $mollieCustomerId = $customerIds[$this->resolveProfileId()][$mode->value] ?? null;
+        if ($mollieCustomerId === null) {
+            return new MandateCollection();
+        }
+        Storage::set(self::STORAGE_MOLLIE_CUSTOMER_ID, $mollieCustomerId);
+
+        /** @var CachedMollieGateway $mollieGateway */
+        $mollieGateway = $this->getContainer()->get(MollieGateway::class);
+        $mollieGateway->clearCache();
+
+        return $mollieGateway->listMandates($mollieCustomerId, $salesChannelId)
+            ->filterByPaymentMethod(PaymentMethod::from($paymentMethodTechnicalName))
+        ;
     }
 
     /**

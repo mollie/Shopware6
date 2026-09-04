@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Subscriber;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Locale;
+use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Mandate\Route\AbstractListMandatesRoute;
 use Mollie\Shopware\Component\Payment\Mandate\Route\ListMandatesRoute;
@@ -15,11 +16,21 @@ use Mollie\Shopware\Component\SalesChannel\LocaleProvider;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
+use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
+use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzerInterface;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Framework\Struct\Collection;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Storefront\Page\Account\Order\AccountEditOrderPage;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
+use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPage;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\Page;
 use Shopware\Storefront\Page\PageLoadedEvent;
@@ -38,6 +49,8 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         #[Autowire(service: MollieGateway::class)]
         private MollieGatewayInterface $mollieGateway,
         private LocaleProvider $localeProvider,
+        #[Autowire(service: LineItemAnalyzer::class)]
+        private LineItemAnalyzerInterface $lineItemAnalyzer,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -90,20 +103,77 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         if ($paymentMethod->getPaymentMethod() !== PaymentMethod::CREDIT_CARD) {
             return;
         }
-        $listMandatesResponse = $this->listMandatesRoute->list('', $salesChannelContext);
-        $mandates = $listMandatesResponse->getMandates();
-        $creditCardMandates = $mandates->filterByPaymentMethod(PaymentMethod::CREDIT_CARD);
-
         $salesChannelId = $salesChannelContext->getSalesChannelId();
         $creditCardSettings = $this->settings->getCreditCardSettings($salesChannelId);
         $paymentSettings = $this->settings->getPaymentSettings($salesChannelId);
-        $page->addExtension('MollieCreditCardMandateCollection', $creditCardMandates);
+
+        $page->addExtension('MollieCreditCardMandateCollection', $this->findSelectableMandates($creditCardSettings, $paymentSettings, $salesChannelContext));
 
         $page->assign([
             'enable_credit_card_components' => $creditCardSettings->isCreditCardComponentsEnabled(),
             'enable_one_click_payments' => $paymentSettings->isOneClickPayment(),
-            'enable_one_click_payments_compact_view' => $paymentSettings->isOneClickCompactView()
+            'enable_one_click_payments_compact_view' => $paymentSettings->isOneClickCompactView(),
+            'mollie_show_save_card_checkbox' => $this->showSaveCardCheckbox($page, $creditCardSettings, $paymentSettings, $salesChannelContext),
         ]);
+    }
+
+    /**
+     * A guest has no account to reuse the card from, and a subscription order gets its mandate from
+     * the first payment either way - PayloadBuilder drops the field in both cases, so offering the
+     * checkbox would promise something the payload ignores.
+     */
+    private function showSaveCardCheckbox(Page $page, CreditCardSettings $creditCardSettings, PaymentSettings $paymentSettings, SalesChannelContext $salesChannelContext): bool
+    {
+        if (! $creditCardSettings->isCreditCardComponentsEnabled()) {
+            return false;
+        }
+
+        if (! $paymentSettings->isOneClickPayment()) {
+            return false;
+        }
+
+        $customer = $salesChannelContext->getCustomer();
+        if (! $customer instanceof CustomerEntity || $customer->getGuest()) {
+            return false;
+        }
+
+        return ! $this->lineItemAnalyzer->hasSubscriptionProduct($this->resolveLineItems($page));
+    }
+
+    /**
+     * @return LineItemCollection|OrderLineItemCollection
+     */
+    private function resolveLineItems(Page $page): Collection
+    {
+        if ($page instanceof CheckoutConfirmPage) {
+            return $page->getCart()->getLineItems();
+        }
+
+        if ($page instanceof AccountEditOrderPage) {
+            return $page->getOrder()->getLineItems() ?? new OrderLineItemCollection();
+        }
+
+        return new LineItemCollection();
+    }
+
+    /**
+     * A stored card is picked inside the card form, so with either switch off there is nothing the
+     * customer could select and no reason to ask Mollie for the mandates.
+     */
+    private function findSelectableMandates(CreditCardSettings $creditCardSettings, PaymentSettings $paymentSettings, SalesChannelContext $salesChannelContext): MandateCollection
+    {
+        if (! $creditCardSettings->isCreditCardComponentsEnabled()) {
+            return new MandateCollection();
+        }
+
+        if (! $paymentSettings->isOneClickPayment()) {
+            return new MandateCollection();
+        }
+
+        return $this->listMandatesRoute->list('', $salesChannelContext)
+            ->getMandates()
+            ->filterByPaymentMethod(PaymentMethod::CREDIT_CARD)
+        ;
     }
 
     private function addPosTerminals(Page $page, PaymentMethodExtension $paymentMethod, SalesChannelContext $salesChannelContext): void

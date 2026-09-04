@@ -208,8 +208,17 @@ ifdef allure
 BEHAT_OUTPUT := --format=progress --format=cucumber_json --out=std --out=$(allure)
 endif
 
-behat: ##3 Starts all Behat Tests [allure=<dir> also writes results for the report]
-	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml $(BEHAT_OUTPUT) --colors
+# Scenarios tagged @mollie-broken assert behaviour that is correct for the plugin but that Mollie's
+# own test mode currently gets wrong, so they would report our code as broken. They stay in the
+# suite and out of the default run; check them with `make behat tags=@mollie-broken` to see whether
+# Mollie has fixed it, and drop the tag when it passes.
+BEHAT_TAGS := --tags='~@mollie-broken'
+ifdef tags
+BEHAT_TAGS := --tags='$(tags)'
+endif
+
+behat: ##3 Starts all Behat Tests [allure=<dir> writes results for the report, tags=<expr> selects scenarios]
+	cd ../../.. && php vendor/bin/behat --config ./custom/plugins/MolliePayments/config/behat.yaml $(BEHAT_OUTPUT) $(BEHAT_TAGS) --colors
 
 insights: ##3 Starts the PHPInsights Analyser
 	@php vendor/bin/phpinsights analyse --no-interaction

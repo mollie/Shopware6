@@ -20,6 +20,17 @@ final class CardPayment extends AbstractMolliePaymentHandler implements Subscrip
      */
     public const FIELD_CREDIT_CARD_TOKEN = 'creditCardToken';
 
+    /**
+     * Rendered by the card template only, but modifySequenceType() honours it for every handler.
+     */
+    public const FIELD_SAVE_PAYMENT_DETAILS = 'savePaymentDetails';
+
+    /**
+     * Rendered by the card templates only, but modifySequenceType() honours it for every recurring
+     * capable handler.
+     */
+    public const FIELD_MANDATE_ID = 'mandateId';
+
     public function applyPaymentSpecificParameters(PaymentParameterInterface $payment, RequestDataBag $dataBag, CustomerEntity $customer): PaymentParameterInterface
     {
         if ($payment->getMandateId() !== null) {
@@ -28,13 +39,16 @@ final class CardPayment extends AbstractMolliePaymentHandler implements Subscrip
             return $payment;
         }
 
-        $cardToken = $dataBag->get(self::FIELD_CREDIT_CARD_TOKEN);
-        if ($cardToken === null) {
+        // The card form posts an empty hidden token whenever the components are rendered, and the
+        // storefront skips the tokenisation when a stored card is selected - so an empty token
+        // means "no card entered", not "pay with an empty card".
+        $cardToken = (string) $dataBag->get(self::FIELD_CREDIT_CARD_TOKEN);
+        if (mb_strlen($cardToken) === 0) {
             return $payment;
         }
         $payment->setCardToken($cardToken);
 
-        $savePaymentDetails = $dataBag->get('savePaymentDetails', false);
+        $savePaymentDetails = $dataBag->get(self::FIELD_SAVE_PAYMENT_DETAILS, false);
         if ($savePaymentDetails) {
             $payment->storeCredentials();
             $payment->setSequenceType(SequenceType::ONEOFF);
