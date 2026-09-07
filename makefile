@@ -276,6 +276,12 @@ release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 		-w /plugins/.build \
 		ghcr.io/shopware/shopware-cli:latest \
 		extension zip /plugins/MolliePayments --disable-git
+	# The admin build writes into src/Resources/public and runs CleanWebpackPlugin with
+	# "static/**/*" (see the plugin branch of Shopware's administration webpack.config.js), so
+	# it deletes the storefront images that are served as bundles/molliepayments/static/*.png -
+	# the PayPal Express button and the POS terminal screens. Restore them here, then add them
+	# to the ZIP below; without this the shipped plugin shows broken images.
+	git checkout -- ./src/Resources/public/static
 	# STOREFRONT only: make the same ZIP work on Shopware 6.5.x as well.
 	#   - 6.6/6.7 load the nested  js/<name>/<name>.js
 	#   - 6.5     loads  the flat  js/<name>.js
@@ -290,6 +296,10 @@ release: ##4 Builds a PROD version and creates a ZIP file in plugins/.build.
 		unzip -o -q "$$ZIP" "$$JS/mollie-payments/mollie-payments.js" && \
 		cp "$$JS/mollie-payments/mollie-payments.js" "$$JS/mollie-payments.js" && \
 		zip -q "$$ZIP" "$$JS/mollie-payments.js" && \
+		STATIC=MolliePayments/src/Resources/public/static && \
+		mkdir -p "$$STATIC" && \
+		cp $(CURDIR)/src/Resources/public/static/*.png "$$STATIC/" && \
+		zip -q "$$ZIP" "$$STATIC"/*.png && \
 		rm -rf MolliePayments
 	@echo ""
 	@echo "CONGRATULATIONS"
@@ -340,9 +350,14 @@ build-js:
     -v "./config/.shopware-extension.yml:/plugins/MolliePayments/.shopware-extension.yml" \
     ghcr.io/shopware/shopware-cli:latest \
     extension build /plugins/MolliePayments
+	# Both builds delete committed files, so they are put back here.
+	#   - The 6.6 admin webpack build writes into src/Resources/public and runs
+	#     CleanWebpackPlugin with "static/**/*", which wipes the storefront images that are
+	#     served as bundles/molliepayments/static/*.png. Only their sourcemap leftovers
+	#     (static/css, static/js) stay behind, and those are git-ignored.
+	#   - shopware-cli removes dist/storefront/js completely before writing the new bundle,
+	#     which takes the flat 6.5 layout with it. We build for 6.6 (nested
+	#     js/<name>/<name>.js) and copy that to the flat 6.5 path, same as "make release".
+	git checkout -- ./src/Resources/public/static
 	@JS_DIR="./src/Resources/app/storefront/dist/storefront/js"; \
-	if [ -f "$$JS_DIR/mollie-payments.js" ]; then \
-	    mkdir -p "$$JS_DIR/mollie-payments" && \
-	    cp "$$JS_DIR/mollie-payments.js" "$$JS_DIR/mollie-payments/mollie-payments.js" && \
-	    { [ -f "$$JS_DIR/mollie-payments.js.map" ] && cp "$$JS_DIR/mollie-payments.js.map" "$$JS_DIR/mollie-payments/mollie-payments.js.map" || true; }; \
-	fi
+	cp "$$JS_DIR/mollie-payments/mollie-payments.js" "$$JS_DIR/mollie-payments.js"
