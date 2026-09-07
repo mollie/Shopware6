@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.6.0
 - Added: New "Authorization and capture" section: the authorized status can be skipped per payment method and sales channel, so the money is paid right at the purchase instead of only after the shipment.
 - Added: The config route returns the new "creditCardComponents" field, so headless setups can read the setting.
 - Added: New "Fetch Mollie data" button in the Mollie tab of the order pulls the current payment status from Mollie.
