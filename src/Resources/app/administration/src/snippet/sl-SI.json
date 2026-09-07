@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Podatki o kreditni kartici",
-            "buttonMolliePaymentLink": "Kopiraj v odložišče",
+            "buttonMollieFetchData": "Pridobi podatke Mollie",
             "columnRefunded": "Vrnjeno",
             "columnShipped": "Odposlano",
             "columnCanceled": "Preklicano",

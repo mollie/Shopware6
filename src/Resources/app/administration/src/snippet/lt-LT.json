@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Kredito kortelės duomenys",
-            "buttonMolliePaymentLink": "Kopijuoti į iškarpinę",
+            "buttonMollieFetchData": "Gauti Mollie duomenis",
             "columnRefunded": "Grąžinta",
             "columnShipped": "Išsiųsta",
             "columnCanceled": "Atšaukta",

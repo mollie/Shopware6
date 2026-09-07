@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Luottokorttitiedot",
-            "buttonMolliePaymentLink": "Kopioi leikepöydälle",
+            "buttonMollieFetchData": "Hae Mollie-tiedot",
             "columnRefunded": "Hyvitetty",
             "columnShipped": "Toimitettu",
             "columnCanceled": "Peruutettu",

@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Kredītkartes dati",
-            "buttonMolliePaymentLink": "Kopēt uz starpliktuvi",
+            "buttonMollieFetchData": "Iegūt Mollie datus",
             "columnRefunded": "Atmaksāts",
             "columnShipped": "Nosūtīts",
             "columnCanceled": "Atcelts",

@@ -111,20 +111,15 @@
                         {% block mollie_order_tab_payment_link %}
                             <div v-if="hasPaymentLink" class="mollie-property-section">
                                 <dt class="mollie-property-title">
-                                    {{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}
-                                </dt>
-                                <dd>
-                                    <sw-button-process
-                                        size="x-small"
-                                        class="mollie-property-paymentlink-button"
-                                        :disabled="!molliePaymentUrl"
-                                        :processSuccess="molliePaymentUrlCopied"
-                                        @click="copyPaymentUrlToClipboard"
-                                        @process-finish="onMolliePaymentUrlProcessFinished"
+                                    <a
+                                        class="mollie-property-paymentlink-link"
+                                        :href="molliePaymentUrl"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                     >
-                                        {{ $tc('sw-order.detailExtended.buttonMolliePaymentLink') }}
-                                    </sw-button-process>
-                                </dd>
+                                        {{ $tc('sw-order.detailExtended.labelMolliePaymentLink') }}
+                                    </a>
+                                </dt>
                             </div>
                         {% endblock %}
                     </div>
@@ -155,6 +150,21 @@
                                     </sw-button>
                                 {% endblock %}
                             </sw-button-group>
+                        {% endblock %}
+
+                        {% block mollie_order_tab_actions_fetch_data %}
+                            <sw-button-process
+                                v-if="canFetchMollieData"
+                                class="mollie-order-tab__actions-fetch-data-button"
+                                size="small"
+                                ghost="true"
+                                :isLoading="isFetchingMollieData"
+                                :processSuccess="mollieDataFetched"
+                                @click="onFetchMollieData"
+                                @process-finish="onFetchMollieDataProcessFinished"
+                            >
+                                {{ $tc('sw-order.detailExtended.buttonMollieFetchData') }}
+                            </sw-button-process>
                         {% endblock %}
 
                         {% block mollie_order_tab_shipped_summary %}{% endblock %}
