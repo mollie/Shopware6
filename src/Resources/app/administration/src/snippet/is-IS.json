@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Kreditkortagögn",
-            "buttonMolliePaymentLink": "Afrita í klippibúnað",
+            "buttonMollieFetchData": "Sækja Mollie-gögn",
             "columnRefunded": "Endurgreitt",
             "columnShipped": "Sent",
             "columnCanceled": "Hætt við",

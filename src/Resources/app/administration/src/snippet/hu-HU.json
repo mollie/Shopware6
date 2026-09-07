@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Hitelkártya adatok",
-            "buttonMolliePaymentLink": "Másolás a vágólapra",
+            "buttonMollieFetchData": "Mollie adatok letöltése",
             "columnRefunded": "Visszatérítve",
             "columnShipped": "Kiszállítva",
             "columnCanceled": "Törölve",

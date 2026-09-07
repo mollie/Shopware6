@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Údaje o kreditnej karte",
-            "buttonMolliePaymentLink": "Kopírovať do schránky",
+            "buttonMollieFetchData": "Načítať údaje Mollie",
             "columnRefunded": "Vrátené",
             "columnShipped": "Odoslané",
             "columnCanceled": "Zrušené",

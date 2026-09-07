@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Kreditkort data",
-            "buttonMolliePaymentLink": "Kopiera till urklipp",
+            "buttonMollieFetchData": "Hämta Mollie-data",
             "columnRefunded": "Återbetald",
             "columnShipped": "Fraktad",
             "columnCanceled": "Avbruten",

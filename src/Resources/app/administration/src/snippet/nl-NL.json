@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Credit Card data",
-            "buttonMolliePaymentLink": "Kopieer naar Klembord",
+            "buttonMollieFetchData": "Mollie-gegevens ophalen",
             "columnRefunded": "Terugbetaald",
             "columnShipped": "Verzonden",
             "columnCanceled": "Geannuleerd",

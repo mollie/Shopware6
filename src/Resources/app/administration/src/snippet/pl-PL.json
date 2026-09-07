@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Dane karty kredytowej",
-            "buttonMolliePaymentLink": "Kopiuj do schowka",
+            "buttonMollieFetchData": "Pobierz dane Mollie",
             "columnRefunded": "Zwrócony",
             "columnShipped": "Wysłano",
             "columnCanceled": "Anulowano",

@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Date card de credit",
-            "buttonMolliePaymentLink": "Copiați în clipboard",
+            "buttonMollieFetchData": "Preluare date Mollie",
             "columnRefunded": "Rambursat",
             "columnShipped": "Expediat",
             "columnCanceled": "Anulat",

@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Krediitkaardi andmed",
-            "buttonMolliePaymentLink": "Kopeeri lõikelauale",
+            "buttonMollieFetchData": "Too Mollie andmed",
             "columnRefunded": "Tagastatud",
             "columnShipped": "Saadetud",
             "columnCanceled": "Tühistatud",

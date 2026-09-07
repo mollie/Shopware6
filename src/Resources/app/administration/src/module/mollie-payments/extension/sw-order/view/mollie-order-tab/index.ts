@@ -15,7 +15,8 @@ interface MollieOrderTab {
     showShippingModal: boolean;
     shippedAmount: number;
     shippedQuantity: number;
-    molliePaymentUrlCopied: boolean;
+    isFetchingMollieData: boolean;
+    mollieDataFetched: boolean;
     initialShippingStatus: any;
     initialCancelStatus: any;
 
@@ -27,7 +28,16 @@ const componentConfig: ThisType<MollieOrderTab> = {
 
     mixins: [Mixin.getByName('notification')],
 
-    inject: ['MollieOrderDetailsService', 'MolliePaymentsRefundService', 'acl'],
+    inject: {
+        MollieOrderDetailsService: { from: 'MollieOrderDetailsService' },
+        MolliePaymentsRefundService: { from: 'MolliePaymentsRefundService' },
+        acl: { from: 'acl' },
+        // Both come from sw-order-detail and are used the same way the payment status dropdown uses
+        // them: ask about unsaved edits before the action, reload the order after it. Older Shopware
+        // versions do not provide them, hence the defaults.
+        swOrderDetailAskAndSaveEdits: { from: 'swOrderDetailAskAndSaveEdits', default: () => true },
+        swOrderDetailOnSaveEdits: { from: 'swOrderDetailOnSaveEdits', default: null },
+    },
 
     props: {
         orderId: {
@@ -51,7 +61,8 @@ const componentConfig: ThisType<MollieOrderTab> = {
             showShippingModal: false,
             shippedAmount: 0,
             shippedQuantity: 0,
-            molliePaymentUrlCopied: false,
+            isFetchingMollieData: false,
+            mollieDataFetched: false,
             initialShippingStatus: null,
             initialCancelStatus: null,
         };
@@ -108,6 +119,14 @@ const componentConfig: ThisType<MollieOrderTab> = {
 
         molliePaymentUrl() {
             return this.details?.checkoutUrl ?? '';
+        },
+
+        latestTransactionId() {
+            return getLatestTransaction(this.order?.transactions)?.id ?? null;
+        },
+
+        canFetchMollieData() {
+            return this.isMollieOrder && this.latestTransactionId !== null;
         },
 
         isSubscription() {
@@ -265,22 +284,38 @@ const componentConfig: ThisType<MollieOrderTab> = {
             this.showShippingModal = false;
         },
 
-        copyPaymentUrlToClipboard() {
-            const fallback = async (url: string) => {
-                await navigator.clipboard.writeText(url);
-            };
+        async onFetchMollieData() {
+            const transactionId = this.latestTransactionId;
+            if (transactionId === null) {
+                return;
+            }
 
-            const clipboard =
-                typeof Shopware.Utils.dom.copyToClipboard === 'function'
-                    ? Shopware.Utils.dom.copyToClipboard
-                    : fallback;
+            const proceed = await this.swOrderDetailAskAndSaveEdits();
+            if (!proceed) {
+                return;
+            }
 
-            clipboard(this.molliePaymentUrl);
-            this.molliePaymentUrlCopied = true;
+            this.isFetchingMollieData = true;
+
+            try {
+                await this.MollieOrderDetailsService.triggerWebhook(transactionId);
+                // The detail page works on a draft version of the order that was branched off when
+                // the page was opened, so a plain reload still returns the payment status from
+                // before the webhook ran. Merging that draft and branching a new one off the live
+                // order is what the payment status dropdown does after a transition, and it is what
+                // makes the fetched status appear.
+                await this.swOrderDetailOnSaveEdits?.();
+                this.loadData();
+                this.mollieDataFetched = true;
+            } catch (error: any) {
+                this.createNotificationError({ message: error.message });
+            } finally {
+                this.isFetchingMollieData = false;
+            }
         },
 
-        onMolliePaymentUrlProcessFinished(value: boolean) {
-            this.molliePaymentUrlCopied = value;
+        onFetchMollieDataProcessFinished(value: boolean) {
+            this.mollieDataFetched = value;
         },
     },
 };

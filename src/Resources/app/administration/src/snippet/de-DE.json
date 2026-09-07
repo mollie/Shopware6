@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Kreditkartendaten",
-            "buttonMolliePaymentLink": "In die Zwischenablage kopieren",
+            "buttonMollieFetchData": "Mollie-Daten abrufen",
             "columnRefunded": "Rückerstattet",
             "columnShipped": "Versandt",
             "columnCanceled": "Abgebrochen",

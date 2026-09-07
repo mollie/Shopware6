@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Данни за кредитната карта",
-            "buttonMolliePaymentLink": "Копирайте в клипборда",
+            "buttonMollieFetchData": "Извличане на данни от Mollie",
             "columnRefunded": "Възстановена сума",
             "columnShipped": "Изпратено",
             "columnCanceled": "Отказан",

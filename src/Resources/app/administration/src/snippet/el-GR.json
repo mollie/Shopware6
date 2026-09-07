@@ -446,7 +446,7 @@
     "sw-order": {
         "detailExtended": {
             "titleCreditCardData": "Δεδομένα πιστωτικής κάρτας",
-            "buttonMolliePaymentLink": "Αντιγραφή στο πρόχειρο",
+            "buttonMollieFetchData": "Λήψη δεδομένων Mollie",
             "columnRefunded": "Επιστράφηκε",
             "columnShipped": "Απεστάλη",
             "columnCanceled": "Ακυρώθηκε",
