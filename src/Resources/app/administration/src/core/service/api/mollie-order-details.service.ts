@@ -21,9 +21,13 @@ export default class MollieOrderDetailsService extends ApiService {
      */
     triggerWebhook(transactionId: string): Promise<any> {
         return this.httpClient
-            .post(`${this.getApiBasePath()}/webhook/${transactionId}`, {}, {
-                headers: this.getBasicHeaders(),
-            })
+            .post(
+                `${this.getApiBasePath()}/webhook/${transactionId}`,
+                {},
+                {
+                    headers: this.getBasicHeaders(),
+                },
+            )
             .then((response: any) => ApiService.handleResponse(response));
     }
 }
