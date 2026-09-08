@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Unit\Fake\FakeRouter;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -115,6 +116,159 @@ final class RouteBuilderTest extends TestCase
         );
 
         $this->assertSame($generated, $routeBuilder->getWebhookUrl('txn-1'));
+    }
+
+    public function testWebhookUrlUsesTheShopDomain(): void
+    {
+        $routeBuilder = $this->createRouteBuilder(
+            'https://storefront.example/mollie/webhook/txn-1',
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        $this->assertSame('https://123.eu.ngrok.io/mollie/webhook/txn-1', $routeBuilder->getWebhookUrl('txn-1'));
+    }
+
+    public function testSubscriptionWebhookUrlUsesTheShopDomain(): void
+    {
+        $routeBuilder = $this->createRouteBuilder(
+            'https://storefront.example/mollie/webhook/subscription/sub-1',
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        $this->assertSame('https://123.eu.ngrok.io/mollie/webhook/subscription/sub-1', $routeBuilder->getSubscriptionWebhookUrl('sub-1'));
+    }
+
+    public function testSubscriptionPaymentUpdateWebhookUrlUsesTheShopDomain(): void
+    {
+        $routeBuilder = $this->createRouteBuilder(
+            'https://storefront.example/api/mollie/webhook/subscription/sub-1/mandate/update',
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        $this->assertSame('https://123.eu.ngrok.io/api/mollie/webhook/subscription/sub-1/mandate/update', $routeBuilder->getSubscriptionPaymentUpdateWebhookUrl('sub-1'));
+    }
+
+    public function testShopDomainOverridesTheAppUrlOnStoreApiRequest(): void
+    {
+        $routeBuilder = $this->createRouteBuilder(
+            'https://storefront.example:3000/store-api/mollie/webhook/txn-1',
+            $this->createStoreApiRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        $this->assertSame('https://123.eu.ngrok.io/store-api/mollie/webhook/txn-1', $routeBuilder->getWebhookUrl('txn-1'));
+    }
+
+    public function testReturnUrlIgnoresTheShopDomain(): void
+    {
+        $generated = 'https://storefront.example/mollie/payment/txn-1';
+        $routeBuilder = $this->createRouteBuilder(
+            $generated,
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        // The customer is redirected here in their browser, so it has to stay on the shop domain.
+        $this->assertSame($generated, $routeBuilder->getReturnUrl('txn-1'));
+    }
+
+    public function testSubscriptionPaymentUpdateReturnUrlIgnoresTheShopDomain(): void
+    {
+        $generated = 'https://storefront.example/account/mollie/subscriptions/sub-1/payment/update-success';
+        $routeBuilder = $this->createRouteBuilder(
+            $generated,
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        // 4.x did rewrite this url as well. It is a browser redirect, so it must stay on the shop domain.
+        $this->assertSame($generated, $routeBuilder->getSubscriptionPaymentUpdateReturnUrl('sub-1'));
+    }
+
+    #[DataProvider('sloppyShopDomainProvider')]
+    public function testShopDomainIsCleanedUpBeforeItIsUsed(string $shopDomain): void
+    {
+        $routeBuilder = $this->createRouteBuilder(
+            'https://storefront.example/mollie/webhook/txn-1',
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            $shopDomain
+        );
+
+        $this->assertSame('https://123.eu.ngrok.io/mollie/webhook/txn-1', $routeBuilder->getWebhookUrl('txn-1'));
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function sloppyShopDomainProvider(): array
+    {
+        return [
+            'trailing slash' => ['https://123.eu.ngrok.io/'],
+            'surrounding whitespace' => ['  https://123.eu.ngrok.io  '],
+            'whitespace and trailing slash' => [' https://123.eu.ngrok.io/ '],
+        ];
+    }
+
+    public function testShopDomainWithoutASchemeIsUsedAsGiven(): void
+    {
+        $routeBuilder = $this->createRouteBuilder(
+            'https://storefront.example/mollie/webhook/txn-1',
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            '123.eu.ngrok.io'
+        );
+
+        // The value is never repaired, so a missing scheme surfaces as a url Mollie rejects.
+        $this->assertSame('123.eu.ngrok.io/mollie/webhook/txn-1', $routeBuilder->getWebhookUrl('txn-1'));
+    }
+
+    public function testPaypalExpressCancelUrlIgnoresTheShopDomain(): void
+    {
+        $generated = 'https://storefront.example/mollie/paypal-express/cancel';
+        $routeBuilder = $this->createRouteBuilder(
+            $generated,
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        $this->assertSame($generated, $routeBuilder->getPaypalExpressCancelUrl());
+    }
+
+    #[DataProvider('missingShopDomainProvider')]
+    public function testWebhookUrlStaysOnTheShopDomainWithoutAShopDomain(?string $shopDomain): void
+    {
+        $generated = 'https://storefront.example/mollie/webhook/txn-1';
+        $routeBuilder = $this->createRouteBuilder(
+            $generated,
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            $shopDomain
+        );
+
+        $this->assertSame($generated, $routeBuilder->getWebhookUrl('txn-1'));
+    }
+
+    /**
+     * @return array<string, array{?string}>
+     */
+    public static function missingShopDomainProvider(): array
+    {
+        return [
+            'variable not set at all' => [null],
+            'variable set to an empty value' => [''],
+            'variable set to whitespace' => ['   '],
+        ];
     }
 
     public function testWebhookUrlUsesTheStorefrontRouteWithoutARequest(): void
@@ -297,11 +451,11 @@ final class RouteBuilderTest extends TestCase
         $this->assertArrayNotHasKey('changePaymentStateUrl', $router->getLastParameters());
     }
 
-    private function createRouteBuilder(string $generatedUrl, RequestStack $requestStack, string $appUrl): RouteBuilder
+    private function createRouteBuilder(string $generatedUrl, RequestStack $requestStack, string $appUrl, ?string $shopDomain = ''): RouteBuilder
     {
         $router = new FakeRouter($generatedUrl);
 
-        return new RouteBuilder($router, $requestStack, $appUrl);
+        return new RouteBuilder($router, $requestStack, $appUrl, $shopDomain);
     }
 
     private function createStoreApiRequestStack(): RequestStack

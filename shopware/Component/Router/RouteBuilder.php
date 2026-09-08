@@ -11,14 +11,19 @@ use Symfony\Component\Routing\RouterInterface;
 
 final class RouteBuilder implements RouteBuilderInterface
 {
+    private string $shopDomain;
+
     public function __construct(
         #[Autowire(service: 'router')]
         private RouterInterface $router,
         #[Autowire(service: 'request_stack')]
         private RequestStack $requestStack,
         #[Autowire(value: '%env(default::APP_URL)%')]
-        private string $appUrl = '')
+        private string $appUrl = '',
+        #[Autowire(env: 'default::MOLLIE_SHOP_DOMAIN')]
+        ?string $shopDomain = null)
     {
+        $this->shopDomain = rtrim(trim((string) $shopDomain), '/');
     }
 
     public function getReturnUrl(string $transactionId): string
@@ -43,7 +48,9 @@ final class RouteBuilder implements RouteBuilderInterface
 
         $url = $this->router->generate($routeName, ['transactionId' => $transactionId], RouterInterface::ABSOLUTE_URL);
 
-        return $this->normalizeUrl($url);
+        $normalizedUrl = $this->normalizeUrl($url);
+
+        return $this->applyShopDomain($normalizedUrl);
     }
 
     public function getSubscriptionWebhookUrl(string $subscriptionId): string
@@ -55,7 +62,9 @@ final class RouteBuilder implements RouteBuilderInterface
 
         $url = $this->router->generate($routeName, ['subscriptionId' => $subscriptionId], RouterInterface::ABSOLUTE_URL);
 
-        return $this->normalizeUrl($url);
+        $normalizedUrl = $this->normalizeUrl($url);
+
+        return $this->applyShopDomain($normalizedUrl);
     }
 
     public function getSubscriptionPaymentUpdateReturnUrl(string $subscriptionId): string
@@ -75,7 +84,9 @@ final class RouteBuilder implements RouteBuilderInterface
             RouterInterface::ABSOLUTE_URL
         );
 
-        return $this->normalizeUrl($url);
+        $normalizedUrl = $this->normalizeUrl($url);
+
+        return $this->applyShopDomain($normalizedUrl);
     }
 
     public function getPaypalExpressRedirectUrl(): string
@@ -185,6 +196,38 @@ final class RouteBuilder implements RouteBuilderInterface
     }
 
     /**
+     * Mollie refuses a payment whose webhook URL it cannot reach, which is every URL of a local
+     * development machine. MOLLIE_SHOP_DOMAIN points the webhooks at a publicly reachable domain
+     * instead. The value has to carry the scheme, e.g. https://123.eu.ngrok.io.
+     */
+    private function applyShopDomain(string $url): string
+    {
+        if ($this->shopDomain === '') {
+            return $url;
+        }
+
+        return $this->replaceOrigin($url, $this->shopDomain);
+    }
+
+    private function replaceOrigin(string $url, string $origin): string
+    {
+        $parts = parse_url($url);
+        if ($parts === false || ! isset($parts['path'])) {
+            return $url;
+        }
+
+        $replaced = $origin . $parts['path'];
+        if (isset($parts['query'])) {
+            $replaced .= '?' . $parts['query'];
+        }
+        if (isset($parts['fragment'])) {
+            $replaced .= '#' . $parts['fragment'];
+        }
+
+        return $replaced;
+    }
+
+    /**
      * In a headless setup the store-api request originates from the storefront proxy (e.g. a Nuxt/Nitro
      * server), so the router builds absolute URLs against the proxy host instead of Shopware's public
      * domain. The resulting webhook and return URLs then point to a host Mollie cannot reach. For store-api
@@ -204,11 +247,6 @@ final class RouteBuilder implements RouteBuilderInterface
             return $url;
         }
 
-        $parts = parse_url($url);
-        if ($parts === false || ! isset($parts['path'])) {
-            return $url;
-        }
-
         $appScheme = parse_url($this->appUrl, PHP_URL_SCHEME);
         $appPort = parse_url($this->appUrl, PHP_URL_PORT);
 
@@ -217,14 +255,6 @@ final class RouteBuilder implements RouteBuilderInterface
             $origin .= ':' . $appPort;
         }
 
-        $normalized = $origin . $parts['path'];
-        if (isset($parts['query'])) {
-            $normalized .= '?' . $parts['query'];
-        }
-        if (isset($parts['fragment'])) {
-            $normalized .= '#' . $parts['fragment'];
-        }
-
-        return $normalized;
+        return $this->replaceOrigin($url, $origin);
     }
 }
