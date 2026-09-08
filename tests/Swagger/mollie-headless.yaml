@@ -437,6 +437,44 @@ paths:
           description: "successful operation"
 
 
+  /store-api/mollie/express-components/create-session:
+    post:
+      tags:
+        - "Express Components"
+      summary: "Creates the Mollie session for the express component and returns the client access token to mount it with"
+      description: "Call this before rendering the express component. Without an orderId the session is built from the cart of the current context token, with an orderId from that order - the flow of a failed payment, where the order already exists. That order has to belong to the logged in customer of the context token. Where the component may be shown is your decision: restrictions lists the places the merchant switched it off in. sessionId and clientAccessToken come back empty when the merchant switched the component off entirely or the cart is empty - do not render it then."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderId:
+                  type: string
+                  default: ""
+      responses:
+        "200":
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  restrictions:
+                    type: array
+                    items:
+                      type: string
+                      enum: [ "pdp", "plp", "offcanvas", "cart", "register", "confirm" ]
+                  sessionId:
+                    type: string
+                  clientAccessToken:
+                    type: string
+
   /store-api/mollie/express-components/finish:
     post:
       tags:

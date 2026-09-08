@@ -383,3 +383,25 @@ Expect the next rename. A change that only follows Mollie here is not merchant-f
 no changelog entry, because the feature has not reached merchants yet. For the same reason the
 response is read from both shapes: nothing guarantees that request and resource move in the
 same release.
+
+## The cart of the page is not the cart of the CartService
+
+`StorefrontCartFacade::get()` is what a storefront page renders. When the cart carries a blocked
+shipping or payment method it recalculates the cart, persists the new instance and hands that one
+to the page — but it never writes it back into `CartService`, which keeps returning the old
+instance for the rest of the request. Anything that loads the cart again through `CartService`
+and saves it therefore reverts the switch the facade just made. A service the storefront and the
+store-api share has to accept the cart from the caller for that reason; only the store-api path
+may resolve it itself. In a store-api controller a `Cart` argument — nullable or not — is filled
+by core's `CartValueResolver`, so the same method can serve both.
+
+The edit order page is the counterpart on the order side: `AccountEditOrderPageLoader` scopes the
+order to the logged in customer or, when the url carries a `deepLinkCode`, to a guest who is not
+logged in at all, and it refuses a cancelled order and one whose payment is already done. A
+store-api route that takes an order id gets none of that for free and has to scope the lookup to
+the customer and the sales channel itself.
+
+**It does not have to guard the payment state, though.** A second payment on an order that is
+already paid is not a lost double charge here: `Component/Payment/DuplicatePaymentReconciler`
+refunds the superseded payment and cancels what can still be cancelled. So a state check in front
+of a new payment attempt buys nothing and only duplicates a rule that lives elsewhere.

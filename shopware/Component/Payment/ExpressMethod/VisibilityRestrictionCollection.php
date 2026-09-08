@@ -30,6 +30,11 @@ final class VisibilityRestrictionCollection extends Collection
         return $collection;
     }
 
+    public function contains(VisibilityRestriction $restriction): bool
+    {
+        return in_array($restriction, $this->elements, true);
+    }
+
     /**
      * @return string[]
      */
