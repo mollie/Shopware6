@@ -11,11 +11,13 @@ use Shopware\Core\Checkout\Cart\SalesChannel\CartResponse;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\HttpFoundation\Request;
 
 #[AsDecorator(decorates: CartItemAddRoute::class)]
+#[Autoconfigure(lazy: true)]
 class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
 {
     public function __construct(

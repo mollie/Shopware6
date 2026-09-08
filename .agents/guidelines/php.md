@@ -83,7 +83,9 @@ on a Collection. The codebase has the pattern already — `LineItemCollection`,
 
 ## Classes and dependencies
 
-**`final` by default.** Inheritance is a deliberate decision, not the default.
+**`final` by default.** Inheritance is a deliberate decision, not the default. The one exception is a
+class that decorates a Shopware service: it carries `#[Autoconfigure(lazy: true)]` and Symfony builds
+that lazy ghost by subclassing. See `domain.md`, "Core declares CartService lazy".
 
 **An injected dependency needs an interface.**
 Any class that is constructor-injected into another class gets an interface, so it can be
