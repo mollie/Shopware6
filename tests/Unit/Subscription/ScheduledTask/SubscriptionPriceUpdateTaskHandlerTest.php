@@ -22,9 +22,9 @@ use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 /**
- * The task does two things: notice price changes and migrate the prices whose notice period has
- * passed. A failure is not caught here - it escapes run() so the core logs it and reschedules the
- * task, instead of marking it failed, which Shopware never re-queues.
+ * The nightly task does two independent things: notice price changes and migrate the prices that
+ * the notice period has passed for. One of them failing must not stop the other, or a shop with a
+ * broken sales channel would never migrate any price again.
  */
 #[CoversClass(SubscriptionPriceUpdateTask::class)]
 #[CoversClass(SubscriptionPriceUpdateTaskHandler::class)]
@@ -45,15 +45,17 @@ final class SubscriptionPriceUpdateTaskHandlerTest extends TestCase
         $this->assertCount(2, $subscriptionRepository->getSearchCriteria());
     }
 
-    public function testAnUnreadableSubscriptionTableSurfacesTheFailure(): void
+    /**
+     * Each step contains its own failure, so a broken detect never stops the migration.
+     */
+    public function testAnUnreadableSubscriptionTableDoesNotFailTheTask(): void
     {
         $subscriptionRepository = new FakeSubscriptionRepository();
         $subscriptionRepository->withSearchFailure(new \RuntimeException('database gone'));
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('database gone');
-
         $this->handler($subscriptionRepository, new FakeSubscriptionGateway())->run();
+
+        $this->assertCount(0, $subscriptionRepository->getSearchCriteria());
     }
 
     private function handler(

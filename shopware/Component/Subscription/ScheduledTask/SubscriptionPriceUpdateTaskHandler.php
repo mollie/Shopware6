@@ -36,10 +36,18 @@ final class SubscriptionPriceUpdateTaskHandler extends ScheduledTaskHandler
     {
         $context = new Context(new SystemSource());
 
-        $detectedCount = $this->priceDriftDetector->detect($context);
-        $this->logger->debug(sprintf('%d subscription price change notices dispatched', $detectedCount));
+        try {
+            $detectedCount = $this->priceDriftDetector->detect($context);
+            $this->logger->debug(sprintf('%d subscription price change notices dispatched', $detectedCount));
+        } catch (\Throwable $exception) {
+            $this->logger->error('Subscription price update scheduled task (detect) failed: ' . $exception->getMessage());
+        }
 
-        $migratedCount = $this->priceMigrationHandler->migrate($context);
-        $this->logger->debug(sprintf('%d subscription prices migrated', $migratedCount));
+        try {
+            $migratedCount = $this->priceMigrationHandler->migrate($context);
+            $this->logger->debug(sprintf('%d subscription prices migrated', $migratedCount));
+        } catch (\Throwable $exception) {
+            $this->logger->error('Subscription price update scheduled task (migrate) failed: ' . $exception->getMessage());
+        }
     }
 }
