@@ -58,10 +58,32 @@ final class FakeOrderSearchRepository extends EntityRepository
             if ($orderNumbers !== null && ! in_array((string) $order->getOrderNumber(), $orderNumbers, true)) {
                 continue;
             }
+            if (! $this->matchesScope($order, $criteria)) {
+                continue;
+            }
             $filtered->add($order);
         }
 
         return new EntitySearchResult(OrderEntity::class, $filtered->count(), $filtered, null, $criteria, $context);
+    }
+
+    private function matchesScope(OrderEntity $order, Criteria $criteria): bool
+    {
+        foreach ($criteria->getFilters() as $filter) {
+            if (! $filter instanceof EqualsFilter) {
+                continue;
+            }
+
+            if ($filter->getField() === 'order.salesChannelId' && $order->getSalesChannelId() !== $filter->getValue()) {
+                return false;
+            }
+
+            if ($filter->getField() === 'order.orderCustomer.customerId' && $order->getOrderCustomer()?->getCustomerId() !== $filter->getValue()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

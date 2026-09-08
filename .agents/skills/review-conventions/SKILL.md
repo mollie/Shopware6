@@ -1,6 +1,6 @@
 ---
 name: review-conventions
-description: Senior-PHP-developer review against this project's PHP standard and Shopware extension-point rules — else/nesting, weak typing, empty(), nullable leakage, void returns, array chains that belong on a Collection, magic values, constructor size, LoggerInterface position, missing interface on an injected service, generic exceptions, queries or API calls in loops, hardcoded snippets. Use after the production code is written and BEFORE any test is written. Report findings only, never edit.
+description: Senior-PHP-developer review against this project's PHP standard and Shopware extension-point rules — else/nesting, weak typing, empty(), nullable leakage, void returns, array chains that belong on a Collection, magic values, comment noise, constructor size, LoggerInterface position, missing interface on an injected service, generic exceptions, queries or API calls in loops, hardcoded snippets. Use after the production code is written and BEFORE any test is written. Report findings only, never edit.
 ---
 
 # Review: Conventions
@@ -13,6 +13,13 @@ that reason stated is also a finding.
 
 The standard is `.agents/guidelines/php.md` — read it, it is the checklist. This file adds
 the Shopware-specific rules on top.
+
+Read the comment rule in php.md as written: **every comment the diff adds is a finding.**
+Report each one by line and say to delete it. The only one you leave standing is above an
+expression that cannot be decoded by reading it — a regular expression, a bit operation, a
+formula. A comment stating a Mollie or Shopware behaviour is still a finding; it belongs in
+`.agents/guidelines/domain.md`. So is a class docblock, a design justification, and a summary of
+the method below it. Do not accept "it is short" or "it explains why" as the reason to keep one.
 
 ## Shopware-specific
 

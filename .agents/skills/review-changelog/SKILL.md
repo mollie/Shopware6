@@ -27,8 +27,11 @@ Run this **after** the changelog entries are written, before hand-over.
 - **Developer detail that leaked in.** Root causes, class or file names, API field names,
   Shopware version internals, ticket numbers. Cut them. The entry says what changes for the
   merchant, nothing else.
-- **Too long.** One sentence per entry. If it needs a comma-spliced explanation, the
-  explanation is the part to drop.
+- **Too long.** One short sentence per entry — aim for a line that fits on one line, roughly
+  fifteen words. Name the effect for the merchant and stop: no relative clause explaining how
+  it works, no second half listing what they can do with it, no "so that …". If the sentence
+  needs a comma-spliced explanation, the explanation is the part to drop. Propose the short
+  version for every entry that runs past one line.
 - **Entry that should not exist.** Refactoring, tests, tooling, CI and internal renames get
   no entry at all.
 - **Missing entry.** A merchant-visible change in the code diff with no line in the

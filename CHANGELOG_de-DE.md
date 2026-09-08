@@ -3,6 +3,7 @@
 # 5.6.0
 - Hinzugefügt: Neuer Bereich "Autorisierung und Einzug": pro Zahlart und Verkaufskanal lässt sich der Status "Autorisiert" überspringen, das Geld wird dann direkt beim Kauf bezahlt statt erst nach dem Versand.
 - Hinzugefügt: Die Konfigurationsroute liefert das neue Feld "creditCardComponents", damit Headless-Shops die Einstellung auswerten können.
+- Hinzugefügt: Headless-Shops können die Mollie Express Components jetzt über die Store-API einbinden.
 - Hinzugefügt: Neue Schaltfläche "Mollie-Daten abrufen" im Mollie-Tab der Bestellung holt den aktuellen Zahlungsstatus bei Mollie ab.
 - Geändert: Die Mollie-Zahlarten stehen in der Zahlarten-Übersicht nun gesammelt in einer Kachel.
 

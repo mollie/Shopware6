@@ -39,6 +39,20 @@ final class VisibilityRestrictionCollectionTest extends TestCase
         $this->assertSame([], $collection->toArray());
     }
 
+    public function testAConfiguredPositionIsRecognisedAsRestricted(): void
+    {
+        $collection = VisibilityRestrictionCollection::fromArray(['pdp', 'cart']);
+
+        $this->assertTrue($collection->contains(VisibilityRestriction::CART));
+    }
+
+    public function testAPositionTheMerchantLeftEnabledIsNotRestricted(): void
+    {
+        $collection = VisibilityRestrictionCollection::fromArray(['pdp', 'cart']);
+
+        $this->assertFalse($collection->contains(VisibilityRestriction::CONFIRM));
+    }
+
     public function testEveryRestrictionSurvivesTheRoundTripThroughTheConfiguration(): void
     {
         $allValues = array_map(static fn (VisibilityRestriction $case): string => $case->value, VisibilityRestriction::cases());
