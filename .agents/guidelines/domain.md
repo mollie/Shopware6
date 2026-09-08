@@ -25,6 +25,14 @@ path.
 the finalize, shipment and cancel events. It is a development crutch, not a second production
 code path.
 
+Locally the payment often cannot even be created: Mollie validates the webhook URL when the
+payment is created and answers `The webhook URL is invalid because it is unreachable from
+Mollie's point of view.` `MOLLIE_SHOP_DOMAIN` is the way around it — it replaces the origin of
+the three webhook URLs with any publicly reachable domain, and that domain does not have to lead
+to the developer's shop. It only covers the webhooks; return and cancel URLs are redirects in the
+customer's own browser, so they stay on the shop domain. The value has to carry the scheme
+(`https://…`); it is used as given.
+
 **Maintenance mode blocks the webhook.** To verify in maintenance mode that payments really work,
 allow Mollie's addresses in the sales channel — `curl https://ip-ranges.mollie.com/ips.txt`. Do
 **not** reach for `MOLLIE_DEV_MODE` instead: once maintenance mode is switched off again, the
