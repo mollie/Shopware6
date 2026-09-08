@@ -26,12 +26,13 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
  * the notice period has passed for. One of them failing must not stop the other, or a shop with a
  * broken sales channel would never migrate any price again.
  */
+#[CoversClass(SubscriptionPriceUpdateTask::class)]
 #[CoversClass(SubscriptionPriceUpdateTaskHandler::class)]
 final class SubscriptionPriceUpdateTaskHandlerTest extends TestCase
 {
-    public function testTheTaskRunsOnItsOwnSchedule(): void
+    public function testAFailingRunKeepsTheTaskScheduled(): void
     {
-        $this->assertSame([SubscriptionPriceUpdateTask::class], iterator_to_array($this->handledMessages()));
+        $this->assertTrue(SubscriptionPriceUpdateTask::shouldRescheduleOnFailure());
     }
 
     public function testBothStepsAskTheSubscriptionsForWork(): void
@@ -45,8 +46,7 @@ final class SubscriptionPriceUpdateTaskHandlerTest extends TestCase
     }
 
     /**
-     * A scheduled task that throws is retried by Shopware and floods the log. Neither step may
-     * surface its failure, or one broken shop stops the whole queue.
+     * Each step contains its own failure, so a broken detect never stops the migration.
      */
     public function testAnUnreadableSubscriptionTableDoesNotFailTheTask(): void
     {
@@ -56,14 +56,6 @@ final class SubscriptionPriceUpdateTaskHandlerTest extends TestCase
         $this->handler($subscriptionRepository, new FakeSubscriptionGateway())->run();
 
         $this->assertCount(0, $subscriptionRepository->getSearchCriteria());
-    }
-
-    /**
-     * @return iterable<class-string>
-     */
-    private function handledMessages(): iterable
-    {
-        return SubscriptionPriceUpdateTaskHandler::getHandledMessages();
     }
 
     private function handler(

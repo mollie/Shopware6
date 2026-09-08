@@ -50,12 +50,4 @@ final class SubscriptionPriceUpdateTaskHandler extends ScheduledTaskHandler
             $this->logger->error('Subscription price update scheduled task (migrate) failed: ' . $exception->getMessage());
         }
     }
-
-    /**
-     * @return iterable<class-string>
-     */
-    public static function getHandledMessages(): iterable
-    {
-        return [SubscriptionPriceUpdateTask::class];
-    }
 }

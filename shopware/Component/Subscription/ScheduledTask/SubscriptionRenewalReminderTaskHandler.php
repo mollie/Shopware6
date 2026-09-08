@@ -32,19 +32,7 @@ final class SubscriptionRenewalReminderTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        try {
-            $count = $this->renewalReminder->remind(new Context(new SystemSource()));
-            $this->logger->debug(sprintf('%d subscription renewal reminders processed', $count));
-        } catch (\Throwable $exception) {
-            $this->logger->error('Subscription renewal reminder scheduled task failed: ' . $exception->getMessage());
-        }
-    }
-
-    /**
-     * @return iterable<class-string>
-     */
-    public static function getHandledMessages(): iterable
-    {
-        return [SubscriptionRenewalReminderTask::class];
+        $count = $this->renewalReminder->remind(new Context(new SystemSource()));
+        $this->logger->debug(sprintf('%d subscription renewal reminders processed', $count));
     }
 }

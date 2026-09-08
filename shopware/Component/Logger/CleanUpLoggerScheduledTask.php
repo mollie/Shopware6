@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Logger;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('shopware.scheduled_task')]
 final class CleanUpLoggerScheduledTask extends ScheduledTask
 {
     public static function getTaskName(): string
@@ -17,5 +15,10 @@ final class CleanUpLoggerScheduledTask extends ScheduledTask
     public static function getDefaultInterval(): int
     {
         return 60;
+    }
+
+    public static function shouldRescheduleOnFailure(): bool
+    {
+        return true;
     }
 }

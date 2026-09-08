@@ -18,6 +18,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
+#[CoversClass(CleanUpLoggerScheduledTask::class)]
 #[CoversClass(CleanUpLoggerScheduledTaskHandler::class)]
 final class CleanUpLoggerScheduledTaskHandlerTest extends TestCase
 {
@@ -120,12 +121,9 @@ final class CleanUpLoggerScheduledTaskHandlerTest extends TestCase
         $this->assertFileExists($other);
     }
 
-    public function testTheTaskRunsOnItsOwnSchedule(): void
+    public function testAFailingRunKeepsTheTaskScheduled(): void
     {
-        $this->assertSame(
-            [CleanUpLoggerScheduledTask::class],
-            iterator_to_array(CleanUpLoggerScheduledTaskHandler::getHandledMessages())
-        );
+        $this->assertTrue(CleanUpLoggerScheduledTask::shouldRescheduleOnFailure());
     }
 
     /**
@@ -179,18 +177,15 @@ final class CleanUpLoggerScheduledTaskHandlerTest extends TestCase
         $this->assertFileExists($logFile);
     }
 
-    /**
-     * A scheduled task that throws is retried by Shopware and floods the log. Cleaning up log
-     * files is housekeeping - it must never fail the queue.
-     */
-    public function testAnUnreadableOrderTableDoesNotFailTheTask(): void
+    public function testAnUnreadableOrderTableSurfacesTheFailure(): void
     {
         $this->orderRepository->withSearchFailure(new \RuntimeException('database gone'));
-        $logFile = $this->createLogFile('order-90000.log', 40);
+        $this->createLogFile('order-90000.log', 40);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('database gone');
 
         $this->createHandler()->run();
-
-        $this->assertFileExists($logFile);
     }
 
     private function createHandler(): CleanUpLoggerScheduledTaskHandler

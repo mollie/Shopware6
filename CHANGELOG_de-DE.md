@@ -7,6 +7,7 @@
 - Hinzugefügt: Neue Schaltfläche "Mollie-Daten abrufen" im Mollie-Tab der Bestellung holt den aktuellen Zahlungsstatus bei Mollie ab.
 - Geändert: Die Mollie-Zahlarten stehen in der Zahlarten-Übersicht nun gesammelt in einer Kachel.
 - Behoben: Unter Shopware 6.5.8 startet der Shop wieder, wenn andere Warenkorb-Plugins wie EasyCoupon aktiv sind.
+- Behoben: Der Abgleich offener Zahlungen mit Mollie bleibt nach einem Fehler nicht mehr dauerhaft stehen.
 
 # 5.5.0
 - Hinzugefügt: Plugins können eigene Positionen, etwa Container-Positionen von Set-Produkten, über das neue Event `FilterLineItemEvent` selbst vom Mollie-Payload ausschließen.
