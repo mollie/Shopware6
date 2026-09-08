@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\StatusUpdate;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('shopware.scheduled.task')]
 final class UpdateStatusScheduledTask extends ScheduledTask
 {
     protected const MINUTELY = 60;
@@ -19,5 +17,10 @@ final class UpdateStatusScheduledTask extends ScheduledTask
     public static function getDefaultInterval(): int
     {
         return self::MINUTELY;
+    }
+
+    public static function shouldRescheduleOnFailure(): bool
+    {
+        return true;
     }
 }

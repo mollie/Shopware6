@@ -7,6 +7,7 @@
 - Added: New "Fetch Mollie data" button in the Mollie tab of the order pulls the current payment status from Mollie.
 - Changed: The Mollie payment methods are now grouped in a single card in the payment method overview.
 - Fixed: On Shopware 6.5.8 the shop starts again when other cart plugins such as EasyCoupon are active.
+- Fixed: Synchronising open payments with Mollie no longer stops permanently after an error.
 
 # 5.5.0
 - Added: Plugins can keep their own line items, such as set product containers, out of the Mollie payload themselves, using the new `FilterLineItemEvent`.

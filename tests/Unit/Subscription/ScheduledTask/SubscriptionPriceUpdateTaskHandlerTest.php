@@ -22,16 +22,17 @@ use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTaskDefinition;
 use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 
 /**
- * The nightly task does two independent things: notice price changes and migrate the prices that
- * the notice period has passed for. One of them failing must not stop the other, or a shop with a
- * broken sales channel would never migrate any price again.
+ * The task does two things: notice price changes and migrate the prices whose notice period has
+ * passed. A failure is not caught here - it escapes run() so the core logs it and reschedules the
+ * task, instead of marking it failed, which Shopware never re-queues.
  */
+#[CoversClass(SubscriptionPriceUpdateTask::class)]
 #[CoversClass(SubscriptionPriceUpdateTaskHandler::class)]
 final class SubscriptionPriceUpdateTaskHandlerTest extends TestCase
 {
-    public function testTheTaskRunsOnItsOwnSchedule(): void
+    public function testAFailingRunKeepsTheTaskScheduled(): void
     {
-        $this->assertSame([SubscriptionPriceUpdateTask::class], iterator_to_array($this->handledMessages()));
+        $this->assertTrue(SubscriptionPriceUpdateTask::shouldRescheduleOnFailure());
     }
 
     public function testBothStepsAskTheSubscriptionsForWork(): void
@@ -44,26 +45,15 @@ final class SubscriptionPriceUpdateTaskHandlerTest extends TestCase
         $this->assertCount(2, $subscriptionRepository->getSearchCriteria());
     }
 
-    /**
-     * A scheduled task that throws is retried by Shopware and floods the log. Neither step may
-     * surface its failure, or one broken shop stops the whole queue.
-     */
-    public function testAnUnreadableSubscriptionTableDoesNotFailTheTask(): void
+    public function testAnUnreadableSubscriptionTableSurfacesTheFailure(): void
     {
         $subscriptionRepository = new FakeSubscriptionRepository();
         $subscriptionRepository->withSearchFailure(new \RuntimeException('database gone'));
 
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('database gone');
+
         $this->handler($subscriptionRepository, new FakeSubscriptionGateway())->run();
-
-        $this->assertCount(0, $subscriptionRepository->getSearchCriteria());
-    }
-
-    /**
-     * @return iterable<class-string>
-     */
-    private function handledMessages(): iterable
-    {
-        return SubscriptionPriceUpdateTaskHandler::getHandledMessages();
     }
 
     private function handler(

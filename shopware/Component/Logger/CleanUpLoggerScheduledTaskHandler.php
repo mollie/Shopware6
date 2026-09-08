@@ -55,64 +55,50 @@ final class CleanUpLoggerScheduledTaskHandler extends ScheduledTaskHandler
 
     public function run(): void
     {
-        try {
-            $loggerSettings = $this->settingsService->getLoggerSettings();
-            $successDays = $loggerSettings->getLogSuccessDays();
-            $failedDays = $loggerSettings->getLogFailedDays();
+        $loggerSettings = $this->settingsService->getLoggerSettings();
+        $successDays = $loggerSettings->getLogSuccessDays();
+        $failedDays = $loggerSettings->getLogFailedDays();
 
-            $orderNumbers = $this->logStorage->listOrderNumbers(self::MAX_DELETE_PER_RUN);
-            if ($orderNumbers === []) {
-                return;
-            }
-
-            $successStateByOrderNumber = $this->fetchSuccessStateByOrderNumber($orderNumbers);
-
-            $deletedCount = 0;
-            foreach ($orderNumbers as $orderNumber) {
-                $modifiedTime = $this->logStorage->getModifiedTime($orderNumber);
-                if ($modifiedTime === null) {
-                    continue;
-                }
-
-                $isSuccess = $successStateByOrderNumber[$orderNumber] ?? false;
-                $daysToKeep = $isSuccess ? $successDays : $failedDays;
-                $cutoffTime = time() - ($daysToKeep * 24 * 60 * 60);
-
-                if ($modifiedTime >= $cutoffTime) {
-                    continue;
-                }
-
-                try {
-                    $this->logStorage->delete($orderNumber);
-                    ++$deletedCount;
-                } catch (\Throwable $e) {
-                    $this->logger->warning('Could not delete order log file', [
-                        'orderNumber' => $orderNumber,
-                        'error' => $e->getMessage(),
-                    ]);
-                }
-            }
-
-            $this->logger->debug('Cleanup logger task executed', [
-                'filesDeleted' => $deletedCount,
-                'filesChecked' => count($orderNumbers),
-                'successDays' => $successDays,
-                'failedDays' => $failedDays,
-                'maxPerRun' => self::MAX_DELETE_PER_RUN,
-            ]);
-        } catch (\Throwable $e) {
-            $this->logger->error('Error in cleanup logger task: ' . $e->getMessage());
+        $orderNumbers = $this->logStorage->listOrderNumbers(self::MAX_DELETE_PER_RUN);
+        if ($orderNumbers === []) {
+            return;
         }
-    }
 
-    /**
-     * @return iterable<mixed>
-     */
-    public static function getHandledMessages(): iterable
-    {
-        return [
-            CleanUpLoggerScheduledTask::class,
-        ];
+        $successStateByOrderNumber = $this->fetchSuccessStateByOrderNumber($orderNumbers);
+
+        $deletedCount = 0;
+        foreach ($orderNumbers as $orderNumber) {
+            $modifiedTime = $this->logStorage->getModifiedTime($orderNumber);
+            if ($modifiedTime === null) {
+                continue;
+            }
+
+            $isSuccess = $successStateByOrderNumber[$orderNumber] ?? false;
+            $daysToKeep = $isSuccess ? $successDays : $failedDays;
+            $cutoffTime = time() - ($daysToKeep * 24 * 60 * 60);
+
+            if ($modifiedTime >= $cutoffTime) {
+                continue;
+            }
+
+            try {
+                $this->logStorage->delete($orderNumber);
+                ++$deletedCount;
+            } catch (\Throwable $e) {
+                $this->logger->warning('Could not delete order log file', [
+                    'orderNumber' => $orderNumber,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $this->logger->debug('Cleanup logger task executed', [
+            'filesDeleted' => $deletedCount,
+            'filesChecked' => count($orderNumbers),
+            'successDays' => $successDays,
+            'failedDays' => $failedDays,
+            'maxPerRun' => self::MAX_DELETE_PER_RUN,
+        ]);
     }
 
     /**
