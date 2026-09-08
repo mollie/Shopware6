@@ -405,3 +405,33 @@ the customer and the sales channel itself.
 already paid is not a lost double charge here: `Component/Payment/DuplicatePaymentReconciler`
 refunds the superseded payment and cancels what can still be cancelled. So a state check in front
 of a new payment attempt buys nothing and only duplicates a rule that lives elsewhere.
+
+## Core declares CartService lazy, and a decorator throws that away
+
+`Shopware\Core\Checkout\Cart\SalesChannel\CartService` is registered with `lazy="true"` in core's
+`cart.xml`, because its own constructor takes `CartItemAddRoute` and the other cart routes. That flag
+is what keeps the container acyclic: Symfony skips an edge into a lazy definition when it looks for
+circular references. `DecoratorServicePass` copies `public` and the container tags onto a decorator,
+but never `lazy` — so as soon as any plugin decorates `CartService` (NetiNextEasyCoupon does), the id
+is eager again, and every service that both injects `CartService` and sits in the `CartItemAddRoute`
+decoration chain closes a cycle: the shop then refuses to boot with a
+`ServiceCircularReferenceException`. `ExpressCartItemAddRoute` is such a service, which is why it
+carries `#[Autoconfigure(lazy: true)]`; the attribute cuts every incoming edge no matter which
+decorator ends up outermost, so one per decoration chain is enough. `RemovePaymentMethodRoute` has
+the same shape — two of its removers inject `CartService` — and carries it too. Reported on
+Shopware 6.5.8; 6.6 and 6.7 boot the same combination without complaint, so a shop that cannot
+reproduce it is most likely not on 6.5.
+
+**So a class of ours that decorates Shopware needs `#[Autoconfigure(lazy: true)]`, and therefore
+cannot be `final`.** We never see the whole graph: any plugin may decorate something further up the
+chain and drop a `lazy` flag we were relying on, and the shop then does not boot at all — with our
+class named in the exception, on a shop we cannot reproduce. Lazy on our own decorator is the one
+edge we control, so it goes on by default and not only after a report. Symfony builds a lazy ghost
+by subclassing, which a final class forbids, so the `final`-by-default rule from `php.md` does not
+apply to these classes. Do not "clean up" either the attribute or the missing `final`.
+
+A decorated *controller* is the exception that needs nothing:
+`RegisterControllerArgumentLocatorsPass` calls `setLazy(false)` on everything tagged
+`controller.service_arguments`, so the attribute would be dropped without a word. It is not needed
+either — a controller is only reached through a service locator, which is never a cycle.
+

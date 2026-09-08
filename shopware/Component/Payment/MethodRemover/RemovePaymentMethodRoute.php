@@ -12,12 +12,14 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\AccountOrderController;
 use Shopware\Storefront\Controller\CheckoutController;
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AsDecorator(decorates: PaymentMethodRoute::class)]
-final class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
+#[Autoconfigure(lazy: true)]
+class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
 {
     /**
      * @param AbstractPaymentRemover[] $paymentMethodRemovers
