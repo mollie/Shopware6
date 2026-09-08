@@ -27,10 +27,6 @@ use Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPage;
 use Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPageLoadedEvent;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * The storefront assigns what the express component needs to the page. Everything it does before
- * calling the route exists so no session is created at Mollie for a page that never shows one.
- */
 #[CoversClass(ExpressComponentsCartSubscriber::class)]
 final class ExpressComponentsCartSubscriberTest extends TestCase
 {
@@ -75,10 +71,6 @@ final class ExpressComponentsCartSubscriberTest extends TestCase
         $this->assertFalse($this->sessionBuilder->wasCalled());
     }
 
-    /**
-     * A failed payment sends the customer here, where there is no cart and the session has to be
-     * built from the order the page already loaded.
-     */
     public function testTheEditOrderPageBuildsTheSessionFromItsOrder(): void
     {
         $order = new OrderEntity();

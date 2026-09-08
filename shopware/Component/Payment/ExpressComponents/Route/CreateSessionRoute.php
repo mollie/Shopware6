@@ -22,10 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * Creates the Mollie session the express component is mounted with. A headless shop has no
- * storefront page the session could be attached to, so it asks for one here.
- */
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class CreateSessionRoute extends AbstractCreateSessionRoute
@@ -55,12 +51,8 @@ final class CreateSessionRoute extends AbstractCreateSessionRoute
     {
         $settings = $this->settingsService->getExpressComponentsSettings($salesChannelContext->getSalesChannelId());
 
-        // where the component may be shown is left to the caller: the restrictions travel back in
-        // the response, and a session is created for every position that asks for one
         $restrictions = $settings->getRestrictions();
 
-        // a shop that never switched the feature on asks for a session on every page, so a
-        // switched off component is an answer and not an error
         if ($settings->isEnabled() === false) {
             return new CreateSessionResponse(false, $restrictions);
         }
@@ -72,7 +64,6 @@ final class CreateSessionRoute extends AbstractCreateSessionRoute
             return new CreateSessionResponse(true, $restrictions, $session->getId(), $session->getClientAccessToken());
         }
 
-        // an empty cart has nothing to pay for, and Mollie rejects a session without lines
         if (! $cart instanceof Cart || $cart->getLineItems()->count() === 0) {
             return new CreateSessionResponse(true, $restrictions);
         }
@@ -82,10 +73,6 @@ final class CreateSessionRoute extends AbstractCreateSessionRoute
         return new CreateSessionResponse(true, $restrictions, $session->getId(), $session->getClientAccessToken());
     }
 
-    /**
-     * An order handed in by the storefront is taken as it is, the edit order page has already
-     * checked who may see it.
-     */
     private function resolveOrder(Request $request, SalesChannelContext $salesChannelContext, ?OrderEntity $order): ?OrderEntity
     {
         if ($order instanceof OrderEntity) {
@@ -100,10 +87,6 @@ final class CreateSessionRoute extends AbstractCreateSessionRoute
         return $this->loadOrder($orderId, $salesChannelContext);
     }
 
-    /**
-     * A caller who is not logged in gets the same answer as one asking for a foreign order, so
-     * the route never tells whether that order exists.
-     */
     private function loadOrder(string $orderId, SalesChannelContext $salesChannelContext): OrderEntity
     {
         $customer = $salesChannelContext->getCustomer();

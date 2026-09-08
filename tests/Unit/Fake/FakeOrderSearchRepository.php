@@ -67,10 +67,6 @@ final class FakeOrderSearchRepository extends EntityRepository
         return new EntitySearchResult(OrderEntity::class, $filtered->count(), $filtered, null, $criteria, $context);
     }
 
-    /**
-     * The two filters a store-api route scopes an order lookup with, so a test can show that a
-     * foreign order is not returned instead of only that the filter was set.
-     */
     private function matchesScope(OrderEntity $order, Criteria $criteria): bool
     {
         foreach ($criteria->getFilters() as $filter) {

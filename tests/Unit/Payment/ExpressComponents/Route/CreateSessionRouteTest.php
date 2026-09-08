@@ -23,10 +23,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * The route is the single place a session is created, for the storefront as well as for a
- * headless shop. It decides between cart and order and guards who may pay for which order.
- */
 #[CoversClass(CreateSessionRoute::class)]
 final class CreateSessionRouteTest extends TestCase
 {
@@ -66,10 +62,6 @@ final class CreateSessionRouteTest extends TestCase
         $this->assertFalse($this->sessionBuilder->wasCalled());
     }
 
-    /**
-     * Where the component may be shown is the caller's decision, so a restricted position still
-     * gets its session - the restrictions only travel back as information.
-     */
     public function testTheRestrictionsAreHandedOutWithoutHoldingTheSessionBack(): void
     {
         $restrictions = VisibilityRestrictionCollection::fromArray([VisibilityRestriction::CART->value]);
@@ -113,9 +105,6 @@ final class CreateSessionRouteTest extends TestCase
         $this->assertFalse($this->sessionBuilder->wasCalled());
     }
 
-    /**
-     * The storefront hands the order of the edit order page in, so it is not read a second time.
-     */
     public function testAHandedInOrderIsUsedInsteadOfTheCart(): void
     {
         $order = $this->order();
@@ -161,9 +150,6 @@ final class CreateSessionRouteTest extends TestCase
         );
     }
 
-    /**
-     * The same answer as for a foreign order, so the route never tells whether it exists.
-     */
     public function testAnOrderIdOfACallerWhoIsNotLoggedInIsRejected(): void
     {
         $this->orderRepository->add($this->order());

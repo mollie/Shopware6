@@ -72,7 +72,7 @@ final class ExpressComponentsCartSubscriber implements EventSubscriberInterface
 
     /**
      * A failed payment sends the customer to the edit order page, where the order already exists
-     * and there is no cart. The route builds the session from the order instead.
+     * and there is no cart. The session is built from the order instead.
      */
     public function onEditOrderPageLoaded(AccountEditOrderPageLoadedEvent $event): void
     {
@@ -94,8 +94,6 @@ final class ExpressComponentsCartSubscriber implements EventSubscriberInterface
             $restrictions = $settings->getRestrictions();
             $page->addExtension(ExpressComponentsData::EXTENSION, new ExpressComponentsData(true, $restrictions->toArray()));
 
-            // asking the route for a session the page is not allowed to show would create one at
-            // Mollie for nothing
             if ($restrictions->contains($position)) {
                 return;
             }

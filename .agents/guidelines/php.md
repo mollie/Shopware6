@@ -139,14 +139,15 @@ own version would be slightly nicer.
 **Descriptive names, no abbreviations.** `$paymentTransaction`, not `$pt`. `$index`, not
 `$i`, outside a trivial loop.
 
-**Comments only where the code cannot carry the intent, three lines at the most.**
-Delete any comment that restates the next line. Keep — and *write* — the comment that
-records a reason the code cannot show: a Mollie API constraint, a rounding rule, a
-Shopware-version workaround, a deliberate rule violation. The ceiling holds for a class
-docblock too, and it holds for a public extension point: a docblock that explains how to use
-the class — when to call it, what a listener may or may not do — is documentation, and
-documentation does not go in the source. Beyond that only the `@param`, `@return` and `@var`
-PHPStan cannot infer.
+**Write no comments.** Not "few", not "short" — none. Ordinary code is already clear from its
+names, its types and its size; a sentence above it repeating that is noise, and so is one that
+explains why you built it that way. The single exception is an expression a reader cannot decode
+however carefully they read it: a regular expression, a bit operation, a formula. Everything
+else has a better home — a fact about how Mollie or Shopware behaves goes to
+`.agents/guidelines/domain.md`, a caller-facing description into the swagger file, a design
+decision into the pull request. If a piece of code seems to need a comment to be understood,
+rename it or split it until it does not. Beyond that only the `@param`, `@return`, `@extends`
+and `@var` PHPStan cannot infer.
 
 ---
 
