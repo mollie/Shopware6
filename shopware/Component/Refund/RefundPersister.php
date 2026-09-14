@@ -40,7 +40,7 @@ final class RefundPersister
     }
 
     /**
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $stockItems
+     * @param array<array{id?: string, quantity?: int, amount?: float, resetStock?: int, label?: string}> $stockItems
      * @param array<string, float> $refundedPerLine already-refunded amount per line item / delivery id
      * @param array<string, array{max: float, quantity: int}> $lineInfo max amount + quantity per line item / delivery id
      */
@@ -88,7 +88,7 @@ final class RefundPersister
         $criteria = new Criteria([$entityId]);
         $criteria->addAssociation('refundItems');
 
-        $entity = $this->refundRepository->search($criteria, $context)->first();
+        $entity = $this->refundRepository->search($criteria, $context)->getEntities()->first();
 
         if (! $entity instanceof RefundEntity) {
             throw new \RuntimeException(sprintf('Refund entity "%s" could not be loaded after upsert.', $entityId));
@@ -138,7 +138,7 @@ final class RefundPersister
      * that exceeds the line item maximum is booked as a separate line-less "misc" entry. The
      * total distributed never exceeds the actual Mollie refund amount.
      *
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
+     * @param array<array{id?: string, quantity?: int, amount?: float, resetStock?: int, label?: string}> $requestItems
      * @param array<string, float> $refundedPerLine
      * @param array<string, array{max: float, quantity: int}> $lineInfo
      *
@@ -230,7 +230,7 @@ final class RefundPersister
     }
 
     /**
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
+     * @param array<array{id?: string, quantity?: int, amount?: float, resetStock?: int, label?: string}> $requestItems
      */
     private function applyStockAlterations(array $requestItems, OrderEntity $order, Context $context): void
     {

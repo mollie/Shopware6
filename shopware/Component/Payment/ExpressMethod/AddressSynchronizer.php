@@ -60,7 +60,7 @@ final class AddressSynchronizer implements AddressSynchronizerInterface
         $foundBillingId = null;
 
         /** @var CustomerAddressEntity $entity */
-        foreach ($existing->getElements() as $entity) {
+        foreach ($existing->getEntities()->getElements() as $entity) {
             $customFields = $entity->getCustomFields();
             if ($customFields === null) {
                 continue;

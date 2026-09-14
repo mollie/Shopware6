@@ -35,7 +35,7 @@ final class LocaleProvider
         $criteria->addAssociation('locale');
 
         /** @var ?LanguageEntity $language */
-        $language = $this->languageRepository->search($criteria, $context)->first();
+        $language = $this->languageRepository->search($criteria, $context)->getEntities()->first();
 
         $localeCode = 'en-GB';
 

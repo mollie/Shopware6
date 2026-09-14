@@ -63,7 +63,7 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
         $criteria->addAssociation('transactions.stateMachineState');
 
         /** @var ?OrderEntity $order */
-        $order = $this->orderRepository->search($criteria, $context)->first();
+        $order = $this->orderRepository->search($criteria, $context)->getEntities()->first();
 
         if (! $order instanceof OrderEntity) {
             return;

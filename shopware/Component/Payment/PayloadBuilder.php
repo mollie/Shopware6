@@ -279,6 +279,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
         foreach ($deliveries as $delivery) {
             $deliveryOrderShippingAddress = $delivery->getShippingOrderAddress();
+            /** @phpstan-ignore function.alreadyNarrowedType */
             if (method_exists($order, 'getPrimaryOrderDeliveryId')
                 && $deliveryOrderShippingAddress instanceof OrderAddressEntity
                 && $order->getPrimaryOrderDeliveryId() !== null

@@ -44,6 +44,7 @@ final class OrderReturnSubscriber implements EventSubscriberInterface
             }
 
             $returnId = $result->getPrimaryKey();
+            /** @phpstan-ignore function.alreadyNarrowedType */
             if (! is_string($returnId)) {
                 continue;
             }

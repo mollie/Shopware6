@@ -34,6 +34,7 @@ final class RenewalReminderCommand extends Command
 
         try {
             $this->logger->info('Starting Subscription Renewal Reminder on CLI');
+            /** @phpstan-ignore shopware.disallow.default.context.creation */
             $count = $this->renewalReminder->remind(Context::createDefaultContext());
             $io->success(sprintf('%d subscription renewal reminders processed', $count));
 

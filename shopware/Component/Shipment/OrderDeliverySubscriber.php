@@ -63,7 +63,7 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
         $criteria = new Criteria([$orderDeliveryId]);
         $criteria->addAssociation('order.transactions.stateMachineState');
 
-        $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->first();
+        $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->getEntities()->first();
         if (! $orderDelivery instanceof OrderDeliveryEntity) {
             return;
         }

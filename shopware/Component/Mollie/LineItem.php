@@ -578,13 +578,7 @@ final class LineItem implements \JsonSerializable
             return null;
         }
         if ($taxCollection->count() === 1) {
-            /** @var CalculatedTax $calculatedTax */
-            $calculatedTax = $taxCollection->first();
-            if ($calculatedTax instanceof CalculatedTax) {
-                return $calculatedTax;
-            }
-
-            return null;
+            return $taxCollection->first();
         }
         $totalBase = 0.0;
         $totalTaxAmount = 0.0;

@@ -8,7 +8,7 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMeth
 use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddress;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
-use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
@@ -36,7 +36,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
 {
     /**
-     * @param EntityRepository<CustomerAddressCollection<CustomerEntity>> $customerAddressRepository
+     * @param EntityRepository<CustomerAddressCollection<CustomerAddressEntity>> $customerAddressRepository
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
      */
     public function __construct(

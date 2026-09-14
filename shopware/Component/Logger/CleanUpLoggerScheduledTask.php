@@ -14,7 +14,7 @@ final class CleanUpLoggerScheduledTask extends ScheduledTask
 
     public static function getDefaultInterval(): int
     {
-        return 60;
+        return 300;
     }
 
     public static function shouldRescheduleOnFailure(): bool

@@ -133,6 +133,7 @@ final class CreateAction
             'lastName' => $address->getLastName(),
             'company' => $address->getCompany(),
             'department' => $address->getDepartment(),
+            /** @phpstan-ignore method.deprecated */
             'vatId' => $address->getVatId(),
             'street' => $address->getStreet(),
             'zipcode' => (string) $address->getZipcode(),

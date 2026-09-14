@@ -72,6 +72,7 @@ final class SubscriptionRenewalReminder
 
         $candidates = $this->findCandidates($salesChannel->getId(), $today, $context);
 
+        /** @phpstan-ignore shopware.noEntityRepositoryInLoop */
         foreach ($candidates as $subscription) {
             if (! $this->isMollieActive($subscription)) {
                 continue;
@@ -143,6 +144,6 @@ final class SubscriptionRenewalReminder
 
         $result = $this->customerRepository->search($criteria, $context);
 
-        return $result->first(); // @phpstan-ignore return.type
+        return $result->getEntities()->first(); // @phpstan-ignore return.type
     }
 }

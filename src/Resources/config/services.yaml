@@ -1,0 +1,23 @@
+imports:
+    - { resource: 'packages/**/*.yaml' }
+
+parameters:
+    # Minimum log level for the Mollie log handlers. Override in your project (e.g. config/services.yaml) to change verbosity. Ignored while debug mode is enabled.
+    mollie.logger.level: 'info'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Mollie\Shopware\:
+        resource: './../../../shopware/'
+        exclude: '../../../shopware/{Resources,Migration,*.php}'
+
+    Monolog\Processor\WebProcessor:
+        tags:
+            - { name: 'monolog.processor', channel: 'mollie' }
+
+    Monolog\Processor\IntrospectionProcessor:
+        tags:
+            - { name: 'monolog.processor', channel: 'mollie' }

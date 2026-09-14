@@ -72,7 +72,7 @@ final class TransactionService implements TransactionServiceInterface
         $criteria->addAssociation('paymentMethod');
 
         $searchResult = $this->orderTransactionRepository->search($criteria, $context);
-        $transactionEntity = $searchResult->first();
+        $transactionEntity = $searchResult->getEntities()->first();
 
         if (! $transactionEntity instanceof OrderTransactionEntity) {
             throw TransactionDataException::transactionNotFound($transactionId);
@@ -93,6 +93,7 @@ final class TransactionService implements TransactionServiceInterface
         /** @var ?OrderDeliveryEntity $firstDeliveryLine */
         $firstDeliveryLine = $deliveries->first();
 
+        /** @phpstan-ignore function.alreadyNarrowedType */
         if (method_exists($order,'getPrimaryOrderDelivery')) {
             $firstDeliveryLine = $order->getPrimaryOrderDelivery();
         }

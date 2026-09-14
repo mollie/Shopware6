@@ -47,6 +47,7 @@ final class DeleteMollieDataCommand extends Command
         }
 
         try {
+            /** @phpstan-ignore shopware.disallow.default.context.creation */
             $this->dataRemover->removeAllData(Context::createDefaultContext());
 
             $io->success('All removable Mollie data has been removed.');

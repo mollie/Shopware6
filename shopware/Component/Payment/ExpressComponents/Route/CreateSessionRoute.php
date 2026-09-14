@@ -101,7 +101,7 @@ final class CreateSessionRoute extends AbstractCreateSessionRoute
         $criteria->addAssociation('lineItems');
         $criteria->addAssociation('currency');
 
-        $order = $this->orderRepository->search($criteria, $salesChannelContext->getContext())->first();
+        $order = $this->orderRepository->search($criteria, $salesChannelContext->getContext())->getEntities()->first();
         if (! $order instanceof OrderEntity) {
             throw ExpressComponentsException::orderNotFound($orderId);
         }

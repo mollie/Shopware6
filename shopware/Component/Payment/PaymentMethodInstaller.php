@@ -132,7 +132,7 @@ final class PaymentMethodInstaller
         $iconNamesSearchResult = $this->mediaRepository->search($criteria, $context);
         if ($iconNamesSearchResult->getTotal() > 0) {
             /** @var MediaEntity $mediaEntity */
-            foreach ($iconNamesSearchResult->getIterator() as $mediaEntity) {
+            foreach ($iconNamesSearchResult->getEntities() as $mediaEntity) {
                 $fileName = (string) $mediaEntity->getFileName();
                 // Duplicate media rows can share a file name; the first hit already claimed the
                 // mapping, so skip the rest - otherwise a null key would create a ghost entry.
@@ -163,7 +163,7 @@ final class PaymentMethodInstaller
 
         if ($paymentMethodSearchResult->getTotal() > 0) {
             /** @var PaymentMethodEntity $paymentMethodEntity */
-            foreach ($paymentMethodSearchResult->getIterator() as $paymentMethodEntity) {
+            foreach ($paymentMethodSearchResult->getEntities() as $paymentMethodEntity) {
                 $handlerIdentifier = $paymentMethodEntity->getHandlerIdentifier();
 
                 // The handler always provides a non-empty name; keep it as fallback so we never

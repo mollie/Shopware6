@@ -77,7 +77,7 @@ final class RescueApiController extends AbstractController
     {
         try {
             $criteria = new Criteria([strtolower($customerId)]);
-            $customer = $this->customerRepository->search($criteria, $context)->first();
+            $customer = $this->customerRepository->search($criteria, $context)->getEntities()->first();
             if (! $customer instanceof CustomerEntity) {
                 throw new \RuntimeException('Customer with ID ' . $customerId . ' not found in Shopware');
             }
@@ -146,7 +146,7 @@ final class RescueApiController extends AbstractController
             $criteria->addFilter(new EqualsFilter('mollieId', $mollieSubscriptionId));
             $localSubscriptions = $this->subscriptionRepository->search($criteria, $context);
 
-            if ($localSubscriptions->count() > 0) {
+            if ($localSubscriptions->getEntities()->count() > 0) {
                 $upsert = [];
                 /** @var SubscriptionEntity $localSubscription */
                 foreach ($localSubscriptions as $localSubscription) {

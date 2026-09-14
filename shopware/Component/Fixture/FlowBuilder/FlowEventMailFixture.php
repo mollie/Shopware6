@@ -64,70 +64,72 @@ final class FlowEventMailFixture extends AbstractFixture
 
     public function install(Context $context): void
     {
+        $mailTemplateTypes = [];
+        $mailTemplates = [];
+        $flows = [];
+
         foreach ($this->getMollieFlowEvents($context) as $eventName) {
             $typeId = $this->mailTemplateTypeId($eventName);
             $templateId = $this->mailTemplateId($eventName);
 
-            $this->mailTemplateTypeRepository->upsert([
-                [
-                    'id' => $typeId,
-                    'technicalName' => $this->technicalName($eventName),
-                    'availableEntities' => [],
-                    'name' => 'Mollie Flow Test: ' . $eventName,
-                    'translations' => [
-                        Defaults::LANGUAGE_SYSTEM => [
-                            'name' => 'Mollie Flow Test: ' . $eventName,
-                        ],
+            $mailTemplateTypes[] = [
+                'id' => $typeId,
+                'technicalName' => $this->technicalName($eventName),
+                'availableEntities' => [],
+                'name' => 'Mollie Flow Test: ' . $eventName,
+                'translations' => [
+                    Defaults::LANGUAGE_SYSTEM => [
+                        'name' => 'Mollie Flow Test: ' . $eventName,
                     ],
                 ],
-            ], $context);
+            ];
 
-            $this->mailTemplateRepository->upsert([
-                [
-                    'id' => $templateId,
-                    'mailTemplateTypeId' => $typeId,
-                    'systemDefault' => false,
-                    'senderName' => 'Mollie Flow Test',
-                    'subject' => 'Mollie Flow Test: ' . $eventName,
-                    'description' => 'Test template for flow event ' . $eventName,
-                    'contentHtml' => '<p>Flow event <strong>' . $eventName . '</strong> triggered</p>',
-                    'contentPlain' => 'Flow event ' . $eventName . ' triggered',
-                    'translations' => [
-                        Defaults::LANGUAGE_SYSTEM => [
-                            'senderName' => 'Mollie Flow Test',
-                            'subject' => 'Mollie Flow Test: ' . $eventName,
-                            'description' => 'Test template for flow event ' . $eventName,
-                            'contentHtml' => '<p>Flow event <strong>' . $eventName . '</strong> triggered</p>',
-                            'contentPlain' => 'Flow event ' . $eventName . ' triggered',
-                        ],
+            $mailTemplates[] = [
+                'id' => $templateId,
+                'mailTemplateTypeId' => $typeId,
+                'systemDefault' => false,
+                'senderName' => 'Mollie Flow Test',
+                'subject' => 'Mollie Flow Test: ' . $eventName,
+                'description' => 'Test template for flow event ' . $eventName,
+                'contentHtml' => '<p>Flow event <strong>' . $eventName . '</strong> triggered</p>',
+                'contentPlain' => 'Flow event ' . $eventName . ' triggered',
+                'translations' => [
+                    Defaults::LANGUAGE_SYSTEM => [
+                        'senderName' => 'Mollie Flow Test',
+                        'subject' => 'Mollie Flow Test: ' . $eventName,
+                        'description' => 'Test template for flow event ' . $eventName,
+                        'contentHtml' => '<p>Flow event <strong>' . $eventName . '</strong> triggered</p>',
+                        'contentPlain' => 'Flow event ' . $eventName . ' triggered',
                     ],
                 ],
-            ], $context);
+            ];
 
-            $this->flowRepository->upsert([
-                [
-                    'id' => $this->flowId($eventName),
-                    'name' => 'Mollie Flow Test: ' . $eventName,
-                    'eventName' => $eventName,
-                    'priority' => 1,
-                    'active' => true,
-                    'sequences' => [
-                        [
-                            'id' => $this->flowSequenceId($eventName),
-                            'actionName' => 'action.mail.send',
-                            'position' => 1,
-                            'displayGroup' => 1,
-                            'trueCase' => false,
-                            'config' => [
-                                'mailTemplateId' => $templateId,
-                                'mailTemplateTypeId' => $typeId,
-                                'recipient' => ['type' => 'default', 'data' => []],
-                            ],
+            $flows[] = [
+                'id' => $this->flowId($eventName),
+                'name' => 'Mollie Flow Test: ' . $eventName,
+                'eventName' => $eventName,
+                'priority' => 1,
+                'active' => true,
+                'sequences' => [
+                    [
+                        'id' => $this->flowSequenceId($eventName),
+                        'actionName' => 'action.mail.send',
+                        'position' => 1,
+                        'displayGroup' => 1,
+                        'trueCase' => false,
+                        'config' => [
+                            'mailTemplateId' => $templateId,
+                            'mailTemplateTypeId' => $typeId,
+                            'recipient' => ['type' => 'default', 'data' => []],
                         ],
                     ],
                 ],
-            ], $context);
+            ];
         }
+
+        $this->mailTemplateTypeRepository->upsert($mailTemplateTypes, $context);
+        $this->mailTemplateRepository->upsert($mailTemplates, $context);
+        $this->flowRepository->upsert($flows, $context);
     }
 
     public function uninstall(Context $context): void

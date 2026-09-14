@@ -228,7 +228,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
     {
         $criteria = $this->buildOrderCriteria($orderId, $orderNumber);
 
-        $order = $this->orderRepository->search($criteria, $context)->first();
+        $order = $this->orderRepository->search($criteria, $context)->getEntities()->first();
 
         if (! $order instanceof OrderEntity) {
             throw $orderNumber !== '' ? ShippingException::orderNumberNotFound($orderNumber) : ShippingException::orderNotFound($orderId);

@@ -79,30 +79,31 @@ final class PaymentMethodFixture extends AbstractFixture
     {
         $pluginId = $this->pluginIdProvider->getPluginIdByBaseClass(MolliePayments::class, $context);
         $paymentHandlers = $this->paymentHandlerLocator->getPaymentMethods();
+        $paymentMethods = [];
         foreach ($paymentHandlers as $paymentHandler) {
             if (! $paymentHandler instanceof TestOnlyAwareInterface) {
                 continue;
             }
             $technicalName = $paymentHandler->getTechnicalName();
-            $this->paymentMethodRepository->upsert([
-                [
-                    'id' => $existingPaymentMethodIds[$technicalName] ?? Uuid::fromStringToHex('mollie-payment-' . $technicalName),
-                    'handlerIdentifier' => get_class($paymentHandler),
-                    'technicalName' => $technicalName,
-                    'pluginId' => $pluginId,
-                    'name' => $paymentHandler->getName(),
-                    'active' => true,
-                    'customFields' => [
-                        'mollie_payment_method_name' => $paymentHandler->getPaymentMethod()->value,
-                    ],
-                    'translations' => [
-                        Defaults::LANGUAGE_SYSTEM => [
-                            'name' => $paymentHandler->getName(),
-                        ],
+            $paymentMethods[] = [
+                'id' => $existingPaymentMethodIds[$technicalName] ?? Uuid::fromStringToHex('mollie-payment-' . $technicalName),
+                'handlerIdentifier' => get_class($paymentHandler),
+                'technicalName' => $technicalName,
+                'pluginId' => $pluginId,
+                'name' => $paymentHandler->getName(),
+                'active' => true,
+                'customFields' => [
+                    'mollie_payment_method_name' => $paymentHandler->getPaymentMethod()->value,
+                ],
+                'translations' => [
+                    Defaults::LANGUAGE_SYSTEM => [
+                        'name' => $paymentHandler->getName(),
                     ],
                 ],
-            ], $context);
+            ];
         }
+
+        $this->paymentMethodRepository->upsert($paymentMethods, $context);
     }
 
     /**
@@ -158,6 +159,7 @@ final class PaymentMethodFixture extends AbstractFixture
         $result = [];
         foreach ($paymentMethods as $paymentMethod) {
             $technicalName = $paymentMethod->getTechnicalName();
+            /** @phpstan-ignore identical.alwaysFalse */
             if ($technicalName === null) {
                 continue;
             }

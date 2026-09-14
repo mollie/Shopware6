@@ -66,7 +66,7 @@ final class OrderAdminController extends AbstractController
         $criteria->addAssociation('currency');
 
         /** @var null|OrderEntity $order */
-        $order = $this->orderRepository->search($criteria, $context)->first();
+        $order = $this->orderRepository->search($criteria, $context)->getEntities()->first();
 
         if ($order === null) {
             return new JsonResponse(['error' => 'Order not found'], Response::HTTP_NOT_FOUND);

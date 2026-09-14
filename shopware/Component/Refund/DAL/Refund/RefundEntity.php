@@ -12,6 +12,7 @@ final class RefundEntity extends Entity
     use EntityIdTrait;
 
     protected ?string $orderId = null;
+    protected ?string $orderVersionId = null;
     protected ?string $mollieRefundId = null;
     protected ?string $type = null;
     protected ?string $publicDescription = null;
@@ -31,6 +32,16 @@ final class RefundEntity extends Entity
     public function setOrderId(?string $orderId): void
     {
         $this->orderId = $orderId;
+    }
+
+    public function getOrderVersionId(): ?string
+    {
+        return $this->orderVersionId;
+    }
+
+    public function setOrderVersionId(?string $orderVersionId): void
+    {
+        $this->orderVersionId = $orderVersionId;
     }
 
     public function getMollieRefundId(): ?string

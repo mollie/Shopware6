@@ -51,7 +51,7 @@ final class VoucherPaymentMethodRemover extends AbstractPaymentRemover
             $criteria = new Criteria([$orderId]);
             $criteria->addAssociation('lineItems');
             $orderSearchResult = $this->orderRepository->search($criteria, $salesChannelContext->getContext());
-            $orderEntity = $orderSearchResult->first();
+            $orderEntity = $orderSearchResult->getEntities()->first();
             if ($orderEntity instanceof OrderEntity) {
                 $hasVoucherItems = $this->hasVoucherLineItemsByOrder($orderEntity);
             }

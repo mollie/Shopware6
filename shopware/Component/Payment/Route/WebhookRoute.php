@@ -296,6 +296,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         // The delivery may already be shipped (e.g. via ShipOrderRoute or a manual state change);
         // skip the redundant transition then instead of failing the whole webhook.
         try {
+            /** @phpstan-ignore shopware.internalMethodCall */
             $this->orderService->orderDeliveryStateTransition(
                 $orderDeliveryId,
                 StateMachineTransitionActions::ACTION_SHIP,
@@ -367,6 +368,7 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
 
         foreach ($lineItems as $lineItem) {
+            /** @phpstan-ignore classConstant.deprecatedClass, method.deprecated */
             if (! in_array(State::IS_DOWNLOAD, $lineItem->getStates(), true)) {
                 continue;
             }

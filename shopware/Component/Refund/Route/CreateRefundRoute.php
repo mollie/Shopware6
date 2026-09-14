@@ -79,7 +79,7 @@ final class CreateRefundRoute extends AbstractCreateRefundRoute
         $description = (string) $request->get('description', '');
         $internalDescription = (string) $request->get('internalDescription', '');
         $returnId = (string) $request->get('returnId', '');
-        /** @var array<array{id: string, quantity: int, amount: float, resetStock: int}> $items */
+        /** @var array<array{id?: string, quantity?: int, amount?: float, resetStock?: int, label?: string}> $items */
         $items = $request->get('items', []);
         $items = array_values(array_filter($items, function ($item) {
             return (int) ($item['quantity'] ?? 0) > 0 || (float) ($item['amount'] ?? 0.0) > 0.0;

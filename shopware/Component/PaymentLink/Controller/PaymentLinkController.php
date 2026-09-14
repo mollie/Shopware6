@@ -85,6 +85,7 @@ final class PaymentLinkController extends StorefrontController
         private AbstractSettingsService $settingsService,
         #[Autowire(service: PaymentHandlerLocator::class)]
         private PaymentHandlerLocator $paymentHandlerLocator,
+        /** @phpstan-ignore classConstant.deprecatedClass, parameter.deprecatedInterface */
         #[Autowire(service: JWTFactoryV2::class)]
         private TokenFactoryInterfaceV2 $tokenFactory,
         #[Autowire(service: AccountService::class)]
@@ -208,7 +209,7 @@ final class PaymentLinkController extends StorefrontController
         $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('transactions.paymentMethod');
 
-        $order = $this->orderRepository->search($criteria, $context)->first();
+        $order = $this->orderRepository->search($criteria, $context)->getEntities()->first();
 
         return $order instanceof OrderEntity ? $order : null;
     }
@@ -372,6 +373,7 @@ final class PaymentLinkController extends StorefrontController
     {
         $orderId = $order->getId();
 
+        /** @phpstan-ignore method.deprecatedClass, new.deprecatedClass */
         $tokenStruct = new TokenStruct(
             null,
             null,
@@ -382,6 +384,7 @@ final class PaymentLinkController extends StorefrontController
             $this->generateUrl('frontend.account.edit-order.page', ['orderId' => $orderId]),
         );
 
+        /** @phpstan-ignore method.deprecatedInterface */
         $token = $this->tokenFactory->generateToken($tokenStruct);
 
         return $this->generateUrl('payment.finalize.transaction', ['_sw_payment_token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);

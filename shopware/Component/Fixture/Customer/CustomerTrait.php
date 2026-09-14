@@ -16,8 +16,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Country\CountryEntity;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\Salutation\SalutationCollection;
+use Shopware\Core\System\Salutation\SalutationEntity;
 
 trait CustomerTrait
 {
@@ -30,7 +30,7 @@ trait CustomerTrait
             ->addSorting(new FieldSorting('salutationKey'))
         ;
 
-        /** @var EntityRepository<SalutationCollection<SalesChannelEntity>> $salutationRepository */
+        /** @var EntityRepository<SalutationCollection<SalutationEntity>> $salutationRepository */
         $salutationRepository = $this->container->get('salutation.repository');
 
         return (string) $salutationRepository->searchIds($criteria, $context)->firstId();
@@ -103,7 +103,7 @@ trait CustomerTrait
         // Billink treats an address with a company name as a B2B order and then requires a valid
         // entity type, which the API rejects. A dedicated address without a company name is used for
         // the Billink checkout so it is created as a private (B2C) order.
-        $germany = $countries->filterByProperty('iso', 'DE')->first();
+        $germany = $countries->getEntities()->filterByProperty('iso', 'DE')->first();
         if ($germany instanceof CountryEntity) {
             $addresses['DE-private'] = [
                 'id' => $this->getAddressId('DE-private'),

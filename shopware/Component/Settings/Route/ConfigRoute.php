@@ -66,7 +66,7 @@ final class ConfigRoute
         $criteria->addAssociation('locale');
 
         /** @var ?LanguageEntity $language */
-        $language = $this->languageRepository->search($criteria, $context->getContext())->first();
+        $language = $this->languageRepository->search($criteria, $context->getContext())->getEntities()->first();
 
         if ($language === null) {
             return Locale::enGB->value;

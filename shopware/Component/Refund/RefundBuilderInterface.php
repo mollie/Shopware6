@@ -10,7 +10,7 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 interface RefundBuilderInterface
 {
     /**
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
+     * @param array<array{id?: string, quantity?: int, amount?: float, resetStock?: int, label?: string}> $requestItems
      */
     public function build(Payment $payment, OrderEntity $order, array $requestItems, string $description, ?float $requestAmount = null): CreateRefund;
 }

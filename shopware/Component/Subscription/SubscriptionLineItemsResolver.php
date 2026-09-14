@@ -36,7 +36,7 @@ final class SubscriptionLineItemsResolver implements SubscriptionLineItemsResolv
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('lineItems');
 
-        $orderEntity = $this->orderRepository->search($criteria, $salesChannelContext->getContext())->first();
+        $orderEntity = $this->orderRepository->search($criteria, $salesChannelContext->getContext())->getEntities()->first();
         if (! $orderEntity instanceof OrderEntity) {
             return new LineItemCollection();
         }
