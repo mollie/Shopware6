@@ -1,43 +1,8 @@
 {% block mollie_order_tab %}
     <div class="mollie-order-tab">
-        {# Only show the skeleton on the initial load; on later reloads (e.g. after closing the
-           refund manager) keep the existing content visible instead of blanking the tab. #}
-        <sw-skeleton v-if="isDetailsLoading && !details" />
+        <sw-skeleton v-if="isDetailsLoading" />
 
         <template v-else-if="isMollieOrder">
-            {% block mollie_order_tab_refund_modal %}
-                <sw-modal
-                    v-if="showRefundModal"
-                    variant="full"
-                    :title="$tc('sw-order.detailExtended.refundManager.title')"
-                    class="mollie-modal-refund-manager"
-                    @modal-close="onCloseRefundManager"
-                >
-                    <mollie-refund-manager :order="order" :refundManagerConfig="details.refundManager" />
-                    <template #modal-footer>
-                        <sw-button size="large" @click="onCloseRefundManager">
-                            {{ $tc('sw-order.detailExtended.refundManager.btnCloseRefundManager') }}
-                        </sw-button>
-                    </template>
-                </sw-modal>
-            {% endblock %}
-
-            {% block mollie_order_tab_shipping_modal %}
-                <sw-modal
-                    v-if="showShippingModal"
-                    :title="$tc('mollie-payments.modals.shipping.title')"
-                    variant="large"
-                    @modal-close="onCloseShippingManager"
-                >
-                    <mollie-ship-order :order="order" :shippingStatus="initialShippingStatus" />
-                    <template #modal-footer>
-                        <sw-button size="small" @click="onCloseShippingManager">
-                            {{ $tc('mollie-payments.modals.shipping.cancelButton') }}
-                        </sw-button>
-                    </template>
-                </sw-modal>
-            {% endblock %}
-
             {% block mollie_order_tab_payment_card %}
                 <sw-card
                     :title="$tc('mollie-payments.pluginTitle')"
@@ -244,6 +209,39 @@
                         </sw-card-section>
                     {% endblock %}
                 </sw-card>
+            {% endblock %}
+
+            {% block mollie_order_tab_refund_modal %}
+                <sw-modal
+                    v-if="showRefundModal"
+                    variant="full"
+                    :title="$tc('sw-order.detailExtended.refundManager.title')"
+                    class="mollie-modal-refund-manager"
+                    @modal-close="onCloseRefundManager"
+                >
+                    <mollie-refund-manager :order="order" :refundManagerConfig="details.refundManager" />
+                    <template #modal-footer>
+                        <sw-button size="large" @click="onCloseRefundManager">
+                            {{ $tc('sw-order.detailExtended.refundManager.btnCloseRefundManager') }}
+                        </sw-button>
+                    </template>
+                </sw-modal>
+            {% endblock %}
+
+            {% block mollie_order_tab_shipping_modal %}
+                <sw-modal
+                    v-if="showShippingModal"
+                    :title="$tc('mollie-payments.modals.shipping.title')"
+                    variant="large"
+                    @modal-close="onCloseShippingManager"
+                >
+                    <mollie-ship-order :order="order" :shippingStatus="initialShippingStatus" />
+                    <template #modal-footer>
+                        <sw-button size="small" @click="onCloseShippingManager">
+                            {{ $tc('mollie-payments.modals.shipping.cancelButton') }}
+                        </sw-button>
+                    </template>
+                </sw-modal>
             {% endblock %}
         </template>
     </div>
