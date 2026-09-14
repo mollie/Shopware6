@@ -26,7 +26,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['storefront']])]
 #[AsDecorator(decorates: AccountOrderController::class)]
-/** @phpstan-ignore shopware.internalClassExtends */
 final class FailureModeOrderController extends AccountOrderController
 {
     public function __construct(

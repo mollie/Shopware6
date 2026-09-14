@@ -1,0 +1,7 @@
+mollie_routes:
+    resource: '../../../shopware/Component/**/*Route.php'
+    type: attribute
+
+mollie_controllers:
+    resource: '../../../shopware/Component/**/*Controller.php'
+    type: attribute

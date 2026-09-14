@@ -122,6 +122,11 @@ final class CleanUpLoggerScheduledTaskHandler extends ScheduledTaskHandler
         /** @phpstan-ignore shopware.disallow.default.context.creation */
         $orders = $this->orderRepository->search($criteria, Context::createDefaultContext());
         foreach ($orders as $order) {
+            /** @phpstan-ignore instanceof.alwaysTrue */
+            if (! $order instanceof OrderEntity) {
+                continue;
+            }
+
             $result[(string) $order->getOrderNumber()] = $this->isOrderSuccessful($order);
         }
 

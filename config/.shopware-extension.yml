@@ -73,6 +73,11 @@ validation:
     - message: 'Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct'
     - message: 'Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException'
 
+    # FailureModeOrderController decorates the core controller and therefore has to extend
+    # it. The finding is reported on the class line including its attributes, so an inline
+    # @phpstan-ignore would have to sit above them.
+    - message: 'Class FailureModeOrderController extends internal class'
+
     # Optional bundles. These are in require-dev so headless setups do not pull
     # in the Storefront; the entries below are a fallback for the case where the
     # check environment installs only "require".
