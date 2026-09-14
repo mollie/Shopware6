@@ -1,4 +1,5 @@
 # Unreleased
+- Behoben: Der Mollie-Tab der Bestellung bleibt nach dem Schließen des Refund Managers wieder bedienbar.
 
 # 5.6.0
 - Hinzugefügt: Neuer Bereich "Autorisierung und Einzug": pro Zahlart und Verkaufskanal lässt sich der Status "Autorisiert" überspringen, das Geld wird dann direkt beim Kauf bezahlt statt erst nach dem Versand.
