@@ -50,7 +50,7 @@ class RefundOrderLoader
         $criteria->addAssociation('transactions.stateMachineState');
 
         /** @var null|OrderEntity $order */
-        $order = $this->orderRepository->search($criteria, $context)->first();
+        $order = $this->orderRepository->search($criteria, $context)->getEntities()->first();
 
         if (! $order instanceof OrderEntity) {
             throw new \RuntimeException(sprintf('Order "%s" not found', $orderId));

@@ -88,7 +88,7 @@ final class PaypalExpressMethodRemover extends AbstractPaymentRemover
         $criteria->getAssociation('transactions')->addSorting(new FieldSorting('createdAt', FieldSorting::DESCENDING))->setLimit(1);
 
         $orderSearchResult = $this->orderRepository->search($criteria, $salesChannelContext->getContext());
-        $orderEntity = $orderSearchResult->first();
+        $orderEntity = $orderSearchResult->getEntities()->first();
 
         if (! $orderEntity instanceof OrderEntity) {
             return $paymentMethods;

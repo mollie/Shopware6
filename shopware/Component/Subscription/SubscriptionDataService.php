@@ -56,7 +56,7 @@ final class SubscriptionDataService implements SubscriptionDataServiceInterface
 
         $searchResult = $this->subscriptionRepository->search($criteria, $context);
 
-        $subscriptionEntity = $searchResult->first();
+        $subscriptionEntity = $searchResult->getEntities()->first();
         if (! $subscriptionEntity instanceof SubscriptionEntity) {
             $this->logger->error('Subscription was not found', $logData);
             throw new SubscriptionNotFoundException($subscriptionId);

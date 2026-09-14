@@ -10,6 +10,7 @@ use Shopware\Commercial\ReturnManagement\Entity\OrderReturn\OrderReturnEntity;
 use Shopware\Commercial\ReturnManagement\Entity\OrderReturnLineItem\OrderReturnLineItemEntity;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -62,7 +63,7 @@ final class OrderReturnLoader implements OrderReturnLoaderInterface
             return null;
         }
 
-        $orderReturn = $result->first();
+        $orderReturn = $result->getEntities()->first();
 
         if (! $orderReturn instanceof OrderReturnEntity) {
             $this->logger->warning('OrderReturn - Return not found', ['returnId' => $returnId]);

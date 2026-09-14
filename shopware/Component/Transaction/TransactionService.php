@@ -72,7 +72,7 @@ final class TransactionService implements TransactionServiceInterface
         $criteria->addAssociation('paymentMethod');
 
         $searchResult = $this->orderTransactionRepository->search($criteria, $context);
-        $transactionEntity = $searchResult->first();
+        $transactionEntity = $searchResult->getEntities()->first();
 
         if (! $transactionEntity instanceof OrderTransactionEntity) {
             throw TransactionDataException::transactionNotFound($transactionId);

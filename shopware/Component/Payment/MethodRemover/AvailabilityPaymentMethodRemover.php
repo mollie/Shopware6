@@ -135,7 +135,7 @@ final class AvailabilityPaymentMethodRemover extends AbstractPaymentRemover
         $criteria = new Criteria([$orderId]);
         $criteria->addAssociation('billingAddress.country');
 
-        $order = $this->orderRepository->search($criteria, $salesChannelContext->getContext())->first();
+        $order = $this->orderRepository->search($criteria, $salesChannelContext->getContext())->getEntities()->first();
         if (! $order instanceof OrderEntity) {
             return null;
         }

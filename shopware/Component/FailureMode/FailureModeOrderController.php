@@ -55,7 +55,7 @@ final class FailureModeOrderController extends AccountOrderController
         } catch (OrderException $exception) {
             $criteria = new Criteria([$orderId]);
             $orderRouteResponse = $this->orderRoute->load($request,$context,$criteria);
-            $order = $orderRouteResponse->getOrders()->first();
+            $order = $orderRouteResponse->getOrders()->getEntities()->first();
 
             if ($order instanceof OrderEntity) {
                 $this->addFlash(self::DANGER, $this->trans('error.' . $exception->getErrorCode(), ['%orderNumber%' => (string) $order->getOrderNumber()]));

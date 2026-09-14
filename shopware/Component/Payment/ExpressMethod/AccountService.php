@@ -132,7 +132,7 @@ final class AccountService extends AbstractAccountService
 
         $countryIsoMapping = [];
         /** @var CountryEntity $country */
-        foreach ($countrySearchResult->getElements() as $country) {
+        foreach ($countrySearchResult->getEntities()->getElements() as $country) {
             $iso = $country->getIso();
             if ($iso === null) {
                 continue;
@@ -163,7 +163,7 @@ final class AccountService extends AbstractAccountService
         $salutationSearchResult = $this->salutationRepository->search($criteria, $context->getContext());
         $foundSalutation = null;
         /** @var SalutationEntity $salutation */
-        foreach ($salutationSearchResult->getElements() as $salutation) {
+        foreach ($salutationSearchResult->getEntities()->getElements() as $salutation) {
             $foundSalutation = $salutation;
             if ($salutation->getSalutationKey() === 'not_specified') {
                 return $foundSalutation;

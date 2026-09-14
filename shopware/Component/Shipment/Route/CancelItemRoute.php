@@ -69,7 +69,7 @@ final class CancelItemRoute
         $criteria->addAssociation('order.transactions.stateMachineState');
         $criteria->addAssociation('order.lineItems');
 
-        $lineItem = $this->orderLineRepository->search($criteria, $context)->first();
+        $lineItem = $this->orderLineRepository->search($criteria, $context)->getEntities()->first();
 
         if (! $lineItem instanceof OrderLineItemEntity) {
             return new JsonResponse(['success' => false, 'message' => 'invalidShopwareLineId'], 400);

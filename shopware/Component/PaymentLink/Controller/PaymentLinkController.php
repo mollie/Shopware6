@@ -208,7 +208,7 @@ final class PaymentLinkController extends StorefrontController
         $criteria->addAssociation('transactions.stateMachineState');
         $criteria->addAssociation('transactions.paymentMethod');
 
-        $order = $this->orderRepository->search($criteria, $context)->first();
+        $order = $this->orderRepository->search($criteria, $context)->getEntities()->first();
 
         return $order instanceof OrderEntity ? $order : null;
     }

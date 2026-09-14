@@ -88,7 +88,7 @@ final class RefundPersister
         $criteria = new Criteria([$entityId]);
         $criteria->addAssociation('refundItems');
 
-        $entity = $this->refundRepository->search($criteria, $context)->first();
+        $entity = $this->refundRepository->search($criteria, $context)->getEntities()->first();
 
         if (! $entity instanceof RefundEntity) {
             throw new \RuntimeException(sprintf('Refund entity "%s" could not be loaded after upsert.', $entityId));

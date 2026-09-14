@@ -64,6 +64,17 @@ validation:
     - message: 'Internal error: Class Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct was not found while trying to analyse it'
     - message: 'Internal error: Class Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException was not found while trying to analyse it'
 
+    # Same three cases, second spelling. Newer shopware-cli versions no longer abort
+    # the analysis on these classes as an "Internal error" but report them as ordinary
+    # class.notFound findings, so the messages above stop matching. Both forms stay
+    # listed, because the pipeline pulls the CLI fresh on every run.
+    - identifier: phpstan/class.notFound
+      message: 'Shopware\Commercial\ReturnManagement'
+    - identifier: phpstan/class.notFound
+      message: 'Shopware\Core\Checkout\Payment\Cart\AsyncPaymentTransactionStruct'
+    - identifier: phpstan/class.notFound
+      message: 'Shopware\Core\Content\MailTemplate\Exception\MailTransportFailedException'
+
     # Optional bundles. These are in require-dev so headless setups do not pull
     # in the Storefront; the entries below are a fallback for the case where the
     # check environment installs only "require".

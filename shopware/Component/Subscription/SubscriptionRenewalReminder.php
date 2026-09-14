@@ -143,6 +143,6 @@ final class SubscriptionRenewalReminder
 
         $result = $this->customerRepository->search($criteria, $context);
 
-        return $result->first(); // @phpstan-ignore return.type
+        return $result->getEntities()->first(); // @phpstan-ignore return.type
     }
 }
