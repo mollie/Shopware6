@@ -1,0 +1,16 @@
+monolog:
+    channels:
+        - 'mollie'
+
+    handlers:
+        # type: service handlers configure their own level and bubble in the constructor; the level/bubble keys are ignored here by Symfony.
+        # The channels key restricts the handler to our own channel. Without it Monolog attaches the handler to every channel, so records of other plugins would end up in our log files.
+        mollie_order_file:
+            type: service
+            id: 'Mollie\Shopware\Component\Logger\OrderFileHandler'
+            channels: ['mollie']
+
+        mollie_rotation_file:
+            type: service
+            id: 'Mollie\Shopware\Component\Logger\PluginSettingsHandler'
+            channels: ['mollie']
