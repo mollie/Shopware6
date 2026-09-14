@@ -16,8 +16,8 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Sorting\FieldSorting;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Country\CountryEntity;
-use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\Salutation\SalutationCollection;
+use Shopware\Core\System\Salutation\SalutationEntity;
 
 trait CustomerTrait
 {
@@ -30,7 +30,7 @@ trait CustomerTrait
             ->addSorting(new FieldSorting('salutationKey'))
         ;
 
-        /** @var EntityRepository<SalutationCollection<SalesChannelEntity>> $salutationRepository */
+        /** @var EntityRepository<SalutationCollection<SalutationEntity>> $salutationRepository */
         $salutationRepository = $this->container->get('salutation.repository');
 
         return (string) $salutationRepository->searchIds($criteria, $context)->firstId();

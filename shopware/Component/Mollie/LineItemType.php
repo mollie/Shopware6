@@ -41,6 +41,7 @@ enum LineItemType: string
         }
 
         // downloadable products carry the is-download state and must be reported as digital to Mollie
+        /** @phpstan-ignore classConstant.deprecatedClass, method.deprecated */
         if ($type === self::PHYSICAL && \in_array(State::IS_DOWNLOAD, $cartLineItem->getStates(), true)) {
             return self::DIGITAL;
         }
@@ -71,6 +72,7 @@ enum LineItemType: string
         }
 
         // downloadable products carry the is-download state and must be reported as digital to Mollie
+        /** @phpstan-ignore classConstant.deprecatedClass, method.deprecated */
         if ($type === self::PHYSICAL && \in_array(State::IS_DOWNLOAD, $orderLineItem->getStates(), true)) {
             return self::DIGITAL;
         }

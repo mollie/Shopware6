@@ -32,6 +32,7 @@ final class OrderLogStorage
     {
         $directory = $this->directory();
         if (! is_dir($directory)) {
+            /** @phpstan-ignore shopware.forbidLocalDiskWrite */
             mkdir($directory, 0755, true);
         }
 
@@ -99,6 +100,7 @@ final class OrderLogStorage
             return;
         }
 
+        /** @phpstan-ignore shopware.forbidLocalDiskWrite */
         if (! unlink($file)) {
             throw new \RuntimeException('Could not delete order log file: ' . basename($file));
         }

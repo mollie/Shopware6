@@ -81,6 +81,7 @@ final class ShipmentPersister
             // The delivery may already be in the target state when this is triggered from a manual
             // delivery state change (OrderDeliverySubscriber); skip the redundant transition then.
             try {
+                /** @phpstan-ignore shopware.internalMethodCall */
                 $this->orderService->orderDeliveryStateTransition(
                     $deliveryId,
                     $transition,

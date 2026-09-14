@@ -18,7 +18,7 @@ final class RecordAnonymizer implements ProcessorInterface
         $recordArray = $record->toArray();
 
         /** @var array<mixed> $extraData */
-        $extraData = $recordArray['extra'] ?? [];
+        $extraData = $recordArray['extra'];
         if (isset($extraData['ip'])) {
             // replace it with our anonymous IP
             $extraData['ip'] = $this->anonymizeIp((string) $extraData['ip']);
@@ -29,9 +29,7 @@ final class RecordAnonymizer implements ProcessorInterface
         }
         $recordArray['extra'] = $extraData;
 
-        if (isset($recordArray['context']) && is_array($recordArray['context'])) {
-            $recordArray['context'] = $this->maskPersonalDataInArray($recordArray['context']);
-        }
+        $recordArray['context'] = $this->maskPersonalDataInArray($recordArray['context']);
 
         return new LogRecord(
             $record->datetime,

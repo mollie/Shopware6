@@ -18,6 +18,7 @@ final class StartCheckoutResponse extends StoreApiResponse
     {
         $this->sessionId = $sessionId;
         $this->redirectUrl = $redirectUrl;
+        /** @phpstan-ignore argument.type */
         parent::__construct(new ArrayStruct(
             [
                 'sessionId' => $sessionId,

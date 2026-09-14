@@ -114,6 +114,7 @@ final class CreditNoteService
 
         $versionId = $this->orderRepository->createVersion($orderId, $context);
         $versionContext = $context->createWithVersionId($versionId);
+        /** @phpstan-ignore method.deprecated */
         $this->recalculationService->recalculateOrder($orderId, $versionContext);
         $context->scope(Context::SYSTEM_SCOPE, function (Context $systemContext) use ($versionId): void {
             $this->orderRepository->merge($versionId, $systemContext);

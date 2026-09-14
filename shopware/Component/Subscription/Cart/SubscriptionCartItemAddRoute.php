@@ -37,6 +37,7 @@ class SubscriptionCartItemAddRoute extends AbstractCartItemAddRoute
 
         if ($referencedId !== '' && $items !== null) {
             foreach ($items as $item) {
+                /** @phpstan-ignore instanceof.alwaysTrue */
                 if (! $item instanceof LineItem) {
                     continue;
                 }

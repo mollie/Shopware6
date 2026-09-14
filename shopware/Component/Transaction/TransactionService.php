@@ -93,6 +93,7 @@ final class TransactionService implements TransactionServiceInterface
         /** @var ?OrderDeliveryEntity $firstDeliveryLine */
         $firstDeliveryLine = $deliveries->first();
 
+        /** @phpstan-ignore function.alreadyNarrowedType */
         if (method_exists($order,'getPrimaryOrderDelivery')) {
             $firstDeliveryLine = $order->getPrimaryOrderDelivery();
         }

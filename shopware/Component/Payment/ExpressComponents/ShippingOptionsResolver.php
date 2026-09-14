@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddress;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute;
@@ -40,7 +41,7 @@ final class ShippingOptionsResolver implements ShippingOptionsResolverInterface
 {
     /**
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
-     * @param EntityRepository<CustomerAddressCollection<CustomerEntity>> $customerAddressRepository
+     * @param EntityRepository<CustomerAddressCollection<CustomerAddressEntity>> $customerAddressRepository
      */
     public function __construct(
         #[Autowire(service: ShippingMethodRoute::class)]

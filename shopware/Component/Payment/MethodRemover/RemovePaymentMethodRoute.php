@@ -98,12 +98,7 @@ class RemovePaymentMethodRoute extends AbstractPaymentMethodRoute
         }
         $controllerParts = explode('::', $controller);
 
-        $controllerClass = $controllerParts[0] ?? null;
-        if ($controllerClass === null) {
-            return null;
-        }
-
-        return $controllerClass;
+        return $controllerParts[0];
     }
 
     private function shouldRemove(Request $request): bool

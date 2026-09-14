@@ -46,6 +46,7 @@ final class LogArchiveGenerator implements AttachmentGeneratorInterface
         if (file_exists($fullPath)) {
             $content = (string) file_get_contents($fullPath);
             $mimeType = (string) mime_content_type($fullPath);
+            /** @phpstan-ignore shopware.forbidLocalDiskWrite */
             unlink($fullPath);
         }
 

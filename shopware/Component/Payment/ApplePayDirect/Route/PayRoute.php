@@ -143,6 +143,7 @@ final class PayRoute extends AbstractPayRoute
         $logData['redirectUrl'] = $redirectUrl;
         $this->logger->info('Finished - applepay direct payment', $logData);
 
+        /** @phpstan-ignore shopware.noEmptyResponse */
         return new PayResponse(true, $redirectUrl, '', $orderId,$salesChannelContext);
     }
 }

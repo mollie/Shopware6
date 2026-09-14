@@ -27,6 +27,7 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
     {
         /** @var OrderTransactionEntity $orderTransaction */
         foreach ($event->getEntities() as $orderTransaction) {
+            /** @phpstan-ignore instanceof.alwaysTrue */
             if (! $orderTransaction instanceof OrderTransactionEntity) {
                 continue;
             }

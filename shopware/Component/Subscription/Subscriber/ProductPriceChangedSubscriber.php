@@ -48,6 +48,7 @@ final class ProductPriceChangedSubscriber implements EventSubscriberInterface
                 continue;
             }
             $id = $writeResult->getPrimaryKey();
+            /** @phpstan-ignore function.alreadyNarrowedType */
             if (is_string($id)) {
                 $productIds[] = $id;
             }

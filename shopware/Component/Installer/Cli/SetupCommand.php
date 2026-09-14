@@ -35,6 +35,7 @@ final class SetupCommand extends Command
         try {
             $this->logger->info('Starting plugin setup from CLI command');
 
+            /** @phpstan-ignore shopware.disallow.default.context.creation */
             $this->pluginInstaller->install(Context::createDefaultContext());
 
             $io->success('Plugin setup successfully finished. Data should now be existing as expected');
