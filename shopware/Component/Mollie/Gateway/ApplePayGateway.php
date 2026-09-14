@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Mollie\Gateway;
 
 use GuzzleHttp\Exception\ClientException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class ApplePayGateway implements ApplePayGatewayInterface
 {

@@ -34,7 +34,7 @@ final class RefundBuilder implements RefundBuilderInterface
     }
 
     /**
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
+     * @param array<array{id?: string, quantity?: int, amount?: float, resetStock?: int, label?: string}> $requestItems
      */
     public function build(Payment $payment, OrderEntity $order, array $requestItems, string $description, ?float $requestAmount = null): CreateRefund
     {
@@ -211,7 +211,7 @@ final class RefundBuilder implements RefundBuilderInterface
     }
 
     /**
-     * @param array<array{id: string, quantity: int, amount: float, resetStock: int}> $requestItems
+     * @param array<array{id?: string, quantity?: int, amount?: float, resetStock?: int, label?: string}> $requestItems
      */
     private function buildFromRequestItems(array $requestItems, OrderLineItemCollection $orderLineItems, OrderDeliveryCollection $orderDeliveries, string $taxStatus, CurrencyEntity $currency, ?LineItemCollection $mollieLines, ?string $shippingDiscountLabel = null): LineItemCollection
     {
