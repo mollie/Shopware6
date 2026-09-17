@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Behat\Context;
 
 use Behat\Step\Given;
 use Mollie\Shopware\Integration\Data\CustomerTestBehaviour;
+use PHPUnit\Framework\Assert;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 
 final class CustomerContext extends ShopwareContext
@@ -24,6 +25,7 @@ final class CustomerContext extends ShopwareContext
         $salesChannelContext = $this->getCurrentSalesChannelContext();
         $addressIdSearchResult = $this->getUserAddressByIso($billingCountry, $salesChannelContext);
         $addressId = $addressIdSearchResult->firstId();
+        Assert::assertNotNull($addressId, sprintf('The customer has no %s address with a company, run "bin/console mollie:fixtures:load data"', $billingCountry));
 
         $this->setOptions(SalesChannelContextService::BILLING_ADDRESS_ID,$addressId);
         $this->setOptions(SalesChannelContextService::SHIPPING_ADDRESS_ID,$addressId);
@@ -35,6 +37,7 @@ final class CustomerContext extends ShopwareContext
         $salesChannelContext = $this->getCurrentSalesChannelContext();
         $addressIdSearchResult = $this->getPrivateUserAddressByIso($billingCountry, $salesChannelContext);
         $addressId = $addressIdSearchResult->firstId();
+        Assert::assertNotNull($addressId, sprintf('The customer has no %s address without a company, run "bin/console mollie:fixtures:load data"', $billingCountry));
 
         $this->setOptions(SalesChannelContextService::BILLING_ADDRESS_ID,$addressId);
         $this->setOptions(SalesChannelContextService::SHIPPING_ADDRESS_ID,$addressId);

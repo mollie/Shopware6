@@ -25,10 +25,34 @@ final class SubscriptionCartCollector implements CartDataCollectorInterface
     public function collect(CartDataCollection $data, Cart $original, SalesChannelContext $context, CartBehavior $behavior): void
     {
         foreach ($original->getLineItems() as $lineItem) {
+            $this->ensureExtension($lineItem);
+
             if ($this->isSubscriptionLineItem($lineItem)) {
                 $this->eventDispatcher->dispatch(new SubscriptionLineItemAddedEvent($lineItem, $context));
             }
         }
+    }
+
+    /**
+     * Carts that are never persisted - the subscription renewal builds one in memory - never trigger
+     * CartLoadedEvent, so LineItemSubscriber cannot attach the extension. Without it the subscription
+     * rules do not match and payment methods bound to such a rule are dropped from the renewal.
+     */
+    private function ensureExtension(LineItem $lineItem): void
+    {
+        if ($lineItem->hasExtension(Mollie::EXTENSION)) {
+            return;
+        }
+
+        $customFields = $lineItem->getPayloadValue('customFields');
+        if (! is_array($customFields)) {
+            return;
+        }
+
+        $lineItem->addExtension(
+            Mollie::EXTENSION,
+            Product::createFromLineItem($customFields, (bool) $lineItem->getPayloadValue(Mollie::SUBSCRIPTION_PAYLOAD_KEY))
+        );
     }
 
     private function isSubscriptionLineItem(LineItem $lineItem): bool

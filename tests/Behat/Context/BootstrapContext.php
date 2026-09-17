@@ -38,14 +38,21 @@ final class BootstrapContext implements Context
         /** @var SystemConfigService $systemConfigService */
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
 
+        $salesChannelId = $this->findSalesChannelByDomain($_ENV['APP_URL'], FrameworkContext::createDefaultContext())->getId();
+
         $directPaymentPrefix = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . CaptureSettings::KEY_PREFIX_DIRECT_PAYMENT;
-        $molliePaymentsSettings = $systemConfigService->getDomain(SettingsService::SYSTEM_CONFIG_DOMAIN);
-        foreach (array_keys($molliePaymentsSettings) as $configKey) {
+        $configKeys = array_merge(
+            array_keys($systemConfigService->getDomain(SettingsService::SYSTEM_CONFIG_DOMAIN)),
+            array_keys($systemConfigService->getDomain(SettingsService::SYSTEM_CONFIG_DOMAIN, $salesChannelId, false))
+        );
+
+        foreach (array_unique($configKeys) as $configKey) {
             if (! str_starts_with((string) $configKey, $directPaymentPrefix)) {
                 continue;
             }
 
             $systemConfigService->delete((string) $configKey);
+            $systemConfigService->delete((string) $configKey, $salesChannelId);
         }
 
         /** @var SettingsService $settingsService */

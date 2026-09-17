@@ -111,7 +111,7 @@ class OrderTransactionRepositoryTest extends TestCase
     {
         $salesChannelContext = $this->setPaymentMethod($paymentMethod, $salesChannelContext);
         $this->assertNotNull($salesChannelContext->getCustomer());
-        $this->addItemToCart('SWDEMO10007.1', $salesChannelContext);
+        $this->addItemToCart('MOL_REGULAR', $salesChannelContext);
 
         /** @var RedirectResponse $response */
         $response = $this->startCheckout($salesChannelContext);
@@ -129,7 +129,7 @@ class OrderTransactionRepositoryTest extends TestCase
         $this->assignPaymentMethodToSalesChannel($cashPaymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
 
         $salesChannelContext = $this->setPaymentMethod($cashPaymentMethod, $salesChannelContext);
-        $this->addItemToCart('SWDEMO10007.1', $salesChannelContext);
+        $this->addItemToCart('MOL_REGULAR', $salesChannelContext);
         /** @var RedirectResponse $response */
         $response = $this->startCheckout($salesChannelContext);
         $urlParts = [];

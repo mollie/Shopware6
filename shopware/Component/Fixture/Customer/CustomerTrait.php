@@ -80,7 +80,7 @@ trait CustomerTrait
      */
     private function getAddresses(array $customer, Context $context): array
     {
-        $countries = $this->getCountries(['DE', 'NL', 'FR', 'BE', 'PL', 'ES', 'SE', 'IT'], $context);
+        $countries = $this->getCountries(['DE', 'NL', 'FR', 'BE', 'PL', 'ES', 'SE', 'IT', 'NO', 'DK'], $context);
 
         $addresses = [];
         /** @var CountryEntity $country */
