@@ -25,6 +25,7 @@ export default class ApplePaySessionFactoryService {
     create(isProductMode, country, currency, withPhone, shopSlug, acceptedDataProtection, clickedButton) {
         const me = this;
         var shippingFields = ['name', 'email', 'postalAddress'];
+        var selectedCountryCode = '';
 
         if (withPhone === 1) {
             shippingFields.push('phone');
@@ -69,6 +70,7 @@ export default class ApplePaySessionFactoryService {
 
             if (event.shippingContact.countryCode !== undefined) {
                 countryCode = event.shippingContact.countryCode;
+                selectedCountryCode = countryCode;
             }
 
             me.client.post(
@@ -154,6 +156,7 @@ export default class ApplePaySessionFactoryService {
                 paymentToken,
                 event.payment,
                 acceptedDataProtection,
+                selectedCountryCode,
             );
             clickedButton.classList.remove('processed');
         };
@@ -176,8 +179,9 @@ export default class ApplePaySessionFactoryService {
      * @param paymentToken
      * @param payment
      * @param acceptedDataProtection
+     * @param fallbackCountryCode
      */
-    finishPayment(checkoutURL, paymentToken, payment, acceptedDataProtection) {
+    finishPayment(checkoutURL, paymentToken, payment, acceptedDataProtection, fallbackCountryCode) {
         const createInput = function (name, val) {
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -210,12 +214,37 @@ export default class ApplePaySessionFactoryService {
             form.insertAdjacentElement('beforeend', createInput('phone', payment.shippingContact.phoneNumber));
         }
 
-        form.insertAdjacentElement('beforeend', createInput('countryCode', payment.shippingContact.countryCode));
+        form.insertAdjacentElement(
+            'beforeend',
+            createInput('countryCode', this.resolveCountryCode(payment, fallbackCountryCode)),
+        );
         // also add our payment token
         form.insertAdjacentElement('beforeend', createInput('paymentToken', paymentToken));
 
         document.body.insertAdjacentElement('beforeend', form);
 
         form.submit();
+    }
+
+    /**
+     *
+     * @param payment
+     * @param fallbackCountryCode
+     * @returns {string}
+     */
+    resolveCountryCode(payment, fallbackCountryCode) {
+        const candidates = [
+            payment.shippingContact ? payment.shippingContact.countryCode : undefined,
+            payment.billingContact ? payment.billingContact.countryCode : undefined,
+            fallbackCountryCode,
+        ];
+
+        for (const candidate of candidates) {
+            if (typeof candidate === 'string' && candidate.length > 0) {
+                return candidate;
+            }
+        }
+
+        return '';
     }
 }
