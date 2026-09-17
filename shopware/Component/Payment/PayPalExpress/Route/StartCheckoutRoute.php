@@ -21,6 +21,9 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(defaults: ['_routeScope' => ['store-api']])]
 final class StartCheckoutRoute extends AbstractStartCheckoutRoute
 {
+    public const REDIRECT_URL_PARAMETER = 'redirectUrl';
+    public const CANCEL_URL_PARAMETER = 'cancelUrl';
+
     public function __construct(
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
@@ -51,7 +54,10 @@ final class StartCheckoutRoute extends AbstractStartCheckoutRoute
             throw PaypalExpressException::cartIsEmpty();
         }
 
-        $session = $this->sessionGateway->createPaypalExpressSession($cart, $salesChannelContext);
+        $redirectUrl = trim((string) $request->get(self::REDIRECT_URL_PARAMETER, ''));
+        $cancelUrl = trim((string) $request->get(self::CANCEL_URL_PARAMETER, ''));
+
+        $session = $this->sessionGateway->createPaypalExpressSession($cart, $salesChannelContext, $redirectUrl, $cancelUrl);
 
         // the guest account is created in the finish route after returning from PayPal,
         // where the storefront checkbox no longer exists - so keep the consent on the session

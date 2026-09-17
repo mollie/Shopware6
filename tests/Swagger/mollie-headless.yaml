@@ -437,12 +437,60 @@ paths:
           description: "successful operation"
 
 
+  /store-api/mollie/paypal-express/start:
+    get:
+      tags:
+        - "PayPal Express"
+      summary: "Creates the Mollie session for PayPal Express and returns the url the customer has to be sent to"
+      description: "Pass redirectUrl and cancelUrl, otherwise PayPal returns the customer to storefront routes that do not exist in a headless shop. Both are pages of your own frontend: on redirectUrl call the finish route with your context token to create the guest account, on cancelUrl restore your cart."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      parameters:
+        - in: "query"
+          name: "redirectUrl"
+          description: "Page of your frontend PayPal returns the customer to after the approval"
+        - in: "query"
+          name: "cancelUrl"
+          description: "Page of your frontend PayPal returns the customer to when they cancel"
+        - in: "query"
+          name: "acceptedDataProtection"
+          description: "1 when the customer accepted the data protection, needed when the shop requires it for a guest registration"
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/paypal-express/finish:
+    get:
+      tags:
+        - "PayPal Express"
+      summary: "Creates the guest account from the PayPal data and puts the session on the cart, so the customer can confirm the order"
+      description: "Call this from your redirectUrl page with the context token you started the checkout with. The response carries the new context token of the guest customer - use that one from here on. No order is created, the customer still has to go through your confirm step."
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
+  /store-api/mollie/paypal-express/cancel:
+    get:
+      tags:
+        - "PayPal Express"
+      summary: "Drops the PayPal Express session and restores the cart the customer started from"
+      security:
+        - AccessKey: [ ]
+        - AccessToken: [ ]
+      responses:
+        "200":
+          description: "successful operation"
+
   /store-api/mollie/express-components/create-session:
     post:
       tags:
         - "Express Components"
       summary: "Creates the Mollie session for the express component and returns the client access token to mount it with"
-      description: "Call this before rendering the express component. Without an orderId the session is built from the cart of the current context token, with an orderId from that order - the flow of a failed payment, where the order already exists. That order has to belong to the logged in customer of the context token. Where the component may be shown is your decision: restrictions lists the places the merchant switched it off in. sessionId and clientAccessToken come back empty when the merchant switched the component off entirely or the cart is empty - do not render it then."
+      description: "Call this before rendering the express component. Without an orderId the session is built from the cart of the current context token, with an orderId from that order - the flow of a failed payment, where the order already exists. That order has to belong to the logged in customer of the context token. Where the component may be shown is your decision: restrictions lists the places the merchant switched it off in. sessionId and clientAccessToken come back empty when the merchant switched the component off entirely or the cart is empty - do not render it then. finishUrl and errorUrl are the pages of your frontend the customer is sent to after the payment; {orderId} in them is replaced with the id of the order. Pass them here, not to the finish route: Mollie redirects the browser back on its own and nothing you put in this request survives that redirect."
       security:
         - AccessKey: [ ]
         - AccessToken: [ ]
@@ -453,6 +501,12 @@ paths:
               type: object
               properties:
                 orderId:
+                  type: string
+                  default: ""
+                finishUrl:
+                  type: string
+                  default: ""
+                errorUrl:
                   type: string
                   default: ""
       responses:
@@ -474,33 +528,6 @@ paths:
                     type: string
                   clientAccessToken:
                     type: string
-
-  /store-api/mollie/express-components/finish:
-    post:
-      tags:
-        - "Express Components"
-      summary: "Finishes an express components checkout: creates the guest account and the order from the cart, or attaches the payment to an existing order, and returns where the customer has to be sent"
-      description: "Either cartToken or orderId has to be provided. cartToken is the regular flow out of the cart, orderId is used on the edit order page, where the order already exists. finishUrl and errorUrl are where Shopware sends the customer after the payment was finalized; {orderId} in them is replaced with the id of the order. Without them the storefront pages are used."
-      security:
-        - AccessKey: [ ]
-        - AccessToken: [ ]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                cartToken:
-                  default: ""
-                orderId:
-                  default: ""
-                finishUrl:
-                  default: ""
-                errorUrl:
-                  default: ""
-      responses:
-        "200":
-          description: "successful operation"
 
   /store-api/mollie/subscription:
     get:
@@ -737,6 +764,33 @@ paths:
       responses:
         "200":
           description: "successful operation"
+
+  /api/mollie/express-components/finish/{salesChannelId}:
+    get:
+      tags:
+        - "Express Components"
+      summary: "Where Mollie sends the customer back to after the express component payment. Mollie calls this, you do not"
+      description: "This url is built when the session is created and handed to Mollie, so there is nothing to call here yourself. It creates the guest account and the order, finalizes the payment and then redirects the browser to the finishUrl you passed to create-session, or to the errorUrl when something went wrong. It carries no authentication, because a browser redirect cannot send the sw-access-key header."
+      parameters:
+        - in: "path"
+          name: "salesChannelId"
+          description: "ID of the Shopware Sales Channel the session was created in"
+          required: true
+        - in: "query"
+          name: "cartToken"
+          description: "Context token of the cart the session was created from"
+        - in: "query"
+          name: "orderId"
+          description: "ID of the order the session was created from, instead of a cartToken"
+        - in: "query"
+          name: "finishUrl"
+          description: "Page of your frontend the customer is redirected to after a successful payment"
+        - in: "query"
+          name: "errorUrl"
+          description: "Page of your frontend the customer is redirected to when the checkout could not be finished"
+      responses:
+        "302":
+          description: "redirect to the finishUrl or the errorUrl"
 
   /api/mollie/webhook/{transactionId}:
     post:

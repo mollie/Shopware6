@@ -1,5 +1,6 @@
 # Unreleased
 - Behoben: Der Mollie-Tab der Bestellung bleibt nach dem Schließen des Refund Managers wieder bedienbar.
+- Behoben: Express Components und PayPal Express funktionieren jetzt auch in Headless-Shops.
 
 # 5.6.0
 - Hinzugefügt: Neuer Bereich "Autorisierung und Einzug": pro Zahlart und Verkaufskanal lässt sich der Status "Autorisiert" überspringen, das Geld wird dann direkt beim Kauf bezahlt statt erst nach dem Versand.

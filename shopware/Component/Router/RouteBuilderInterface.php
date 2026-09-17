@@ -17,9 +17,9 @@ interface RouteBuilderInterface
 
     public function getPaypalExpressCancelUrl(): string;
 
-    public function getExpressComponentsRedirectUrl(string $cartToken): string;
+    public function getExpressComponentsRedirectUrl(string $salesChannelId, string $cartToken): string;
 
-    public function getExpressComponentsOrderRedirectUrl(string $orderId): string;
+    public function getExpressComponentsOrderRedirectUrl(string $salesChannelId, string $orderId): string;
 
     public function getExpressComponentsShippingCallbackUrl(string $salesChannelId, string $cartToken): string;
 

@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Router;
 
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Payment\ExpressComponents\FinishUrls;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\FinishCheckoutRoute;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -96,7 +98,9 @@ final class RouteBuilder implements RouteBuilderInterface
             $routeName = 'store-api.mollie.paypal-express.checkout.finish';
         }
 
-        return $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
+        $url = $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
     }
 
     public function getPaypalExpressCancelUrl(): string
@@ -106,7 +110,9 @@ final class RouteBuilder implements RouteBuilderInterface
             $routeName = 'store-api.mollie.paypal-express.checkout.cancel';
         }
 
-        return $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
+        $url = $this->router->generate($routeName, [], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
     }
 
     /**
@@ -114,31 +120,29 @@ final class RouteBuilder implements RouteBuilderInterface
      * the Mollie session id, so the cart token is handed to Mollie as a query parameter and
      * comes back with the redirect.
      */
-    public function getExpressComponentsRedirectUrl(string $cartToken): string
+    public function getExpressComponentsRedirectUrl(string $salesChannelId, string $cartToken): string
     {
-        $routeName = 'frontend.mollie.express-components.finish';
+        $parameters = [FinishCheckoutRoute::CART_TOKEN_PARAMETER => $cartToken];
+
         if ($this->isStoreApiRequest()) {
-            $routeName = 'store-api.mollie.express-components.checkout.finish';
+            return $this->buildExpressComponentsFinishUrl($salesChannelId, $parameters);
         }
 
-        $url = $this->router->generate($routeName, [FinishCheckoutRoute::CART_TOKEN_PARAMETER => $cartToken], RouterInterface::ABSOLUTE_URL);
-
-        return $this->normalizeUrl($url);
+        return $this->router->generate('frontend.mollie.express-components.finish', $parameters, RouterInterface::ABSOLUTE_URL);
     }
 
     /**
      * On the edit order page there is no cart, so the order takes the place of the cart token.
      */
-    public function getExpressComponentsOrderRedirectUrl(string $orderId): string
+    public function getExpressComponentsOrderRedirectUrl(string $salesChannelId, string $orderId): string
     {
-        $routeName = 'frontend.mollie.express-components.finish';
+        $parameters = [FinishCheckoutRoute::ORDER_ID_PARAMETER => $orderId];
+
         if ($this->isStoreApiRequest()) {
-            $routeName = 'store-api.mollie.express-components.checkout.finish';
+            return $this->buildExpressComponentsFinishUrl($salesChannelId, $parameters);
         }
 
-        $url = $this->router->generate($routeName, [FinishCheckoutRoute::ORDER_ID_PARAMETER => $orderId], RouterInterface::ABSOLUTE_URL);
-
-        return $this->normalizeUrl($url);
+        return $this->router->generate('frontend.mollie.express-components.finish', $parameters, RouterInterface::ABSOLUTE_URL);
     }
 
     public function getExpressComponentsShippingCallbackUrl(string $salesChannelId, string $cartToken): string
@@ -183,6 +187,32 @@ final class RouteBuilder implements RouteBuilderInterface
         }
 
         return $this->router->generate('frontend.mollie.pos.checkout', $parameters, RouterInterface::ABSOLUTE_URL);
+    }
+
+    /**
+     * @param array<string, string> $parameters
+     */
+    private function buildExpressComponentsFinishUrl(string $salesChannelId, array $parameters): string
+    {
+        $finishUrls = $this->getFinishUrls();
+
+        $parameters['salesChannelId'] = $salesChannelId;
+        $parameters[FinishUrls::FINISH_URL_PARAMETER] = $finishUrls->getFinishUrlTemplate();
+        $parameters[FinishUrls::ERROR_URL_PARAMETER] = $finishUrls->getErrorUrlTemplate();
+
+        $url = $this->router->generate('api.mollie.express-components.finish', $parameters, RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
+    }
+
+    private function getFinishUrls(): FinishUrls
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (! $request instanceof Request) {
+            return new FinishUrls('', '');
+        }
+
+        return FinishUrls::fromRequest($request);
     }
 
     private function isStoreApiRequest(): bool

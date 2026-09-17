@@ -95,6 +95,46 @@ final class PayPalExpressRoutesTest extends TestCase
         $this->assertFalse($session->hasAcceptedDataProtection());
     }
 
+    /**
+     * A headless client has no storefront pages PayPal could return to, so it names its own.
+     */
+    public function testStartCheckoutHandsTheReturnAndCancelUrlOfTheClientToTheSession(): void
+    {
+        $sessionGateway = new FakeSessionGateway($this->buildSession('session-1', 'https://mollie.com/checkout'));
+
+        $route = new StartCheckoutRoute(
+            new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
+            $sessionGateway,
+            new FakeCartService($this->buildCartWithItems()),
+        );
+
+        $request = new \Symfony\Component\HttpFoundation\Request([
+            StartCheckoutRoute::REDIRECT_URL_PARAMETER => 'https://frontend.example/checkout/paypal-return',
+            StartCheckoutRoute::CANCEL_URL_PARAMETER => 'https://frontend.example/checkout/cart',
+        ]);
+
+        $route->startCheckout($request, $this->salesChannelContext);
+
+        $this->assertSame('https://frontend.example/checkout/paypal-return', $sessionGateway->getPaypalExpressRedirectUrl());
+        $this->assertSame('https://frontend.example/checkout/cart', $sessionGateway->getPaypalExpressCancelUrl());
+    }
+
+    public function testStartCheckoutLeavesTheUrlsEmptyWhenTheClientNamesNone(): void
+    {
+        $sessionGateway = new FakeSessionGateway($this->buildSession('session-1', 'https://mollie.com/checkout'));
+
+        $route = new StartCheckoutRoute(
+            new FakeSettingsService(paypalExpressSettings: new PayPalExpressSettings(true)),
+            $sessionGateway,
+            new FakeCartService($this->buildCartWithItems()),
+        );
+
+        $route->startCheckout(new \Symfony\Component\HttpFoundation\Request(), $this->salesChannelContext);
+
+        $this->assertSame('', $sessionGateway->getPaypalExpressRedirectUrl());
+        $this->assertSame('', $sessionGateway->getPaypalExpressCancelUrl());
+    }
+
     public function testStartCheckoutThrowsWhenDisabled(): void
     {
         $route = new StartCheckoutRoute(

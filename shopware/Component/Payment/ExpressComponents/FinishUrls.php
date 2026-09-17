@@ -34,6 +34,16 @@ final class FinishUrls
         );
     }
 
+    public function getFinishUrlTemplate(): string
+    {
+        return $this->finishUrl;
+    }
+
+    public function getErrorUrlTemplate(): string
+    {
+        return $this->errorUrl;
+    }
+
     public function getFinishUrl(string $orderId): string
     {
         return str_replace(self::ORDER_ID_PLACEHOLDER, $orderId, $this->finishUrl);

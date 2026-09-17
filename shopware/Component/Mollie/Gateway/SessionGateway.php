@@ -61,7 +61,7 @@ final class SessionGateway implements SessionGatewayInterface
         }
     }
 
-    public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext): Session
+    public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext, string $redirectUrl = '', string $cancelUrl = ''): Session
     {
         try {
             $salesChannelId = $salesChannelContext->getSalesChannelId();
@@ -69,14 +69,23 @@ final class SessionGateway implements SessionGatewayInterface
             $client = $this->clientFactory->create($salesChannelId);
             $amount = new Money($cart->getPrice()->getTotalPrice(), $currencyIso);
             $method = PaymentMethod::PAYPAL;
+
+            if ($redirectUrl === '') {
+                $redirectUrl = $this->routeBuilder->getPaypalExpressRedirectUrl();
+            }
+
+            if ($cancelUrl === '') {
+                $cancelUrl = $this->routeBuilder->getPaypalExpressCancelUrl();
+            }
+
             $formParams = [
                 'method' => $method->value,
                 'methodDetails' => [
                     'checkoutFlow' => 'express',
                 ],
                 'amount' => $amount->toArray(),
-                'redirectUrl' => $this->routeBuilder->getPaypalExpressRedirectUrl(),
-                'cancelUrl' => $this->routeBuilder->getPaypalExpressCancelUrl(),
+                'redirectUrl' => $redirectUrl,
+                'cancelUrl' => $cancelUrl,
             ];
 
             $response = $client->post('sessions', [

@@ -11,6 +11,9 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 final class FakeSessionGateway implements SessionGatewayInterface
 {
+    private string $paypalExpressRedirectUrl = '';
+    private string $paypalExpressCancelUrl = '';
+
     /** @var list<CreateSession> */
     private array $createSessionPayloads = [];
     private ?Session $existingSession = null;
@@ -55,9 +58,22 @@ final class FakeSessionGateway implements SessionGatewayInterface
         return $this->session;
     }
 
-    public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext): Session
+    public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext, string $redirectUrl = '', string $cancelUrl = ''): Session
     {
+        $this->paypalExpressRedirectUrl = $redirectUrl;
+        $this->paypalExpressCancelUrl = $cancelUrl;
+
         return $this->session;
+    }
+
+    public function getPaypalExpressRedirectUrl(): string
+    {
+        return $this->paypalExpressRedirectUrl;
+    }
+
+    public function getPaypalExpressCancelUrl(): string
+    {
+        return $this->paypalExpressCancelUrl;
     }
 
     public function getSession(string $sessionId, SalesChannelContext $salesChannelContext): Session
