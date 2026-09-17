@@ -18,6 +18,8 @@ final class PaymentContext extends ShopwareContext
      */
     private array $previousConfigValues = [];
 
+    private ?string $configuredSalesChannelId = null;
+
     #[Given('payment method :arg1 exists and active')]
     public function paymentMethodExistsAndActive(string $paymentMethodIdentifier): void
     {
@@ -48,12 +50,15 @@ final class PaymentContext extends ShopwareContext
             $configValue = (int) $configValue;
         }
 
+        $salesChannelId = $this->getCurrentSalesChannelContext()->getSalesChannelId();
+        $this->configuredSalesChannelId = $salesChannelId;
+
         $fullConfigKey = SettingsService::SYSTEM_CONFIG_DOMAIN . '.' . $configKey;
         if (! array_key_exists($fullConfigKey, $this->previousConfigValues)) {
-            $this->previousConfigValues[$fullConfigKey] = $systemConfigService->get($fullConfigKey);
+            $this->previousConfigValues[$fullConfigKey] = $systemConfigService->get($fullConfigKey, $salesChannelId);
         }
 
-        $systemConfigService->set($fullConfigKey, $configValue);
+        $systemConfigService->set($fullConfigKey, $configValue, $salesChannelId);
 
         $this->getContainer()->get(SettingsService::class)->clearCache();
     }
@@ -74,10 +79,11 @@ final class PaymentContext extends ShopwareContext
         $systemConfigService = $this->getContainer()->get(SystemConfigService::class);
 
         foreach ($this->previousConfigValues as $configKey => $configValue) {
-            $systemConfigService->set($configKey, $configValue);
+            $systemConfigService->set($configKey, $configValue, $this->configuredSalesChannelId);
         }
 
         $this->previousConfigValues = [];
+        $this->configuredSalesChannelId = null;
 
         $this->getContainer()->get(SettingsService::class)->clearCache();
     }

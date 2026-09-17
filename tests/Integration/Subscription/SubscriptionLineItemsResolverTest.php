@@ -32,7 +32,7 @@ final class SubscriptionLineItemsResolverTest extends TestCase
     public function testResolveLineItemsReturnsCartLineItemsForEmptyOrderId(): void
     {
         $salesChannelContext = $this->getDefaultSalesChannelContext();
-        $this->addItemToCart('SWDEMO10007.1', $salesChannelContext);
+        $this->addItemToCart('MOL_REGULAR', $salesChannelContext);
 
         $resolver = $this->getResolver();
 
@@ -56,7 +56,7 @@ final class SubscriptionLineItemsResolverTest extends TestCase
             SalesChannelContextService::PAYMENT_METHOD_ID => $cashPaymentMethod->getId(),
         ]);
 
-        $this->addItemToCart('SWDEMO10007.1', $salesChannelContext);
+        $this->addItemToCart('MOL_REGULAR', $salesChannelContext);
         $this->startCheckout($salesChannelContext);
 
         $orderId = $this->getLatestOrderId($salesChannelContext->getContext());

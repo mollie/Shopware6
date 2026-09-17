@@ -74,6 +74,24 @@ final class Product extends Struct
     }
 
     /**
+     * For products that may be bought both one-off and as a subscription, the subscription state
+     * is decided per line item via the payload marker set by the storefront "Subscribe" button.
+     * Products that are subscription-only keep their product-level state untouched.
+     *
+     * @param array<mixed> $customFields
+     */
+    public static function createFromLineItem(array $customFields, bool $hasSubscriptionMarker): Product
+    {
+        $productExtension = self::createFromCustomFields($customFields);
+
+        if ($productExtension->isSubscription() && $productExtension->allowsStandalonePurchase()) {
+            $productExtension->setIsSubscription($hasSubscriptionMarker);
+        }
+
+        return $productExtension;
+    }
+
+    /**
      * @param array<mixed> $customFields
      */
     public static function createFromCustomFields(array $customFields): Product

@@ -34,10 +34,10 @@ final class LineItemSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $extension = Product::createFromCustomFields($customFields);
-
-            $hasSubscriptionMarker = (bool) $lineItem->getPayloadValue(Mollie::SUBSCRIPTION_PAYLOAD_KEY);
-            $this->applySubscriptionMarker($extension, $hasSubscriptionMarker);
+            $extension = Product::createFromLineItem(
+                $customFields,
+                (bool) $lineItem->getPayloadValue(Mollie::SUBSCRIPTION_PAYLOAD_KEY)
+            );
 
             $lineItem->addExtension(Mollie::EXTENSION, $extension);
         }
@@ -57,26 +57,12 @@ final class LineItemSubscriber implements EventSubscriberInterface
             if ($customFields === null) {
                 continue;
             }
-            $extension = Product::createFromCustomFields($customFields);
-
-            $hasSubscriptionMarker = (bool) ($lineItem->getPayload()[Mollie::SUBSCRIPTION_PAYLOAD_KEY] ?? false);
-            $this->applySubscriptionMarker($extension, $hasSubscriptionMarker);
+            $extension = Product::createFromLineItem(
+                $customFields,
+                (bool) ($lineItem->getPayload()[Mollie::SUBSCRIPTION_PAYLOAD_KEY] ?? false)
+            );
 
             $lineItem->addExtension(Mollie::EXTENSION, $extension);
         }
-    }
-
-    /**
-     * For products that may be bought both one-off and as a subscription, the subscription state
-     * is decided per line item via the payload marker set by the storefront "Subscribe" button.
-     * Products that are subscription-only keep their product-level state untouched.
-     */
-    private function applySubscriptionMarker(Product $extension, bool $hasSubscriptionMarker): void
-    {
-        if (! $extension->isSubscription() || ! $extension->allowsStandalonePurchase()) {
-            return;
-        }
-
-        $extension->setIsSubscription($hasSubscriptionMarker);
     }
 }

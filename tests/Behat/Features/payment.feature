@@ -19,7 +19,7 @@ Feature: Payment
     Examples:
       | paymentMethod | productNumber | quantity | paymentStatus | billingCountry | currency |
       | paypal        | MOL_DIGITAL   | 1        | paid          | DE             | EUR      |
-      | banktransfer  | MOL_DIGITAL   | 2        | paid          | DE             | EUR      |
+      | banktransfer  | MOL_DIGITAL   | 1        | paid          | DE             | EUR      |
 
   Scenario: digital product with klarna is captured automatically and becomes paid
     Given payment method "klarna" exists and active
@@ -83,6 +83,7 @@ Feature: Payment
 
   Scenario: direct payment with a credit card collects the money right at the checkout
     Given payment method "creditcard" exists and active
+    And plugin configuration "enableCreditCardComponents" is set to "true"
     And plugin configuration "directPaymentCreditcard" is set to "true"
     And i select "DE" as billing country
     And i select "EUR" as currency
@@ -95,6 +96,7 @@ Feature: Payment
 
   Scenario: without direct payment a credit card is only held until the shipment
     Given payment method "creditcard" exists and active
+    And plugin configuration "enableCreditCardComponents" is set to "true"
     And plugin configuration "directPaymentCreditcard" is set to "false"
     And i select "DE" as billing country
     And i select "EUR" as currency

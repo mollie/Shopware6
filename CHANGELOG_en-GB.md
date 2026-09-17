@@ -1,4 +1,5 @@
 # Unreleased
+- Fixed: Subscriptions are renewed again when the payment method is restricted to subscription products by a rule.
 - Fixed: The Mollie tab of the order stays usable again after closing the Refund Manager.
 - Fixed: Express components and PayPal Express now also work in headless shops.
 

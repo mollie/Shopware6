@@ -20,6 +20,12 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 #[CoversClass(SubscriptionCartCollector::class)]
 final class SubscriptionCartCollectorTest extends TestCase
 {
+    private const SUBSCRIPTION_CUSTOM_FIELDS = [
+        'mollie_payments_product_subscription_enabled' => true,
+        'mollie_payments_product_subscription_interval' => 1,
+        'mollie_payments_product_subscription_interval_unit' => 'months',
+    ];
+
     public function testDispatchesEventOncePerSubscriptionLineItem(): void
     {
         $subscriptionItem = $this->buildLineItem(true, 'sub-1');
@@ -43,6 +49,79 @@ final class SubscriptionCartCollectorTest extends TestCase
         $this->assertInstanceOf(SubscriptionLineItemAddedEvent::class, $eventSpy->getEvents()[0]);
         $this->assertSame($subscriptionItem, $eventSpy->getEvents()[0]->getLineItem());
         $this->assertSame($secondSubscription, $eventSpy->getEvents()[1]->getLineItem());
+    }
+
+    public function testBuildsExtensionFromPayloadWhenCartWasNeverLoaded(): void
+    {
+        $lineItem = new LineItem('renewal-1', 'product');
+        $lineItem->setPayloadValue('customFields', self::SUBSCRIPTION_CUSTOM_FIELDS);
+        $lineItem->setPayloadValue(Mollie::SUBSCRIPTION_PAYLOAD_KEY, true);
+
+        $eventSpy = new EventSpy();
+        $collector = new SubscriptionCartCollector($eventSpy);
+
+        $cart = new Cart('cart-token');
+        $cart->setLineItems(new LineItemCollection([$lineItem]));
+
+        $collector->collect(
+            new CartDataCollection(),
+            $cart,
+            $this->createMock(SalesChannelContext::class),
+            new CartBehavior()
+        );
+
+        $extension = $lineItem->getExtension(Mollie::EXTENSION);
+        $this->assertInstanceOf(Product::class, $extension);
+        $this->assertTrue($extension->isSubscription());
+        $this->assertSame(1, $eventSpy->getEventCount());
+    }
+
+    public function testKeepsStandaloneProductUnmarkedWithoutSubscriptionPayload(): void
+    {
+        $lineItem = new LineItem('standalone-1', 'product');
+        $lineItem->setPayloadValue('customFields', array_merge(
+            self::SUBSCRIPTION_CUSTOM_FIELDS,
+            ['mollie_payments_product_subscription_allow_onetime' => true]
+        ));
+
+        $eventSpy = new EventSpy();
+        $collector = new SubscriptionCartCollector($eventSpy);
+
+        $cart = new Cart('cart-token');
+        $cart->setLineItems(new LineItemCollection([$lineItem]));
+
+        $collector->collect(
+            new CartDataCollection(),
+            $cart,
+            $this->createMock(SalesChannelContext::class),
+            new CartBehavior()
+        );
+
+        $extension = $lineItem->getExtension(Mollie::EXTENSION);
+        $this->assertInstanceOf(Product::class, $extension);
+        $this->assertFalse($extension->isSubscription());
+        $this->assertSame(0, $eventSpy->getEventCount());
+    }
+
+    public function testDoesNotOverwriteExistingExtension(): void
+    {
+        $lineItem = $this->buildLineItem(true, 'existing-1');
+        $existing = $lineItem->getExtension(Mollie::EXTENSION);
+        $lineItem->setPayloadValue('customFields', self::SUBSCRIPTION_CUSTOM_FIELDS);
+
+        $collector = new SubscriptionCartCollector(new EventSpy());
+
+        $cart = new Cart('cart-token');
+        $cart->setLineItems(new LineItemCollection([$lineItem]));
+
+        $collector->collect(
+            new CartDataCollection(),
+            $cart,
+            $this->createMock(SalesChannelContext::class),
+            new CartBehavior()
+        );
+
+        $this->assertSame($existing, $lineItem->getExtension(Mollie::EXTENSION));
     }
 
     public function testDoesNothingForCartWithoutSubscriptionLineItems(): void

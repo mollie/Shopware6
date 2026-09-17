@@ -6,10 +6,13 @@ namespace Mollie\Shopware\Integration\Data;
 use Mollie\Shopware\Component\Payment\Controller\PaymentController;
 use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
+use Shopware\Core\Checkout\Cart\CartCalculator;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
+use Shopware\Core\Checkout\Gateway\SalesChannel\CheckoutGatewayRoute;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
@@ -22,6 +25,7 @@ use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\CartLineItemController;
 use Shopware\Storefront\Controller\CheckoutController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 
@@ -124,16 +128,22 @@ trait CheckoutTestBehaviour
             $request->request->set($fieldName, $fieldValue);
         }
 
-        $response = $checkoutController->order($requestDataBag, $salesChannelContext, $request);
-
         /** @var FlashBag $flashBag */
         $flashBag = $request->getSession()->getBag('flashes');
+        $flashBag->clear();
+
+        $this->reloadCartFromStorage($salesChannelContext);
+
+        $response = $checkoutController->order($requestDataBag, $salesChannelContext, $request);
+
         $flashBagData = $flashBag->peekAll();
         $dangerErrors = $flashBagData['danger'] ?? [];
         $warningErrors = $flashBagData['warning'] ?? [];
         $hasFlashes = count($dangerErrors) > 0 || count($warningErrors) > 0;
 
-        Assert::assertFalse($hasFlashes, 'Create order has error messages ' . print_r($dangerErrors + $warningErrors, true));
+        if ($hasFlashes) {
+            Assert::fail('Create order has error messages ' . print_r($dangerErrors + $warningErrors, true) . $this->describeCartState($salesChannelContext));
+        }
 
         return $response;
     }
@@ -184,5 +194,38 @@ trait CheckoutTestBehaviour
         $searchResult = $repository->search($criteria, $salesChannelContext->getContext());
 
         return $searchResult->first();
+    }
+
+    private function reloadCartFromStorage(SalesChannelContext $salesChannelContext): void
+    {
+        $this->getContainer()->get(CartService::class)->getCart($salesChannelContext->getToken(), $salesChannelContext, false);
+    }
+
+    private function describeCartState(SalesChannelContext $salesChannelContext): string
+    {
+        $cartService = $this->getContainer()->get(CartService::class);
+        $cart = $cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+
+        $calculatedCart = $this->getContainer()->get(CartCalculator::class)->calculate($cart, $salesChannelContext);
+
+        $gatewayResponse = $this->getContainer()->get(CheckoutGatewayRoute::class)->load(new Request(), $cart, $salesChannelContext);
+
+        $availablePaymentMethods = $gatewayResponse->getPaymentMethods()->map(
+            static fn (PaymentMethodEntity $paymentMethod): string => (string) $paymentMethod->getTechnicalName()
+        );
+        $availableShippingMethods = $gatewayResponse->getShippingMethods()->map(
+            static fn (ShippingMethodEntity $shippingMethod): string => (string) $shippingMethod->getTechnicalName()
+        );
+
+        return sprintf(
+            "\ncached cart errors:       %s\ncalculated cart errors:   %s\ngateway errors:           %s\nselected payment method:  %s\nselected shipping method: %s\navailable payment methods: %s\navailable shipping methods: %s\n",
+            implode(', ', $cart->getErrors()->getKeys()),
+            implode(', ', $calculatedCart->getErrors()->getKeys()),
+            implode(', ', $gatewayResponse->getErrors()->getKeys()),
+            (string) $salesChannelContext->getPaymentMethod()->getTechnicalName(),
+            (string) $salesChannelContext->getShippingMethod()->getTechnicalName(),
+            implode(', ', $availablePaymentMethods),
+            implode(', ', $availableShippingMethods)
+        );
     }
 }
