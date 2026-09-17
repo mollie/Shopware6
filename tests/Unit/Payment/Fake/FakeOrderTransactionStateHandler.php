@@ -12,6 +12,9 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
     private bool $shouldThrow = false;
     private bool $shouldThrowIllegalTransition = false;
     private bool $called = false;
+    private int $callCount = 0;
+    private ?\Throwable $failure = null;
+    private int $failureAttempts = 0;
 
     public function __construct()
     {
@@ -27,9 +30,20 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
         $this->shouldThrowIllegalTransition = $shouldThrow;
     }
 
+    public function withFailure(\Throwable $failure, int $failureAttempts): void
+    {
+        $this->failure = $failure;
+        $this->failureAttempts = $failureAttempts;
+    }
+
     public function wasCalled(): bool
     {
         return $this->called;
+    }
+
+    public function getCallCount(): int
+    {
+        return $this->callCount;
     }
 
     public function reopen(string $transactionId, Context $context): void
@@ -95,6 +109,10 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
     private function throwIfNeeded(): void
     {
         $this->called = true;
+        ++$this->callCount;
+        if ($this->failure !== null && $this->callCount <= $this->failureAttempts) {
+            throw $this->failure;
+        }
         if ($this->shouldThrowIllegalTransition) {
             throw new IllegalTransitionException('paid', 'paid', ['reopen']);
         }

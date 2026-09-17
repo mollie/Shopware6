@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Payment\Route;
 
+use Doctrine\DBAL\Exception\DeadlockException;
+use Doctrine\DBAL\Exception\DriverException;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGateway;
 use Mollie\Shopware\Component\Mollie\Payment;
@@ -17,6 +19,7 @@ use Mollie\Shopware\Unit\Fake\FakeOrderService;
 use Mollie\Shopware\Unit\Fake\FakeShipOrderRoute;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClient;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeClientFactory;
+use Mollie\Shopware\Unit\Payment\Fake\FakeDriverException;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderStateHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionStateHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodUpdater;
@@ -128,6 +131,81 @@ final class WebhookRouteTest extends TestCase
         } catch (WebhookException $exception) {
             $this->assertSame(WebhookException::PAYMENT_STATUS_CHANGE_FAILED, $exception->getErrorCode());
         }
+    }
+
+    #[DataProvider('deadlockProvider')]
+    public function testDeadlockOnPaymentStatusIsRetried(\Throwable $deadlock): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $stateHandler = new FakeOrderTransactionStateHandler();
+        $stateHandler->withFailure($deadlock, 1);
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $stateHandler);
+
+        $response = $webhookRoute->notify('test', $this->context);
+
+        $this->assertInstanceOf(WebhookResponse::class, $response);
+        $this->assertSame(2, $stateHandler->getCallCount());
+    }
+
+    #[DataProvider('deadlockProvider')]
+    public function testPermanentDeadlockOnPaymentStatusThrowsWebhookException(\Throwable $deadlock): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $stateHandler = new FakeOrderTransactionStateHandler();
+        $stateHandler->withFailure($deadlock, 3);
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $stateHandler);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::PAYMENT_STATUS_CHANGE_FAILED, $exception->getErrorCode());
+        }
+
+        $this->assertSame(3, $stateHandler->getCallCount());
+    }
+
+    /**
+     * @return array<string, array{\Throwable}>
+     */
+    public static function deadlockProvider(): array
+    {
+        $driverException = new FakeDriverException('SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock', '40001', 1213);
+        $savepointException = new FakeDriverException('SQLSTATE[42000]: Syntax error or access violation: 1305 SAVEPOINT DOCTRINE_2 does not exist', '42000', 1305);
+
+        return [
+            'deadlock reported as such' => [new DeadlockException($driverException, null)],
+            'deadlock masked by the lost savepoint' => [new DriverException($savepointException, null)],
+        ];
+    }
+
+    public function testFailureThatIsNoDeadlockIsNotRetried(): void
+    {
+        $transactionService = new FakeTransactionService();
+        $transactionService->createValidStruct();
+
+        $stateHandler = new FakeOrderTransactionStateHandler();
+        $stateHandler->setShouldThrow(true);
+
+        $fakeClient = new FakeClient('mollieTestId', 'paid');
+        $webhookRoute = $this->getRoute($transactionService, $fakeClient, $stateHandler);
+
+        try {
+            $webhookRoute->notify('test', $this->context);
+            $this->fail('Expected WebhookException was not thrown');
+        } catch (WebhookException $exception) {
+            $this->assertSame(WebhookException::PAYMENT_STATUS_CHANGE_FAILED, $exception->getErrorCode());
+        }
+
+        $this->assertSame(1, $stateHandler->getCallCount());
     }
 
     /**
