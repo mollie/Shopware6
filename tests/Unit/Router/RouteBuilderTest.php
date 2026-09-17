@@ -368,7 +368,7 @@ final class RouteBuilderTest extends TestCase
         $router = new FakeRouter('https://storefront.example/mollie/express-components/finish');
         $routeBuilder = new RouteBuilder($router, $this->createStorefrontRequestStack(), 'https://shop.example');
 
-        $routeBuilder->getExpressComponentsRedirectUrl('cart-token');
+        $routeBuilder->getExpressComponentsRedirectUrl('sales-channel-id', 'cart-token');
 
         $this->assertSame('frontend.mollie.express-components.finish', $router->getLastRouteName());
         $this->assertSame(['cartToken' => 'cart-token'], $router->getLastParameters());
@@ -376,13 +376,105 @@ final class RouteBuilderTest extends TestCase
 
     public function testExpressComponentsOrderRedirectUrlCarriesTheOrderId(): void
     {
-        $router = new FakeRouter('https://shop.example/store-api/mollie/express-components/finish');
+        $router = new FakeRouter('https://storefront.example/mollie/express-components/finish');
+        $routeBuilder = new RouteBuilder($router, $this->createStorefrontRequestStack(), 'https://shop.example');
+
+        $routeBuilder->getExpressComponentsOrderRedirectUrl('sales-channel-id', 'order-id');
+
+        $this->assertSame('frontend.mollie.express-components.finish', $router->getLastRouteName());
+        $this->assertSame(['orderId' => 'order-id'], $router->getLastParameters());
+    }
+
+    /**
+     * Mollie redirects a browser back, which cannot send the sw-access-key header, so a headless
+     * shop is returned to the api route instead of the store-api one.
+     */
+    public function testExpressComponentsRedirectUrlAvoidsTheStoreApiOnAStoreApiRequest(): void
+    {
+        $router = new FakeRouter('https://storefront.example:3000/api/mollie/express-components/finish/sales-channel-id');
         $routeBuilder = new RouteBuilder($router, $this->createStoreApiRequestStack(), 'https://shop.example');
 
-        $routeBuilder->getExpressComponentsOrderRedirectUrl('order-id');
+        $routeBuilder->getExpressComponentsRedirectUrl('sales-channel-id', 'cart-token');
 
-        $this->assertSame('store-api.mollie.express-components.checkout.finish', $router->getLastRouteName());
-        $this->assertSame(['orderId' => 'order-id'], $router->getLastParameters());
+        $this->assertSame('api.mollie.express-components.finish', $router->getLastRouteName());
+        $this->assertSame('sales-channel-id', $router->getLastParameters()['salesChannelId']);
+        $this->assertSame('cart-token', $router->getLastParameters()['cartToken']);
+    }
+
+    public function testExpressComponentsOrderRedirectUrlAvoidsTheStoreApiOnAStoreApiRequest(): void
+    {
+        $router = new FakeRouter('https://storefront.example:3000/api/mollie/express-components/finish/sales-channel-id');
+        $routeBuilder = new RouteBuilder($router, $this->createStoreApiRequestStack(), 'https://shop.example');
+
+        $routeBuilder->getExpressComponentsOrderRedirectUrl('sales-channel-id', 'order-id');
+
+        $this->assertSame('api.mollie.express-components.finish', $router->getLastRouteName());
+        $this->assertSame('sales-channel-id', $router->getLastParameters()['salesChannelId']);
+        $this->assertSame('order-id', $router->getLastParameters()['orderId']);
+    }
+
+    /**
+     * The return request is Mollie's and carries nothing the client put into the create-session
+     * call, so its pages have to travel inside the url.
+     */
+    public function testExpressComponentsRedirectUrlCarriesTheFinishUrlsOfTheClient(): void
+    {
+        $router = new FakeRouter('https://storefront.example:3000/api/mollie/express-components/finish/sales-channel-id');
+        $requestStack = $this->createStoreApiRequestStack([
+            'finishUrl' => 'https://frontend.example/checkout/finish/{orderId}',
+            'errorUrl' => 'https://frontend.example/checkout/failed',
+        ]);
+        $routeBuilder = new RouteBuilder($router, $requestStack, 'https://shop.example');
+
+        $routeBuilder->getExpressComponentsRedirectUrl('sales-channel-id', 'cart-token');
+
+        $parameters = $router->getLastParameters();
+
+        $this->assertSame('https://frontend.example/checkout/finish/{orderId}', $parameters['finishUrl']);
+        $this->assertSame('https://frontend.example/checkout/failed', $parameters['errorUrl']);
+    }
+
+    public function testExpressComponentsRedirectUrlCarriesEmptyFinishUrlsWhenTheClientNamedNone(): void
+    {
+        $router = new FakeRouter('https://storefront.example:3000/api/mollie/express-components/finish/sales-channel-id');
+        $routeBuilder = new RouteBuilder($router, $this->createStoreApiRequestStack(), 'https://shop.example');
+
+        $routeBuilder->getExpressComponentsRedirectUrl('sales-channel-id', 'cart-token');
+
+        $parameters = $router->getLastParameters();
+
+        $this->assertSame('', $parameters['finishUrl']);
+        $this->assertSame('', $parameters['errorUrl']);
+    }
+
+    public function testExpressComponentsRedirectUrlIsNormalizedToAppUrlOnStoreApiRequest(): void
+    {
+        $router = new FakeRouter('https://storefront.example:3000/api/mollie/express-components/finish/sales-channel-id?cartToken=cart-token');
+        $routeBuilder = new RouteBuilder($router, $this->createStoreApiRequestStack(), 'https://shop.example');
+
+        $url = $routeBuilder->getExpressComponentsRedirectUrl('sales-channel-id', 'cart-token');
+
+        $this->assertSame('https://shop.example/api/mollie/express-components/finish/sales-channel-id?cartToken=cart-token', $url);
+    }
+
+    public function testPaypalExpressRedirectUrlIsNormalizedToAppUrlOnStoreApiRequest(): void
+    {
+        $router = new FakeRouter('https://storefront.example:3000/store-api/mollie/paypal-express/finish');
+        $routeBuilder = new RouteBuilder($router, $this->createStoreApiRequestStack(), 'https://shop.example');
+
+        $url = $routeBuilder->getPaypalExpressRedirectUrl();
+
+        $this->assertSame('https://shop.example/store-api/mollie/paypal-express/finish', $url);
+    }
+
+    public function testPaypalExpressCancelUrlIsNormalizedToAppUrlOnStoreApiRequest(): void
+    {
+        $router = new FakeRouter('https://storefront.example:3000/store-api/mollie/paypal-express/cancel');
+        $routeBuilder = new RouteBuilder($router, $this->createStoreApiRequestStack(), 'https://shop.example');
+
+        $url = $routeBuilder->getPaypalExpressCancelUrl();
+
+        $this->assertSame('https://shop.example/store-api/mollie/paypal-express/cancel', $url);
     }
 
     public function testExpressComponentsShippingCallbackUrlCarriesSalesChannelAndCartToken(): void
@@ -458,10 +550,13 @@ final class RouteBuilderTest extends TestCase
         return new RouteBuilder($router, $requestStack, $appUrl, $shopDomain);
     }
 
-    private function createStoreApiRequestStack(): RequestStack
+    /**
+     * @param array<string, string> $parameters
+     */
+    private function createStoreApiRequestStack(array $parameters = []): RequestStack
     {
         $requestStack = new RequestStack();
-        $requestStack->push(Request::create('https://storefront.example:3000/store-api/mollie/webhook/txn-1'));
+        $requestStack->push(Request::create('https://storefront.example:3000/store-api/mollie/webhook/txn-1', 'GET', $parameters));
 
         return $requestStack;
     }

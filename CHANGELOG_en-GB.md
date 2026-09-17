@@ -1,5 +1,6 @@
 # Unreleased
 - Fixed: The Mollie tab of the order stays usable again after closing the Refund Manager.
+- Fixed: Express components and PayPal Express now also work in headless shops.
 
 # 5.6.0
 - Added: New "Authorization and capture" section: the authorized status can be skipped per payment method and sales channel, so the money is paid right at the purchase instead of only after the shipment.

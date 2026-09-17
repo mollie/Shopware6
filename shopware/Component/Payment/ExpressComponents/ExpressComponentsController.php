@@ -15,12 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
- * Storefront endpoints for the express components session. They only translate between the
- * storefront and the store-api routes, so both the classic and a headless setup share the
- * same implementation.
- *
- * The shipping callback is not here: Mollie calls it without credentials, so it lives in the
- * api scope with authentication disabled, the same way the webhooks do.
+ * Storefront endpoint for the express components session. It only translates between the
+ * storefront and the checkout of FinishCheckoutRoute, which a headless setup reaches through
+ * its api route instead, so both share the same implementation.
  */
 #[Route(defaults: ['_routeScope' => ['storefront'], 'csrf_protected' => false])]
 final class ExpressComponentsController extends StorefrontController

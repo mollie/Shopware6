@@ -138,7 +138,7 @@ final class SessionBuilder implements SessionBuilderInterface
 
         $createSession = new CreateSession(
             $this->buildDescription($salesChannelContext),
-            $this->routeBuilder->getExpressComponentsOrderRedirectUrl($order->getId()),
+            $this->routeBuilder->getExpressComponentsOrderRedirectUrl($salesChannelContext->getSalesChannelId(), $order->getId()),
             $amount
         );
         $createSession->setLines($this->lineBuilder->buildFromOrder($order, $amount, $salesChannelContext));
@@ -319,7 +319,7 @@ final class SessionBuilder implements SessionBuilderInterface
     {
         $createSession = new CreateSession(
             $this->buildDescription($salesChannelContext),
-            $this->routeBuilder->getExpressComponentsRedirectUrl($cart->getToken()),
+            $this->routeBuilder->getExpressComponentsRedirectUrl($salesChannelContext->getSalesChannelId(), $cart->getToken()),
             $amount
         );
         $createSession->setLines($this->lineBuilder->build($cart, $amount, $salesChannelContext));

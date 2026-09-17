@@ -12,7 +12,7 @@ interface SessionGatewayInterface
 {
     public function createSession(CreateSession $createSession, SalesChannelContext $salesChannelContext): Session;
 
-    public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext): Session;
+    public function createPaypalExpressSession(Cart $cart, SalesChannelContext $salesChannelContext, string $redirectUrl = '', string $cancelUrl = ''): Session;
 
     public function getSession(string $sessionId, SalesChannelContext $salesChannelContext): Session;
 

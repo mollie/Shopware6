@@ -70,6 +70,47 @@ final class SessionGatewayTest extends TestCase
         $this->assertSame('https://shop.test/paypal/cancel', $formParams['cancelUrl']);
     }
 
+    public function testTheUrlsOfTheClientReplaceTheOnesOfTheShop(): void
+    {
+        $client = new FakeClient(body: $this->sessionResponse());
+        $routeBuilder = new FakeRouteBuilder(
+            paypalExpressRedirectUrl: 'https://shop.test/paypal/return',
+            paypalExpressCancelUrl: 'https://shop.test/paypal/cancel'
+        );
+
+        $this->gateway($client, $routeBuilder)->createPaypalExpressSession(
+            $this->cart(99.99),
+            new FakeSalesChannelContext(),
+            'https://frontend.example/checkout/paypal-return',
+            'https://frontend.example/checkout/cart'
+        );
+
+        $formParams = $client->getLastPostOptions()['form_params'];
+
+        $this->assertSame('https://frontend.example/checkout/paypal-return', $formParams['redirectUrl']);
+        $this->assertSame('https://frontend.example/checkout/cart', $formParams['cancelUrl']);
+    }
+
+    public function testOnlyTheUrlTheClientNamedIsReplaced(): void
+    {
+        $client = new FakeClient(body: $this->sessionResponse());
+        $routeBuilder = new FakeRouteBuilder(
+            paypalExpressRedirectUrl: 'https://shop.test/paypal/return',
+            paypalExpressCancelUrl: 'https://shop.test/paypal/cancel'
+        );
+
+        $this->gateway($client, $routeBuilder)->createPaypalExpressSession(
+            $this->cart(99.99),
+            new FakeSalesChannelContext(),
+            'https://frontend.example/checkout/paypal-return'
+        );
+
+        $formParams = $client->getLastPostOptions()['form_params'];
+
+        $this->assertSame('https://frontend.example/checkout/paypal-return', $formParams['redirectUrl']);
+        $this->assertSame('https://shop.test/paypal/cancel', $formParams['cancelUrl']);
+    }
+
     public function testAFreshPaypalExpressSessionCarriesNoAuthenticationYet(): void
     {
         $client = new FakeClient(body: $this->sessionResponse(['authenticationId' => 'auth_1']));
