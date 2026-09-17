@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\Route;
 
+use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Exception\RetryableException;
 use Mollie\Shopware\Component\FlowBuilder\Event\Webhook\WebhookEvent;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
@@ -37,6 +39,12 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
 final class WebhookRoute extends AbstractWebhookRoute
 {
+    private const DEADLOCK_ATTEMPTS = 3;
+
+    private const DEADLOCK_RETRY_MIN_MICROSECONDS = 50000;
+
+    private const DEADLOCK_RETRY_MAX_MICROSECONDS = 150000;
+
     public function __construct(
         #[Autowire(service: MollieGateway::class)]
         private readonly MollieGatewayInterface $mollieGateway,
@@ -143,7 +151,9 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
 
         try {
-            $this->stateMachineHandler->{$shopwareHandlerMethod}($transactionId, $context);
+            $this->retryOnDeadlock(function () use ($shopwareHandlerMethod, $transactionId, $context): void {
+                $this->stateMachineHandler->{$shopwareHandlerMethod}($transactionId, $context);
+            }, $logData);
             $this->logger->info('Payment status changed', $logData);
         } catch (IllegalTransitionException $exception) {
             $logData['exceptionMessage'] = $exception->getMessage();
@@ -380,5 +390,44 @@ final class WebhookRoute extends AbstractWebhookRoute
         }
 
         return $items;
+    }
+
+    /**
+     * @param array<string, mixed> $logData
+     */
+    private function retryOnDeadlock(\Closure $write, array $logData): void
+    {
+        for ($attempt = 1; $attempt < self::DEADLOCK_ATTEMPTS; ++$attempt) {
+            try {
+                $write();
+
+                return;
+            } catch (\Throwable $exception) {
+                if (! $this->isDeadlock($exception)) {
+                    throw $exception;
+                }
+
+                $logData['attempt'] = $attempt;
+                $logData['exceptionMessage'] = $exception->getMessage();
+                $this->logger->warning('Database deadlock while changing the payment status, retrying', $logData);
+
+                usleep(random_int(self::DEADLOCK_RETRY_MIN_MICROSECONDS, self::DEADLOCK_RETRY_MAX_MICROSECONDS));
+            }
+        }
+
+        $write();
+    }
+
+    private function isDeadlock(\Throwable $exception): bool
+    {
+        if ($exception instanceof RetryableException) {
+            return true;
+        }
+
+        if (! $exception instanceof DriverException) {
+            return false;
+        }
+
+        return preg_match('/SAVEPOINT \S+ does not exist/', $exception->getMessage()) === 1;
     }
 }
