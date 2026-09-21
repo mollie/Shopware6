@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Shipment\Route;
 
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\Shipment;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
@@ -20,6 +22,7 @@ use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
@@ -61,7 +64,10 @@ class ShipOrderRouteTest extends TestCase
         $this->orderRepository = new FakeOrderSearchRepository();
         $this->lineItemRepository = new FakeOrderRepository();
         $this->deliveryRepository = new FakeOrderRepository();
-        $this->gateway = new FakeGateway();
+        $authorizedPayment = new Payment('tr_1');
+        $authorizedPayment->setStatus(PaymentStatus::AUTHORIZED);
+
+        $this->gateway = new FakeGateway('', $authorizedPayment);
         $this->eventDispatcher = new EventSpy();
         $this->orderBuilder = new OrderEntityBuilder();
 
@@ -78,7 +84,7 @@ class ShipOrderRouteTest extends TestCase
             $this->eventDispatcher,
             $logger,
         );
-        $reconciler = new AuthorizationReconciler($this->gateway, $itemResolver, $logger);
+        $reconciler = new AuthorizationReconciler($this->gateway, $itemResolver, new PaymentHandlerLocator([]), new FakeSettingsService(), $logger);
 
         $this->itemResolver = $itemResolver;
         $this->trackingResolver = $trackingResolver;

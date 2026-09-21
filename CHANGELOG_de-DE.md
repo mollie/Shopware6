@@ -1,5 +1,6 @@
 # Unreleased
 - Hinzugefügt: Der Webhook wiederholt das Schreiben des Zahlungsstatus bei einem Datenbank-Deadlock.
+- Geändert: Der automatische Versand ignoriert Zahlarten, die dafür nicht vorgesehen sind, komplett.
 - Behoben: Abos werden wieder verlängert, wenn die Zahlart über eine Regel auf Abo-Produkte eingeschränkt ist.
 - Behoben: Der Mollie-Tab der Bestellung bleibt nach dem Schließen des Refund Managers wieder bedienbar.
 - Behoben: Express Components und PayPal Express funktionieren jetzt auch in Headless-Shops.
