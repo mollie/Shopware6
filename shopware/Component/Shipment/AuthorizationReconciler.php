@@ -9,7 +9,13 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
+use Mollie\Shopware\Component\Payment\Handler\AutomaticCaptureAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
+use Mollie\Shopware\Component\Settings\AbstractSettingsService;
+use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderResponse;
 use Mollie\Shopware\Mollie;
 use Psr\Log\LoggerInterface;
@@ -37,6 +43,9 @@ final class AuthorizationReconciler
         private readonly MollieGatewayInterface $mollieGateway,
         #[Autowire(service: ShipmentItemResolver::class)]
         private readonly ShipmentItemResolver $itemResolver,
+        private readonly PaymentHandlerLocator $paymentHandlerLocator,
+        #[Autowire(service: SettingsService::class)]
+        private readonly AbstractSettingsService $settingsService,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -61,6 +70,20 @@ final class AuthorizationReconciler
         array $logContext
     ): ?string {
         $paymentId = $payment->getId();
+        $logContext['molliePaymentId'] = $paymentId;
+
+        if (! $this->hasManualCapture($payment, $salesChannelId)) {
+            $this->logger->debug('AuthorizationReconciler: payment method holds no authorization, skipping capture', $logContext);
+
+            return null;
+        }
+
+        $freshPayment = $this->resolveFreshPayment($paymentId, $orderNumber, $salesChannelId, $logContext);
+        if ($freshPayment !== null && ! $this->hasOpenAuthorization($freshPayment)) {
+            $this->logger->debug('AuthorizationReconciler: no open authorization left, skipping capture', $logContext);
+
+            return null;
+        }
 
         // Each shipment captures the gross amount of exactly its own items (incl. their taxes). The
         // description ends up in the Mollie balances/settlement report, so it is the plain Shopware
@@ -69,12 +92,10 @@ final class AuthorizationReconciler
 
         $hasCancelledItems = $this->itemResolver->hasCancelledItems($lineItems);
 
-        $captureAmount = $this->resolveCaptureAmount($payment, $shippingItems, $order, $lineItems, $currency, $orderNumber, $salesChannelId, $fullyShipped, $hasCancelledItems, $logContext);
+        $captureAmount = $this->resolveCaptureAmount($freshPayment, $shippingItems, $order, $lineItems, $currency, $fullyShipped, $hasCancelledItems);
         if ($captureAmount !== null) {
             $createCapture->setAmount($captureAmount);
         }
-
-        $logContext['molliePaymentId'] = $paymentId;
 
         $this->logger->info('AuthorizationReconciler: calling Mollie createCapture (Payments API)', $logContext);
 
@@ -219,23 +240,16 @@ final class AuthorizationReconciler
      * Resolves the amount to capture, or null to keep the default (the gross of exactly the shipped
      * line items). The rounding difference (Shopware allows 4 decimals per currency, Mollie only 2) is
      * never a Shopware line item, so it has to be added here in the cases below.
-     *
-     * @param array<string, mixed> $logContext
      */
     private function resolveCaptureAmount(
-        Payment $payment,
+        ?Payment $freshPayment,
         ShippingItemCollection $shippingItems,
         OrderEntity $order,
         OrderLineItemCollection $lineItems,
         CurrencyEntity $currency,
-        string $orderNumber,
-        string $salesChannelId,
         bool $fullyShipped,
-        bool $hasCancelledItems,
-        array $logContext
+        bool $hasCancelledItems
     ): ?Money {
-        $paymentId = $payment->getId();
-
         // Full shipment without cancellations: the entire authorized amount is owed. Derive the capture
         // directly from the Mollie payment (authorized minus already captured) rather than summing the
         // shipped line items plus a separately tracked rounding difference. This lands the capture
@@ -244,7 +258,6 @@ final class AuthorizationReconciler
         // rounding SKU is configured), and trues up the final shipment of a multi-shipment order
         // regardless of what earlier shipments captured.
         if ($fullyShipped && ! $hasCancelledItems) {
-            $freshPayment = $this->resolveFreshPayment($paymentId, $orderNumber, $salesChannelId, $logContext);
             if ($freshPayment === null) {
                 return null;
             }
@@ -266,7 +279,7 @@ final class AuthorizationReconciler
             return null;
         }
 
-        $roundingDiff = $this->resolveOrderRoundingDifference($order, $paymentId, $orderNumber, $salesChannelId, $logContext);
+        $roundingDiff = $this->resolveOrderRoundingDifference($order, $freshPayment);
         if (abs($roundingDiff) <= self::RECONCILE_THRESHOLD) {
             return null;
         }
@@ -277,38 +290,46 @@ final class AuthorizationReconciler
     /**
      * The rounding difference persisted on the order at payment creation, falling back to the value on
      * the Mollie payment for orders created before it was persisted.
-     *
-     * @param array<string, mixed> $logContext
      */
-    private function resolveOrderRoundingDifference(OrderEntity $order, string $paymentId, string $orderNumber, string $salesChannelId, array $logContext): float
+    private function resolveOrderRoundingDifference(OrderEntity $order, ?Payment $freshPayment): float
     {
         $mollieCustomFields = $order->getCustomFields()[Mollie::EXTENSION] ?? [];
         if (array_key_exists('rounding_diff', $mollieCustomFields)) {
             return (float) $mollieCustomFields['rounding_diff'];
         }
 
-        return $this->resolveRoundingDifference($paymentId, $orderNumber, $salesChannelId, $logContext);
+        return $freshPayment?->getRoundingDiff() ?? 0.0;
     }
 
-    /**
-     * The rounding difference tracked on the Mollie payment lines (Shopware allows 4 decimals per
-     * currency, Mollie only 2). Fallback for orders created before it was persisted on the order.
-     * Best-effort: returns 0.0 when the payment cannot be loaded.
-     *
-     * @param array<string, mixed> $logContext
-     */
-    private function resolveRoundingDifference(string $paymentId, string $orderNumber, string $salesChannelId, array $logContext): float
+    private function hasManualCapture(Payment $payment, string $salesChannelId): bool
     {
-        try {
-            $payment = $this->mollieGateway->getPayment($paymentId, $orderNumber, $salesChannelId);
-
-            return $payment->getRoundingDiff();
-        } catch (\Throwable $exception) {
-            $logContext['exception'] = $exception->getMessage();
-            $this->logger->error('AuthorizationReconciler: could not resolve rounding difference', $logContext);
-
-            return 0.0;
+        $method = $payment->getMethod();
+        if ($method === null) {
+            return true;
         }
+
+        $paymentHandler = $this->paymentHandlerLocator->findByPaymentMethod($method->value);
+        if ($paymentHandler === null) {
+            return true;
+        }
+
+        if ($paymentHandler instanceof AutomaticCaptureAwareInterface) {
+            return ! $this->settingsService->getCaptureSettings($salesChannelId)->isDirectPaymentEnabled($method);
+        }
+
+        return $paymentHandler instanceof ManualCaptureModeAwareInterface;
+    }
+
+    private function hasOpenAuthorization(Payment $freshPayment): bool
+    {
+        $alreadyCaptured = $freshPayment->getCapturedAmount();
+        if ($alreadyCaptured === null) {
+            return $freshPayment->getStatus() === PaymentStatus::AUTHORIZED;
+        }
+
+        $authorized = $freshPayment->getAmount()?->getValue() ?? 0.0;
+
+        return $authorized - $alreadyCaptured->getValue() > self::RECONCILE_THRESHOLD;
     }
 
     /**

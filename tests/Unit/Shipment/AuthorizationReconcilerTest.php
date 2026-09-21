@@ -6,14 +6,24 @@ namespace Mollie\Shopware\Unit\Shipment;
 
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\ShippingItem;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
+use Mollie\Shopware\Component\Payment\Method\CardPayment;
+use Mollie\Shopware\Component\Payment\Method\IdealPayment;
+use Mollie\Shopware\Component\Payment\Method\KlarnaPayment;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
+use Mollie\Shopware\Component\Settings\Struct\CaptureSettings;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
+use Mollie\Shopware\Unit\Payment\Fake\FakeFinalize;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Payment\Fake\FakePay;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -29,7 +39,7 @@ final class AuthorizationReconcilerTest extends TestCase
 {
     public function testCaptureViaPaymentsApiCapturesAndReturnsCaptureId(): void
     {
-        $gateway = new FakeGateway();
+        $gateway = new FakeGateway('', $this->authorizedPayment());
         $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
@@ -56,7 +66,7 @@ final class AuthorizationReconcilerTest extends TestCase
     {
         // The capture description shows up in the Mollie balances report, so it must identify the
         // order instead of listing the shipped items.
-        $gateway = new FakeGateway();
+        $gateway = new FakeGateway('', $this->authorizedPayment());
         $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
@@ -143,7 +153,7 @@ final class AuthorizationReconcilerTest extends TestCase
 
     public function testCaptureViaPaymentsApiReturnsNullWhenMollieCallFails(): void
     {
-        $gateway = new FakeGateway();
+        $gateway = new FakeGateway('', $this->authorizedPayment());
         $gateway->withCaptureThrowing();
         $reconciler = $this->createReconciler($gateway);
 
@@ -192,7 +202,7 @@ final class AuthorizationReconcilerTest extends TestCase
     {
         // The shipped items are captured, everything else the customer authorized (cancelled items and
         // the rounding difference) is released so it is never charged.
-        $gateway = new FakeGateway();
+        $gateway = new FakeGateway('', $this->authorizedPayment());
         $reconciler = $this->createReconciler($gateway);
 
         $shippingItems = new ShippingItemCollection();
@@ -219,7 +229,7 @@ final class AuthorizationReconcilerTest extends TestCase
 
     public function testFailedReleaseDoesNotUndoTheSuccessfulCapture(): void
     {
-        $gateway = new FakeGateway();
+        $gateway = new FakeGateway('', $this->authorizedPayment());
         $gateway->withReleaseAuthorizationThrowing();
         $reconciler = $this->createReconciler($gateway);
 
@@ -271,7 +281,7 @@ final class AuthorizationReconcilerTest extends TestCase
     {
         // Orders created before the rounding difference was persisted on the order only carry it on the
         // Mollie payment, so the first partial shipment has to read it from there.
-        $payment = new Payment('tr_1');
+        $payment = $this->authorizedPayment();
         $payment->setRoundingDiff(0.02);
 
         $gateway = new FakeGateway('', $payment);
@@ -490,13 +500,190 @@ final class AuthorizationReconcilerTest extends TestCase
         self::assertCount(0, $gateway->getReleasedAuthorizations());
     }
 
-    private function createReconciler(FakeGateway $gateway): AuthorizationReconciler
+    public function testShipmentSkipsTheCaptureForAMethodThatIsNeverAuthorized(): void
+    {
+        // iDEAL is collected at the checkout and holds no authorization, so Mollie answers a capture
+        // with "Capture not supported because the payment was not pre-authorized".
+        $gateway = new FakeGateway('', $this->authorizedPayment());
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            $this->authorizedPayment(PaymentMethod::IDEAL),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            false,
+            [],
+        );
+
+        self::assertNull($mollieId);
+        self::assertCount(0, $gateway->getCapturePayloads());
+    }
+
+    public function testShipmentCapturesAPayLaterMethodWithAnOpenAuthorization(): void
+    {
+        $gateway = new FakeGateway('', $this->authorizedPayment());
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            $this->authorizedPayment(PaymentMethod::KLARNA),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            false,
+            [],
+        );
+
+        self::assertNotNull($mollieId);
+        self::assertCount(1, $gateway->getCapturePayloads());
+    }
+
+    public function testShipmentSkipsTheCaptureWhenTheMerchantCollectsTheMethodDirectly(): void
+    {
+        // Credit card supports both capture modes; with the direct payment switched on Mollie has
+        // already collected the money at the checkout.
+        $gateway = new FakeGateway('', $this->authorizedPayment());
+        $reconciler = $this->createReconciler($gateway, new CaptureSettings(['directPaymentCreditcard' => true]));
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            $this->authorizedPayment(PaymentMethod::CREDIT_CARD),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            false,
+            [],
+        );
+
+        self::assertNull($mollieId);
+        self::assertCount(0, $gateway->getCapturePayloads());
+    }
+
+    public function testShipmentCapturesTheMethodTheMerchantHoldsUntilTheShipment(): void
+    {
+        $gateway = new FakeGateway('', $this->authorizedPayment());
+        $reconciler = $this->createReconciler($gateway, new CaptureSettings(['directPaymentCreditcard' => false]));
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            $this->authorizedPayment(PaymentMethod::CREDIT_CARD),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            false,
+            [],
+        );
+
+        self::assertNotNull($mollieId);
+        self::assertCount(1, $gateway->getCapturePayloads());
+    }
+
+    public function testShipmentSkipsTheCaptureWhenTheAuthorizationIsAlreadyFullyCaptured(): void
+    {
+        // The merchant captured the order themselves, e.g. by setting it to paid in the Mollie dashboard.
+        $freshPayment = new Payment('tr_1');
+        $freshPayment->setAmount(new Money(90.0, 'EUR'));
+        $freshPayment->setCapturedAmount(new Money(90.0, 'EUR'));
+
+        $gateway = new FakeGateway('', $freshPayment);
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 90.0, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            $this->authorizedPayment(PaymentMethod::KLARNA),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            true,
+            [],
+        );
+
+        self::assertNull($mollieId);
+        self::assertCount(0, $gateway->getCapturePayloads());
+    }
+
+    public function testShipmentSkipsTheCaptureForAnUnknownMethodThatWasNeverAuthorized(): void
+    {
+        // Orders whose custom fields carry no method fall through to the Mollie payment: a payment that
+        // is not authorized has nothing to capture.
+        $freshPayment = new Payment('tr_1');
+        $freshPayment->setStatus(PaymentStatus::PAID);
+
+        $gateway = new FakeGateway('', $freshPayment);
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            new Payment('tr_1'),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            false,
+            [],
+        );
+
+        self::assertNull($mollieId);
+        self::assertCount(0, $gateway->getCapturePayloads());
+    }
+
+    private function createReconciler(FakeGateway $gateway, ?CaptureSettings $captureSettings = null): AuthorizationReconciler
     {
         $lineItemFilter = LineItemFilterBuilder::build();
         $itemResolver = new ShipmentItemResolver($lineItemFilter);
         $logger = new NullLogger();
 
-        return new AuthorizationReconciler($gateway, $itemResolver, $logger);
+        $paymentHandlerLocator = new PaymentHandlerLocator([
+            new IdealPayment(new FakePay(), new FakeFinalize(), $logger),
+            new CardPayment(new FakePay(), new FakeFinalize(), $logger),
+            new KlarnaPayment(new FakePay(), new FakeFinalize(), $logger),
+        ]);
+
+        $settingsService = new FakeSettingsService(captureSettings: $captureSettings);
+
+        return new AuthorizationReconciler($gateway, $itemResolver, $paymentHandlerLocator, $settingsService, $logger);
+    }
+
+    private function authorizedPayment(?PaymentMethod $paymentMethod = null): Payment
+    {
+        $payment = new Payment('tr_1');
+        $payment->setStatus(PaymentStatus::AUTHORIZED);
+        if ($paymentMethod !== null) {
+            $payment->setMethod($paymentMethod);
+        }
+
+        return $payment;
     }
 
     private function currency(): CurrencyEntity

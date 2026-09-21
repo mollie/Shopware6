@@ -5,6 +5,8 @@ namespace Mollie\Shopware\Unit\FlowBuilder\Action;
 
 use Mollie\Shopware\Component\FlowBuilder\Action\ShipOrderAction;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentStatus;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\Route\ShipOrderRoute;
 use Mollie\Shopware\Component\Shipment\Route\ShippingException;
@@ -16,6 +18,7 @@ use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeOrderRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
+use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
@@ -42,7 +45,10 @@ final class ShipOrderActionTest extends TestCase
     protected function setUp(): void
     {
         $this->orderRepository = new FakeOrderSearchRepository();
-        $this->gateway = new FakeGateway();
+        $authorizedPayment = new Payment('tr_1');
+        $authorizedPayment->setStatus(PaymentStatus::AUTHORIZED);
+
+        $this->gateway = new FakeGateway('', $authorizedPayment);
     }
 
     public function testTheActionIsOfferedUnderItsOwnName(): void
@@ -132,7 +138,7 @@ final class ShipOrderActionTest extends TestCase
             $eventDispatcher,
             $itemResolver,
             new ShipmentTrackingResolver(),
-            new AuthorizationReconciler($this->gateway, $itemResolver, $logger),
+            new AuthorizationReconciler($this->gateway, $itemResolver, new PaymentHandlerLocator([]), new FakeSettingsService(), $logger),
             new ShipmentPersister(new FakeOrderRepository(), new FakeOrderRepository(), new FakeOrderService(), $eventDispatcher, $logger),
             new FakeTransactionService(),
             $logger,
