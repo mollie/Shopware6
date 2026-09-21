@@ -28,6 +28,7 @@ use Mollie\Shopware\Unit\Fake\FakeSalesChannelContextPersister;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Fake\FakeShopwareAccountService;
 use Mollie\Shopware\Unit\Fake\FakeTokenFactory;
+use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakePayloadBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\MethodRemover\Fake\FakePaymentMethodRoute;
@@ -70,6 +71,7 @@ final class PaymentLinkControllerTest extends TestCase
     private const TRANSACTION_ID = 'transaction-1';
     private const CUSTOMER_ID = 'test-customer-id';
     private const GENERATED_URL = 'https://shop.test/generated';
+    private const CHECKOUT_URL = 'https://mollie.test/checkout/tr_open';
 
     private Context $context;
 
@@ -84,6 +86,8 @@ final class PaymentLinkControllerTest extends TestCase
     private FakePayloadBuilder $payloadBuilder;
 
     private FakePaymentLinkGateway $paymentLinkGateway;
+
+    private FakeGateway $mollieGateway;
 
     private FakePaymentMethodRoute $paymentMethodRoute;
 
@@ -117,6 +121,7 @@ final class PaymentLinkControllerTest extends TestCase
         $this->transactionService = new FakeTransactionService();
         $this->payloadBuilder = new FakePayloadBuilder();
         $this->paymentLinkGateway = new FakePaymentLinkGateway();
+        $this->givenMolliePayment(PaymentStatus::EXPIRED);
         $this->paymentMethodRoute = new FakePaymentMethodRoute(new PaymentMethodCollection());
         $this->accountService = new FakeShopwareAccountService();
         $this->contextPersister = new FakeSalesChannelContextPersister();
@@ -506,6 +511,100 @@ final class PaymentLinkControllerTest extends TestCase
         $this->assertSame(1800, $this->tokenFactory->getLastTokenStruct()->getExpires());
     }
 
+    // ------------------------------------------------------------ open payment
+
+    /**
+     * The customer is still in a running checkout: sending them back into that payment's checkout
+     * keeps them on the page they were on instead of starting a second attempt.
+     */
+    public function testPayRedirectsToTheCheckoutOfAnAlreadyOpenPayment(): void
+    {
+        $this->givenOrder(molliePaymentId: 'tr_open');
+        $this->givenMolliePayment(PaymentStatus::OPEN);
+
+        $response = $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(self::CHECKOUT_URL, $response->getTargetUrl());
+    }
+
+    public function testPayCreatesNoLinkWhileThePaymentIsStillOpen(): void
+    {
+        $this->givenOrder(molliePaymentId: 'tr_open');
+        $this->givenMolliePayment(PaymentStatus::OPEN);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame([], $this->paymentLinkGateway->getCreatedPayloads());
+        $this->assertSame([], $this->paymentLinkGateway->getUpdatedPayloads());
+    }
+
+    /**
+     * The payment carries the redirect URL of the checkout it was created in, so the return leg
+     * runs through that checkout's own session - the payment link's temporary login would log a
+     * regularly logged-in customer out again.
+     */
+    public function testPayDoesNotLogTheCustomerInWhenItRedirectsToAnOpenPayment(): void
+    {
+        $this->givenOrder(molliePaymentId: 'tr_open');
+        $this->givenMolliePayment(PaymentStatus::OPEN);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertNull($this->accountService->getLoggedInId());
+    }
+
+    public function testPayCreatesALinkWhenThePaymentIsNoLongerOpen(): void
+    {
+        $this->givenOrder(molliePaymentId: 'tr_expired');
+        $this->givenMolliePayment(PaymentStatus::EXPIRED);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertCount(1, $this->paymentLinkGateway->getCreatedPayloads());
+    }
+
+    /**
+     * Mollie leaves the checkout URL out for payments the customer cannot continue in a browser,
+     * e.g. a terminal payment. There is nothing to redirect to, so the link is the way to pay.
+     */
+    public function testPayCreatesALinkWhenTheOpenPaymentHasNoCheckoutUrl(): void
+    {
+        $this->givenOrder(molliePaymentId: 'tr_open');
+        $this->givenMolliePayment(PaymentStatus::OPEN, '');
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertCount(1, $this->paymentLinkGateway->getCreatedPayloads());
+    }
+
+    /**
+     * A payment id Mollie no longer knows - e.g. after a switch between the test and the live key -
+     * must not take the payment link down with it.
+     */
+    public function testPayCreatesALinkWhenTheExistingPaymentCannotBeLoaded(): void
+    {
+        $this->givenOrder(molliePaymentId: 'tr_gone');
+        $this->mollieGateway->withGetPaymentThrowing();
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertCount(1, $this->paymentLinkGateway->getCreatedPayloads());
+    }
+
+    /**
+     * A transaction that only ever had a payment link has no payment id, so there is nothing to
+     * look up at Mollie.
+     */
+    public function testPayLooksUpNoPaymentForATransactionWithoutAPaymentId(): void
+    {
+        $this->givenOrder();
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame(0, $this->mollieGateway->getCallCount('getPayment'));
+    }
+
     // ----------------------------------------------------------------- helpers
 
     /**
@@ -516,6 +615,7 @@ final class PaymentLinkControllerTest extends TestCase
         ?MolliePaymentMethod $mollieMethod = MolliePaymentMethod::PAYPAL,
         ?string $existingPaymentLinkId = null,
         array $transactionCustomFields = [],
+        ?string $molliePaymentId = null,
     ): void {
         $state = new StateMachineStateEntity();
         $state->setId('transaction-state');
@@ -534,9 +634,11 @@ final class PaymentLinkControllerTest extends TestCase
         $transaction->setCustomFields($transactionCustomFields);
         $transaction->setCreatedAt(new \DateTimeImmutable('2026-01-01T10:00:00+00:00'));
 
-        if ($existingPaymentLinkId !== null) {
-            $payment = new Payment('tr_1');
-            $payment->setPaymentLinkId($existingPaymentLinkId);
+        if ($existingPaymentLinkId !== null || $molliePaymentId !== null) {
+            $payment = new Payment($molliePaymentId ?? 'tr_1');
+            if ($existingPaymentLinkId !== null) {
+                $payment->setPaymentLinkId($existingPaymentLinkId);
+            }
             $transaction->addExtension(Mollie::EXTENSION, $payment);
         }
 
@@ -584,6 +686,18 @@ final class PaymentLinkControllerTest extends TestCase
         );
     }
 
+    /**
+     * The payment the gateway answers with when the controller looks up the transaction's payment.
+     */
+    private function givenMolliePayment(PaymentStatus $status, string $checkoutUrl = self::CHECKOUT_URL): void
+    {
+        $payment = new Payment('tr_open');
+        $payment->setStatus($status);
+        $payment->setCheckoutUrl($checkoutUrl);
+
+        $this->mollieGateway = new FakeGateway(payment: $payment);
+    }
+
     private function paymentsWithStatus(PaymentStatus $status): PaymentCollection
     {
         $payment = new Payment('tr_link');
@@ -600,6 +714,7 @@ final class PaymentLinkControllerTest extends TestCase
             $this->transactionService,
             $this->payloadBuilder,
             $this->paymentLinkGateway,
+            $this->mollieGateway,
             $this->paymentMethodRoute,
             new FakeSettingsService(paymentSettings: $this->paymentSettings),
             new PaymentHandlerLocator($this->paymentHandlers),

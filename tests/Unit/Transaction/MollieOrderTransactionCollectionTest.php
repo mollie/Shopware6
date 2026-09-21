@@ -140,6 +140,20 @@ final class MollieOrderTransactionCollectionTest extends TestCase
     }
 
     /**
+     * A checkout that was started but never finished leaves its transaction unconfirmed. It still
+     * awaits payment, so a payment link may be opened for it.
+     */
+    public function testAnUnconfirmedTransactionStillAwaitsPayment(): void
+    {
+        $unconfirmed = $this->createTransaction('unconfirmed', OrderTransactionStates::STATE_UNCONFIRMED, 2000);
+        $cancelled = $this->createTransaction('cancelled', OrderTransactionStates::STATE_CANCELLED, 3000);
+
+        $transactions = new MollieOrderTransactionCollection(new OrderTransactionCollection([$unconfirmed, $cancelled]));
+
+        self::assertSame($unconfirmed, $transactions->getLatestPayableTransaction());
+    }
+
+    /**
      * Unlike the current transaction, this must not fall back to the newest one - a paid order has
      * nothing left to pay a payment link for.
      */
