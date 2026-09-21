@@ -157,6 +157,19 @@ on the transaction.
 
 ---
 
+## A transaction a payment link may be paid for is open, reminded or unconfirmed
+
+`unconfirmed` is the state a Shopware transaction sits in while the customer is away at the payment
+provider: the checkout was started, the redirect happened, finalize has not run. So a running
+checkout and an abandoned one look the same from the order, and both are still payable. A payment
+link for such an order must not start a second attempt - the transaction's Mollie payment is still
+`open`, and sending the customer to that payment's own checkout URL puts them back where they were.
+
+`MollieOrderTransactionCollection::getLatestPayableTransaction()` therefore accepts `open`,
+`reminded` and `unconfirmed`.
+
+---
+
 ## Order state mapping is the simple alternative to the Flow Builder
 
 Shopware's own answer to "set the order state when the payment status changes" is the Flow

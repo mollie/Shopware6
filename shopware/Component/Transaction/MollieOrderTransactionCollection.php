@@ -62,13 +62,13 @@ final class MollieOrderTransactionCollection
     }
 
     /**
-     * The newest transaction (by createdAt) that still awaits payment (state open or reminded) -
-     * i.e. the one a payment link should be paid for. Returns null when there is none.
+     * The newest transaction (by createdAt) that still awaits payment (state open, reminded or
+     * unconfirmed) - i.e. the one a payment link should be paid for. Returns null when there is none.
      */
     public function getLatestPayableTransaction(): ?OrderTransactionEntity
     {
         return $this->findTransaction(
-            [OrderTransactionStates::STATE_OPEN, OrderTransactionStates::STATE_REMINDED],
+            [OrderTransactionStates::STATE_OPEN, OrderTransactionStates::STATE_REMINDED, OrderTransactionStates::STATE_UNCONFIRMED],
             true,
             false,
             false

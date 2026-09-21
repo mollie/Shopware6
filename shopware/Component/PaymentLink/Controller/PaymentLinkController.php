@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\PaymentLink\Controller;
 
 use Mollie\Shopware\Component\Mollie\CreatePaymentLink;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
+use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\PaymentLinkGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
@@ -79,6 +81,8 @@ final class PaymentLinkController extends StorefrontController
         private PayloadBuilderInterface $payloadBuilder,
         #[Autowire(service: PaymentLinkGateway::class)]
         private PaymentLinkGatewayInterface $paymentLinkGateway,
+        #[Autowire(service: MollieGateway::class)]
+        private MollieGatewayInterface $mollieGateway,
         #[Autowire(service: PaymentMethodRoute::class)]
         private AbstractPaymentMethodRoute $paymentMethodRoute,
         #[Autowire(service: SettingsService::class)]
@@ -123,6 +127,7 @@ final class PaymentLinkController extends StorefrontController
 
         $transactionCollection = new MollieOrderTransactionCollection($order->getTransactions());
         $transaction = $transactionCollection->getLatestPayableTransaction();
+
         if (! $transaction instanceof OrderTransactionEntity) {
             $this->logger->warning('Payment link requested but order has no open transaction', $logData);
             $this->addFlash(self::DANGER, $this->trans('molliePayments.messages.paymentLink.error'));
@@ -145,7 +150,8 @@ final class PaymentLinkController extends StorefrontController
 
         // Reuse an existing payment link instead of creating a second one. If it already has a
         // settled payment, a new/updated link makes no sense - stop with a flash message.
-        $existingPaymentLinkId = $this->getExistingPaymentLinkId($transaction);
+        $molliePayment = $this->getPaymentExtension($transaction);
+        $existingPaymentLinkId = $molliePayment?->getPaymentLinkId();
         if ($existingPaymentLinkId !== null) {
             $logData['paymentLinkId'] = $existingPaymentLinkId;
 
@@ -154,6 +160,16 @@ final class PaymentLinkController extends StorefrontController
                 $this->addFlash(self::INFO, $this->trans('molliePayments.messages.paymentLink.alreadyPaid'));
 
                 return $this->redirectToRoute('frontend.account.order.page');
+            }
+        }
+
+        if ($molliePayment instanceof Payment) {
+            $openCheckoutUrl = $this->getOpenPaymentCheckoutUrl($molliePayment, $orderNumber, $salesChannelId, $logData);
+            if ($openCheckoutUrl !== null) {
+                $logData['molliePaymentId'] = $molliePayment->getId();
+                $this->logger->info('Order has an open Mollie payment, redirecting customer to its checkout', $logData);
+
+                return new RedirectResponse($openCheckoutUrl);
             }
         }
 
@@ -300,11 +316,40 @@ final class PaymentLinkController extends StorefrontController
         return $this->paymentHandlerLocator->findByPaymentMethod($allowedMethods[0]);
     }
 
-    private function getExistingPaymentLinkId(OrderTransactionEntity $transaction): ?string
+    private function getPaymentExtension(OrderTransactionEntity $transaction): ?Payment
     {
         $mollieExtension = $transaction->getExtension(Mollie::EXTENSION);
 
-        return $mollieExtension instanceof Payment ? $mollieExtension->getPaymentLinkId() : null;
+        return $mollieExtension instanceof Payment ? $mollieExtension : null;
+    }
+
+    /**
+     * @param array<string, string> $logData
+     */
+    private function getOpenPaymentCheckoutUrl(Payment $payment, string $orderNumber, string $salesChannelId, array $logData): ?string
+    {
+        if ($payment->getId() === '') {
+            return null;
+        }
+
+        $logData['molliePaymentId'] = $payment->getId();
+
+        try {
+            $molliePayment = $this->mollieGateway->getPayment($payment->getId(), $orderNumber, $salesChannelId);
+        } catch (\Throwable $exception) {
+            $logData['error'] = $exception->getMessage();
+            $this->logger->warning('Could not load the existing Mollie payment for the payment link', $logData);
+
+            return null;
+        }
+
+        if ($molliePayment->getStatus() !== PaymentStatus::OPEN) {
+            return null;
+        }
+
+        $checkoutUrl = $molliePayment->getCheckoutUrl();
+
+        return $checkoutUrl !== '' ? $checkoutUrl : null;
     }
 
     private function createOrUpdatePaymentLink(CreatePaymentLink $createPaymentLink, string $orderNumber, string $salesChannelId, ?string $existingPaymentLinkId): PaymentLink
