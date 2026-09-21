@@ -81,6 +81,29 @@ Feature: Subscription
     Then the subscription has been renewed
     And order payment status is "paid"
 
+  Scenario: a subscription can be renewed when the payment method is restricted to carts with subscription products
+    Given payment method "eps" exists and active
+    And payment method "belfius" exists and active
+    And payment method "eps" has availability rule "Cart has subscription products"
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And i select "mollie_fixture_shipment" as shipping method
+    And product "MOL_SUB_1" with quantity "1" is in cart
+    When i start checkout with payment method "eps"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And i remember the subscription for renewal
+    Given product "MOL_REGULAR" with quantity "1" is in cart
+    When i start checkout with payment method "belfius"
+    And select payment status "paid"
+    Then i see success page
+    And order payment status is "paid"
+    And i remember the mollie payment id
+    When i trigger the subscription renewal webhook
+    Then the subscription has been renewed
+    And order payment status is "paid"
+
   Scenario: mixed cart renewal creates a renewal order containing only the products of the renewed subscription group
     Given payment method "eps" exists and active
     And payment method "belfius" exists and active

@@ -7,6 +7,10 @@ use Behat\Hook\AfterScenario;
 use Behat\Step\Given;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Integration\Data\PaymentMethodTestBehaviour;
+use Shopware\Core\Content\Rule\RuleEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 final class PaymentContext extends ShopwareContext
@@ -20,6 +24,11 @@ final class PaymentContext extends ShopwareContext
 
     private ?string $configuredSalesChannelId = null;
 
+    /**
+     * @var array<string, ?string>
+     */
+    private array $previousAvailabilityRules = [];
+
     #[Given('payment method :arg1 exists and active')]
     public function paymentMethodExistsAndActive(string $paymentMethodIdentifier): void
     {
@@ -27,6 +36,57 @@ final class PaymentContext extends ShopwareContext
         $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodIdentifier, $salesChannelContext->getContext());
         $this->activatePaymentMethod($paymentMethod, $salesChannelContext->getContext());
         $this->assignPaymentMethodToSalesChannel($paymentMethod, $salesChannelContext->getSalesChannel(), $salesChannelContext->getContext());
+    }
+
+    #[Given('payment method :arg1 has availability rule :arg2')]
+    public function paymentMethodHasAvailabilityRule(string $paymentMethodIdentifier, string $ruleName): void
+    {
+        $context = $this->getCurrentSalesChannelContext()->getContext();
+        $paymentMethod = $this->getPaymentMethodByTechnicalName($paymentMethodIdentifier, $context);
+
+        /** @var EntityRepository $ruleRepository */
+        $ruleRepository = $this->getContainer()->get('rule.repository');
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('name', $ruleName));
+        $rule = $ruleRepository->search($criteria, $context)->first();
+        if (! $rule instanceof RuleEntity) {
+            throw new \RuntimeException(sprintf('Rule "%s" not found, load the mollie fixtures first', $ruleName));
+        }
+
+        if (! array_key_exists($paymentMethod->getId(), $this->previousAvailabilityRules)) {
+            $this->previousAvailabilityRules[$paymentMethod->getId()] = $paymentMethod->getAvailabilityRuleId();
+        }
+
+        /** @var EntityRepository $paymentMethodRepository */
+        $paymentMethodRepository = $this->getContainer()->get('payment_method.repository');
+        $paymentMethodRepository->upsert([[
+            'id' => $paymentMethod->getId(),
+            'availabilityRuleId' => $rule->getId(),
+        ]], $context);
+    }
+
+    #[AfterScenario]
+    public function restoreAvailabilityRules(): void
+    {
+        if (count($this->previousAvailabilityRules) === 0) {
+            return;
+        }
+
+        $context = $this->getCurrentSalesChannelContext()->getContext();
+
+        /** @var EntityRepository $paymentMethodRepository */
+        $paymentMethodRepository = $this->getContainer()->get('payment_method.repository');
+
+        $updates = [];
+        foreach ($this->previousAvailabilityRules as $paymentMethodId => $availabilityRuleId) {
+            $updates[] = [
+                'id' => $paymentMethodId,
+                'availabilityRuleId' => $availabilityRuleId,
+            ];
+        }
+        $paymentMethodRepository->upsert($updates, $context);
+
+        $this->previousAvailabilityRules = [];
     }
 
     #[Given('plugin configuration :arg1 is set to :arg2')]

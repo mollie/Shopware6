@@ -15,11 +15,13 @@ use Symfony\Component\Validator\Constraints\Type;
 #[AutoconfigureTag('shopware.rule.definition')]
 final class CartSubscriptionRule extends Rule
 {
+    public const RULE_NAME = 'mollie_cart_subscription_rule';
+
     protected bool $isSubscription = false;
 
     public function getName(): string
     {
-        return 'mollie_cart_subscription_rule';
+        return self::RULE_NAME;
     }
 
     public function match(RuleScope $scope): bool
