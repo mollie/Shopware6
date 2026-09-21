@@ -46,7 +46,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutRoundingDiff(),
             $this->cleanLineItems(),
@@ -73,7 +73,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutRoundingDiff(),
             $this->cleanLineItems(),
@@ -93,7 +93,7 @@ final class AuthorizationReconcilerTest extends TestCase
         // The shipped line items sum to only 91.92 because the rounding-difference line is not a
         // Shopware line item. On a full shipment the capture must still land on the full authorized
         // 91.94 (amount - amountCaptured), independent of the rounding-line recognition.
-        $payment = new Payment('tr_1');
+        $payment = $this->authorizedPayment();
         $payment->setAmount(new Money(91.94, 'EUR'));
         $payment->setCapturedAmount(new Money(0.0, 'EUR'));
 
@@ -124,7 +124,7 @@ final class AuthorizationReconcilerTest extends TestCase
     {
         // A prior shipment already captured 50.00 of the authorized 90.00; the final full shipment
         // must top up exactly the remaining 40.00.
-        $payment = new Payment('tr_1');
+        $payment = $this->authorizedPayment();
         $payment->setAmount(new Money(90.0, 'EUR'));
         $payment->setCapturedAmount(new Money(50.0, 'EUR'));
 
@@ -161,7 +161,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutRoundingDiff(),
             $this->cleanLineItems(),
@@ -209,7 +209,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutRoundingDiff(),
             $this->cancelledLineItems(),
@@ -237,7 +237,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutRoundingDiff(),
             $this->cancelledLineItems(),
@@ -262,7 +262,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutRoundingDiff(),
             $this->cleanLineItems(),
@@ -316,7 +316,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutMollieCustomFields(),
             $this->cleanLineItems(),
@@ -629,10 +629,36 @@ final class AuthorizationReconcilerTest extends TestCase
         self::assertCount(0, $gateway->getCapturePayloads());
     }
 
-    public function testShipmentSkipsTheCaptureForAnUnknownMethodThatWasNeverAuthorized(): void
+    public function testShipmentSkipsTheCaptureForAnOrderWithoutAKnownPaymentMethod(): void
     {
-        // Orders whose custom fields carry no method fall through to the Mollie payment: a payment that
-        // is not authorized has nothing to capture.
+        // Without the method on the transaction there is no handler that says the money is only held
+        // until the shipment, so nothing is captured.
+        $gateway = new FakeGateway('', $this->authorizedPayment());
+        $reconciler = $this->createReconciler($gateway);
+
+        $shippingItems = new ShippingItemCollection();
+        $shippingItems->add(new ShippingItem(1, 10.0, null));
+
+        $mollieId = $reconciler->captureViaPaymentsApi(
+            new Payment('tr_1'),
+            $shippingItems,
+            $this->orderWithoutRoundingDiff(),
+            $this->cleanLineItems(),
+            $this->currency(),
+            'SW10001',
+            'sales-channel',
+            false,
+            [],
+        );
+
+        self::assertNull($mollieId);
+        self::assertCount(0, $gateway->getCapturePayloads());
+    }
+
+    public function testShipmentSkipsTheCaptureWhenThePaymentWasNeverAuthorized(): void
+    {
+        // The merchant switched the method to the direct payment after the order was placed, so Mollie
+        // collected the money at the checkout and has no authorization to capture.
         $freshPayment = new Payment('tr_1');
         $freshPayment->setStatus(PaymentStatus::PAID);
 
@@ -643,7 +669,7 @@ final class AuthorizationReconcilerTest extends TestCase
         $shippingItems->add(new ShippingItem(1, 10.0, null));
 
         $mollieId = $reconciler->captureViaPaymentsApi(
-            new Payment('tr_1'),
+            $this->authorizedPayment(),
             $shippingItems,
             $this->orderWithoutRoundingDiff(),
             $this->cleanLineItems(),
@@ -675,13 +701,11 @@ final class AuthorizationReconcilerTest extends TestCase
         return new AuthorizationReconciler($gateway, $itemResolver, $paymentHandlerLocator, $settingsService, $logger);
     }
 
-    private function authorizedPayment(?PaymentMethod $paymentMethod = null): Payment
+    private function authorizedPayment(PaymentMethod $paymentMethod = PaymentMethod::KLARNA): Payment
     {
         $payment = new Payment('tr_1');
         $payment->setStatus(PaymentStatus::AUTHORIZED);
-        if ($paymentMethod !== null) {
-            $payment->setMethod($paymentMethod);
-        }
+        $payment->setMethod($paymentMethod);
 
         return $payment;
     }

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Shipment\Route;
 
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\Shipment;
+use Mollie\Shopware\Component\Payment\Method\KlarnaPayment;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Shipment\AuthorizationReconciler;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
@@ -24,7 +26,9 @@ use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderService;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
+use Mollie\Shopware\Unit\Payment\Fake\FakeFinalize;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Payment\Fake\FakePay;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -84,7 +88,7 @@ class ShipOrderRouteTest extends TestCase
             $this->eventDispatcher,
             $logger,
         );
-        $reconciler = new AuthorizationReconciler($this->gateway, $itemResolver, new PaymentHandlerLocator([]), new FakeSettingsService(), $logger);
+        $reconciler = new AuthorizationReconciler($this->gateway, $itemResolver, new PaymentHandlerLocator([new KlarnaPayment(new FakePay(), new FakeFinalize(), $logger)]), new FakeSettingsService(), $logger);
 
         $this->itemResolver = $itemResolver;
         $this->trackingResolver = $trackingResolver;
@@ -190,7 +194,7 @@ class ShipOrderRouteTest extends TestCase
     public function testShipByOrderIdCapturesAndPersistsRequestedItems(): void
     {
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], [
@@ -218,7 +222,7 @@ class ShipOrderRouteTest extends TestCase
     public function testShipByOrderNumberResolvesOrder(): void
     {
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 5.0);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], [
@@ -234,7 +238,7 @@ class ShipOrderRouteTest extends TestCase
     public function testShipResolvesItemByProductNumber(): void
     {
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 5.0);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], [
@@ -253,7 +257,7 @@ class ShipOrderRouteTest extends TestCase
     {
         $first = $this->orderBuilder->createShippableLineItem('lineitemid1', 'SW100', 2, 10.0);
         $second = $this->orderBuilder->createShippableLineItem('lineitemid2', 'SW200', 3, 4.0, ['quantity' => 1]);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$first, $second]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$first, $second]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], ['orderId' => $order->getId()]);
@@ -280,7 +284,7 @@ class ShipOrderRouteTest extends TestCase
         // reject the capture with "The amount to capture is higher than the remaining authorized amount".
         $container = $this->orderBuilder->createContainerLineItem('containerid', 'Personalize this product', 10.0);
         $product = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$container, $product]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$container, $product]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], ['orderId' => $order->getId()]);
@@ -298,7 +302,7 @@ class ShipOrderRouteTest extends TestCase
     public function testShipIsAnIdempotentNoopWhenNothingRemains(): void
     {
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0, ['quantity' => 2]);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], ['orderId' => $order->getId()]);
@@ -321,7 +325,7 @@ class ShipOrderRouteTest extends TestCase
         // Merchants may set an authorized order to paid themselves (for their ERP); those orders must
         // still be shipped instead of being treated as a no-op.
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
-        $order = $this->orderBuilder->getOrderWithNonCapturablePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithNonCapturablePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], ['orderId' => $order->getId()]);
@@ -343,7 +347,7 @@ class ShipOrderRouteTest extends TestCase
         $this->gateway->withCaptureThrowing();
 
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 10.0);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], ['orderId' => $order->getId()]);
@@ -417,7 +421,7 @@ class ShipOrderRouteTest extends TestCase
     public function testShipThrowsWhenLineItemIsAlreadyFullyShipped(): void
     {
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0, ['quantity' => 2]);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], [
@@ -439,7 +443,7 @@ class ShipOrderRouteTest extends TestCase
     public function testShipThrowsWhenRequestedQuantityIsTooHigh(): void
     {
         $lineItem = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 2, 10.0);
-        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]));
+        $order = $this->orderBuilder->getOrderWithMolliePayment(new OrderLineItemCollection([$lineItem]), $this->capturablePayment());
         $this->orderRepository->add($order);
 
         $request = new Request([], [
@@ -525,6 +529,14 @@ class ShipOrderRouteTest extends TestCase
         $this->orderRepository->add($order);
 
         return $order;
+    }
+
+    private function capturablePayment(): Payment
+    {
+        $payment = new Payment('tr_fake_payment');
+        $payment->setMethod(PaymentMethod::KLARNA);
+
+        return $payment;
     }
 
     private function shipRequest(string $orderId): Request

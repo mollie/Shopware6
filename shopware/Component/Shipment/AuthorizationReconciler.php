@@ -305,12 +305,12 @@ final class AuthorizationReconciler
     {
         $method = $payment->getMethod();
         if ($method === null) {
-            return true;
+            return false;
         }
 
         $paymentHandler = $this->paymentHandlerLocator->findByPaymentMethod($method->value);
         if ($paymentHandler === null) {
-            return true;
+            return false;
         }
 
         if ($paymentHandler instanceof AutomaticCaptureAwareInterface) {
