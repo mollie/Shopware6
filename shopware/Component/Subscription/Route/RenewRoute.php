@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SubscriptionGatewayInterface;
+use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\SubscriptionStatus;
 use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute as AbstractPaymentWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
@@ -14,12 +15,15 @@ use Mollie\Shopware\Component\Payment\Route\WebhookRoute as PaymentWebhookRoute;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\Action\RenewAction;
+use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionEntity;
 use Mollie\Shopware\Component\Subscription\RenewalOrderCreator;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncer;
 use Mollie\Shopware\Component\Subscription\SubscriptionAddressSyncerInterface;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataService;
 use Mollie\Shopware\Component\Subscription\SubscriptionDataServiceInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -101,17 +105,9 @@ final class RenewRoute extends AbstractRenewRoute
             return new WebhookResponse($molliePayment);
         }
 
-        $intervalKey = (string) $subscription->getMetadata()->getInterval();
-        $addresses = $this->addressSyncer->syncFromSubscription($subscription, $context);
-
-        $transaction = $this->renewalOrderCreator->create(
-            $order,
-            $subscriptionId,
-            $intervalKey,
-            $addresses,
-            $molliePayment,
-            $context
-        );
+        $existingOrderId = (string) $request->get('orderId', '');
+        $hasExistingOrder = strlen($existingOrderId) > 0;
+        $transaction = $this->resolveTransaction($existingOrderId, $subscription, $order, $molliePayment, $context);
 
         $this->renewAction->execute(
             $subscription,
@@ -123,6 +119,34 @@ final class RenewRoute extends AbstractRenewRoute
             $context
         );
 
+        if ($hasExistingOrder) {
+            return new WebhookResponse($molliePayment);
+        }
+
         return $this->paymentWebhookRoute->notify($transaction->getId(), $context);
+    }
+
+    private function resolveTransaction(
+        string $existingOrderId,
+        SubscriptionEntity $subscription,
+        OrderEntity $order,
+        Payment $molliePayment,
+        Context $context
+    ): OrderTransactionEntity {
+        if (strlen($existingOrderId) > 0) {
+            return $this->renewalOrderCreator->linkExistingOrder($existingOrderId, $subscription, $molliePayment, $context);
+        }
+
+        $intervalKey = (string) $subscription->getMetadata()->getInterval();
+        $addresses = $this->addressSyncer->syncFromSubscription($subscription, $context);
+
+        return $this->renewalOrderCreator->create(
+            $order,
+            $subscription->getId(),
+            $intervalKey,
+            $addresses,
+            $molliePayment,
+            $context
+        );
     }
 }

@@ -13,6 +13,9 @@ final class RenewException extends SubscriptionException
     public const SUBSCRIPTION_WITHOUT_ADDRESS = 'SUBSCRIPTION_WITHOUT_ADDRESS';
     public const ORDER_WITHOUT_DELIVERIES = 'ORDER_WITHOUT_DELIVERIES';
     public const SUBSCRIPTION_WITHOUT_CUSTOMER = 'SUBSCRIPTION_WITHOUT_CUSTOMER';
+    public const ORDER_NOT_FOUND = 'ORDER_NOT_FOUND';
+    public const EXISTING_ORDER_WITHOUT_TRANSACTION = 'EXISTING_ORDER_WITHOUT_TRANSACTION';
+    public const ORDER_ALREADY_LINKED = 'ORDER_ALREADY_LINKED';
 
     public static function subscriptionWithoutOrder(string $subscriptionId): self
     {
@@ -91,6 +94,42 @@ final class RenewException extends SubscriptionException
             self::SUBSCRIPTION_WITHOUT_CUSTOMER,
             'Failed to renew {{subscriptionId}}, subscription order has no customer ',[
                 'subscriptionId' => $subscriptionId,
+            ]
+        );
+    }
+
+    public static function orderNotFound(string $subscriptionId, string $orderId): self
+    {
+        return new self(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            self::ORDER_NOT_FOUND,
+            'Failed to renew {{subscriptionId}}, order {{orderId}} was not found',[
+                'subscriptionId' => $subscriptionId,
+                'orderId' => $orderId,
+            ]
+        );
+    }
+
+    public static function existingOrderWithoutTransaction(string $subscriptionId, string $orderId): self
+    {
+        return new self(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            self::EXISTING_ORDER_WITHOUT_TRANSACTION,
+            'Failed to renew {{subscriptionId}}, order {{orderId}} has no transaction to link',[
+                'subscriptionId' => $subscriptionId,
+                'orderId' => $orderId,
+            ]
+        );
+    }
+
+    public static function orderAlreadyLinked(string $subscriptionId, string $orderId): self
+    {
+        return new self(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            self::ORDER_ALREADY_LINKED,
+            'Failed to renew {{subscriptionId}}, order {{orderId}} is already linked to a mollie payment',[
+                'subscriptionId' => $subscriptionId,
+                'orderId' => $orderId,
             ]
         );
     }

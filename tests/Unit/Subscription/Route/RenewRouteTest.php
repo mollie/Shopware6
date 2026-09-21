@@ -38,10 +38,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Order\Aggregate\OrderCustomer\OrderCustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(RenewRoute::class)]
@@ -152,6 +154,90 @@ final class RenewRouteTest extends TestCase
         $this->assertSame('new-transaction-id', $paymentWebhookRoute->getCalls()[0]['transactionId']);
     }
 
+    public function testRenewLinksExistingOrderInsteadOfCreatingOne(): void
+    {
+        $existingOrderId = Uuid::randomHex();
+        $orderRepository = new FakeOrderRepository();
+        $orderRepository->add($this->buildManuallyCreatedOrder($existingOrderId));
+
+        $cartOrderRoute = new FakeCartOrderRoute();
+        $route = $this->buildRoute(orderRepository: $orderRepository, cartOrderRoute: $cartOrderRoute);
+
+        $request = new Request(query: ['id' => 'mollie-payment-id', 'orderId' => $existingOrderId]);
+        $response = $route->renew('subscription-id', $request, Context::createDefaultContext());
+
+        $this->assertSame(0, $cartOrderRoute->getCallCount());
+        $this->assertSame($existingOrderId, $orderRepository->getLastUpsert()['id']);
+        $this->assertSame('existing-transaction-id', $orderRepository->getLastUpsert()['transactions'][0]['id']);
+        $this->assertSame('mollie-payment-id', $response->getPayment()->getId());
+    }
+
+    public function testRenewKeepsTheAddressesOfAnExistingOrder(): void
+    {
+        $existingOrderId = Uuid::randomHex();
+        $orderRepository = new FakeOrderRepository();
+        $orderRepository->add($this->buildManuallyCreatedOrder($existingOrderId));
+
+        $addressSyncer = new FakeSubscriptionAddressSyncer();
+        $route = $this->buildRoute(orderRepository: $orderRepository, addressSyncer: $addressSyncer);
+
+        $request = new Request(query: ['id' => 'mollie-payment-id', 'orderId' => $existingOrderId]);
+        $route->renew('subscription-id', $request, Context::createDefaultContext());
+
+        $this->assertSame(0, $addressSyncer->getCallCount());
+    }
+
+    public function testRenewDoesNotTouchThePaymentStatusOfAnExistingOrder(): void
+    {
+        $existingOrderId = Uuid::randomHex();
+        $orderRepository = new FakeOrderRepository();
+        $orderRepository->add($this->buildManuallyCreatedOrder($existingOrderId));
+
+        $paymentWebhookRoute = new FakePaymentWebhookRoute();
+        $route = $this->buildRoute(orderRepository: $orderRepository, paymentWebhookRoute: $paymentWebhookRoute);
+
+        $request = new Request(query: ['id' => 'mollie-payment-id', 'orderId' => $existingOrderId]);
+        $route->renew('subscription-id', $request, Context::createDefaultContext());
+
+        $this->assertSame(0, $paymentWebhookRoute->getCallCount());
+    }
+
+    public function testRenewStillPersistsTheRenewalWhenAnExistingOrderIsLinked(): void
+    {
+        $existingOrderId = Uuid::randomHex();
+        $orderRepository = new FakeOrderRepository();
+        $orderRepository->add($this->buildManuallyCreatedOrder($existingOrderId));
+
+        $subscriptionRepository = new FakeSubscriptionRepository();
+
+        $route = $this->buildRoute(orderRepository: $orderRepository, subscriptionRepository: $subscriptionRepository);
+
+        $request = new Request(query: ['id' => 'mollie-payment-id', 'orderId' => $existingOrderId]);
+        $route->renew('subscription-id', $request, Context::createDefaultContext());
+
+        $this->assertSame(1, $subscriptionRepository->getUpsertCount());
+        $this->assertSame('renewed', $subscriptionRepository->getLastUpsert()['historyEntries'][0]['comment']);
+    }
+
+    private function buildManuallyCreatedOrder(string $orderId): OrderEntity
+    {
+        $orderCustomer = new OrderCustomerEntity();
+        $orderCustomer->setId('order-customer-id');
+        $orderCustomer->setCustomerId('customer-id');
+
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId('existing-transaction-id');
+
+        $order = new OrderEntity();
+        $order->setId($orderId);
+        $order->setOrderNumber('10042');
+        $order->setSalesChannelId('sales-channel-id');
+        $order->setOrderCustomer($orderCustomer);
+        $order->setTransactions(new OrderTransactionCollection([$transaction]));
+
+        return $order;
+    }
+
     private function buildRoute(
         ?FakeSettingsService $settings = null,
         ?FakeSubscriptionDataService $dataService = null,
@@ -159,6 +245,8 @@ final class RenewRouteTest extends TestCase
         ?FakeOrderRepository $orderRepository = null,
         ?FakeSubscriptionRepository $subscriptionRepository = null,
         ?FakePaymentWebhookRoute $paymentWebhookRoute = null,
+        ?FakeSubscriptionAddressSyncer $addressSyncer = null,
+        ?FakeCartOrderRoute $cartOrderRoute = null,
     ): RenewRoute {
         $settings ??= new FakeSettingsService(subscriptionSettings: new SubscriptionSettings(enabled: true));
         $dataService ??= new FakeSubscriptionDataService($this->buildSubscriptionData());
@@ -166,6 +254,8 @@ final class RenewRouteTest extends TestCase
         $orderRepository ??= new FakeOrderRepository();
         $subscriptionRepository ??= new FakeSubscriptionRepository();
         $paymentWebhookRoute ??= new FakePaymentWebhookRoute();
+        $addressSyncer ??= new FakeSubscriptionAddressSyncer();
+        $cartOrderRoute ??= new FakeCartOrderRoute();
 
         $subscriptionGateway = new FakeSubscriptionGateway();
         $mollieSubscription = MollieSubscriptionBuilder::create()
@@ -185,7 +275,6 @@ final class RenewRouteTest extends TestCase
         $newOrder->setOrderNumber('20000');
         $newOrder->setTransactions(new OrderTransactionCollection([$newTransaction]));
 
-        $cartOrderRoute = new FakeCartOrderRoute();
         $cartOrderRoute->setResponse($newOrder);
 
         $groupCart = new SubscriptionGroupCart(new Cart('cart-token'), new FakeSalesChannelContext());
@@ -210,7 +299,7 @@ final class RenewRouteTest extends TestCase
             $dataService,
             $subscriptionGateway,
             $mollieGateway,
-            new FakeSubscriptionAddressSyncer(),
+            $addressSyncer,
             $renewalOrderCreator,
             $renewAction,
             $paymentWebhookRoute,

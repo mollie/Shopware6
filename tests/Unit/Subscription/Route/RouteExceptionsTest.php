@@ -79,6 +79,24 @@ final class RouteExceptionsTest extends TestCase
                 RenewException::INVALID_PAYMENT_ID,
                 ['sub-123', '10000'],
             ],
+            'renew-order-not-found' => [
+                static fn (): RenewException => RenewException::orderNotFound('sub-123', 'order-456'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                RenewException::ORDER_NOT_FOUND,
+                ['sub-123', 'order-456'],
+            ],
+            'renew-existing-order-without-transaction' => [
+                static fn (): RenewException => RenewException::existingOrderWithoutTransaction('sub-123', 'order-456'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                RenewException::EXISTING_ORDER_WITHOUT_TRANSACTION,
+                ['sub-123', 'order-456'],
+            ],
+            'renew-order-already-linked' => [
+                static fn (): RenewException => RenewException::orderAlreadyLinked('sub-123', 'order-456'),
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                RenewException::ORDER_ALREADY_LINKED,
+                ['sub-123', 'order-456'],
+            ],
             'renew-subscription-without-address' => [
                 static fn (): RenewException => RenewException::subscriptionWithoutAddress('sub-123'),
                 Response::HTTP_UNPROCESSABLE_ENTITY,

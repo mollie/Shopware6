@@ -345,6 +345,24 @@ The last point caused a real defect: `SkipAction` set the shifted start date, th
 the whole object with the cancel response, so the replacement subscription was created with
 the original creation date. `SkipActionTest` now covers it.
 
+### A failed renewal is repaired by hand, not by a retry
+
+The renewal creates the follow-up order through the normal cart and order route, so anything
+that makes the cart invalid — a rule that no longer matches for that customer, a removed
+product, a shipping method that is gone — kills the renewal on the Shopware side while the
+money at Mollie is already collected.
+
+What merchants do then is not wait for a retry: they create the order in the admin by hand,
+set the payment status to `paid` themselves, and let the normal flows run, so the goods still
+ship on time. By the time anybody looks at the plugin, the order is finished — only the link
+between Mollie payment, order and subscription is missing.
+
+That is why the repair path (`orderId` on the renewal route) must not touch the payment state
+machine. Running `paymentWebhookRoute->notify()` there would drive an order the merchant
+already completed backwards through reopen → open → process. For the same reason there is no
+open or reminded transaction left to link to, so the order's current transaction is the one to
+write to.
+
 ### Interval strings
 
 Mollie writes the unit in the singular for a single period (`1 month`, not `1 months`) and
