@@ -348,9 +348,9 @@ final class OrderEntityBuilder
         return $this->buildOrderWithTransaction($lineItems, $payment ?? new Payment('tr_fake_payment'), OrderTransactionStates::STATE_AUTHORIZED);
     }
 
-    public function getOrderWithNonCapturablePayment(OrderLineItemCollection $lineItems): OrderEntity
+    public function getOrderWithNonCapturablePayment(OrderLineItemCollection $lineItems, ?Payment $payment = null): OrderEntity
     {
-        return $this->buildOrderWithTransaction($lineItems, new Payment('tr_fake_payment'), OrderTransactionStates::STATE_PAID);
+        return $this->buildOrderWithTransaction($lineItems, $payment ?? new Payment('tr_fake_payment'), OrderTransactionStates::STATE_PAID);
     }
 
     public function getOrderWithoutMolliePayment(OrderLineItemCollection $lineItems): OrderEntity
