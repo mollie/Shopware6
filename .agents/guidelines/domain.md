@@ -472,3 +472,25 @@ A decorated *controller* is the exception that needs nothing:
 `controller.service_arguments`, so the attribute would be dropped without a word. It is not needed
 either — a controller is only reached through a service locator, which is never a cycle.
 
+
+## The context remembers an address id, and the wallet flows have to clean up after themselves
+
+`ContextSwitchRoute` does not only change the context of the running request: it persists every
+parameter it accepts — including `shippingAddressId` and `billingAddressId` — into
+`sales_channel_api_context` for the shopper's token, and `SalesChannelContextPersister::save()`
+merges, so a key that was written once cannot be unset again. The wallet flows write a temporary
+address there to price the delivery for the country the wallet reports, and whoever deletes that
+address again has to switch the context back to a real address first. A dangling id is not
+harmless: Shopware 6.5 dereferences it without a fallback and
+`CustomerEntity::setActiveShippingAddress()` receives `null`, which kills every later request on
+that token — cart, checkout, the widgets — until the context expires about a day later. Newer
+cores fall back to the default address, so the same bug only shows up as addresses silently
+jumping back to the default.
+
+The flip side is that a persisted address id **wins over the customer's default address**, since
+the factory reads `$options[SHIPPING_ADDRESS_ID] ?? $customer->getDefaultShippingAddressId()`.
+Writing the wallet address onto the customer defaults is therefore not enough to make the order
+use it — as long as any address id sits in the context, that one is used. `AccountService` sets
+the synchronised ids explicitly for that reason, but only when the context already carries a
+customer: `ContextSwitchRoute` answers an address id with `customerNotLoggedIn()` when it does
+not, and the express login path still holds the pre-login context object at that point.

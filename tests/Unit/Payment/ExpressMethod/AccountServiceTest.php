@@ -22,6 +22,7 @@ use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Country\CountryEntity;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\Salutation\SalutationEntity;
 
@@ -203,6 +204,50 @@ final class AccountServiceTest extends TestCase
         $this->assertNotEmpty($syncSpy->getLastCountryMap(), 'country map must always be pre-built and forwarded to syncAddresses');
     }
 
+    public function testALoggedInShopperIsSwitchedToTheWalletAddress(): void
+    {
+        $contextSwitchRoute = new FakeContextSwitchRoute();
+        $service = $this->buildService(
+            customersFoundByEmail: [],
+            syncSpy: new FakeAddressSynchronizer(),
+            contextSwitchRoute: $contextSwitchRoute,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext($this->makeCustomer('customer-logged-in')),
+        );
+
+        $switch = $contextSwitchRoute->getSwitches()[0];
+        $this->assertSame('shipping-id', $switch[SalesChannelContextService::SHIPPING_ADDRESS_ID]);
+        $this->assertSame('billing-id', $switch[SalesChannelContextService::BILLING_ADDRESS_ID]);
+    }
+
+    public function testAShopperWhoWasNotLoggedInGetsNoAddressIdsSwitched(): void
+    {
+        $contextSwitchRoute = new FakeContextSwitchRoute();
+        $service = $this->buildService(
+            customersFoundByEmail: [$this->makeCustomer('customer-returning', guest: true)],
+            syncSpy: new FakeAddressSynchronizer(),
+            contextSwitchRoute: $contextSwitchRoute,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $switch = $contextSwitchRoute->getSwitches()[0];
+        $this->assertArrayNotHasKey(SalesChannelContextService::SHIPPING_ADDRESS_ID, $switch);
+        $this->assertArrayNotHasKey(SalesChannelContextService::BILLING_ADDRESS_ID, $switch);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -245,6 +290,7 @@ final class AccountServiceTest extends TestCase
         ?FakeShopwareAccountService $loginTracker = null,
         ?FakeRegisterRoute $registerRoute = null,
         ?SalesChannelContext $newContext = null,
+        ?FakeContextSwitchRoute $contextSwitchRoute = null,
     ): AccountService {
         $newContext ??= $this->createMock(SalesChannelContext::class);
 
@@ -262,7 +308,7 @@ final class AccountServiceTest extends TestCase
             salutationRepository: new FakeSalutationRepository([$salutation]),
             registerRoute: $registerRoute ?? new FakeRegisterRoute($this->makeCustomer('fallback')),
             accountService: $loginTracker ?? new FakeShopwareAccountService(),
-            contextSwitchRoute: new FakeContextSwitchRoute(),
+            contextSwitchRoute: $contextSwitchRoute ?? new FakeContextSwitchRoute(),
             salesChannelContextService: new FakeSalesChannelContextService($newContext),
             addressSynchronizer: $syncSpy,
             logger: new NullLogger(),

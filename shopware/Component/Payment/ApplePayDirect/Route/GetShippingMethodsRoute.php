@@ -6,9 +6,9 @@ namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMethod;
 use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddress;
+use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddressManager;
+use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddressManagerInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
@@ -36,7 +36,6 @@ use Symfony\Component\Routing\Attribute\Route;
 final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
 {
     /**
-     * @param EntityRepository<CustomerAddressCollection<CustomerAddressEntity>> $customerAddressRepository
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
      */
     public function __construct(
@@ -50,8 +49,8 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
         private AbstractContextSwitchRoute $contextSwitchRoute,
         #[Autowire(service: GetCartRoute::class)]
         private AbstractGetCartRoute $getCartRoute,
-        #[Autowire(service: 'customer_address.repository')]
-        private EntityRepository $customerAddressRepository,
+        #[Autowire(service: TempAddressManager::class)]
+        private TempAddressManagerInterface $tempAddressManager,
         #[Autowire(service: 'country.repository')]
         private EntityRepository $countryRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
@@ -98,59 +97,61 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
 
         $requestDataBag = $this->addFakeAddress($requestDataBag, $countryId, $logData, $salesChannelContext);
 
-        $contextSwitchResponse = $this->contextSwitchRoute->switchContext($requestDataBag, $salesChannelContext);
+        try {
+            $contextSwitchResponse = $this->contextSwitchRoute->switchContext($requestDataBag, $salesChannelContext);
 
-        $salesChannelContextServiceParameters = new SalesChannelContextServiceParameters(
-            $salesChannelContext->getSalesChannelId(),
-            $contextSwitchResponse->getToken(),
-            originalContext: $salesChannelContext->getContext(),
-            customerId: $customerId,
-        );
+            $salesChannelContextServiceParameters = new SalesChannelContextServiceParameters(
+                $salesChannelContext->getSalesChannelId(),
+                $contextSwitchResponse->getToken(),
+                originalContext: $salesChannelContext->getContext(),
+                customerId: $customerId,
+            );
 
-        $newContext = $this->salesChannelContextService->get($salesChannelContextServiceParameters);
+            $newContext = $this->salesChannelContextService->get($salesChannelContextServiceParameters);
 
-        $this->logger->info('Finished - set shipping country for apple pay', $logData);
+            $this->logger->info('Finished - set shipping country for apple pay', $logData);
 
-        $request->query->set('onlyAvailable', '1');
-        $shippingMethods = $this->shippingMethodRoute->load($request, $newContext, new Criteria())->getShippingMethods();
+            $request->query->set('onlyAvailable', '1');
+            $shippingMethods = $this->shippingMethodRoute->load($request, $newContext, new Criteria())->getShippingMethods();
 
-        $selectedShippingMethodId = $salesChannelContext->getShippingMethod()->getId();
-        $salesChannelId = $salesChannelContext->getSalesChannelId();
+            $selectedShippingMethodId = $salesChannelContext->getShippingMethod()->getId();
+            $salesChannelId = $salesChannelContext->getSalesChannelId();
 
-        $logData = [
-            'shippingMethodId' => $selectedShippingMethodId,
-            'salesChannelId' => $salesChannelId,
-        ];
-        $this->logger->info('Start - get shipping methods for apple pay express', $logData);
+            $logData = [
+                'shippingMethodId' => $selectedShippingMethodId,
+                'salesChannelId' => $salesChannelId,
+            ];
+            $this->logger->info('Start - get shipping methods for apple pay express', $logData);
 
-        $applePayMethods = [];
+            $applePayMethods = [];
 
-        /** @var ShippingMethodEntity $shippingMethod */
-        foreach ($shippingMethods as $shippingMethod) {
-            $detail = '';
-            $shippingMethodId = $shippingMethod->getId();
-            $deliveryTime = $shippingMethod->getDeliveryTime();
-            if ($deliveryTime instanceof DeliveryTimeEntity) {
-                $detail = (string) $deliveryTime->getName();
+            /** @var ShippingMethodEntity $shippingMethod */
+            foreach ($shippingMethods as $shippingMethod) {
+                $detail = '';
+                $shippingMethodId = $shippingMethod->getId();
+                $deliveryTime = $shippingMethod->getDeliveryTime();
+                if ($deliveryTime instanceof DeliveryTimeEntity) {
+                    $detail = (string) $deliveryTime->getName();
+                }
+                $tempContext = $this->setShippingMethod($shippingMethodId, $salesChannelContext);
+                $cartResponse = $this->getCartRoute->cart($request, $tempContext);
+
+                $cart = $cartResponse->getCart();
+                $shippingCosts = $cart->getShippingAmount();
+
+                $applePayMethods[$shippingMethodId] = new ApplePayShippingMethod($shippingMethod->getId(), (string) $shippingMethod->getName(), $detail, $shippingCosts);
             }
-            $tempContext = $this->setShippingMethod($shippingMethodId, $salesChannelContext);
-            $cartResponse = $this->getCartRoute->cart($request, $tempContext);
 
-            $cart = $cartResponse->getCart();
-            $shippingCosts = $cart->getShippingAmount();
+            $this->setShippingMethod($selectedShippingMethodId, $salesChannelContext);
 
-            $applePayMethods[$shippingMethodId] = new ApplePayShippingMethod($shippingMethod->getId(), (string) $shippingMethod->getName(), $detail, $shippingCosts);
+            $applePayMethods = $this->setSelectedMethodToFirstElement($applePayMethods, $selectedShippingMethodId);
+
+            $this->logger->info('Finished - get shipping methods for apple pay express', $logData);
+
+            return new GetShippingMethodsResponse($applePayMethods);
+        } finally {
+            $this->tempAddressManager->restore($salesChannelContext);
         }
-
-        $this->setShippingMethod($selectedShippingMethodId, $salesChannelContext);
-
-        $applePayMethods = $this->setSelectedMethodToFirstElement($applePayMethods, $selectedShippingMethodId);
-
-        $this->deleteFakeAddress($salesChannelContext);
-
-        $this->logger->info('Finished - get shipping methods for apple pay express', $logData);
-
-        return new GetShippingMethodsResponse($applePayMethods);
     }
 
     /**
@@ -163,32 +164,13 @@ final class GetShippingMethodsRoute extends AbstractGetShippingMethodsRoute
             return $requestDataBag;
         }
 
-        $customerId = $customer->getId();
         $fakeApplePayAddress = new TempAddress($customer, $countryId);
-        $fakeApplePayAddressId = TempAddress::getId($customer);
 
-        $logData['customerId'] = $customerId;
-        $logData['addressId'] = $fakeApplePayAddressId;
+        $logData['customerId'] = $customer->getId();
+        $logData['addressId'] = $fakeApplePayAddress->getAddressId();
         $this->logger->info('Customer is logged in, fake apple pay address added for cart rules', $logData);
 
-        $this->customerAddressRepository->upsert([$fakeApplePayAddress->toUpsertArray()], $salesChannelContext->getContext());
-
-        $requestDataBag->set(SalesChannelContextService::CUSTOMER_ID, $customerId);
-        $requestDataBag->set(SalesChannelContextService::SHIPPING_ADDRESS_ID, $fakeApplePayAddressId);
-        $requestDataBag->set(SalesChannelContextService::BILLING_ADDRESS_ID, $fakeApplePayAddressId);
-
-        return $requestDataBag;
-    }
-
-    public function deleteFakeAddress(SalesChannelContext $salesChannelContext): void
-    {
-        $customer = $salesChannelContext->getCustomer();
-        if ($customer === null) {
-            return;
-        }
-
-        $fakeAddressId = TempAddress::getId($customer);
-        $this->customerAddressRepository->delete([['id' => $fakeAddressId]], $salesChannelContext->getContext());
+        return $this->tempAddressManager->apply($requestDataBag, $fakeApplePayAddress, $salesChannelContext);
     }
 
     private function setShippingMethod(string $shippingMethodId, SalesChannelContext $salesChannelContext): SalesChannelContext

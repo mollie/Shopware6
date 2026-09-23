@@ -7,10 +7,10 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\ShippingOption;
 use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddress;
+use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddressManager;
+use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddressManagerInterface;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressCollection;
-use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Shipping\SalesChannel\AbstractShippingMethodRoute;
 use Shopware\Core\Checkout\Shipping\SalesChannel\ShippingMethodRoute;
@@ -41,7 +41,6 @@ final class ShippingOptionsResolver implements ShippingOptionsResolverInterface
 {
     /**
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
-     * @param EntityRepository<CustomerAddressCollection<CustomerAddressEntity>> $customerAddressRepository
      */
     public function __construct(
         #[Autowire(service: ShippingMethodRoute::class)]
@@ -51,10 +50,10 @@ final class ShippingOptionsResolver implements ShippingOptionsResolverInterface
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
         private CartService $cartService,
+        #[Autowire(service: TempAddressManager::class)]
+        private TempAddressManagerInterface $tempAddressManager,
         #[Autowire(service: 'country.repository')]
         private EntityRepository $countryRepository,
-        #[Autowire(service: 'customer_address.repository')]
-        private EntityRepository $customerAddressRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -78,32 +77,36 @@ final class ShippingOptionsResolver implements ShippingOptionsResolverInterface
             return $shippingOptions;
         }
 
-        $countryContext = $this->switchCountry($countryId, $address, $salesChannelContext);
-        $currencyIso = $countryContext->getCurrency()->getIsoCode();
         $selectedShippingMethodId = $salesChannelContext->getShippingMethod()->getId();
 
-        $request = new Request();
-        $request->query->set('onlyAvailable', '1');
-        $shippingMethods = $this->shippingMethodRoute->load($request, $countryContext, new Criteria())->getShippingMethods();
+        try {
+            $countryContext = $this->switchCountry($countryId, $address, $salesChannelContext);
+            $currencyIso = $countryContext->getCurrency()->getIsoCode();
 
-        /** @var ShippingMethodEntity $shippingMethod */
-        foreach ($shippingMethods as $shippingMethod) {
-            $methodContext = $this->switchShippingMethod($shippingMethod->getId(), $countryContext);
-            $cart = $this->cartService->getCart($methodContext->getToken(), $methodContext);
+            $request = new Request();
+            $request->query->set('onlyAvailable', '1');
+            $shippingMethods = $this->shippingMethodRoute->load($request, $countryContext, new Criteria())->getShippingMethods();
 
-            $description = (string) ($shippingMethod->getTranslation('name') ?? $shippingMethod->getName());
-            $shippingCosts = $cart->getDeliveries()->getShippingCosts()->sum()->getTotalPrice();
+            /** @var ShippingMethodEntity $shippingMethod */
+            foreach ($shippingMethods as $shippingMethod) {
+                $methodContext = $this->switchShippingMethod($shippingMethod->getId(), $countryContext);
+                $cart = $this->cartService->getCart($methodContext->getToken(), $methodContext);
 
-            $shippingOptions->add(new ShippingOption(
-                $description,
-                $shippingMethod->getId(),
-                new Money($shippingCosts, $currencyIso)
-            ));
+                $description = (string) ($shippingMethod->getTranslation('name') ?? $shippingMethod->getName());
+                $shippingCosts = $cart->getDeliveries()->getShippingCosts()->sum()->getTotalPrice();
+
+                $shippingOptions->add(new ShippingOption(
+                    $description,
+                    $shippingMethod->getId(),
+                    new Money($shippingCosts, $currencyIso)
+                ));
+            }
+
+            // leave the shopper's context the way it was found
+            $this->switchShippingMethod($selectedShippingMethodId, $countryContext);
+        } finally {
+            $this->tempAddressManager->restore($salesChannelContext);
         }
-
-        // leave the shopper's context the way it was found
-        $this->switchShippingMethod($selectedShippingMethodId, $countryContext);
-        $this->deleteTempAddress($salesChannelContext);
 
         $logData['total'] = $shippingOptions->count();
         $this->logger->info('Shipping options for express components resolved', $logData);
@@ -157,25 +160,8 @@ final class ShippingOptionsResolver implements ShippingOptionsResolverInterface
         }
 
         $tempAddress = new TempAddress($customer, $countryId, $address->getCity(), $address->getPostalCode());
-        $tempAddressId = TempAddress::getId($customer);
 
-        $this->customerAddressRepository->upsert([$tempAddress->toUpsertArray()], $salesChannelContext->getContext());
-
-        $requestDataBag->set(SalesChannelContextService::CUSTOMER_ID, $customer->getId());
-        $requestDataBag->set(SalesChannelContextService::SHIPPING_ADDRESS_ID, $tempAddressId);
-        $requestDataBag->set(SalesChannelContextService::BILLING_ADDRESS_ID, $tempAddressId);
-
-        return $requestDataBag;
-    }
-
-    private function deleteTempAddress(SalesChannelContext $salesChannelContext): void
-    {
-        $customer = $salesChannelContext->getCustomer();
-        if (! $customer instanceof CustomerEntity) {
-            return;
-        }
-
-        $this->customerAddressRepository->delete([['id' => TempAddress::getId($customer)]], $salesChannelContext->getContext());
+        return $this->tempAddressManager->apply($requestDataBag, $tempAddress, $salesChannelContext);
     }
 
     private function getCountryId(string $countryIso, SalesChannelContext $salesChannelContext): ?string
