@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Subscriber;
 
+use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Mollie;
@@ -54,6 +55,7 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             }
 
             $method = $mollieCustomFields['method'] ?? null;
+            $captureMode = CaptureMode::tryFrom($mollieCustomFields['captureMode'] ?? '');
             $countPayments = $mollieCustomFields['countPayments'] ?? 1;
             $reconciled = $mollieCustomFields['reconciled'] ?? false;
             $thirdPartyPaymentId = $mollieCustomFields['thirdPartyPaymentId'] ?? null;
@@ -81,6 +83,9 @@ final class OrderTransactionSubscriber implements EventSubscriberInterface
             }
             if ($method !== null) {
                 $transactionExtension->setMethod(PaymentMethod::from($method));
+            }
+            if ($captureMode !== null) {
+                $transactionExtension->setCaptureMode($captureMode);
             }
             if ($thirdPartyPaymentId !== null) {
                 $transactionExtension->setThirdPartyPaymentId($thirdPartyPaymentId);

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Order\Admin;
 
+use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Order;
@@ -10,6 +11,8 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Order\Admin\Response\OrderDetailsResponse;
 use Mollie\Shopware\Component\Order\Admin\Response\RefundManagerConfig;
 use Mollie\Shopware\Component\Order\Admin\Response\ShippingData;
+use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Subscription\DAL\Subscription\SubscriptionCollection;
@@ -48,6 +51,7 @@ final class OrderAdminController extends AbstractController
         private readonly OrderAdminStatusBuilder $statusBuilder,
         #[Autowire(service: OrderPaymentRecovery::class)]
         private readonly OrderPaymentRecovery $paymentRecovery,
+        private readonly PaymentHandlerLocator $paymentHandlerLocator,
     ) {
     }
 
@@ -122,6 +126,10 @@ final class OrderAdminController extends AbstractController
             OrderTransactionStates::STATE_CHARGEBACK,
         ], true);
 
+        if ($mollieOrderId === '' && ! $this->isManualCapture($payment)) {
+            $shippingAllowed = false;
+        }
+
         // Cancelling items releases a part of the authorization, which Mollie only allows while the
         // payment is authorized (see CancelItemRoute).
         $cancelAllowed = $transactionState === OrderTransactionStates::STATE_AUTHORIZED;
@@ -143,6 +151,16 @@ final class OrderAdminController extends AbstractController
             ),
             $this->statusBuilder->buildCancelStatus($mollieOrderId, $mollieOrder, $order->getLineItems(), $cancelAllowed),
         ));
+    }
+
+    private function isManualCapture(Payment $payment): bool
+    {
+        $paymentHandler = $this->paymentHandlerLocator->findByPaymentMethod($payment->getMethod()->value ?? '');
+        if (! $paymentHandler instanceof ManualCaptureModeAwareInterface) {
+            return false;
+        }
+
+        return $payment->getCaptureMode() !== CaptureMode::AUTOMATIC;
     }
 
     private function loadMollieOrder(string $mollieOrderId, string $salesChannelId): ?Order
