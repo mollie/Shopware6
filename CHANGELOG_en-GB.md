@@ -6,6 +6,7 @@
 - Fixed: The Mollie tab of the order stays usable again after closing the Refund Manager.
 - Fixed: Express components and PayPal Express now also work in headless shops.
 - Fixed: Apple Pay Direct completes the payment even when Apple sends no country for the shipping address.
+- Fixed: Cart and checkout work again for logged-in customers after they cancel Apple Pay Direct.
 
 # 5.6.0
 - Added: New "Authorization and capture" section: the authorized status can be skipped per payment method and sales channel, so the money is paid right at the purchase instead of only after the shipment.

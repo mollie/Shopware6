@@ -6,6 +6,7 @@
 - Behoben: Der Mollie-Tab der Bestellung bleibt nach dem Schließen des Refund Managers wieder bedienbar.
 - Behoben: Express Components und PayPal Express funktionieren jetzt auch in Headless-Shops.
 - Behoben: Apple Pay Direct schließt die Zahlung auch dann ab, wenn Apple kein Land zur Lieferadresse liefert.
+- Behoben: Nach einem abgebrochenen Apple Pay Direct funktionieren Warenkorb und Checkout für eingeloggte Kunden wieder.
 
 # 5.6.0
 - Hinzugefügt: Neuer Bereich "Autorisierung und Einzug": pro Zahlart und Verkaufskanal lässt sich der Status "Autorisiert" überspringen, das Geld wird dann direkt beim Kauf bezahlt statt erst nach dem Versand.

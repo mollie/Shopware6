@@ -7,6 +7,8 @@ use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetShippingMethodsResponse;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Route\GetShippingMethodsRoute;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\Struct\ApplePayShippingMethod;
+use Mollie\Shopware\Component\Payment\ExpressMethod\TempAddressManager;
+use Mollie\Shopware\Unit\Fake\CustomerEntityBuilder;
 use Mollie\Shopware\Unit\Fake\FakeContextSwitchRoute;
 use Mollie\Shopware\Unit\Fake\FakeCountryRepository;
 use Mollie\Shopware\Unit\Fake\FakeEntityRepository;
@@ -19,8 +21,13 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressDefinition;
+use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEntity;
+use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
+use Shopware\Core\Framework\Event\NestedEventCollection;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\DeliveryTime\DeliveryTimeEntity;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
@@ -176,6 +183,24 @@ final class GetShippingMethodsRouteTest extends TestCase
         $this->assertSame([], $methods);
     }
 
+    /**
+     * The temp address that prices the sheet for a logged in shopper is deleted again at the end, so
+     * the persisted context has to point at a real address afterwards - a dangling id breaks every
+     * following request of that shopper on Shopware 6.5.
+     */
+    public function testALoggedInShoppersAddressesAreSwitchedBackAfterTheSheetIsPriced(): void
+    {
+        $contextSwitchRoute = new FakeContextSwitchRoute();
+        $context = $this->context();
+        $context->setCustomer($this->customer());
+
+        $this->route(contextSwitchRoute: $contextSwitchRoute)->methods($this->request(), $context);
+
+        $lastSwitch = $contextSwitchRoute->getLastSwitch();
+        $this->assertSame('address-shipping', $lastSwitch[SalesChannelContextService::SHIPPING_ADDRESS_ID]);
+        $this->assertSame('address-billing', $lastSwitch[SalesChannelContextService::BILLING_ADDRESS_ID]);
+    }
+
     private function request(string $countryCode = 'DE'): Request
     {
         return new Request([], ['countryCode' => $countryCode]);
@@ -229,16 +254,46 @@ final class GetShippingMethodsRouteTest extends TestCase
         $germany = new CountryEntity();
         $germany->setId('country-de');
 
+        $contextSwitchRoute ??= new FakeContextSwitchRoute();
+
         return new GetShippingMethodsRoute(
             $shippingMethodRoute ?? new FakeShippingMethodRoute($this->shippingMethods($withDeliveryTime)),
             $setShippingMethodRoute ?? new FakeSetShippingMethodRoute(),
             new FakeSalesChannelContextService($this->context()),
-            $contextSwitchRoute ?? new FakeContextSwitchRoute(),
+            $contextSwitchRoute,
             new FakeGetCartRoute($shippingCosts),
-            new FakeEntityRepository(new CustomerAddressDefinition()),
+            new TempAddressManager($contextSwitchRoute, $this->addressRepository()),
             new FakeCountryRepository($countries ?? [$germany]),
             new NullLogger()
         );
+    }
+
+    private function addressRepository(): FakeEntityRepository
+    {
+        $addressRepository = new FakeEntityRepository(new CustomerAddressDefinition());
+        $addressRepository->entityWrittenContainerEvents[] = new EntityWrittenContainerEvent(Context::createDefaultContext(), new NestedEventCollection(), []);
+        $addressRepository->entityWrittenContainerEvents[] = new EntityWrittenContainerEvent(Context::createDefaultContext(), new NestedEventCollection(), []);
+
+        return $addressRepository;
+    }
+
+    private function customer(): CustomerEntity
+    {
+        $customer = (new CustomerEntityBuilder())->getDefaultCustomer();
+        $customer->setDefaultShippingAddressId('default-shipping');
+        $customer->setDefaultBillingAddressId('default-billing');
+        $customer->setActiveShippingAddress($this->address('address-shipping'));
+        $customer->setActiveBillingAddress($this->address('address-billing'));
+
+        return $customer;
+    }
+
+    private function address(string $id): CustomerAddressEntity
+    {
+        $address = new CustomerAddressEntity();
+        $address->setId($id);
+
+        return $address;
     }
 
     private function shippingMethods(bool $withDeliveryTime = true): ShippingMethodCollection
