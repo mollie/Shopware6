@@ -102,7 +102,12 @@ final class AccountService extends AbstractAccountService
             }
         }
 
-        $this->addressSynchronizer->syncAddresses($customer, $shippingAddress, $billingAddress, $salesChannelContext, $countryMap);
+        $addressSyncResult = $this->addressSynchronizer->syncAddresses($customer, $shippingAddress, $billingAddress, $salesChannelContext, $countryMap);
+
+        if ($salesChannelContext->getCustomer() instanceof CustomerEntity) {
+            $requestDataBag->set(SalesChannelContextService::SHIPPING_ADDRESS_ID, $addressSyncResult->getShippingAddressId());
+            $requestDataBag->set(SalesChannelContextService::BILLING_ADDRESS_ID, $addressSyncResult->getBillingAddressId());
+        }
 
         $requestDataBag->set(SalesChannelContextService::CUSTOMER_ID, $customer->getId());
         $this->logger->debug('Switch customers payment method', $logData);

@@ -34,6 +34,11 @@ final class TempAddress
         return Uuid::fromBytesToHex(md5($customer->getId() . '-' . self::ID_SUFFIX, true));
     }
 
+    public function getAddressId(): string
+    {
+        return self::getId($this->customer);
+    }
+
     /**
      * @return array<mixed>
      */
