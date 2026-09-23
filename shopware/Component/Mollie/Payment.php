@@ -47,6 +47,7 @@ final class Payment extends Struct implements \JsonSerializable
 
     private ?string $authenticationId = null;
     private ?PaymentMethod $method = null;
+    private ?CaptureMode $captureMode = null;
 
     private ?string $profileId = null;
     private ?string $customerId = null;
@@ -180,6 +181,16 @@ final class Payment extends Struct implements \JsonSerializable
     public function setMethod(PaymentMethod $method): void
     {
         $this->method = $method;
+    }
+
+    public function getCaptureMode(): ?CaptureMode
+    {
+        return $this->captureMode;
+    }
+
+    public function setCaptureMode(CaptureMode $captureMode): void
+    {
+        $this->captureMode = $captureMode;
     }
 
     public function getThirdPartyPaymentId(): string

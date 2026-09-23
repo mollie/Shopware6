@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Subscriber;
 
+use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Subscriber\OrderTransactionSubscriber;
@@ -76,6 +77,17 @@ final class OrderTransactionSubscriberTest extends TestCase
         $this->assertInstanceOf(Payment::class, $payment);
         $this->assertSame('pl_1', $payment->getPaymentLinkId());
         $this->assertSame('', $payment->getId());
+    }
+
+    public function testTheCaptureModeIsHydrated(): void
+    {
+        $transaction = $this->buildTransaction(['id' => 'tr_1', 'captureMode' => 'manual']);
+
+        (new OrderTransactionSubscriber())->onOrderTransaction($this->buildEvent([$transaction]));
+
+        $payment = $transaction->getExtension(Mollie::EXTENSION);
+        $this->assertInstanceOf(Payment::class, $payment);
+        $this->assertSame(CaptureMode::MANUAL, $payment->getCaptureMode());
     }
 
     public function testTheCheckoutUrlsAreHydrated(): void

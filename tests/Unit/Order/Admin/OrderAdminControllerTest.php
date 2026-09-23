@@ -3,19 +3,24 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Order\Admin;
 
+use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
+use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Order\Admin\OrderAdminController;
 use Mollie\Shopware\Component\Order\Admin\OrderAdminStatusBuilder;
 use Mollie\Shopware\Component\Order\Admin\OrderPaymentRecovery;
+use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\Shipment\ShipmentItemResolver;
 use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Payment\Fake\FakeManualCaptureModeAwarePaymentHandler;
+use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
@@ -256,6 +261,61 @@ final class OrderAdminControllerTest extends TestCase
         $this->assertSame(2, $cancel['cancelableQuantity']);
     }
 
+    public function testPaymentsApiLineItemsAreNotShippableForPaymentMethodWithoutManualCapture(): void
+    {
+        $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
+        $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_PAID, $lineItems, PaymentMethod::CREDIT_CARD);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $controller = $this->buildController($repository, new FakeGateway());
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $shipping = $body['shipping']['status']['shopware-line-1'];
+        $this->assertFalse($shipping['isShippable']);
+        $this->assertSame(0, $shipping['shippableQuantity']);
+        $this->assertSame(0, $body['shipping']['total']['shippable']);
+    }
+
+    public function testPaymentsApiLineItemsAreNotShippableForManualCaptureMethodPaidWithAutomaticCapture(): void
+    {
+        $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
+        $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_PAID, $lineItems, captureMode: CaptureMode::AUTOMATIC);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $controller = $this->buildController($repository, new FakeGateway());
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $shipping = $body['shipping']['status']['shopware-line-1'];
+        $this->assertFalse($shipping['isShippable']);
+        $this->assertSame(0, $shipping['shippableQuantity']);
+    }
+
+    public function testPaymentsApiLineItemsAreShippableForManualCaptureMethodAuthorizedWithManualCapture(): void
+    {
+        $lineItems = new OrderLineItemCollection([$this->buildShopwareLineItem('shopware-line-1', 2)]);
+        $order = $this->buildOrder('pay-xxx', null, OrderTransactionStates::STATE_AUTHORIZED, $lineItems, captureMode: CaptureMode::MANUAL);
+
+        $repository = new FakeOrderSearchRepository();
+        $repository->add($order);
+
+        $controller = $this->buildController($repository, new FakeGateway());
+
+        $response = $controller->details('order-1', $this->context);
+        $body = json_decode((string) $response->getContent(), true);
+
+        $shipping = $body['shipping']['status']['shopware-line-1'];
+        $this->assertTrue($shipping['isShippable']);
+        $this->assertSame(2, $shipping['shippableQuantity']);
+    }
+
     private function buildController(FakeOrderSearchRepository $repository, FakeGateway $gateway): OrderAdminController
     {
         $lineItemFilter = LineItemFilterBuilder::build();
@@ -264,12 +324,21 @@ final class OrderAdminControllerTest extends TestCase
         $settingsService = new FakeSettingsService();
         $paymentRecovery = new OrderPaymentRecovery($repository);
 
-        return new OrderAdminController($repository, $settingsService, $gateway, $statusBuilder, $paymentRecovery);
+        $paymentHandlerLocator = new PaymentHandlerLocator([
+            new FakeManualCaptureModeAwarePaymentHandler(),
+            new FakePaymentMethodHandler(PaymentMethod::CREDIT_CARD),
+        ]);
+
+        return new OrderAdminController($repository, $settingsService, $gateway, $statusBuilder, $paymentRecovery, $paymentHandlerLocator);
     }
 
-    private function buildOrder(string $molliePaymentId, ?string $mollieOrderId, ?string $transactionState = null, ?OrderLineItemCollection $lineItems = null): OrderEntity
+    private function buildOrder(string $molliePaymentId, ?string $mollieOrderId, ?string $transactionState = null, ?OrderLineItemCollection $lineItems = null, PaymentMethod $method = PaymentMethod::PAYPAL, ?CaptureMode $captureMode = null): OrderEntity
     {
         $payment = new Payment($molliePaymentId);
+        $payment->setMethod($method);
+        if ($captureMode !== null) {
+            $payment->setCaptureMode($captureMode);
+        }
         if ($mollieOrderId !== null) {
             $payment->setOrderId($mollieOrderId);
         }

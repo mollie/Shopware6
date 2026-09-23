@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Mollie;
 
+use Mollie\Shopware\Component\Mollie\CaptureMode;
 use Mollie\Shopware\Component\Mollie\PaymentHydrator;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentStatus;
@@ -48,6 +49,20 @@ final class PaymentHydratorTest extends TestCase
         $this->assertSame('pfl_1', $payment->getProfileId());
         $this->assertSame('sub_1', $payment->getSubscriptionId());
         $this->assertTrue($payment->isCancelable());
+    }
+
+    public function testTheCaptureModeIsHydrated(): void
+    {
+        $payment = (new PaymentHydrator())->hydrate(['id' => 'tr_test', 'status' => PaymentStatus::AUTHORIZED->value, 'captureMode' => CaptureMode::MANUAL->value]);
+
+        $this->assertSame(CaptureMode::MANUAL, $payment->getCaptureMode());
+    }
+
+    public function testAMissingCaptureModeStaysUnknown(): void
+    {
+        $payment = (new PaymentHydrator())->hydrate(['id' => 'tr_test', 'status' => PaymentStatus::PAID->value]);
+
+        $this->assertNull($payment->getCaptureMode());
     }
 
     public function testCreatedAtIsParsedFromAtom(): void

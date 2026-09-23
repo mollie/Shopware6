@@ -48,6 +48,11 @@ final class PaymentHydrator
             $payment->setMethod($paymentMethod);
         }
 
+        $captureMode = CaptureMode::tryFrom($body['captureMode'] ?? '');
+        if ($captureMode !== null) {
+            $payment->setCaptureMode($captureMode);
+        }
+
         $thirdPartyPaymentId = $body['details']['paypalReference'] ?? null;
         if ($thirdPartyPaymentId !== null) {
             $payment->setThirdPartyPaymentId($thirdPartyPaymentId);
