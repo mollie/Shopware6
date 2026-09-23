@@ -5,6 +5,7 @@
 - Fixed: Subscriptions are renewed again when the payment method is restricted to subscription products by a rule.
 - Fixed: The Mollie tab of the order stays usable again after closing the Refund Manager.
 - Fixed: Express components and PayPal Express now also work in headless shops.
+- Fixed: After a credit card input error on the checkout confirmation page, the order can be placed again once the input is corrected.
 - Fixed: Apple Pay Direct completes the payment even when Apple sends no country for the shipping address.
 
 # 5.6.0

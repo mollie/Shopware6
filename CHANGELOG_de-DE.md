@@ -5,6 +5,7 @@
 - Behoben: Abos werden wieder verlängert, wenn die Zahlart über eine Regel auf Abo-Produkte eingeschränkt ist.
 - Behoben: Der Mollie-Tab der Bestellung bleibt nach dem Schließen des Refund Managers wieder bedienbar.
 - Behoben: Express Components und PayPal Express funktionieren jetzt auch in Headless-Shops.
+- Behoben: Nach einem Eingabefehler bei der Kreditkarte auf der Bestellbestätigungsseite lässt sich die Bestellung nach der Korrektur wieder abschicken.
 - Behoben: Apple Pay Direct schließt die Zahlung auch dann ab, wenn Apple kein Land zur Lieferadresse liefert.
 
 # 5.6.0

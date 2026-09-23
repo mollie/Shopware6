@@ -313,6 +313,12 @@ Mollie". What the setting does guarantee is that the shop never offers or charge
 `ListMandatesRoute` and `StoreFrontDataSubscriber` return nothing, and `PayloadBuilder` drops
 `savePaymentDetails` and `mandateId`. Word merchant-facing texts accordingly.
 
+The confirm page and the edit order page disable their submit button with different Shopware
+plugins. The checkout confirm form uses `data-form-submit-loader` (`FormSubmitLoaderPlugin`), which
+ignores the `removeLoader` event; only `FormHandler` (`data-form-handler`) listens to it. That is why
+`_reactivateFormSubmit()` after a failed `createToken()` both dispatches `removeLoader` and resets the
+button itself - dropping either part leaves one of the two pages stuck with a disabled spinner.
+
 ## Apple Pay Direct: it is almost always the `.well-known` file
 
 The most frequent cause of "Apple Pay Direct does not work" is the domain verification file.
