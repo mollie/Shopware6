@@ -1,6 +1,7 @@
 # Unreleased
 - Hinzugefügt: Der Webhook wiederholt das Schreiben des Zahlungsstatus bei einem Datenbank-Deadlock.
 - Hinzugefügt: Der Bezahllink leitet auf die Checkout-URL einer bereits laufenden Zahlung weiter.
+- Hinzugefügt: Plugins können über das Event `ModifyCreatePaymentPayloadEvent` eigene Metadaten an Mollie-Zahlungen anhängen.
 - Geändert: Der automatische Versand ignoriert Zahlarten, die dafür nicht vorgesehen sind, komplett.
 - Geändert: "Versand melden" im Mollie-Tab ist bei Zahlungen ohne manuellen Einzug deaktiviert.
 - Behoben: Abos werden wieder verlängert, wenn die Zahlart über eine Regel auf Abo-Produkte eingeschränkt ist.
