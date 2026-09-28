@@ -97,7 +97,7 @@
                                         class="sw-order-line-items-grid__actions-ship-button"
                                         size="small"
                                         ghost="true"
-                                        :disabled="!isShippingPossible"
+                                        :disabled="!isShippingPossible || !acl.can('order.editor')"
                                         @click="onOpenShippingManager"
                                     >
                                         {{ $tc('mollie-payments.general.shipThroughMollie') }}

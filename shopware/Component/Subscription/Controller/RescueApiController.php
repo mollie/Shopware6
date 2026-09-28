@@ -112,7 +112,8 @@ final class RescueApiController extends AbstractController
     #[Route(
         path: '/api/_action/mollie/subscriptions/cancel/{mollieCustomerId}/{mollieSubscriptionId}/{mandateId}/{salesChannelId}',
         name: 'api.action.mollie.subscription.cancel_by_customer',
-        methods: ['GET']
+        methods: ['GET'],
+        defaults: [PlatformRequest::ATTRIBUTE_ACL => ['mollie_subscription_custom:cancel']]
     )]
     public function cancelByMollieId(
         string $mollieCustomerId,

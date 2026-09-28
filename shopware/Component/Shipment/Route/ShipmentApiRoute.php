@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * and delegate the actual work to the ShipOrderRoute.
  */
 #[AsController]
-#[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => true, 'auth_enabled' => true])]
+#[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => true, 'auth_enabled' => true, '_acl' => ['order:update']])]
 final class ShipmentApiRoute
 {
     public function __construct(

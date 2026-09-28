@@ -3,6 +3,7 @@
 - Hinzugefügt: Der Bezahllink leitet auf die Checkout-URL einer bereits laufenden Zahlung weiter.
 - Geändert: Der automatische Versand ignoriert Zahlarten, die dafür nicht vorgesehen sind, komplett.
 - Geändert: "Versand melden" im Mollie-Tab ist bei Zahlungen ohne manuellen Einzug deaktiviert.
+- Geändert: Erstatten, Versand melden, Positionen stornieren und Abos pausieren oder kündigen setzt jetzt auch auf dem Server das passende Recht in der Rolle des Benutzers oder der Integration voraus; Versandmeldungen, etwa aus einem ERP, brauchen das Recht, Bestellungen zu bearbeiten.
 - Behoben: Abos werden wieder verlängert, wenn die Zahlart über eine Regel auf Abo-Produkte eingeschränkt ist.
 - Behoben: Der Mollie-Tab der Bestellung bleibt nach dem Schließen des Refund Managers wieder bedienbar.
 - Behoben: Express Components und PayPal Express funktionieren jetzt auch in Headless-Shops.

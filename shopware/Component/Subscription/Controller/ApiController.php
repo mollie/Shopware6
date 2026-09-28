@@ -26,11 +26,11 @@ final class ApiController extends AbstractController
     ) {
     }
 
-    #[Route(path: '/api/_action/mollie/subscriptions/pause', name: 'api.action.mollie.subscription.pause', defaults: ['action' => 'pause'], methods: ['POST'])]
-    #[Route(path: '/api/_action/mollie/subscriptions/resume', name: 'api.action.mollie.subscription.resume', defaults: ['action' => 'resume'], methods: ['POST'])]
-    #[Route(path: '/api/_action/mollie/subscriptions/skip', name: 'api.action.mollie.subscription.skip', defaults: ['action' => 'skip'], methods: ['POST'])]
-    #[Route(path: '/api/_action/mollie/subscriptions/cancel', name: 'api.action.mollie.subscription.cancel', defaults: ['action' => 'cancel'], methods: ['POST'])]
-    #[Route(path: '/api/_action/mollie/subscriptions/{action}', name: 'api.action.mollie.subscription.changeState', methods: ['POST'])]
+    #[Route(path: '/api/_action/mollie/subscriptions/pause', name: 'api.action.mollie.subscription.pause', defaults: ['action' => 'pause', PlatformRequest::ATTRIBUTE_ACL => ['mollie_subscription:update']], methods: ['POST'])]
+    #[Route(path: '/api/_action/mollie/subscriptions/resume', name: 'api.action.mollie.subscription.resume', defaults: ['action' => 'resume', PlatformRequest::ATTRIBUTE_ACL => ['mollie_subscription:update']], methods: ['POST'])]
+    #[Route(path: '/api/_action/mollie/subscriptions/skip', name: 'api.action.mollie.subscription.skip', defaults: ['action' => 'skip', PlatformRequest::ATTRIBUTE_ACL => ['mollie_subscription:update']], methods: ['POST'])]
+    #[Route(path: '/api/_action/mollie/subscriptions/cancel', name: 'api.action.mollie.subscription.cancel', defaults: ['action' => 'cancel', PlatformRequest::ATTRIBUTE_ACL => ['mollie_subscription_custom:cancel']], methods: ['POST'])]
+    #[Route(path: '/api/_action/mollie/subscriptions/{action}', name: 'api.action.mollie.subscription.changeState', defaults: [PlatformRequest::ATTRIBUTE_ACL => ['mollie_subscription:update', 'mollie_subscription_custom:cancel']], methods: ['POST'])]
     public function changeState(Request $request, Context $context): Response
     {
         $subscriptionId = (string) $request->request->get('id');

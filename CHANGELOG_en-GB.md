@@ -3,6 +3,7 @@
 - Added: The payment link redirects to the checkout URL of a payment that is already running.
 - Changed: The automatic shipment ignores payment methods that are not meant for it entirely.
 - Changed: "Ship through Mollie" in the Mollie tab is disabled for payments without manual capture.
+- Changed: Refunding, reporting shipments, cancelling line items and pausing or cancelling subscriptions now require the matching permission in the role of the user or integration on the server as well; shipment reports, for example from an ERP, need the permission to edit orders.
 - Fixed: Subscriptions are renewed again when the payment method is restricted to subscription products by a rule.
 - Fixed: The Mollie tab of the order stays usable again after closing the Refund Manager.
 - Fixed: Express components and PayPal Express now also work in headless shops.

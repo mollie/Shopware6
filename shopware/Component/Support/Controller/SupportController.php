@@ -29,6 +29,7 @@ final class SupportController extends AbstractController
         path: '/api/_action/mollie/support/request',
         name: 'api.action.mollie.support.request',
         methods: ['POST'],
+        defaults: ['_acl' => ['system_config:read']],
     )]
     public function requestSupport(Request $request, Context $context): JsonResponse
     {

@@ -48,6 +48,7 @@ final class CancelRefundRoute extends AbstractCancelRefundRoute
         path: '/api/_action/mollie/refund/cancel',
         name: 'api.action.mollie.refund.cancel',
         methods: ['POST'],
+        defaults: ['_acl' => ['mollie_refund_manager:delete']],
     )]
     public function cancel(Request $request, Context $context): JsonResponse
     {

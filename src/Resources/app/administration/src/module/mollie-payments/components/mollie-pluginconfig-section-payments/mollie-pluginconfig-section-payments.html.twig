@@ -4,6 +4,7 @@
 >
     <sw-button
         @click="onUpdatePaymentMethodsButtonClicked"
+        :disabled="!acl.can('payment.editor')"
         :isLoading="updatePaymentMethodsIsLoading"
     >
         {{ $tc('mollie-payments.config.payments.updatePaymentMethods.button') }}

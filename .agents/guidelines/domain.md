@@ -494,3 +494,15 @@ use it — as long as any address id sits in the context, that one is used. `Acc
 the synchronised ids explicitly for that reason, but only when the context already carries a
 customer: `ContextSwitchRoute` answers an address id with `customerNotLoggedIn()` when it does
 not, and the express login path still holds the pre-login context object at that point.
+
+## Admin routes that change something check the role on the server
+
+Every admin route that changes something carries `_acl` in its route defaults, and Shopware's
+`AclAnnotationValidator` answers 403 before the controller runs — the administration hiding a button
+is not a permission check, since the API is reachable without it. Refunds use
+`mollie_refund_manager:create` / `:delete`, subscription actions `mollie_subscription:update` and
+`mollie_subscription_custom:cancel`, and every shipping and line-cancel route, including the ERP routes
+under `/api/mollie/ship/`, uses the core `order:update`: the plugin registers no shipping privilege of its
+own, and an integration that reports shipments already needs `order:update` to set the delivery state.
+Admin users and integrations with the admin flag pass every check. A new admin route that changes
+something gets its `_acl` in the same change, and `tests/Unit/Router/AdminRoutePrivilegesTest` lists it.

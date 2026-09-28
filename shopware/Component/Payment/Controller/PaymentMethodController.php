@@ -22,7 +22,7 @@ final class PaymentMethodController extends AbstractController
     ) {
     }
 
-    #[Route(path: '/api/_action/mollie/payment-method/update-methods', name: 'api.mollie.payment-method.update-methods', methods: ['GET'])]
+    #[Route(path: '/api/_action/mollie/payment-method/update-methods', name: 'api.mollie.payment-method.update-methods', defaults: ['_acl' => ['payment_method:update']], methods: ['GET'])]
     public function update(Context $context): JsonResponse
     {
         try {

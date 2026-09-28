@@ -65,6 +65,7 @@ final class CreateRefundRoute extends AbstractCreateRefundRoute
         path: '/api/_action/mollie/refund',
         name: 'api.action.mollie.refund',
         methods: ['POST'],
+        defaults: ['_acl' => ['mollie_refund_manager:create']],
     )]
     public function create(Request $request, Context $context): JsonResponse
     {
