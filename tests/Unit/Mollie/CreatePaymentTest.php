@@ -136,6 +136,31 @@ final class CreatePaymentTest extends TestCase
         $this->assertSame('https://example.com/redirect', $array['redirectUrl']);
     }
 
+    public function testAddedMetadataIsSentNextToShopwareOrderNumber(): void
+    {
+        $payment = new CreatePayment('Test', 'https://example.com', new Money(50.00, 'EUR'));
+        $payment->setShopwareOrderNumber('SW-ORDER-123456');
+
+        $added = $payment->addMetadata('customerNumber', 'SW-CUSTOMER-123456');
+
+        $this->assertTrue($added);
+        $this->assertSame(
+            ['shopwareOrderNumber' => 'SW-ORDER-123456', 'customerNumber' => 'SW-CUSTOMER-123456'],
+            $payment->toArray()['metadata']
+        );
+    }
+
+    public function testAddMetadataDoesNotOverwriteShopwareOrderNumber(): void
+    {
+        $payment = new CreatePayment('Test', 'https://example.com', new Money(50.00, 'EUR'));
+        $payment->setShopwareOrderNumber('SW-ORDER-123456');
+
+        $added = $payment->addMetadata('shopwareOrderNumber', 'SW-ORDER-999999');
+
+        $this->assertFalse($added);
+        $this->assertSame(['shopwareOrderNumber' => 'SW-ORDER-123456'], $payment->toArray()['metadata']);
+    }
+
     public function testToArrayFiltersNullValues(): void
     {
         $payment = new CreatePayment('Test', 'https://example.com', new Money(50.00, 'EUR'));

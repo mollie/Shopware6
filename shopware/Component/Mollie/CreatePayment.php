@@ -9,6 +9,8 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
 {
     use JsonSerializableTrait;
 
+    private const METADATA_SHOPWARE_ORDER_NUMBER = 'shopwareOrderNumber';
+
     private string $cancelUrl = '';
     private string $webhookUrl = '';
     private PaymentMethod $method;
@@ -206,12 +208,23 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
 
     public function setShopwareOrderNumber(string $orderNumber): void
     {
-        $this->metadata['shopwareOrderNumber'] = $orderNumber;
+        $this->metadata[self::METADATA_SHOPWARE_ORDER_NUMBER] = $orderNumber;
     }
 
     public function getShopwareOrderNumber(): string
     {
-        return $this->metadata['shopwareOrderNumber'];
+        return $this->metadata[self::METADATA_SHOPWARE_ORDER_NUMBER];
+    }
+
+    public function addMetadata(string $key, string $value): bool
+    {
+        if ($key === self::METADATA_SHOPWARE_ORDER_NUMBER) {
+            return false;
+        }
+
+        $this->metadata[$key] = $value;
+
+        return true;
     }
 
     public function setApplePayPaymentToken(string $token): void
