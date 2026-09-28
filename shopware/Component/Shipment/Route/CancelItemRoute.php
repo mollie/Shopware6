@@ -50,7 +50,7 @@ final class CancelItemRoute
     ) {
     }
 
-    #[Route(path: '/api/_action/mollie/cancel/item', name: 'api.action.mollie.cancel.item', methods: ['POST'])]
+    #[Route(path: '/api/_action/mollie/cancel/item', name: 'api.action.mollie.cancel.item', defaults: ['_acl' => ['order:update']], methods: ['POST'])]
     public function cancel(Request $request, Context $context): JsonResponse
     {
         $shopwareLineId = (string) $request->get('shopwareLineId', '');

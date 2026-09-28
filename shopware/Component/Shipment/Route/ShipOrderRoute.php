@@ -75,7 +75,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         throw new DecorationPatternException(self::class);
     }
 
-    #[Route(path: '/api/_action/mollie/ship', name: 'api.action.mollie.ship.order', methods: ['POST', 'GET'])]
+    #[Route(path: '/api/_action/mollie/ship', name: 'api.action.mollie.ship.order', defaults: ['_acl' => ['order:update']], methods: ['POST', 'GET'])]
     public function ship(Request $request, Context $context): ShipOrderResponse
     {
         $orderId = strtolower((string) $request->get('orderId'));

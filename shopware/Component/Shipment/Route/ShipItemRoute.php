@@ -20,7 +20,7 @@ final class ShipItemRoute
     ) {
     }
 
-    #[Route(path: '/api/_action/mollie/ship/item', name: 'api.action.mollie.ship.item', methods: ['POST'])]
+    #[Route(path: '/api/_action/mollie/ship/item', name: 'api.action.mollie.ship.item', defaults: ['_acl' => ['order:update']], methods: ['POST'])]
     public function ship(Request $request, Context $context): ShipOrderResponse
     {
         $orderId = (string) $request->get('orderId', '');

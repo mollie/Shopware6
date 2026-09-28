@@ -16,7 +16,7 @@ const componentConfig: ThisType<SectionPaymentsComponent> = {
 
     mixins: [Mixin.getByName('notification')],
 
-    inject: ['MolliePaymentsPaymentMethodService'],
+    inject: ['MolliePaymentsPaymentMethodService', 'acl'],
 
     data() {
         return {

@@ -104,13 +104,13 @@
 
 {% block sw_order_line_items_grid_grid_actions_extension %}
     <sw-context-menu-item
-        :disabled="!isShippable(item)"
+        :disabled="!isShippable(item) || !acl.can('order.editor')"
         @click="onOpenShipItemModal(item)"
     >
         {{ $tc('mollie-payments.general.shipThroughMollie') }}
     </sw-context-menu-item>
     <sw-context-menu-item
-        :disabled="!isCancelable(item)"
+        :disabled="!isCancelable(item) || !acl.can('order.editor')"
         @click="onOpenCancelItemModal(item)"
     >
         {{ $tc('mollie-payments.general.cancelMollieItem') }}

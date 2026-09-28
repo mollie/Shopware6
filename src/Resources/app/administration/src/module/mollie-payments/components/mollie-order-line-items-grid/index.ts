@@ -21,7 +21,7 @@ interface LineItemsGridComponent {
 const componentConfig: ThisType<LineItemsGridComponent> = {
     mixins: [Mixin.getByName('notification')],
 
-    inject: ['MolliePaymentsShippingService', 'MolliePaymentsItemCancelService'],
+    inject: ['MolliePaymentsShippingService', 'MolliePaymentsItemCancelService', 'acl'],
 
     props: {
         initialShippingStatus: {
