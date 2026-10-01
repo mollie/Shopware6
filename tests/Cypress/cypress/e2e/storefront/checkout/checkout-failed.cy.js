@@ -10,7 +10,6 @@ import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import PaymentStatusScreen from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
-import PaymentListScreen from "cypress-mollie/src/actions/screens/PaymentListScreen";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";
 import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
@@ -24,7 +23,6 @@ const checkout = new CheckoutAction();
 const paymentAction = new PaymentAction();
 const mollieSandbox = new MollieSandbox();
 const molliePaymentStatus = new PaymentStatusScreen();
-const molliePaymentList = new PaymentListScreen();
 
 const scenarioDummyBasket = new DummyBasketScenario(1);
 
@@ -105,7 +103,7 @@ context("Checkout Failure Tests", () => {
 
                 // select giro pay and mark it as "paid"
                 mollieSandbox.initSandboxCookie();
-                molliePaymentList.selectBankTransfer();
+                cy.get('button[name="method"][value="banktransfer"]').first().click({force: true});
                 molliePaymentStatus.selectPaid();
 
                 cy.url().should('include', '/checkout/finish');

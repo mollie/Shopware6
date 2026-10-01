@@ -25,13 +25,25 @@ export default class CheckoutAction {
         // open off canvas
         cy.get('.header-cart-total').click({force: true});
 
-        const btnRemoveItem = '.cart-item-remove > .btn, .line-item-remove .btn';
+        cy.get('.offcanvas-cart', {timeout: 10000}).should('be.visible');
+
+        this._removeCartItems();
+    }
+
+    _removeCartItems() {
+        const btnRemoveItem = '.offcanvas-cart .cart-item-remove > .btn, .offcanvas-cart .line-item-remove .btn';
 
         cy.get('body').then((body) => {
-            if (body.find(btnRemoveItem).length > 0) {
-                cy.get(btnRemoveItem).click({multiple: true});
-                cy.wait(300);
+            const itemCount = body.find(btnRemoveItem).length;
+
+            if (itemCount === 0) {
+                return;
             }
+
+            cy.get(btnRemoveItem).first().click();
+            cy.get('body').find(btnRemoveItem, {timeout: 10000}).should('have.length', itemCount - 1);
+
+            this._removeCartItems();
         });
     }
 
