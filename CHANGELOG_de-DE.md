@@ -7,7 +7,7 @@
 - Geändert: Erstatten, Versand melden, Positionen stornieren und Abos pausieren oder kündigen setzt jetzt auch auf dem Server das passende Recht in der Rolle des Benutzers oder der Integration voraus; Versandmeldungen, etwa aus einem ERP, brauchen das Recht, Bestellungen zu bearbeiten.
 - Behoben: Abos werden wieder verlängert, wenn die Zahlart über eine Regel auf Abo-Produkte eingeschränkt ist.
 - Behoben: Der Mollie-Tab der Bestellung bleibt nach dem Schließen des Refund Managers wieder bedienbar.
-- Behoben: Express Components und PayPal Express funktionieren jetzt auch in Headless-Shops.
+- Behoben: Express Components und PayPal Express funktionieren jetzt auch in Headless-Shops, und Gäste sehen dort nach Apple Pay Direct wieder ihre Bestellung.
 - Behoben: Nach einem Eingabefehler bei der Kreditkarte auf der Bestellbestätigungsseite lässt sich die Bestellung nach der Korrektur wieder abschicken.
 - Behoben: Apple Pay Direct schließt die Zahlung auch dann ab, wenn Apple kein Land zur Lieferadresse liefert.
 - Behoben: Nach einem abgebrochenen Apple Pay Direct funktionieren Warenkorb und Checkout für eingeloggte Kunden wieder.

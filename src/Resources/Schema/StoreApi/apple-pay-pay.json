@@ -105,18 +105,23 @@
                       "type": "string",
                       "description": "The ID of the created Shopware order."
                     },
+                    "token": {
+                      "type": "string",
+                      "description": "The sales channel context token after guest registration or login. Use it as sw-context-token for subsequent requests, e.g. to load the order."
+                    },
                     "apiAlias": {
                       "type": "string",
                       "example": "mollie_payments_applepay_direct_payment"
                     }
                   },
-                  "required": ["success", "url", "message", "orderId", "apiAlias"]
+                  "required": ["success", "url", "message", "orderId", "token", "apiAlias"]
                 },
                 "example": {
                   "success": true,
                   "url": "https://applepay.mollie.com/redirect",
                   "message": "",
                   "orderId": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+                  "token": "f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4",
                   "apiAlias": "mollie_payments_applepay_direct_payment"
                 }
               }
