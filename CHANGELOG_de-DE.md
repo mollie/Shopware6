@@ -2,6 +2,7 @@
 - Hinzugefügt: Der Webhook wiederholt das Schreiben des Zahlungsstatus bei einem Datenbank-Deadlock.
 - Hinzugefügt: Der Bezahllink leitet auf die Checkout-URL einer bereits laufenden Zahlung weiter.
 - Hinzugefügt: Plugins können über das Event `ModifyCreatePaymentPayloadEvent` eigene Metadaten an Mollie-Zahlungen anhängen.
+- Hinzugefügt: ZUGFeRD-Rechnungen enthalten bei Kreditkartenzahlungen Kartentyp, Kartennummer und Karteninhaber.
 - Geändert: Der automatische Versand ignoriert Zahlarten, die dafür nicht vorgesehen sind, komplett.
 - Geändert: "Versand melden" im Mollie-Tab ist bei Zahlungen ohne manuellen Einzug deaktiviert.
 - Geändert: Erstatten, Versand melden, Positionen stornieren und Abos pausieren oder kündigen setzt jetzt auch auf dem Server das passende Recht in der Rolle des Benutzers oder der Integration voraus; Versandmeldungen, etwa aus einem ERP, brauchen das Recht, Bestellungen zu bearbeiten.

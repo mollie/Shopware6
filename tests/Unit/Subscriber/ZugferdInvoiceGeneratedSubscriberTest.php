@@ -38,6 +38,26 @@ final class ZugferdInvoiceGeneratedSubscriberTest extends TestCase
         $this->assertStringContainsString('<ram:TypeCode>48</ram:TypeCode>', $xml);
     }
 
+    public function testCreditCardPaymentAddsFinancialCard(): void
+    {
+        $builder = ZugferdDocumentBuilder::createNew(ZugferdProfiles::PROFILE_XRECHNUNG_3);
+        $document = new ZugferdDocument($builder);
+        $order = $this->buildOrder(PaymentMethod::CREDIT_CARD);
+        $payment = $order->getTransactions()?->last()?->getExtension(Mollie::EXTENSION);
+        $this->assertInstanceOf(Payment::class, $payment);
+        $payment->setCreditCardLabel('Mastercard');
+        $payment->setCreditCardNumber('6787');
+        $payment->setCreditCardHolder('T. TEST');
+
+        $subscriber = new ZugferdInvoiceGeneratedSubscriber();
+        $subscriber->onInvoiceGenerated($this->buildEvent($document, $order));
+
+        $xml = $builder->getContent();
+        $this->assertStringContainsString('ApplicableTradeSettlementFinancialCard', $xml);
+        $this->assertStringContainsString('schemeID="Mastercard">6787</ram:ID>', $xml);
+        $this->assertStringContainsString('<ram:CardholderName>T. TEST</ram:CardholderName>', $xml);
+    }
+
     public function testFallbackMethodUsesOnlinePaymentServiceCode(): void
     {
         $builder = ZugferdDocumentBuilder::createNew(ZugferdProfiles::PROFILE_XRECHNUNG_3);
