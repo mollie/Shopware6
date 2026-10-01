@@ -7,10 +7,6 @@ use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
 use Mollie\Shopware\Component\Mollie\LineItemType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Shopware Custom Products: the container's product child carries the price, an option only
- * reaches Mollie when it adds a surcharge.
- */
 final class CustomizedProductsSubscriber implements EventSubscriberInterface
 {
     private const TYPE_OPTION = 'customized-products-option';

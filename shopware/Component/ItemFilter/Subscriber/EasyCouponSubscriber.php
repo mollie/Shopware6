@@ -7,9 +7,6 @@ use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * NetiNextEasyCoupon: the voucher product carries no price, its voucher and fee children do.
- */
 final class EasyCouponSubscriber implements EventSubscriberInterface
 {
     private const PAYLOAD_KEY = 'netiNextEasyCoupon';

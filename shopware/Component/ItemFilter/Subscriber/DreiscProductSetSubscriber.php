@@ -6,9 +6,6 @@ namespace Mollie\Shopware\Component\ItemFilter\Subscriber;
 use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * DreiSC product sets: the container carries no price, the products of the set do.
- */
 final class DreiscProductSetSubscriber implements EventSubscriberInterface
 {
     private const CONTAINER_TYPE = 'dreisc-set';

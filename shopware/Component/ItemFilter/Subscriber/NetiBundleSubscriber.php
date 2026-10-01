@@ -7,9 +7,6 @@ use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * NetInext bundles: the flagged bundle parent carries no price, the bundled products do.
- */
 final class NetiBundleSubscriber implements EventSubscriberInterface
 {
     private const PAYLOAD_KEY = 'is-neti-bundle';
