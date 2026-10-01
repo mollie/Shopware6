@@ -7,7 +7,7 @@
 - Changed: Refunding, reporting shipments, cancelling line items and pausing or cancelling subscriptions now require the matching permission in the role of the user or integration on the server as well; shipment reports, for example from an ERP, need the permission to edit orders.
 - Fixed: Subscriptions are renewed again when the payment method is restricted to subscription products by a rule.
 - Fixed: The Mollie tab of the order stays usable again after closing the Refund Manager.
-- Fixed: Express components and PayPal Express now also work in headless shops.
+- Fixed: Express components and PayPal Express now also work in headless shops, and guests there can see their order again after Apple Pay Direct.
 - Fixed: After a credit card input error on the checkout confirmation page, the order can be placed again once the input is corrected.
 - Fixed: Apple Pay Direct completes the payment even when Apple sends no country for the shipping address.
 - Fixed: Cart and checkout work again for logged-in customers after they cancel Apple Pay Direct.

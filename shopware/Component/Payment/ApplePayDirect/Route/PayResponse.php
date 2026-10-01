@@ -20,6 +20,7 @@ final class PayResponse extends StoreApiResponse
                 'url' => $redirectUrl,
                 'message' => $message,
                 'orderId' => $orderId,
+                'token' => $salesChannelContext->getToken(),
             ],
             'mollie_payments_applepay_direct_payment'
         );
