@@ -39,7 +39,10 @@ final class ZugferdInvoiceGeneratedSubscriber implements EventSubscriberInterfac
         // methods, so Mollie payments would ship without the block. Add it based on the Mollie method.
         $event->document->getBuilder()->addDocumentPaymentMean(
             typeCode: (string) $method->eInvoicePaymentMeansCode(),
-            information: $transaction->getPaymentMethod()?->getName()
+            information: $transaction->getPaymentMethod()?->getName(),
+            cardType: $payment->getCreditCardLabel(),
+            cardId: $payment->getCreditCardNumber(),
+            cardHolderName: $payment->getCreditCardHolder()
         );
     }
 }

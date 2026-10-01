@@ -2,6 +2,7 @@
 - Added: The webhook retries writing the payment status on a database deadlock.
 - Added: The payment link redirects to the checkout URL of a payment that is already running.
 - Added: Plugins can add their own metadata to Mollie payments via the `ModifyCreatePaymentPayloadEvent`.
+- Added: ZUGFeRD invoices for credit card payments include the card type, card number and card holder.
 - Changed: The automatic shipment ignores payment methods that are not meant for it entirely.
 - Changed: "Ship through Mollie" in the Mollie tab is disabled for payments without manual capture.
 - Changed: Refunding, reporting shipments, cancelling line items and pausing or cancelling subscriptions now require the matching permission in the role of the user or integration on the server as well; shipment reports, for example from an ERP, need the permission to edit orders.
