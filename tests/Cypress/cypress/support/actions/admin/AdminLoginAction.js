@@ -1,3 +1,7 @@
+import Shopware from "Services/shopware/Shopware";
+
+const shopware = new Shopware();
+
 export default class AdminLoginAction {
 
     /**
@@ -50,9 +54,26 @@ export default class AdminLoginAction {
 
         // the admin SPA boot after login is slow on CI - the element does appear
         // eventually, 10s was simply too tight. give it room.
-        cy.get('.sw-version__info', {timeout: 60000}).should('be.visible');
+        this.assertVersionInfoVisible();
 
         this.closeUpdateNotification();
+    }
+
+    assertVersionInfoVisible() {
+        if (shopware.isVersionLower('6.7.15.0')) {
+            cy.get('.sw-version__info', {timeout: 60000}).should('be.visible');
+            return;
+        }
+
+        cy.get('.sw-admin-menu__user-actions-toggle', {timeout: 60000})
+            .should('be.visible')
+            .click();
+
+        cy.get('.sw-admin-menu__user-actions-menu .sw-version__info').should('be.visible');
+
+        cy.get('.sw-admin-menu__user-actions-toggle').click();
+
+        cy.get('.sw-admin-menu__user-actions-menu').should('not.exist');
     }
 
     /**
