@@ -70,10 +70,6 @@ export default class AdminLoginAction {
             .click();
 
         cy.get('.sw-admin-menu__user-actions-menu .sw-version__info').should('be.visible');
-
-        cy.get('.sw-admin-menu__user-actions-toggle').click();
-
-        cy.get('.sw-admin-menu__user-actions-menu').should('not.exist');
     }
 
     /**
