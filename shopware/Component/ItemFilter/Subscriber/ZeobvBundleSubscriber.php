@@ -13,7 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final class ZeobvBundleSubscriber implements EventSubscriberInterface
 {
-    private const PAYLOAD_KEY = 'zeobvProductsInBundle';
+    private const PAYLOAD_KEY = 'zeobvCustomLineItemType';
+    private const BUNDLE_PRODUCT_ITEM = 'bundle_product_item';
 
     public static function getSubscribedEvents(): array
     {
@@ -28,8 +29,9 @@ final class ZeobvBundleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $bundledProducts = $event->getPayload()[self::PAYLOAD_KEY] ?? [];
-        if (is_array($bundledProducts) === false || count($bundledProducts) === 0) {
+        $bundleProductItemType = $event->getPayload()[self::PAYLOAD_KEY] ?? null;
+
+        if ($bundleProductItemType !== self::BUNDLE_PRODUCT_ITEM) {
             return;
         }
 

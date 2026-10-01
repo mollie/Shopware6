@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final class GiftConfiguratorSubscriber implements EventSubscriberInterface
 {
-    private const PAYLOAD_KEY = 'configuratorToken';
+    private const PAYLOAD_KEY = 'configuratorFieldId';
 
     public static function getSubscribedEvents(): array
     {
