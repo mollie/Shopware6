@@ -13,6 +13,7 @@
 - Fixed: Apple Pay Direct completes the payment even when Apple sends no country for the shipping address.
 - Fixed: Cart and checkout work again for logged-in customers after they cancel Apple Pay Direct.
 - Fixed: Orders containing sets of the swkweb "Product Sets" plugin can be paid again.
+- Fixed: Orders containing purchase vouchers of the Net Inventors "EasyCoupon" plugin can be paid again.
 
 # 5.6.0
 - Added: New "Authorization and capture" section: the authorized status can be skipped per payment method and sales channel, so the money is paid right at the purchase instead of only after the shipment.

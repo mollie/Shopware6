@@ -4,12 +4,15 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\ItemFilter\Subscriber;
 
 use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
-use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class EasyCouponSubscriber implements EventSubscriberInterface
 {
-    private const PAYLOAD_KEY = 'netiNextEasyCoupon';
+    private const EXTRA_OPTION_TYPES = [
+        'easy-coupon-extra-option',
+        'easy-coupon-extra-option-postal',
+        'easy-coupon-extra-option-voucher',
+    ];
 
     public static function getSubscribedEvents(): array
     {
@@ -20,11 +23,7 @@ final class EasyCouponSubscriber implements EventSubscriberInterface
 
     public function onFilterLineItem(FilterLineItemEvent $event): void
     {
-        if ($event->getType() !== CartLineItem::PRODUCT_LINE_ITEM_TYPE) {
-            return;
-        }
-
-        if (isset($event->getPayload()[self::PAYLOAD_KEY]) === false) {
+        if (\in_array($event->getType(), self::EXTRA_OPTION_TYPES, true) === false) {
             return;
         }
 
