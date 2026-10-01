@@ -7,10 +7,6 @@ use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Zeobv product bundles: the bundle parent lists its products in the payload, and those products
- * are already in the flat list.
- */
 final class ZeobvBundleSubscriber implements EventSubscriberInterface
 {
     private const PAYLOAD_KEY = 'zeobvCustomLineItemType';

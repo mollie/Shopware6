@@ -69,7 +69,7 @@ final class SessionLineBuilderTest extends TestCase
         $bundleParent = LineItemBuilder::regular('bundle')
             ->withLabel('Bundle')
             ->withPrice($this->price(19.98))
-            ->withPayload(['zeobvProductsInBundle' => ['shirt']])
+            ->withPayload(['zeobvCustomLineItemType' => 'bundle_product_item'])
             ->build()
         ;
         $cart = CartBuilder::create()

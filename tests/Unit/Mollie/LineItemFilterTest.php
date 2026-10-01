@@ -71,7 +71,7 @@ class LineItemFilterTest extends TestCase
     public function testZeobvBundleParentIsSkipped(): void
     {
         $parent = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 50.0);
-        $parent->setPayload(['zeobvProductsInBundle' => ['child-1', 'child-2']]);
+        $parent->setPayload(['zeobvCustomLineItemType' => 'bundle_product_item']);
 
         $child1 = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 25.0);
         $child2 = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 25.0);
@@ -175,13 +175,13 @@ class LineItemFilterTest extends TestCase
     }
 
     /**
-     * A gift-configurator parent (carrying the configuratorToken) must be removed,
+     * A gift-configurator parent (carrying the configuratorFieldId) must be removed,
      * just like a zeobv / NetI bundle parent.
      */
     public function testGiftConfiguratorParentIsSkipped(): void
     {
         $parent = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 30.0);
-        $parent->setPayload(['configuratorToken' => 'token-123']);
+        $parent->setPayload(['configuratorFieldId' => 'field-123']);
 
         $product = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 20.0);
 
@@ -234,7 +234,7 @@ class LineItemFilterTest extends TestCase
     public function testCartZeobvBundleParentIsSkipped(): void
     {
         $parent = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
-        $parent->setPayload(['zeobvProductsInBundle' => ['a', 'b']]);
+        $parent->setPayload(['zeobvCustomLineItemType' => 'bundle_product_item']);
 
         $child = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
 
@@ -308,12 +308,12 @@ class LineItemFilterTest extends TestCase
     }
 
     /**
-     * Gift-configurator parent (carrying the configuratorToken) in cart must be removed.
+     * Gift-configurator parent (carrying the configuratorFieldId) in cart must be removed.
      */
     public function testCartGiftConfiguratorParentIsSkipped(): void
     {
         $parent = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
-        $parent->setPayload(['configuratorToken' => 'token-123']);
+        $parent->setPayload(['configuratorFieldId' => 'field-123']);
 
         $product = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
         $product->setPrice($this->makeCartPrice(20.0));

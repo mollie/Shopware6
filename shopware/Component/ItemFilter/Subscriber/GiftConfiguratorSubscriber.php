@@ -7,9 +7,6 @@ use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as CartLineItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Gift configurator: the parent holding the configurator token carries no price, its parts do.
- */
 final class GiftConfiguratorSubscriber implements EventSubscriberInterface
 {
     private const PAYLOAD_KEY = 'configuratorFieldId';
