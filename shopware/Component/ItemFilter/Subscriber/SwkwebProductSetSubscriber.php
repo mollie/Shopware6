@@ -8,7 +8,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SwkwebProductSetSubscriber implements EventSubscriberInterface
 {
-    private const CONTAINER_TYPE = 'swkweb-product-set';
+    private const CONTAINER_TYPES = [
+        'swkweb-product-set',
+        'swkweb-product-set-slot',
+        'swkweb-product-set-option',
+    ];
 
     public static function getSubscribedEvents(): array
     {
@@ -19,7 +23,7 @@ final class SwkwebProductSetSubscriber implements EventSubscriberInterface
 
     public function onFilterLineItem(FilterLineItemEvent $event): void
     {
-        if ($event->getType() !== self::CONTAINER_TYPE) {
+        if (in_array($event->getType(), self::CONTAINER_TYPES, true) === false) {
             return;
         }
 

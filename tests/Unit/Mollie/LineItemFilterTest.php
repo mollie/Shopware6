@@ -137,6 +137,22 @@ class LineItemFilterTest extends TestCase
     }
 
     /**
+     * SKWeb slots and options carry the price of their product children, only the products stay.
+     */
+    public function testSkwebSlotAndOptionAreSkipped(): void
+    {
+        $container = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set', 21.0);
+        $slot = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set-slot', 1.0);
+        $option = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set-option', 1.0);
+        $optionProduct = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 1.0);
+        $mainProduct = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 20.0);
+
+        $result = $this->filterOrderItems(new OrderLineItemCollection([$container, $slot, $option, $optionProduct, $mainProduct]));
+
+        $this->assertSame([$optionProduct->getId(), $mainProduct->getId()], array_keys(iterator_to_array($result)));
+    }
+
+    /**
      * The customized-products wrapper must be filtered; its product child stays.
      */
     public function testCustomizedProductsContainerIsSkipped(): void
@@ -255,6 +271,21 @@ class LineItemFilterTest extends TestCase
         $result = $this->filterCartItems(new CartLineItemCollection([$parent]));
 
         $this->assertCount(0, $result);
+    }
+
+    /**
+     * SKWeb slot and option in cart must be filtered, the product of the option stays.
+     */
+    public function testCartSkwebSlotAndOptionAreSkipped(): void
+    {
+        $slot = new CartLineItem(Uuid::randomHex(), 'swkweb-product-set-slot');
+        $option = new CartLineItem(Uuid::randomHex(), 'swkweb-product-set-option');
+        $product = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
+
+        $result = $this->filterCartItems(new CartLineItemCollection([$slot, $option, $product]));
+
+        $this->assertCount(1, $result);
+        $this->assertSame($product->getId(), $result->first()->getId());
     }
 
     /**
