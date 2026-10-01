@@ -207,11 +207,7 @@ class LineItemFilterTest extends TestCase
         $this->assertSame($product->getId(), $result->first()->getId());
     }
 
-    /**
-     * A NetiNextEasyCoupon voucher-product parent must be removed. Its voucher and
-     * service-fee children carry the actual price and stay in the payload.
-     */
-    public function testEasyCouponVoucherParentIsSkipped(): void
+    public function testEasyCouponExtraOptionChildrenAreSkipped(): void
     {
         $parent = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 497.95);
         $parent->setPayload(['netiNextEasyCoupon' => ['voucherValue' => 25.0]]);
@@ -222,9 +218,19 @@ class LineItemFilterTest extends TestCase
 
         $result = $this->filterOrderItems(new OrderLineItemCollection([$parent, $voucherChild, $serviceChild, $postalChild]));
 
-        $this->assertCount(3, $result);
-        $ids = array_keys(iterator_to_array($result));
-        $this->assertNotContains($parent->getId(), $ids);
+        $this->assertCount(1, $result);
+        $this->assertSame($parent->getId(), $result->first()->getId());
+    }
+
+    public function testEasyCouponVoucherWithoutExtraOptionsIsKept(): void
+    {
+        $voucher = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 150.0);
+        $voucher->setPayload(['netiNextEasyCoupon' => ['voucherValue' => 150.0]]);
+
+        $result = $this->filterOrderItems(new OrderLineItemCollection([$voucher]));
+
+        $this->assertCount(1, $result);
+        $this->assertSame($voucher->getId(), $result->first()->getId());
     }
 
     // -------------------------------------------------------------------------
@@ -355,10 +361,7 @@ class LineItemFilterTest extends TestCase
         $this->assertSame($product->getId(), $result->first()->getId());
     }
 
-    /**
-     * NetiNextEasyCoupon voucher-product parent in cart must be removed.
-     */
-    public function testCartEasyCouponVoucherParentIsSkipped(): void
+    public function testCartEasyCouponExtraOptionChildIsSkipped(): void
     {
         $parent = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
         $parent->setPayload(['netiNextEasyCoupon' => ['voucherValue' => 25.0]]);
@@ -370,7 +373,7 @@ class LineItemFilterTest extends TestCase
         $result = $this->filterCartItems(new CartLineItemCollection([$parent, $voucherChild]));
 
         $this->assertCount(1, $result);
-        $this->assertSame($voucherChild->getId(), $result->first()->getId());
+        $this->assertSame($parent->getId(), $result->first()->getId());
     }
 
     /**
