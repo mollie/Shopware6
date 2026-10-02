@@ -365,13 +365,16 @@
                 "resumeTitle": "Atnaujinti prenumeratą?",
                 "resume": "Tęskite prenumeratą dar kartą.",
                 "skipTitle": "Praleisti kitą mokėjimą?",
-                "skip": "Praleiskite kitą prenumeratos mokėjimą. Vėliau ji tęsis automatiškai."
+                "skip": "Praleiskite kitą prenumeratos mokėjimą. Vėliau ji tęsis automatiškai.",
+                "editTitle": "Keisti prenumeratos duomenis?",
+                "edit": "Ar tikrai norite pakeisti šios prenumeratos duomenis?"
             },
             "alerts": {
                 "cancelSuccess": "Prenumerata sėkmingai atšaukta",
                 "pauseSuccess": "Prenumerata sėkmingai sustabdyta",
                 "resumeSuccess": "Prenumerata sėkmingai atnaujinta",
-                "skipSuccess": "Prenumerata sėkmingai praleista. Kitas mokėjimas buvo atnaujintas."
+                "skipSuccess": "Prenumerata sėkmingai praleista. Kitas mokėjimas buvo atnaujintas.",
+                "editSuccess": "Prenumeratos duomenys sėkmingai išsaugoti"
             },
             "list": {
                 "title": "Mollie prenumeratos",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Būsena (iš)",
                     "colStatusTo": "Būsena (į)",
                     "colMollieSubscription": "Mollie prenumerata"
+                },
+                "edit": {
+                    "cardTitle": "Redaguoti Mollie duomenis",
+                    "warning": "Redaguokite šiuos duomenis tik išimtiniais atvejais, pvz., jei kuriant prenumeratą kažkas nepavyko. Jokie pakeitimai į Mollie nesiunčiami.",
+                    "labelOrder": "Užsakymas",
+                    "buttonSave": "Išsaugoti"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie grąžinimų valdymas",
                 "btnOpenRefundManager": "Atidaryti grąžinimų valdymą",
                 "btnCloseRefundManager": "Uždaryti grąžinimų valdymą"
+            },
+            "editMollieIds": {
+                "title": "Redaguoti Mollie duomenis",
+                "warning": "Redaguokite šiuos duomenis tik išimtiniais atvejais, pvz., jei mokėjimo metu kažkas nepavyko. Neteisingi ID trikdo mokėjimo būsenos atnaujinimą, grąžinimus ir siuntimą.",
+                "labelPaymentId": "Mollie mokėjimo ID",
+                "labelOrderId": "Mollie užsakymo ID",
+                "buttonSave": "Išsaugoti",
+                "confirmTitle": "Keisti Mollie duomenis",
+                "confirmText": "Ar tikrai norite pakeisti šio užsakymo Mollie ID?"
             }
         }
     },

@@ -365,13 +365,16 @@
                 "resumeTitle": "Återuppta prenumeration?",
                 "resume": "Fortsätt prenumerationen igen.",
                 "skipTitle": "Hoppa över nästa betalning?",
-                "skip": "Hoppa över nästa avbetalning i prenumerationen. Den fortsätter automatiskt efteråt."
+                "skip": "Hoppa över nästa avbetalning i prenumerationen. Den fortsätter automatiskt efteråt.",
+                "editTitle": "Ändra prenumerationsdata?",
+                "edit": "Är du säker på att du vill ändra data för denna prenumeration?"
             },
             "alerts": {
                 "cancelSuccess": "Prenumerationen har avbrutits framgångsrikt",
                 "pauseSuccess": "Prenumerationen har pausats framgångsrikt",
                 "resumeSuccess": "Prenumerationen har återupptagits framgångsrikt",
-                "skipSuccess": "Prenumerationen har hoppa överts framgångsrikt. Nästa betalning har uppdaterats."
+                "skipSuccess": "Prenumerationen har hoppa överts framgångsrikt. Nästa betalning har uppdaterats.",
+                "editSuccess": "Prenumerationsdatan har sparats"
             },
             "list": {
                 "title": "Mollie Prenumerationer",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (från)",
                     "colStatusTo": "Status (till)",
                     "colMollieSubscription": "Mollie prenumeration"
+                },
+                "edit": {
+                    "cardTitle": "Redigera Mollie-data",
+                    "warning": "Redigera endast dessa data i undantagsfall, t.ex. om något gick fel när prenumerationen skapades. Inga ändringar skickas till Mollie.",
+                    "labelOrder": "Order",
+                    "buttonSave": "Spara"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Återbetalningshanterare",
                 "btnOpenRefundManager": "Öppna återbetalningshanterare",
                 "btnCloseRefundManager": "Stäng återbetalningshanterare"
+            },
+            "editMollieIds": {
+                "title": "Redigera Mollie-data",
+                "warning": "Redigera endast dessa data i undantagsfall, t.ex. om något gick fel vid betalningen. Felaktiga ID:n hindrar uppdatering av betalningsstatus, återbetalningar och leverans.",
+                "labelPaymentId": "Mollie betalnings-ID",
+                "labelOrderId": "Mollie order-ID",
+                "buttonSave": "Spara",
+                "confirmTitle": "Ändra Mollie-data",
+                "confirmText": "Är du säker på att du vill ändra Mollie-ID:n för denna order?"
             }
         }
     },

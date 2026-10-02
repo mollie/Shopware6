@@ -365,13 +365,16 @@
                 "resumeTitle": "Előfizetés folytatása?",
                 "resume": "Folytassa az előfizetést.",
                 "skipTitle": "Átugorja a következő részletet?",
-                "skip": "Átugorja a következő részletet az előfizetésben. Később automatikusan folytatódik."
+                "skip": "Átugorja a következő részletet az előfizetésben. Később automatikusan folytatódik.",
+                "editTitle": "Módosítja az előfizetés adatait?",
+                "edit": "Biztosan módosítani szeretné az előfizetés adatait?"
             },
             "alerts": {
                 "cancelSuccess": "Az előfizetések sikeresen lemondásra kerültek",
                 "pauseSuccess": "Az előfizetés sikeresen felfüggesztve",
                 "resumeSuccess": "Az előfizetés sikeresen folytatva",
-                "skipSuccess": "Az előfizetés sikeresen átugrásra került. A következő kifizetés frissítve lett."
+                "skipSuccess": "Az előfizetés sikeresen átugrásra került. A következő kifizetés frissítve lett.",
+                "editSuccess": "Az előfizetés adatai sikeresen mentve"
             },
             "list": {
                 "title": "Mollie Előfizetések",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Állapot (től)",
                     "colStatusTo": "Állapot (ig)",
                     "colMollieSubscription": "Mollie előfizetés"
+                },
+                "edit": {
+                    "cardTitle": "Mollie adatok szerkesztése",
+                    "warning": "Ezeket az adatokat csak kivételes esetben szerkessze, pl. ha valami hiba történt az előfizetés létrehozásakor. A módosítások nem kerülnek továbbításra a Mollie felé.",
+                    "labelOrder": "Rendelés",
+                    "buttonSave": "Mentés"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Visszatérítési Menedzser",
                 "btnOpenRefundManager": "Visszatérítési Menedzser megnyitása",
                 "btnCloseRefundManager": "Visszatérítési Menedzser bezárása"
+            },
+            "editMollieIds": {
+                "title": "Mollie adatok szerkesztése",
+                "warning": "Ezeket az adatokat csak kivételes esetben szerkessze, pl. ha valami hiba történt a fizetés során. A hibás azonosítók megakadályozzák a fizetési állapot frissítését, a visszatérítéseket és a szállítást.",
+                "labelPaymentId": "Mollie fizetési azonosító",
+                "labelOrderId": "Mollie rendelésazonosító",
+                "buttonSave": "Mentés",
+                "confirmTitle": "Mollie adatok módosítása",
+                "confirmText": "Biztosan módosítani szeretné a rendelés Mollie azonosítóit?"
             }
         }
     },

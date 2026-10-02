@@ -365,13 +365,16 @@
                 "resumeTitle": "Abonnement hervatten?",
                 "resume": "Zet het abonnement weer voort.",
                 "skipTitle": "Volgende betaling overslaan?",
-                "skip": "Sla het volgende betaling van het abonnement over. Daarna gaat het automatisch verder."
+                "skip": "Sla het volgende betaling van het abonnement over. Daarna gaat het automatisch verder.",
+                "editTitle": "Abonnementsgegevens wijzigen?",
+                "edit": "Weet je zeker dat je de gegevens van dit abonnement wilt wijzigen?"
             },
             "alerts": {
                 "cancelSuccess": "Het abonnement is succesvol opgezegd",
                 "pauseSuccess": "Het abonnement is succesvol onderbroken",
                 "resumeSuccess": "Het abonnement is succesvol voortgezet",
-                "skipSuccess": "Het abonnement is succesvol opgeschort. De volgende betalingsdatum is bijgewerkt."
+                "skipSuccess": "Het abonnement is succesvol opgeschort. De volgende betalingsdatum is bijgewerkt.",
+                "editSuccess": "De abonnementsgegevens zijn succesvol opgeslagen"
             },
             "list": {
                 "title": "Mollie Abonnementen",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (van)",
                     "colStatusTo": "Status (tot)",
                     "colMollieSubscription": "Mollie Abonnement"
+                },
+                "edit": {
+                    "cardTitle": "Mollie-gegevens bewerken",
+                    "warning": "Bewerk deze gegevens alleen in uitzonderlijke gevallen, bijv. als er iets misging bij het aanmaken van het abonnement. Er worden geen wijzigingen naar Mollie verzonden.",
+                    "labelOrder": "Bestelling",
+                    "buttonSave": "Opslaan"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Terugbetaling via Mollie",
                 "btnOpenRefundManager": "Refund Manager openen",
                 "btnCloseRefundManager": "Refund Manager sluiten"
+            },
+            "editMollieIds": {
+                "title": "Mollie-gegevens bewerken",
+                "warning": "Bewerk deze gegevens alleen in uitzonderlijke gevallen, bijv. als er iets misging bij de betaling. Onjuiste ID's verstoren betaalstatus-updates, terugbetalingen en verzending.",
+                "labelPaymentId": "Mollie betaling-ID",
+                "labelOrderId": "Mollie bestelling-ID",
+                "buttonSave": "Opslaan",
+                "confirmTitle": "Mollie-gegevens wijzigen",
+                "confirmText": "Weet je zeker dat je de Mollie-ID's van deze bestelling wilt wijzigen?"
             }
         }
     },

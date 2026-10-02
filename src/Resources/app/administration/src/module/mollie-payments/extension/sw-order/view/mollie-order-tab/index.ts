@@ -3,6 +3,7 @@ import './mollie-order-tab.scss';
 import MollieShippingEvents from '../../../../components/mollie-ship-order/MollieShippingEvents';
 import getLatestTransaction from '../../getLatestTransaction';
 import { getStore } from '../../../../../../core/service/utils/store.utils';
+import VersionCompare from '../../../../../../core/service/utils/version-compare.utils';
 
 const { Component, Mixin, Filter } = Shopware;
 
@@ -19,6 +20,11 @@ interface MollieOrderTab {
     mollieDataFetched: boolean;
     initialShippingStatus: any;
     initialCancelStatus: any;
+    editMolliePaymentId: string;
+    editMollieOrderId: string;
+    showEditMollieIdsConfirm: boolean;
+    isSavingMollieIds: boolean;
+    mollieIdsSaved: boolean;
 
     [key: string]: any;
 }
@@ -31,6 +37,7 @@ const componentConfig: ThisType<MollieOrderTab> = {
     inject: {
         MollieOrderDetailsService: { from: 'MollieOrderDetailsService' },
         MolliePaymentsRefundService: { from: 'MolliePaymentsRefundService' },
+        repositoryFactory: { from: 'repositoryFactory' },
         acl: { from: 'acl' },
         // Both come from sw-order-detail and are used the same way the payment status dropdown uses
         // them: ask about unsaved edits before the action, reload the order after it. Older Shopware
@@ -65,6 +72,11 @@ const componentConfig: ThisType<MollieOrderTab> = {
             mollieDataFetched: false,
             initialShippingStatus: null,
             initialCancelStatus: null,
+            editMolliePaymentId: '',
+            editMollieOrderId: '',
+            showEditMollieIdsConfirm: false,
+            isSavingMollieIds: false,
+            mollieIdsSaved: false,
         };
     },
 
@@ -127,6 +139,20 @@ const componentConfig: ThisType<MollieOrderTab> = {
 
         canFetchMollieData() {
             return this.isMollieOrder && this.latestTransactionId !== null;
+        },
+
+        editWarningVariant() {
+            return new VersionCompare().greaterOrEqual(Shopware.Context.app.config.version, '6.7.0.0')
+                ? 'critical'
+                : 'error';
+        },
+
+        canSaveMollieIds() {
+            return (
+                this.latestTransactionId !== null &&
+                this.editMolliePaymentId.trim() !== '' &&
+                this.acl.can('order.editor')
+            );
         },
 
         isSubscription() {
@@ -243,6 +269,9 @@ const componentConfig: ThisType<MollieOrderTab> = {
 
                     const refundManager = response.refundManager ?? {};
                     const latestTransaction = getLatestTransaction(this.order?.transactions);
+                    const mollieCustomFields = latestTransaction?.customFields?.mollie_payments ?? {};
+                    this.editMolliePaymentId = mollieCustomFields.id ?? '';
+                    this.editMollieOrderId = mollieCustomFields.orderId ?? '';
                     const isAuthorized = latestTransaction?.stateMachineState?.technicalName === 'authorized';
                     const aclAllowed = this.acl.can('mollie_refund_manager:read');
                     this.isRefundManagerPossible = !isAuthorized && aclAllowed && (refundManager.enabled ?? false);
@@ -316,6 +345,72 @@ const componentConfig: ThisType<MollieOrderTab> = {
 
         onFetchMollieDataProcessFinished(value: boolean) {
             this.mollieDataFetched = value;
+        },
+
+        onSaveMollieIds() {
+            this.showEditMollieIdsConfirm = true;
+        },
+
+        onCloseEditMollieIdsConfirm() {
+            this.showEditMollieIdsConfirm = false;
+        },
+
+        async onConfirmSaveMollieIds() {
+            this.showEditMollieIdsConfirm = false;
+
+            const transactionId = this.latestTransactionId;
+            if (transactionId === null) {
+                return;
+            }
+
+            const proceed = await this.swOrderDetailAskAndSaveEdits();
+            if (!proceed) {
+                return;
+            }
+
+            this.isSavingMollieIds = true;
+
+            const paymentId = this.editMolliePaymentId.trim();
+            const mollieOrderId = this.editMollieOrderId.trim();
+            const mollieIds = {
+                id: paymentId,
+                payment_id: paymentId,
+                orderId: mollieOrderId === '' ? null : mollieOrderId,
+                order_id: mollieOrderId,
+            };
+
+            const transactionRepository = this.repositoryFactory.create('order_transaction');
+            const orderRepository = this.repositoryFactory.create('order');
+            const context = Shopware.Context.api;
+
+            try {
+                const [transaction, order] = await Promise.all([
+                    transactionRepository.get(transactionId, context),
+                    orderRepository.get(this.orderId, context),
+                ]);
+
+                [transaction, order].forEach((entity: any) => {
+                    const customFields = entity.customFields ?? {};
+                    entity.customFields = {
+                        ...customFields,
+                        mollie_payments: { ...(customFields.mollie_payments ?? {}), ...mollieIds },
+                    };
+                });
+
+                await transactionRepository.save(transaction, context);
+                await orderRepository.save(order, context);
+                await this.swOrderDetailOnSaveEdits?.();
+                this.loadData();
+                this.mollieIdsSaved = true;
+            } catch (error: any) {
+                this.createNotificationError({ message: error.message });
+            } finally {
+                this.isSavingMollieIds = false;
+            }
+        },
+
+        onSaveMollieIdsProcessFinished(value: boolean) {
+            this.mollieIdsSaved = value;
         },
     },
 };

@@ -365,13 +365,16 @@
                 "resumeTitle": "Resume subscription?",
                 "resume": "Continue the subscription again.",
                 "skipTitle": "Skip next instalment?",
-                "skip": "Skip the next instalment in the subscription. It continues automatically afterwards."
+                "skip": "Skip the next instalment in the subscription. It continues automatically afterwards.",
+                "editTitle": "Change subscription data?",
+                "edit": "Are you sure you want to change the data of this subscription?"
             },
             "alerts": {
                 "cancelSuccess": "The subscription has been canceled successfully",
                 "pauseSuccess": "The subscription has been paused successfully",
                 "resumeSuccess": "The subscription has been resumed successfully",
-                "skipSuccess": "The subscription has been skipped successfully. The next payment has been updated."
+                "skipSuccess": "The subscription has been skipped successfully. The next payment has been updated.",
+                "editSuccess": "The subscription data has been saved successfully"
             },
             "list": {
                 "title": "Mollie Subscriptions",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (from)",
                     "colStatusTo": "Status (to)",
                     "colMollieSubscription": "Mollie subscription"
+                },
+                "edit": {
+                    "cardTitle": "Edit Mollie data",
+                    "warning": "Only edit this data in exceptional cases, e.g. when something went wrong while creating the subscription. No changes are sent to Mollie.",
+                    "labelOrder": "Order",
+                    "buttonSave": "Save"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Refund Manager",
                 "btnOpenRefundManager": "Open Refund Manager",
                 "btnCloseRefundManager": "Close Refund Manager"
+            },
+            "editMollieIds": {
+                "title": "Edit Mollie data",
+                "warning": "Only edit this data in exceptional cases, e.g. when something went wrong during payment. Wrong IDs break payment status updates, refunds and shipping.",
+                "labelPaymentId": "Mollie Payment ID",
+                "labelOrderId": "Mollie Order ID",
+                "buttonSave": "Save",
+                "confirmTitle": "Change Mollie data",
+                "confirmText": "Are you sure you want to change the Mollie IDs of this order?"
             }
         }
     },

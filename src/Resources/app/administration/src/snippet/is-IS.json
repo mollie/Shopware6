@@ -365,13 +365,16 @@
                 "resumeTitle": "Endurnýja áskrift?",
                 "resume": "Halda áfram áskriftinni aftur.",
                 "skipTitle": "Sleppa næstu greiðslu?",
-                "skip": "Sleppa næstu greiðslu í áskriftinni. Hún heldur áfram sjálfkrafa eftir það."
+                "skip": "Sleppa næstu greiðslu í áskriftinni. Hún heldur áfram sjálfkrafa eftir það.",
+                "editTitle": "Breyta gögnum áskriftar?",
+                "edit": "Ertu viss um að þú viljir breyta gögnum þessarar áskriftar?"
             },
             "alerts": {
                 "cancelSuccess": "Hætt var við pöntun með góðum árangri",
                 "pauseSuccess": "Áskriftin hefur verið dregin í hlé með góðum árangri",
                 "resumeSuccess": "Áskriftin hefur verið endurnýjuð með góðum árangri",
-                "skipSuccess": "Áskriftinni hefur verið sleppt með góðum árangri. Næsta greiðsla hefur verið uppfærð."
+                "skipSuccess": "Áskriftinni hefur verið sleppt með góðum árangri. Næsta greiðsla hefur verið uppfærð.",
+                "editSuccess": "Gögn áskriftarinnar voru vistuð"
             },
             "list": {
                 "title": "Mollie áskriftir",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Staða (frá)",
                     "colStatusTo": "Staða (til)",
                     "colMollieSubscription": "Mollie áskrift"
+                },
+                "edit": {
+                    "cardTitle": "Breyta Mollie gögnum",
+                    "warning": "Breyttu þessum gögnum aðeins í undantekningartilvikum, t.d. ef eitthvað fór úrskeiðis við stofnun áskriftarinnar. Engar breytingar eru sendar til Mollie.",
+                    "labelOrder": "Pöntun",
+                    "buttonSave": "Vista"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie endurgreiðslustjóri",
                 "btnOpenRefundManager": "Opna endurgreiðslustjóra",
                 "btnCloseRefundManager": "Loka endurgreiðslustjóra"
+            },
+            "editMollieIds": {
+                "title": "Breyta Mollie gögnum",
+                "warning": "Breyttu þessum gögnum aðeins í undantekningartilvikum, t.d. ef eitthvað fór úrskeiðis við greiðslu. Röng auðkenni koma í veg fyrir uppfærslu greiðslustöðu, endurgreiðslur og sendingu.",
+                "labelPaymentId": "Mollie greiðsluauðkenni",
+                "labelOrderId": "Mollie pöntunarauðkenni",
+                "buttonSave": "Vista",
+                "confirmTitle": "Breyta Mollie gögnum",
+                "confirmText": "Ertu viss um að þú viljir breyta Mollie auðkennum þessarar pöntunar?"
             }
         }
     },

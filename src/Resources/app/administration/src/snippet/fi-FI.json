@@ -365,13 +365,16 @@
                 "resumeTitle": "Jatketaanko tilausta?",
                 "resume": "Jatka tilausta uudelleen.",
                 "skipTitle": "Ohita seuraava erä?",
-                "skip": "Ohita tilauksen seuraava erä. Se jatkuu automaattisesti sen jälkeen."
+                "skip": "Ohita tilauksen seuraava erä. Se jatkuu automaattisesti sen jälkeen.",
+                "editTitle": "Muutetaanko tilauksen tietoja?",
+                "edit": "Haluatko varmasti muuttaa tämän kestotilauksen tietoja?"
             },
             "alerts": {
                 "cancelSuccess": "Tilaus on peruutettu onnistuneesti",
                 "pauseSuccess": "Tilaus on keskeytetty onnistuneesti",
                 "resumeSuccess": "Tilausta on jatkettu onnistuneesti",
-                "skipSuccess": "Tilaus on ohitettu onnistuneesti. Seuraava maksu on päivitetty."
+                "skipSuccess": "Tilaus on ohitettu onnistuneesti. Seuraava maksu on päivitetty.",
+                "editSuccess": "Kestotilauksen tiedot tallennettiin"
             },
             "list": {
                 "title": "Mollie-tilaukset",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Tila (alkaen)",
                     "colStatusTo": "Tila (asti)",
                     "colMollieSubscription": "Mollie-tilaus"
+                },
+                "edit": {
+                    "cardTitle": "Muokkaa Mollie-tietoja",
+                    "warning": "Muokkaa näitä tietoja vain poikkeustapauksissa, esim. jos tilauksen luonnissa meni jotain pieleen. Muutoksia ei lähetetä Mollielle.",
+                    "labelOrder": "Tilaus",
+                    "buttonSave": "Tallenna"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie-hyvityshallinta",
                 "btnOpenRefundManager": "Avaa hyvityshallinta",
                 "btnCloseRefundManager": "Sulje hyvityshallinta"
+            },
+            "editMollieIds": {
+                "title": "Muokkaa Mollie-tietoja",
+                "warning": "Muokkaa näitä tietoja vain poikkeustapauksissa, esim. jos maksussa meni jotain pieleen. Väärät tunnukset estävät maksun tilan päivitykset, hyvitykset ja toimitukset.",
+                "labelPaymentId": "Mollie-maksutunnus",
+                "labelOrderId": "Mollie-tilaustunnus",
+                "buttonSave": "Tallenna",
+                "confirmTitle": "Muuta Mollie-tietoja",
+                "confirmText": "Haluatko varmasti muuttaa tämän tilauksen Mollie-tunnuksia?"
             }
         }
     },

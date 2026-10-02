@@ -365,13 +365,16 @@
                 "resumeTitle": "Gjenoppta abonnement?",
                 "resume": "Fortsett abonnementet igjen.",
                 "skipTitle": "Hopp over neste avbetaling?",
-                "skip": "Hopp over neste avbetaling i abonnementet. Det fortsetter automatisk etterpå."
+                "skip": "Hopp over neste avbetaling i abonnementet. Det fortsetter automatisk etterpå.",
+                "editTitle": "Endre abonnementsdata?",
+                "edit": "Er du sikker på at du vil endre dataene for dette abonnementet?"
             },
             "alerts": {
                 "cancelSuccess": "Abonnementet har blitt kansellert",
                 "pauseSuccess": "Abonnementet har blitt pauset",
                 "resumeSuccess": "Abonnementet har blitt gjenopptatt",
-                "skipSuccess": "Abonnementet har blitt hoppet over. Neste betaling er oppdatert."
+                "skipSuccess": "Abonnementet har blitt hoppet over. Neste betaling er oppdatert.",
+                "editSuccess": "Abonnementsdataene er lagret"
             },
             "list": {
                 "title": "Mollie Abonnementer",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (fra)",
                     "colStatusTo": "Status (til)",
                     "colMollieSubscription": "Mollie-abonnement"
+                },
+                "edit": {
+                    "cardTitle": "Rediger Mollie-data",
+                    "warning": "Rediger disse dataene kun i unntakstilfeller, f.eks. hvis noe gikk galt da abonnementet ble opprettet. Ingen endringer sendes til Mollie.",
+                    "labelOrder": "Ordre",
+                    "buttonSave": "Lagre"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Refusjonsansvarlig",
                 "btnOpenRefundManager": "Åpne refusjonsansvarlig",
                 "btnCloseRefundManager": "Lukk refusjonsansvarlig"
+            },
+            "editMollieIds": {
+                "title": "Rediger Mollie-data",
+                "warning": "Rediger disse dataene kun i unntakstilfeller, f.eks. hvis noe gikk galt under betalingen. Feil ID-er hindrer oppdatering av betalingsstatus, refusjoner og forsendelse.",
+                "labelPaymentId": "Mollie betalings-ID",
+                "labelOrderId": "Mollie ordre-ID",
+                "buttonSave": "Lagre",
+                "confirmTitle": "Endre Mollie-data",
+                "confirmText": "Er du sikker på at du vil endre Mollie-ID-ene for denne ordren?"
             }
         }
     },

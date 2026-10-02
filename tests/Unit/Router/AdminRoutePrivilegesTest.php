@@ -65,6 +65,7 @@ final class AdminRoutePrivilegesTest extends TestCase
             'subscription skip' => [ApiController::class, 'api.action.mollie.subscription.skip', ['mollie_subscription:update']],
             'subscription cancel' => [ApiController::class, 'api.action.mollie.subscription.cancel', ['mollie_subscription_custom:cancel']],
             'subscription any action' => [ApiController::class, 'api.action.mollie.subscription.changeState', ['mollie_subscription:update', 'mollie_subscription_custom:cancel']],
+            'subscription edit' => [ApiController::class, 'api.action.mollie.subscription.edit', ['mollie_subscription:update']],
             'subscription rescue cancel' => [RescueApiController::class, 'api.action.mollie.subscription.cancel_by_customer', ['mollie_subscription_custom:cancel']],
             'update payment methods' => [PaymentMethodController::class, 'api.mollie.payment-method.update-methods', ['payment_method:update']],
             'support request' => [SupportController::class, 'api.action.mollie.support.request', ['system_config:read']],

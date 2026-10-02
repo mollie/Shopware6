@@ -365,13 +365,16 @@
                 "resumeTitle": "Atjaunot abonementu?",
                 "resume": "Turpināt abonementu vēlreiz.",
                 "skipTitle": "Izlaist nākamo iemaksu?",
-                "skip": "Izlaidiet nākamo maksājumu abonementā. Pēc tam tas automātiski turpinās."
+                "skip": "Izlaidiet nākamo maksājumu abonementā. Pēc tam tas automātiski turpinās.",
+                "editTitle": "Mainīt abonementa datus?",
+                "edit": "Vai tiešām vēlaties mainīt šī abonementa datus?"
             },
             "alerts": {
                 "cancelSuccess": "Abonements tika veiksmīgi atcelts",
                 "pauseSuccess": "Abonements ir veiksmīgi pauzēts",
                 "resumeSuccess": "Abonements ir veiksmīgi atjaunots",
-                "skipSuccess": "Abonements ir veiksmīgi izlaists. Nākamais maksājums ir atjaunināts."
+                "skipSuccess": "Abonements ir veiksmīgi izlaists. Nākamais maksājums ir atjaunināts.",
+                "editSuccess": "Abonementa dati ir veiksmīgi saglabāti"
             },
             "list": {
                 "title": "Mollie Subscriptions",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Statuss (no)",
                     "colStatusTo": "Statuss (uz)",
                     "colMollieSubscription": "Mollie abonements"
+                },
+                "edit": {
+                    "cardTitle": "Rediģēt Mollie datus",
+                    "warning": "Rediģējiet šos datus tikai izņēmuma gadījumos, piem., ja abonementa izveides laikā kaut kas nogāja greizi. Izmaiņas uz Mollie netiek nosūtītas.",
+                    "labelOrder": "Pasūtījums",
+                    "buttonSave": "Saglabāt"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Refund Manager",
                 "btnOpenRefundManager": "Atvērt Refund Manager",
                 "btnCloseRefundManager": "Aizvērt Refund Manager"
+            },
+            "editMollieIds": {
+                "title": "Rediģēt Mollie datus",
+                "warning": "Rediģējiet šos datus tikai izņēmuma gadījumos, piem., ja maksājuma laikā kaut kas nogāja greizi. Nepareizi ID traucē maksājuma statusa atjaunināšanu, atmaksas un piegādi.",
+                "labelPaymentId": "Mollie maksājuma ID",
+                "labelOrderId": "Mollie pasūtījuma ID",
+                "buttonSave": "Saglabāt",
+                "confirmTitle": "Mainīt Mollie datus",
+                "confirmText": "Vai tiešām vēlaties mainīt šī pasūtījuma Mollie ID?"
             }
         }
     },

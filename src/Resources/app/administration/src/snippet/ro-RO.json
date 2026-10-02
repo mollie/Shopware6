@@ -365,13 +365,16 @@
                 "resumeTitle": "Reactivați abonamentul?",
                 "resume": "Reluați abonamentul din nou.",
                 "skipTitle": "Sari peste următoarea rată?",
-                "skip": "Sari peste următoarea tranșă din abonament. Acesta continuă automat după aceea."
+                "skip": "Sari peste următoarea tranșă din abonament. Acesta continuă automat după aceea.",
+                "editTitle": "Modifici datele abonamentului?",
+                "edit": "Sigur vrei să modifici datele acestui abonament?"
             },
             "alerts": {
                 "cancelSuccess": "Abonamentul a fost anulat cu succes",
                 "pauseSuccess": "Abonamentul a fost pus pe pauză cu succes",
                 "resumeSuccess": "Abonamentul a fost reluat cu succes",
-                "skipSuccess": "Abonamentul a fost sărit cu succes. Următoarea plată a fost actualizată."
+                "skipSuccess": "Abonamentul a fost sărit cu succes. Următoarea plată a fost actualizată.",
+                "editSuccess": "Datele abonamentului au fost salvate cu succes"
             },
             "list": {
                 "title": "Abonamente Mollie",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (de la)",
                     "colStatusTo": "Status (până la)",
                     "colMollieSubscription": "Abonament Mollie"
+                },
+                "edit": {
+                    "cardTitle": "Editează datele Mollie",
+                    "warning": "Editează aceste date doar în cazuri excepționale, de ex. dacă ceva nu a funcționat la crearea abonamentului. Nicio modificare nu este trimisă către Mollie.",
+                    "labelOrder": "Comandă",
+                    "buttonSave": "Salvează"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Refund Manager",
                 "btnOpenRefundManager": "Deschideți Refund Manager",
                 "btnCloseRefundManager": "Închideți Refund Manager"
+            },
+            "editMollieIds": {
+                "title": "Editează datele Mollie",
+                "warning": "Editează aceste date doar în cazuri excepționale, de ex. dacă ceva nu a funcționat la plată. ID-urile greșite împiedică actualizarea stării plății, rambursările și livrarea.",
+                "labelPaymentId": "ID plată Mollie",
+                "labelOrderId": "ID comandă Mollie",
+                "buttonSave": "Salvează",
+                "confirmTitle": "Modifică datele Mollie",
+                "confirmText": "Sigur vrei să modifici ID-urile Mollie ale acestei comenzi?"
             }
         }
     },

@@ -365,13 +365,16 @@
                 "resumeTitle": "Obnoviť predplatné?",
                 "resume": "Pokračovať v predplatnom.",
                 "skipTitle": "Preskočiť nasledujúcu splátku?",
-                "skip": "Preskočiť nasledujúcu splátku v predplatnom. Následne bude predplatné pokračovať automaticky."
+                "skip": "Preskočiť nasledujúcu splátku v predplatnom. Následne bude predplatné pokračovať automaticky.",
+                "editTitle": "Zmeniť údaje predplatného?",
+                "edit": "Naozaj chcete zmeniť údaje tohto predplatného?"
             },
             "alerts": {
                 "cancelSuccess": "Predplatné bolo úspešne zrušené",
                 "pauseSuccess": "Predplatné bolo úspešne pozastavené",
                 "resumeSuccess": "Predplatné bolo úspešne obnovené",
-                "skipSuccess": "Predplatné bolo úspešne preskočené. Nasledujúca platba bola aktualizovaná."
+                "skipSuccess": "Predplatné bolo úspešne preskočené. Nasledujúca platba bola aktualizovaná.",
+                "editSuccess": "Údaje predplatného boli úspešne uložené"
             },
             "list": {
                 "title": "Mollie Predplatné",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Stav (od)",
                     "colStatusTo": "Stav (do)",
                     "colMollieSubscription": "Mollie predplatné"
+                },
+                "edit": {
+                    "cardTitle": "Upraviť údaje Mollie",
+                    "warning": "Tieto údaje upravujte len vo výnimočných prípadoch, napr. ak sa pri vytváraní predplatného niečo pokazilo. Do Mollie sa neodosielajú žiadne zmeny.",
+                    "labelOrder": "Objednávka",
+                    "buttonSave": "Uložiť"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Manager vrátenia",
                 "btnOpenRefundManager": "Otvoriť Manager vrátenia",
                 "btnCloseRefundManager": "Zavrieť Manager vrátenia"
+            },
+            "editMollieIds": {
+                "title": "Upraviť údaje Mollie",
+                "warning": "Tieto údaje upravujte len vo výnimočných prípadoch, napr. ak sa pri platbe niečo pokazilo. Nesprávne ID znemožnia aktualizáciu stavu platby, refundácie a odoslanie.",
+                "labelPaymentId": "ID platby Mollie",
+                "labelOrderId": "ID objednávky Mollie",
+                "buttonSave": "Uložiť",
+                "confirmTitle": "Zmeniť údaje Mollie",
+                "confirmText": "Naozaj chcete zmeniť Mollie ID tejto objednávky?"
             }
         }
     },
