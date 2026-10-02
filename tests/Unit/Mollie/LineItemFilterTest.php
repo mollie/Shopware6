@@ -24,6 +24,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Framework\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -146,6 +147,10 @@ class LineItemFilterTest extends TestCase
         $option = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set-option', 1.0);
         $optionProduct = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 1.0);
         $mainProduct = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 20.0);
+        $slot->setParentId($container->getId());
+        $option->setParentId($slot->getId());
+        $optionProduct->setParentId($option->getId());
+        $mainProduct->setParentId($container->getId());
 
         $result = $this->filterOrderItems(new OrderLineItemCollection([$container, $slot, $option, $optionProduct, $mainProduct]));
 
@@ -287,11 +292,22 @@ class LineItemFilterTest extends TestCase
         $slot = new CartLineItem(Uuid::randomHex(), 'swkweb-product-set-slot');
         $option = new CartLineItem(Uuid::randomHex(), 'swkweb-product-set-option');
         $product = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
+        $option->addChild($product);
 
         $result = $this->filterCartItems(new CartLineItemCollection([$slot, $option, $product]));
 
         $this->assertCount(1, $result);
         $this->assertSame($product->getId(), $result->first()->getId());
+    }
+
+    public function testCartSkwebOptionWithoutProductIsKept(): void
+    {
+        $option = new CartLineItem(Uuid::randomHex(), 'swkweb-product-set-option');
+        $option->setPrice($this->makeCartPrice(6.05));
+
+        $result = $this->filterCartItems(new CartLineItemCollection([$option]));
+
+        $this->assertCount(1, $result);
     }
 
     /**
@@ -434,7 +450,7 @@ class LineItemFilterTest extends TestCase
 
     private function filterOrderItems(OrderLineItemCollection $items): OrderLineItemCollection
     {
-        return $items->filter($this->lineItemFilter->isItemAllowed(...));
+        return $items->filter(fn (OrderLineItemEntity $item): bool => $this->lineItemFilter->isItemAllowed($item, $items));
     }
 
     private function filterCartItems(CartLineItemCollection $items): CartLineItemCollection

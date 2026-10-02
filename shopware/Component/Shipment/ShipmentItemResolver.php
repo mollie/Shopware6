@@ -71,7 +71,7 @@ final class ShipmentItemResolver
         $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
 
         foreach ($lineItems as $lineItem) {
-            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                 continue;
             }
 
@@ -112,7 +112,7 @@ final class ShipmentItemResolver
 
             // Was never part of the Mollie payload, so there is nothing to capture for it. Skipped
             // instead of rejected, so explicitly passing the full order line list still works.
-            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                 continue;
             }
 
@@ -225,7 +225,7 @@ final class ShipmentItemResolver
 
         foreach ($lineItems as $lineItem) {
             $shippedQuantity = (int) (($lineItem->getCustomFields()[Mollie::EXTENSION] ?? [])['quantity'] ?? 0);
-            if ($shippedQuantity <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if ($shippedQuantity <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                 continue;
             }
             $grossLine = LineItem::fromOrderLine($lineItem, $currency, $taxStatus);
@@ -251,7 +251,7 @@ final class ShipmentItemResolver
     public function hasPriorShipments(OrderLineItemCollection $lineItems): bool
     {
         foreach ($lineItems as $lineItem) {
-            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                 continue;
             }
 
@@ -267,7 +267,7 @@ final class ShipmentItemResolver
     public function hasCancelledItems(OrderLineItemCollection $lineItems): bool
     {
         foreach ($lineItems as $lineItem) {
-            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                 continue;
             }
 
@@ -294,7 +294,7 @@ final class ShipmentItemResolver
         }
 
         foreach ($lineItems as $lineItem) {
-            if ($lineItem->getQuantity() <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if ($lineItem->getQuantity() <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                 continue;
             }
 

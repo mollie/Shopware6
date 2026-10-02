@@ -198,7 +198,7 @@ final class CancelItemRoute
         foreach ($allLineItems as $lineItem) {
             // Container line items are not part of the Mollie payload, so they never carry a shipped
             // or cancelled quantity and would block the release of the authorization forever.
-            if ($lineItem->getQuantity() <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if ($lineItem->getQuantity() <= 0 || ! $this->lineItemFilter->isItemAllowed($lineItem, $allLineItems)) {
                 continue;
             }
 

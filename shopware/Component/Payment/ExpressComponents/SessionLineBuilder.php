@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -68,8 +69,10 @@ final class SessionLineBuilder implements SessionLineBuilderInterface
 
         $lines = new LineItemCollection();
 
-        foreach ($order->getLineItems() ?? [] as $orderLineItem) {
-            if (! $this->lineItemFilter->isItemAllowed($orderLineItem)) {
+        $orderLineItems = $order->getLineItems() ?? new OrderLineItemCollection();
+
+        foreach ($orderLineItems as $orderLineItem) {
+            if (! $this->lineItemFilter->isItemAllowed($orderLineItem, $orderLineItems)) {
                 continue;
             }
 

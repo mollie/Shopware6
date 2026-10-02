@@ -46,7 +46,7 @@ final class OrderAdminStatusBuilder
             foreach ($lineItems as $lineItem) {
                 // Container line items were never part of the Mollie payload, so they can neither be
                 // shipped nor cancelled at Mollie (see ShipmentItemResolver).
-                if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+                if (! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                     continue;
                 }
 
@@ -96,7 +96,7 @@ final class OrderAdminStatusBuilder
 
             $result = [];
             foreach ($lineItems as $lineItem) {
-                if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+                if (! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                     continue;
                 }
 
@@ -188,7 +188,7 @@ final class OrderAdminStatusBuilder
         $totalShippable = 0;
 
         foreach ($lineItems as $lineItem) {
-            if (! $this->lineItemFilter->isItemAllowed($lineItem)) {
+            if (! $this->lineItemFilter->isItemAllowed($lineItem, $lineItems)) {
                 continue;
             }
 
