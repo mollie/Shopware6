@@ -5,8 +5,13 @@ namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Struct;
 
 final class ApplePayAmount implements \JsonSerializable
 {
-    public function __construct(private float $value)
+    private const PRECISION = 2;
+
+    private float $value;
+
+    public function __construct(float $value)
     {
+        $this->value = round($value, self::PRECISION);
     }
 
     public function getValue(): float
