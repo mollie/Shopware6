@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.7.0
 - Hinzugefügt: Der Webhook wiederholt das Schreiben des Zahlungsstatus bei einem Datenbank-Deadlock.
 - Hinzugefügt: Der Bezahllink leitet auf die Checkout-URL einer bereits laufenden Zahlung weiter.
 - Hinzugefügt: Plugins können über das Event `ModifyCreatePaymentPayloadEvent` eigene Metadaten an Mollie-Zahlungen anhängen.
