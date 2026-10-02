@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\ItemFilter\Subscriber\CustomizedProductsSubscriber
 use Mollie\Shopware\Component\ItemFilter\Subscriber\DreiscProductSetSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\EasyCouponSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\GiftConfiguratorSubscriber;
+use Mollie\Shopware\Component\ItemFilter\Subscriber\MoorlProductAccessoriesSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\NetiBundleSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\RepertusProductSetSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\SwkwebProductSetSubscriber;
@@ -34,6 +35,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[CoversClass(DreiscProductSetSubscriber::class)]
 #[CoversClass(EasyCouponSubscriber::class)]
 #[CoversClass(GiftConfiguratorSubscriber::class)]
+#[CoversClass(MoorlProductAccessoriesSubscriber::class)]
 #[CoversClass(NetiBundleSubscriber::class)]
 #[CoversClass(RepertusProductSetSubscriber::class)]
 #[CoversClass(SwkwebProductSetSubscriber::class)]
@@ -236,6 +238,19 @@ class LineItemFilterTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertSame($voucher->getId(), $result->first()->getId());
+    }
+
+    public function testMoorlAccessoryContainerIsSkipped(): void
+    {
+        $container = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'moorl_pa_accessory', 38.99);
+        $mainProduct = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 19.0);
+        $accessory = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 19.99);
+        $mainProduct->setParentId($container->getId());
+        $accessory->setParentId($container->getId());
+
+        $result = $this->filterOrderItems(new OrderLineItemCollection([$container, $mainProduct, $accessory]));
+
+        $this->assertSame([$mainProduct->getId(), $accessory->getId()], array_keys(iterator_to_array($result)));
     }
 
     // -------------------------------------------------------------------------

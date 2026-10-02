@@ -920,6 +920,24 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame($actual->getAmount()->getValue(), round($lineSum, 2));
     }
 
+    public function testMoorlAccessoryOrderLinesAddUpToTheOrderAmount(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+        $order = $transactionData->getOrder();
+        $order->setAmountTotal(43.98);
+        $order->setLineItems($this->createMoorlAccessoryLineItems());
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $lineSum = 0.0;
+        foreach ($actual->getLines() as $line) {
+            $lineSum += $line->getAmount()->getValue();
+        }
+        $this->assertSame(43.98, round($lineSum, 2));
+        $this->assertSame($actual->getAmount()->getValue(), round($lineSum, 2));
+    }
+
     public function testPaymentLinkPayloadCarriesTheAllowedMethods(): void
     {
         $builder = $this->createBuilder();
@@ -1025,6 +1043,40 @@ final class PayloadBuilderTest extends TestCase
         ]);
 
         return new OrderLineItemCollection([$mainProduct, $firstLine, $secondLine, $fontColor, $slot, $set]);
+    }
+
+    private function createMoorlAccessoryLineItems(): OrderLineItemCollection
+    {
+        $orderBuilder = new OrderEntityBuilder();
+
+        $container = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'moorl_pa_accessory', 38.99);
+        $container->setLabel('Voucher MEAL');
+        $container->setPayload(['customFields' => ['mollie_payments_product_voucher_type' => 2]]);
+
+        $mainProduct = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), LineItem::PRODUCT_LINE_ITEM_TYPE, 19.0);
+        $mainProduct->setLabel('Voucher MEAL');
+        $mainProduct->setParentId($container->getId());
+        $mainProduct->setPayload([
+            'productType' => 'physical',
+            'productNumber' => 'MOL_VOUCHER_2',
+            'parentId' => null,
+            'options' => [],
+            'customFields' => ['mollie_payments_product_voucher_type' => 2],
+        ]);
+
+        $accessory = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), LineItem::PRODUCT_LINE_ITEM_TYPE, 19.99);
+        $accessory->setLabel('Variant product');
+        $accessory->setParentId($container->getId());
+        $accessory->setPayload([
+            'productType' => 'physical',
+            'productNumber' => 'SWDEMO10005.1',
+            'parentId' => '43a23e0c03bf4ceabc6055a2185faa87',
+            'accessoryId' => '01a0fc4f0fba70aaa9fc90c1e6917b5d',
+            'options' => [['group' => 'Colour', 'option' => 'Blue'], ['group' => 'Size', 'option' => 'M']],
+            'customFields' => [],
+        ]);
+
+        return new OrderLineItemCollection([$container, $mainProduct, $accessory]);
     }
 
     private function roundingDiffSettings(bool $enabled): PaymentSettings
