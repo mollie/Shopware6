@@ -21,6 +21,7 @@ use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
+use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeFinalize;
@@ -37,8 +38,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Shopware\Core\Checkout\Cart\LineItem\LineItem;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
 #[CoversClass(PayloadBuilder::class)]
@@ -899,6 +903,23 @@ final class PayloadBuilderTest extends TestCase
         $this->assertNotContains('ROUND-1', $this->skusOf($actual));
     }
 
+    public function testSkwebProductSetOrderLinesAddUpToTheOrderAmount(): void
+    {
+        $builder = $this->createBuilder();
+        $transactionData = (new FakeTransactionService())->findById('test', $this->context);
+        $order = $transactionData->getOrder();
+        $order->setAmountTotal(81.04);
+        $order->setLineItems($this->createSkwebProductSetLineItems());
+
+        $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), new RequestDataBag(), $this->context);
+
+        $lineSum = 0.0;
+        foreach ($actual->getLines() as $line) {
+            $lineSum += $line->getAmount()->getValue();
+        }
+        $this->assertSame($actual->getAmount()->getValue(), round($lineSum, 2));
+    }
+
     public function testPaymentLinkPayloadCarriesTheAllowedMethods(): void
     {
         $builder = $this->createBuilder();
@@ -947,6 +968,63 @@ final class PayloadBuilderTest extends TestCase
     private function oneClickSettings(): PaymentSettings
     {
         return new PaymentSettings('test_{ordernumber}-{customernumber}', 0, true);
+    }
+
+    private function createSkwebProductSetLineItems(): OrderLineItemCollection
+    {
+        $orderBuilder = new OrderEntityBuilder();
+
+        $set = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set', 76.05);
+        $set->setLabel('Veredelung Torwarthandschuhe (60°)');
+        $set->setPayload([
+            'swkweb-product-set-referenced-entity' => 'product',
+            'swkweb-product-set-configuration-id' => '2950f750d707319b20cb5dc1078e8305',
+            'swkweb-product-set' => '01953d54f463731a800b12736f61409e',
+            'swkweb-product-set-show-main-product-as-main-item' => true,
+            'swkweb-product-set-include-main-product-delivery-time' => true,
+            'productNumber' => 'VER311111',
+            'swkweb-product-set-url-configuration' => 'eyI1OWVjYzRiZCI6eyI4NDExNjhiYiI6eyJxIjoxLCJmIjp7ImRlNTNlMTAxIjoiMDE5NjgwYzU1MWUyNzE0NWEwY2VjN2RmNmNhODBhMDIifX0sIjZiYTdlNjNjIjp7InEiOjEsImYiOnsiZGNkNGZhMGIiOiJ0ZXN0In19LCIwOGNiODQwNSI6eyJxIjoxLCJmIjp7IjNhNzQxYzM2IjoidGVzdCJ9fX19',
+        ]);
+
+        $mainProduct = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), LineItem::PRODUCT_LINE_ITEM_TYPE, 70.0);
+        $mainProduct->setLabel('Night Edition Supersoft HN #392');
+        $mainProduct->setParentId($set->getId());
+        $mainProduct->setPayload([
+            'productType' => 'physical',
+            'productNumber' => '000001011380012026_10.5_A',
+            'parentId' => 'c94b1b8a768c4438b127b5f98df2955a',
+            'options' => [['group' => 'Größe', 'option' => '10.5']],
+        ]);
+
+        $slot = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set-slot', 6.05);
+        $slot->setLabel('Handschuh Lasche (Alle Schriftfarben, Zeile 1, Zeile 2 ) (60°)');
+        $slot->setParentId($set->getId());
+
+        $firstLine = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set-option', 6.05);
+        $firstLine->setLabel('Zeile 1');
+        $firstLine->setParentId($slot->getId());
+        $firstLine->setPayload([
+            'swkweb-product-set-option-fields' => ['019680c39f567b7295898142dcd4fa0b' => 'test'],
+            'swkweb-product-set-option-fields-parsed' => [['id' => '019680c39f567b7295898142dcd4fa0b', 'type' => 'text', 'name' => 'text_1', 'label' => 'Zeile 1', 'value' => 'test', 'printableValue' => 'test']],
+        ]);
+
+        $secondLine = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set-option', 0.0);
+        $secondLine->setLabel('Zeile 2');
+        $secondLine->setParentId($slot->getId());
+        $secondLine->setPayload([
+            'swkweb-product-set-option-fields' => ['019680c93a2e741b843194e33a741c36' => 'test'],
+            'swkweb-product-set-option-fields-parsed' => [['id' => '019680c93a2e741b843194e33a741c36', 'type' => 'text', 'name' => 'text_2', 'label' => 'Zeile 2', 'value' => 'test', 'printableValue' => 'test']],
+        ]);
+
+        $fontColor = $orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'swkweb-product-set-option', 0.0);
+        $fontColor->setLabel('Schriftfarbe');
+        $fontColor->setParentId($slot->getId());
+        $fontColor->setPayload([
+            'swkweb-product-set-option-fields' => ['019680c516da7df6a591c0cbde53e101' => '019680c551e27145a0cec7df6ca80a02'],
+            'swkweb-product-set-option-fields-parsed' => [['id' => '019680c516da7df6a591c0cbde53e101', 'type' => 'select', 'name' => 'color', 'label' => 'Schriftfarbe', 'value' => '000000', 'printableValue' => "\t Schwarz", 'choiceId' => '019680c551e27145a0cec7df6ca80a02']],
+        ]);
+
+        return new OrderLineItemCollection([$mainProduct, $firstLine, $secondLine, $fontColor, $slot, $set]);
     }
 
     private function roundingDiffSettings(bool $enabled): PaymentSettings

@@ -42,6 +42,7 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemEntity;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -268,7 +269,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
         $orderLineItems = $order->getLineItems();
         $shippingDiscountLabel = $orderLineItems !== null ? LineItem::resolveDeliveryDiscountLabel($orderLineItems) : null;
         if ($orderLineItems !== null) {
-            $filteredLineItems = $orderLineItems->filter($this->lineItemFilter->isItemAllowed(...));
+            $filteredLineItems = $orderLineItems->filter(fn (OrderLineItemEntity $lineItem): bool => $this->lineItemFilter->isItemAllowed($lineItem, $orderLineItems));
             foreach ($filteredLineItems as $lineItem) {
                 $lineItemCollection->add(LineItem::fromOrderLine($lineItem, $currency, $taxStatus));
             }

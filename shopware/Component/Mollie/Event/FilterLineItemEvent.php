@@ -16,13 +16,20 @@ final class FilterLineItemEvent
 {
     private bool $allowed = true;
 
-    public function __construct(private readonly CartLineItem|OrderLineItemEntity $item)
-    {
+    public function __construct(
+        private readonly CartLineItem|OrderLineItemEntity $item,
+        private readonly bool $hasChildren = false
+    ) {
     }
 
     public function getItem(): CartLineItem|OrderLineItemEntity
     {
         return $this->item;
+    }
+
+    public function hasChildren(): bool
+    {
+        return $this->hasChildren;
     }
 
     public function getType(): string

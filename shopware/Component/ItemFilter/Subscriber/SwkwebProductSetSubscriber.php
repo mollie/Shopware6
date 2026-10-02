@@ -11,8 +11,9 @@ final class SwkwebProductSetSubscriber implements EventSubscriberInterface
     private const CONTAINER_TYPES = [
         'swkweb-product-set',
         'swkweb-product-set-slot',
-        'swkweb-product-set-option',
     ];
+
+    private const TYPE_OPTION = 'swkweb-product-set-option';
 
     public static function getSubscribedEvents(): array
     {
@@ -23,7 +24,15 @@ final class SwkwebProductSetSubscriber implements EventSubscriberInterface
 
     public function onFilterLineItem(FilterLineItemEvent $event): void
     {
-        if (in_array($event->getType(), self::CONTAINER_TYPES, true) === false) {
+        $type = $event->getType();
+
+        if (in_array($type, self::CONTAINER_TYPES, true)) {
+            $event->disallow();
+
+            return;
+        }
+
+        if ($type !== self::TYPE_OPTION || $event->hasChildren() === false) {
             return;
         }
 
