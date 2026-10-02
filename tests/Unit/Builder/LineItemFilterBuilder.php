@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\ItemFilter\Subscriber\CustomizedProductsSubscriber
 use Mollie\Shopware\Component\ItemFilter\Subscriber\DreiscProductSetSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\EasyCouponSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\GiftConfiguratorSubscriber;
+use Mollie\Shopware\Component\ItemFilter\Subscriber\MoorlProductAccessoriesSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\NetiBundleSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\RepertusProductSetSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\SwkwebProductSetSubscriber;
@@ -32,6 +33,7 @@ final class LineItemFilterBuilder
         $eventDispatcher->addSubscriber(new NetiBundleSubscriber());
         $eventDispatcher->addSubscriber(new GiftConfiguratorSubscriber());
         $eventDispatcher->addSubscriber(new EasyCouponSubscriber());
+        $eventDispatcher->addSubscriber(new MoorlProductAccessoriesSubscriber());
 
         return new LineItemFilter($eventDispatcher, new FakeLogger());
     }

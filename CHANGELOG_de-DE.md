@@ -4,6 +4,7 @@
 - Hinzugefügt: Plugins können über das Event `ModifyCreatePaymentPayloadEvent` eigene Metadaten an Mollie-Zahlungen anhängen.
 - Hinzugefügt: ZUGFeRD-Rechnungen enthalten bei Kreditkartenzahlungen Kartentyp, Kartennummer und Karteninhaber.
 - Hinzugefügt: Für Ausnahmefälle lassen sich in der Administration die Mollie-IDs einer Bestellung sowie Status, Mollie-ID und zugeordnete Bestellung eines Abos nachträglich korrigieren.
+- Hinzugefügt: Bestellungen mit Zubehör aus dem Plugin "Produkt Add-ons / Zubehör" von moori lassen sich mit Mollie bezahlen.
 - Geändert: Der automatische Versand ignoriert Zahlarten, die dafür nicht vorgesehen sind, komplett.
 - Geändert: "Versand melden" im Mollie-Tab ist bei Zahlungen ohne manuellen Einzug deaktiviert.
 - Geändert: Erstatten, Versand melden, Positionen stornieren und Abos pausieren oder kündigen setzt jetzt auch auf dem Server das passende Recht in der Rolle des Benutzers oder der Integration voraus; Versandmeldungen, etwa aus einem ERP, brauchen das Recht, Bestellungen zu bearbeiten.
