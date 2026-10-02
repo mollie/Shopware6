@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.7.0
 - Added: The webhook retries writing the payment status on a database deadlock.
 - Added: The payment link redirects to the checkout URL of a payment that is already running.
 - Added: Plugins can add their own metadata to Mollie payments via the `ModifyCreatePaymentPayloadEvent`.
