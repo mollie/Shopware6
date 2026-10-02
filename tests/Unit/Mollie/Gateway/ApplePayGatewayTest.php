@@ -22,7 +22,7 @@ final class ApplePayGatewayTest extends TestCase
 
         $gateway->requestSession($domain, 'https://apple.com/validate', 'sales-channel-id');
 
-        $this->assertSame($expected, $fakeClient->getLastPostOptions()['form_params']['domain']);
+        $this->assertSame($expected, $fakeClient->getLastPostOptions()['json']['domain']);
     }
 
     /**

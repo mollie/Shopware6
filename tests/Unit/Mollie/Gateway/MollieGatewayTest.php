@@ -237,15 +237,15 @@ final class MollieGatewayTest extends TestCase
 
         $gateway->updatePayment('tr_test', $createPayment, '10000', Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
 
-        $formParams = $fakeClient->getLastPatchOptions()['form_params'];
+        $requestBody = $fakeClient->getLastPatchOptions()['json'];
 
         $this->assertSame('PATCH', $fakeClient->getLastMethod());
         $this->assertSame('payments/tr_test', $fakeClient->getLastUri());
-        $this->assertArrayNotHasKey('amount', $formParams);
-        $this->assertArrayNotHasKey('lines', $formParams);
-        $this->assertSame('Order 10000', $formParams['description']);
-        $this->assertSame('https://shop.example/webhook', $formParams['webhookUrl']);
-        $this->assertSame('de_DE', $formParams['locale']);
+        $this->assertArrayNotHasKey('amount', $requestBody);
+        $this->assertArrayNotHasKey('lines', $requestBody);
+        $this->assertSame('Order 10000', $requestBody['description']);
+        $this->assertSame('https://shop.example/webhook', $requestBody['webhookUrl']);
+        $this->assertSame('de_DE', $requestBody['locale']);
     }
 
     public function testCreateOrderPostsThePayloadAndEmbedsThePayments(): void
@@ -259,7 +259,7 @@ final class MollieGatewayTest extends TestCase
         $this->assertSame('POST', $fakeClient->getLastMethod());
         $this->assertSame('orders', $fakeClient->getLastUri());
         $this->assertSame(['embed' => 'payments'], $fakeClient->getLastPostOptions()['query']);
-        $this->assertSame('SW10001', $fakeClient->getLastPostOptions()['form_params']['orderNumber']);
+        $this->assertSame('SW10001', $fakeClient->getLastPostOptions()['json']['orderNumber']);
     }
 
     public function testGetOrderEmbedsPaymentsAndRefunds(): void
@@ -304,14 +304,14 @@ final class MollieGatewayTest extends TestCase
 
         $customer = $gateway->createCustomer(self::shopwareCustomer(), Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
 
-        $formParams = $fakeClient->getLastPostOptions()['form_params'];
+        $requestBody = $fakeClient->getLastPostOptions()['json'];
 
         $this->assertSame('cst_1', $customer->getId());
         $this->assertSame('customers', $fakeClient->getLastUri());
-        $this->assertSame('John Doe', $formParams['name']);
-        $this->assertSame('john@example.com', $formParams['email']);
-        $this->assertSame(['shopwareCustomerNumber' => '10000'], $formParams['metadata']);
-        $this->assertArrayNotHasKey('locale', $formParams);
+        $this->assertSame('John Doe', $requestBody['name']);
+        $this->assertSame('john@example.com', $requestBody['email']);
+        $this->assertSame(['shopwareCustomerNumber' => '10000'], $requestBody['metadata']);
+        $this->assertArrayNotHasKey('locale', $requestBody);
     }
 
     public function testCustomerLocaleIsDerivedFromTheCustomerLanguage(): void
@@ -328,7 +328,7 @@ final class MollieGatewayTest extends TestCase
 
         $gateway->createCustomer($shopwareCustomer, Defaults::SALES_CHANNEL_TYPE_STOREFRONT);
 
-        $this->assertSame('de_DE', $fakeClient->getLastPostOptions()['form_params']['locale']);
+        $this->assertSame('de_DE', $fakeClient->getLastPostOptions()['json']['locale']);
     }
 
     public function testMandatesAreListedForACustomerPresentScope(): void
@@ -447,7 +447,7 @@ final class MollieGatewayTest extends TestCase
 
         $this->assertSame('cpt_1', $capture->getId());
         $this->assertSame('payments/tr_test/captures', $fakeClient->getLastUri());
-        $this->assertSame(['value' => '20.00', 'currency' => 'EUR'], $fakeClient->getLastPostOptions()['form_params']['amount']);
+        $this->assertSame(['value' => '20.00', 'currency' => 'EUR'], $fakeClient->getLastPostOptions()['json']['amount']);
     }
 
     public function testShipmentIsCreatedForAnOrder(): void
@@ -462,7 +462,7 @@ final class MollieGatewayTest extends TestCase
 
         $this->assertSame('shp_1', $shipment->getId());
         $this->assertSame('orders/ord_test/shipments', $fakeClient->getLastUri());
-        $this->assertSame([['id' => 'odl_1', 'quantity' => 2]], $fakeClient->getLastPostOptions()['form_params']['lines']);
+        $this->assertSame([['id' => 'odl_1', 'quantity' => 2]], $fakeClient->getLastPostOptions()['json']['lines']);
     }
 
     public function testOrderLinesAreCancelled(): void

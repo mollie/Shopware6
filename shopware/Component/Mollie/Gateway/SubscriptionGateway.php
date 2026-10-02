@@ -27,14 +27,14 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
         try {
             $client = $this->clientFactory->create($salesChannelId);
 
-            $formParams = $createSubscription->toArray();
+            $requestBody = $createSubscription->toArray();
 
             $response = $client->post('customers/' . $customerId . '/subscriptions', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
             $this->logger->info('Subscription created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'customerId' => $customerId,
                 'orderNumber' => $orderNumber,
@@ -181,7 +181,7 @@ final class SubscriptionGateway implements SubscriptionGatewayInterface
             $mollieSubscriptionId = $mollieSubscription->getId();
 
             $response = $client->patch('customers/' . $customerId . '/subscriptions/' . $mollieSubscriptionId, [
-                'form_params' => $mollieSubscription->toArray()
+                'json' => $mollieSubscription->toArray()
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);

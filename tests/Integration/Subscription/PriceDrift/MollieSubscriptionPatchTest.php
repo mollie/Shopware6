@@ -134,7 +134,7 @@ final class MollieSubscriptionPatchTest extends TestCase
     private function createCustomer(): string
     {
         $response = $this->rawClient->post('customers', [
-            'form_params' => [
+            'json' => [
                 'name' => 'Integration Test Customer',
                 'email' => 'integration-test-' . bin2hex(random_bytes(4)) . '@example.com',
             ],
@@ -149,7 +149,7 @@ final class MollieSubscriptionPatchTest extends TestCase
     private function createDirectDebitMandate(string $customerId): string
     {
         $response = $this->rawClient->post(sprintf('customers/%s/mandates', $customerId), [
-            'form_params' => [
+            'json' => [
                 'method' => 'directdebit',
                 'consumerName' => 'Integration Test Holder',
                 'consumerAccount' => self::TEST_IBAN,

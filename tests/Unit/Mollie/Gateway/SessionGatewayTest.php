@@ -39,10 +39,10 @@ final class SessionGatewayTest extends TestCase
 
         $this->gateway($client)->createPaypalExpressSession($this->cart(99.99), new FakeSalesChannelContext());
 
-        $formParams = $client->getLastPostOptions()['form_params'];
+        $requestBody = $client->getLastPostOptions()['json'];
 
-        $this->assertSame(PaymentMethod::PAYPAL->value, $formParams['method']);
-        $this->assertSame('express', $formParams['methodDetails']['checkoutFlow']);
+        $this->assertSame(PaymentMethod::PAYPAL->value, $requestBody['method']);
+        $this->assertSame('express', $requestBody['methodDetails']['checkoutFlow']);
     }
 
     public function testAPaypalExpressSessionIsOpenedForTheFullCartTotal(): void
@@ -51,7 +51,7 @@ final class SessionGatewayTest extends TestCase
 
         $this->gateway($client)->createPaypalExpressSession($this->cart(99.99), new FakeSalesChannelContext());
 
-        $this->assertSame(['value' => '99.99', 'currency' => 'EUR'], $client->getLastPostOptions()['form_params']['amount']);
+        $this->assertSame(['value' => '99.99', 'currency' => 'EUR'], $client->getLastPostOptions()['json']['amount']);
     }
 
     public function testAPaypalExpressSessionCarriesTheReturnAndCancelUrlOfTheShop(): void
@@ -64,10 +64,10 @@ final class SessionGatewayTest extends TestCase
 
         $this->gateway($client, $routeBuilder)->createPaypalExpressSession($this->cart(99.99), new FakeSalesChannelContext());
 
-        $formParams = $client->getLastPostOptions()['form_params'];
+        $requestBody = $client->getLastPostOptions()['json'];
 
-        $this->assertSame('https://shop.test/paypal/return', $formParams['redirectUrl']);
-        $this->assertSame('https://shop.test/paypal/cancel', $formParams['cancelUrl']);
+        $this->assertSame('https://shop.test/paypal/return', $requestBody['redirectUrl']);
+        $this->assertSame('https://shop.test/paypal/cancel', $requestBody['cancelUrl']);
     }
 
     public function testTheUrlsOfTheClientReplaceTheOnesOfTheShop(): void
@@ -85,10 +85,10 @@ final class SessionGatewayTest extends TestCase
             'https://frontend.example/checkout/cart'
         );
 
-        $formParams = $client->getLastPostOptions()['form_params'];
+        $requestBody = $client->getLastPostOptions()['json'];
 
-        $this->assertSame('https://frontend.example/checkout/paypal-return', $formParams['redirectUrl']);
-        $this->assertSame('https://frontend.example/checkout/cart', $formParams['cancelUrl']);
+        $this->assertSame('https://frontend.example/checkout/paypal-return', $requestBody['redirectUrl']);
+        $this->assertSame('https://frontend.example/checkout/cart', $requestBody['cancelUrl']);
     }
 
     public function testOnlyTheUrlTheClientNamedIsReplaced(): void
@@ -105,10 +105,10 @@ final class SessionGatewayTest extends TestCase
             'https://frontend.example/checkout/paypal-return'
         );
 
-        $formParams = $client->getLastPostOptions()['form_params'];
+        $requestBody = $client->getLastPostOptions()['json'];
 
-        $this->assertSame('https://frontend.example/checkout/paypal-return', $formParams['redirectUrl']);
-        $this->assertSame('https://shop.test/paypal/cancel', $formParams['cancelUrl']);
+        $this->assertSame('https://frontend.example/checkout/paypal-return', $requestBody['redirectUrl']);
+        $this->assertSame('https://shop.test/paypal/cancel', $requestBody['cancelUrl']);
     }
 
     public function testAFreshPaypalExpressSessionCarriesNoAuthenticationYet(): void
@@ -217,11 +217,11 @@ final class SessionGatewayTest extends TestCase
 
         $this->gateway($client)->createSession($this->createSessionPayload(), new FakeSalesChannelContext());
 
-        $formParams = $client->getLastPostOptions()['form_params'];
+        $requestBody = $client->getLastPostOptions()['json'];
 
-        $this->assertSame('Order 10000', $formParams['description']);
-        $this->assertSame(['value' => '25.00', 'currency' => 'EUR'], $formParams['amount']);
-        $this->assertSame('https://shop.test/return', $formParams['redirectUrl']);
+        $this->assertSame('Order 10000', $requestBody['description']);
+        $this->assertSame(['value' => '25.00', 'currency' => 'EUR'], $requestBody['amount']);
+        $this->assertSame('https://shop.test/return', $requestBody['redirectUrl']);
     }
 
     public function testACreatedSessionCarriesTheIdAndStatusMollieAnswered(): void

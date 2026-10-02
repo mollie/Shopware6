@@ -84,17 +84,17 @@ final class RefundGateway implements RefundGatewayInterface
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = $createRefund->toArray();
+            $requestBody = $createRefund->toArray();
 
             $this->logger->info('Mollie refund create requested', [
                 'paymentId' => $createRefund->getPaymentId(),
                 'orderNumber' => $orderNumber,
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'salesChannelId' => $salesChannelId,
             ]);
 
             $response = $client->post('payments/' . $createRefund->getPaymentId() . '/refunds', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);
@@ -115,17 +115,17 @@ final class RefundGateway implements RefundGatewayInterface
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = $createRefund->toArray();
+            $requestBody = $createRefund->toArray();
 
             $this->logger->info('Mollie order refund create requested', [
                 'orderId' => $createRefund->getOrderId(),
                 'orderNumber' => $orderNumber,
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'salesChannelId' => $salesChannelId,
             ]);
 
             $response = $client->post('orders/' . $createRefund->getOrderId() . '/refunds', [
-                'json' => $formParams,
+                'json' => $requestBody,
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);

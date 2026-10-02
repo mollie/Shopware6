@@ -74,7 +74,7 @@ final class SubscriptionGatewayTest extends TestCase
         $this->gateway($client)->updateSubscription($this->subscription(), self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL);
 
         $this->assertSame('customers/cst_1/subscriptions/sub_1', $client->getLastUri());
-        $this->assertArrayHasKey('form_params', $client->getLastPatchOptions());
+        $this->assertArrayHasKey('json', $client->getLastPatchOptions());
     }
 
     public function testACopiedSubscriptionKeepsDescriptionIntervalAndAmountOfTheOriginal(): void
@@ -83,11 +83,11 @@ final class SubscriptionGatewayTest extends TestCase
 
         $this->gateway($client)->copySubscription($this->subscription(), self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL);
 
-        $formParams = $client->getLastPostOptions()['form_params'];
+        $requestBody = $client->getLastPostOptions()['json'];
 
-        $this->assertSame('Monthly box', $formParams['description']);
-        $this->assertSame('1 month', $formParams['interval']);
-        $this->assertSame(['value' => '19.99', 'currency' => 'EUR'], $formParams['amount']);
+        $this->assertSame('Monthly box', $requestBody['description']);
+        $this->assertSame('1 month', $requestBody['interval']);
+        $this->assertSame(['value' => '19.99', 'currency' => 'EUR'], $requestBody['amount']);
     }
 
     public function testACopiedSubscriptionKeepsTheMandateSoTheCustomerIsNotAskedToPayAgain(): void
@@ -96,7 +96,7 @@ final class SubscriptionGatewayTest extends TestCase
 
         $this->gateway($client)->copySubscription($this->subscription(), self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL);
 
-        $this->assertSame('mdt_1', $client->getLastPostOptions()['form_params']['mandateId']);
+        $this->assertSame('mdt_1', $client->getLastPostOptions()['json']['mandateId']);
     }
 
     public function testACopiedSubscriptionIsCreatedAtTheCustomersEndpoint(): void
@@ -195,7 +195,7 @@ final class SubscriptionGatewayTest extends TestCase
 
         $this->gateway($client)->copySubscription($original, self::CUSTOMER, self::ORDER_NUMBER, self::SALES_CHANNEL);
 
-        $this->assertSame(4, $client->getLastPostOptions()['form_params']['times']);
+        $this->assertSame(4, $client->getLastPostOptions()['json']['times']);
     }
 
     /**
