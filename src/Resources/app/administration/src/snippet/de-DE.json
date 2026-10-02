@@ -365,13 +365,16 @@
                 "resumeTitle": "Abonnement fortsetzen?",
                 "resume": "Das Abonnement erneut fortsetzen.",
                 "skipTitle": "Nächste Rate überspringen?",
-                "skip": "Überspringen Sie die nächste Rate im Abonnement. Es wird danach automatisch fortgesetzt."
+                "skip": "Überspringen Sie die nächste Rate im Abonnement. Es wird danach automatisch fortgesetzt.",
+                "editTitle": "Abo-Daten ändern?",
+                "edit": "Bist du sicher, dass du die Daten dieses Abos ändern möchtest?"
             },
             "alerts": {
                 "cancelSuccess": "Das Abonnement wurde erfolgreich gekündigt",
                 "pauseSuccess": "Das Abonnement wurde erfolgreich pausiert",
                 "resumeSuccess": "Das Abonnement wurde erfolgreich fortgesetzt",
-                "skipSuccess": "Das Abonnement wurde erfolgreich ausgesetzt. Das Datum der nächsten Zahlung wurde aktualisiert."
+                "skipSuccess": "Das Abonnement wurde erfolgreich ausgesetzt. Das Datum der nächsten Zahlung wurde aktualisiert.",
+                "editSuccess": "Die Abo-Daten wurden erfolgreich gespeichert"
             },
             "list": {
                 "title": "Mollie Abonnements",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (von)",
                     "colStatusTo": "Status (zu)",
                     "colMollieSubscription": "Mollie Abo"
+                },
+                "edit": {
+                    "cardTitle": "Mollie-Daten bearbeiten",
+                    "warning": "Diese Daten nur in Ausnahmefällen bearbeiten, z. B. wenn bei der Erstellung des Abos etwas schiefgelaufen ist. Es werden keine Änderungen an Mollie übertragen.",
+                    "labelOrder": "Bestellung",
+                    "buttonSave": "Speichern"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Rückerstattung über Mollie",
                 "btnOpenRefundManager": "Refund Manager öffnen",
                 "btnCloseRefundManager": "Refund Manager schließen"
+            },
+            "editMollieIds": {
+                "title": "Mollie-Daten bearbeiten",
+                "warning": "Diese Daten nur in Ausnahmefällen bearbeiten, z. B. wenn bei der Zahlung etwas schiefgelaufen ist. Falsche IDs führen dazu, dass Zahlungsstatus, Rückerstattungen und Versand nicht mehr funktionieren.",
+                "labelPaymentId": "Mollie Zahlungs-ID",
+                "labelOrderId": "Mollie Bestell-ID",
+                "buttonSave": "Speichern",
+                "confirmTitle": "Mollie-Daten ändern",
+                "confirmText": "Bist du sicher, dass du die Mollie-IDs dieser Bestellung ändern möchtest?"
             }
         }
     },

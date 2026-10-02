@@ -365,13 +365,16 @@
                 "resumeTitle": "Wznów subskrypcję?",
                 "resume": "Wznów subskrypcję ponownie.",
                 "skipTitle": "Pominąć następną ratę?",
-                "skip": "Pomiń następną ratę w subskrypcji. Subskrypcja będzie automatycznie kontynuowana po tym okresie."
+                "skip": "Pomiń następną ratę w subskrypcji. Subskrypcja będzie automatycznie kontynuowana po tym okresie.",
+                "editTitle": "Zmienić dane subskrypcji?",
+                "edit": "Czy na pewno chcesz zmienić dane tej subskrypcji?"
             },
             "alerts": {
                 "cancelSuccess": "Subskrypcja została pomyślnie anulowana",
                 "pauseSuccess": "Subskrypcja została pomyślnie wstrzymana",
                 "resumeSuccess": "Subskrypcja została pomyślnie wznowiona",
-                "skipSuccess": "Subskrypcja została pomyślnie pominięta. Zaktualizowano kolejną płatność."
+                "skipSuccess": "Subskrypcja została pomyślnie pominięta. Zaktualizowano kolejną płatność.",
+                "editSuccess": "Dane subskrypcji zostały pomyślnie zapisane"
             },
             "list": {
                 "title": "Mollie Subscriptions",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (od)",
                     "colStatusTo": "Status (do)",
                     "colMollieSubscription": "Subskrypcja Mollie"
+                },
+                "edit": {
+                    "cardTitle": "Edytuj dane Mollie",
+                    "warning": "Edytuj te dane tylko w wyjątkowych przypadkach, np. gdy coś poszło nie tak przy tworzeniu subskrypcji. Żadne zmiany nie są przesyłane do Mollie.",
+                    "labelOrder": "Zamówienie",
+                    "buttonSave": "Zapisz"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Menedżer Zwrotów",
                 "btnOpenRefundManager": "Otwórz Menedżera Zwrotów",
                 "btnCloseRefundManager": "Zamknij Menedżera Zwrotów"
+            },
+            "editMollieIds": {
+                "title": "Edytuj dane Mollie",
+                "warning": "Edytuj te dane tylko w wyjątkowych przypadkach, np. gdy coś poszło nie tak podczas płatności. Błędne ID uniemożliwiają aktualizację statusu płatności, zwroty i wysyłkę.",
+                "labelPaymentId": "ID płatności Mollie",
+                "labelOrderId": "ID zamówienia Mollie",
+                "buttonSave": "Zapisz",
+                "confirmTitle": "Zmień dane Mollie",
+                "confirmText": "Czy na pewno chcesz zmienić ID Mollie tego zamówienia?"
             }
         }
     },

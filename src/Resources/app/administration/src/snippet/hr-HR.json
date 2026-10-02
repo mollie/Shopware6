@@ -365,13 +365,16 @@
                 "resumeTitle": "Nastavi pretplatu?",
                 "resume": "Nastavite pretplatu ponovno.",
                 "skipTitle": "Preskoči sljedeću uplatu?",
-                "skip": "Preskočite sljedeću uplatu u pretplati. Nastavak se odvija automatski nakon toga."
+                "skip": "Preskočite sljedeću uplatu u pretplati. Nastavak se odvija automatski nakon toga.",
+                "editTitle": "Promijeniti podatke pretplate?",
+                "edit": "Jeste li sigurni da želite promijeniti podatke ove pretplate?"
             },
             "alerts": {
                 "cancelSuccess": "Pretplata je uspješno otkazana",
                 "pauseSuccess": "Pretplata je uspješno pauzirana",
                 "resumeSuccess": "Pretplata je uspješno nastavljena",
-                "skipSuccess": "Pretplata je uspješno preskočena. Sljedeća uplata je ažurirana."
+                "skipSuccess": "Pretplata je uspješno preskočena. Sljedeća uplata je ažurirana.",
+                "editSuccess": "Podaci pretplate uspješno su spremljeni"
             },
             "list": {
                 "title": "Mollie pretplate",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (od)",
                     "colStatusTo": "Status (do)",
                     "colMollieSubscription": "Mollie pretplata"
+                },
+                "edit": {
+                    "cardTitle": "Uredi Mollie podatke",
+                    "warning": "Ove podatke uređujte samo u iznimnim slučajevima, npr. ako je nešto pošlo po zlu pri stvaranju pretplate. Nikakve promjene ne šalju se Mollieju.",
+                    "labelOrder": "Narudžba",
+                    "buttonSave": "Spremi"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Upravitelj povrata",
                 "btnOpenRefundManager": "Otvori Upravitelja povrata",
                 "btnCloseRefundManager": "Zatvori Upravitelja povrata"
+            },
+            "editMollieIds": {
+                "title": "Uredi Mollie podatke",
+                "warning": "Ove podatke uređujte samo u iznimnim slučajevima, npr. ako je nešto pošlo po zlu tijekom plaćanja. Pogrešni ID-ovi onemogućuju ažuriranje statusa plaćanja, povrate i dostavu.",
+                "labelPaymentId": "Mollie ID plaćanja",
+                "labelOrderId": "Mollie ID narudžbe",
+                "buttonSave": "Spremi",
+                "confirmTitle": "Promijeni Mollie podatke",
+                "confirmText": "Jeste li sigurni da želite promijeniti Mollie ID-ove ove narudžbe?"
             }
         }
     },

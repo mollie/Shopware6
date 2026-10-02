@@ -1,6 +1,7 @@
 import template from './mollie-subscriptions-detail.html.twig';
 import './mollie-subscriptions-detail.scss';
 import SubscriptionService from '../../../../core/service/subscription/subscription.service';
+import VersionCompare from '../../../../core/service/utils/version-compare.utils';
 
 const { Component, Mixin, Application, ApiService, Filter } = Shopware;
 const { Criteria } = Shopware.Data;
@@ -21,6 +22,11 @@ interface SubscriptionsDetailPage {
     formattedNextPaymentAt: string;
     formattedLastRemindedAt: string;
     formattedCanceledAt: string;
+    editStatus: string;
+    editMollieId: string;
+    editOrderId: string;
+    showConfirmEdit: boolean;
+    isSavingEdit: boolean;
 
     [key: string]: any;
 }
@@ -49,6 +55,11 @@ const componentConfig: ThisType<SubscriptionsDetailPage> = {
             formattedNextPaymentAt: '',
             formattedLastRemindedAt: '',
             formattedCanceledAt: '',
+            editStatus: '',
+            editMollieId: '',
+            editOrderId: '',
+            showConfirmEdit: false,
+            isSavingEdit: false,
         };
     },
 
@@ -120,6 +131,18 @@ const componentConfig: ThisType<SubscriptionsDetailPage> = {
         dateFilter() {
             return Filter.getByName('date');
         },
+
+        editWarningVariant() {
+            return new VersionCompare().greaterOrEqual(Shopware.Context.app.config.version, '6.7.0.0')
+                ? 'critical'
+                : 'error';
+        },
+
+        statusOptions() {
+            return ['pending', 'active', 'suspended', 'completed', 'canceled', 'paused', 'resumed', 'skipped'].map(
+                (status: string) => ({ value: status, label: this.statusTranslation(status) }),
+            );
+        },
     },
 
     created() {
@@ -152,6 +175,10 @@ const componentConfig: ThisType<SubscriptionsDetailPage> = {
                 this.formattedNextPaymentAt = this.getFormattedDate(this.subscription.nextPaymentAt);
                 this.formattedLastRemindedAt = this.getFormattedDate(this.subscription.lastRemindedAt);
                 this.formattedCanceledAt = this.getFormattedDate(this.subscription.canceledAt);
+
+                this.editStatus = this.subscription.status;
+                this.editMollieId = this.subscription.mollieId ?? '';
+                this.editOrderId = this.subscription.orderId;
 
                 this.history = this.subscription.historyEntries;
                 this.history.sort(
@@ -217,6 +244,42 @@ const componentConfig: ThisType<SubscriptionsDetailPage> = {
             this.showConfirmPause = false;
             this.showConfirmResume = false;
             this.showConfirmSkip = false;
+            this.showConfirmEdit = false;
+        },
+
+        btnSaveEdit_Click() {
+            this.showConfirmEdit = true;
+        },
+
+        btnConfirmEdit_Click() {
+            this.showConfirmEdit = false;
+
+            if (!this.isAclEditAllowed) {
+                return;
+            }
+
+            this.isSavingEdit = true;
+
+            this.MolliePaymentsSubscriptionService.edit({
+                id: this.subscription.id,
+                status: this.editStatus,
+                mollieId: this.editMollieId,
+                orderId: this.editOrderId,
+            })
+                .then((response: any) => {
+                    if (!response.success) {
+                        this.createNotificationError({ message: response.errors[0] });
+                        return;
+                    }
+
+                    this.loadDetails();
+                    this.createNotificationSuccess({
+                        message: this.$tc('mollie-payments.subscriptions.alerts.editSuccess'),
+                    });
+                })
+                .finally(() => {
+                    this.isSavingEdit = false;
+                });
         },
 
         btnConfirmCancel_Click() {

@@ -137,6 +137,42 @@
                 </sw-card>
             {% endblock %}
 
+            {% block mollie_order_tab_edit_mollie_ids %}
+                <sw-card
+                    :title="$tc('sw-order.detailExtended.editMollieIds.title')"
+                    class="mollie-order-tab__edit-mollie-ids"
+                    position-identifier="mollie-order-tab-edit-mollie-ids"
+                >
+                    <sw-alert :variant="editWarningVariant" :showIcon="true" :closable="false">
+                        {{ $tc('sw-order.detailExtended.editMollieIds.warning') }}
+                    </sw-alert>
+
+                    <sw-text-field
+                        v-model:value="editMolliePaymentId"
+                        :label="$tc('sw-order.detailExtended.editMollieIds.labelPaymentId')"
+                        :disabled="!acl.can('order.editor')"
+                    />
+
+                    <sw-text-field
+                        v-model:value="editMollieOrderId"
+                        :label="$tc('sw-order.detailExtended.editMollieIds.labelOrderId')"
+                        :disabled="!acl.can('order.editor')"
+                    />
+
+                    <sw-button-process
+                        class="mollie-order-tab__edit-mollie-ids-save-button"
+                        size="small"
+                        :disabled="!canSaveMollieIds"
+                        :isLoading="isSavingMollieIds"
+                        :processSuccess="mollieIdsSaved"
+                        @click="onSaveMollieIds"
+                        @process-finish="onSaveMollieIdsProcessFinished"
+                    >
+                        {{ $tc('sw-order.detailExtended.editMollieIds.buttonSave') }}
+                    </sw-button-process>
+                </sw-card>
+            {% endblock %}
+
             {% block mollie_order_tab_line_items %}
                 <sw-card
                     v-if="order"
@@ -242,6 +278,16 @@
                         </sw-button>
                     </template>
                 </sw-modal>
+            {% endblock %}
+            {% block mollie_order_tab_edit_mollie_ids_confirm_modal %}
+                <sw-confirm-modal
+                    v-if="showEditMollieIdsConfirm"
+                    :title="$tc('sw-order.detailExtended.editMollieIds.confirmTitle')"
+                    :text="$tc('sw-order.detailExtended.editMollieIds.confirmText')"
+                    @confirm="onConfirmSaveMollieIds"
+                    @close="onCloseEditMollieIdsConfirm"
+                    @cancel="onCloseEditMollieIdsConfirm"
+                />
             {% endblock %}
         </template>
     </div>

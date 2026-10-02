@@ -365,13 +365,16 @@
                 "resumeTitle": "Jätka tellimust?",
                 "resume": "Jätka tellimust uuesti.",
                 "skipTitle": "Jäta järgmine makse vahele?",
-                "skip": "Jäta järgmine osamakse tellimusest vahele. Pärast seda jätkub tellimus automaatselt."
+                "skip": "Jäta järgmine osamakse tellimusest vahele. Pärast seda jätkub tellimus automaatselt.",
+                "editTitle": "Muuta püsitellimuse andmeid?",
+                "edit": "Kas oled kindel, et soovid selle püsitellimuse andmeid muuta?"
             },
             "alerts": {
                 "cancelSuccess": "Tellimus on edukalt tühistatud",
                 "pauseSuccess": "Tellimus on edukalt peatatud",
                 "resumeSuccess": "Tellimus on edukalt taastatud",
-                "skipSuccess": "Tellimus on edukalt vahele jäetud. Järgmine makse on uuendatud."
+                "skipSuccess": "Tellimus on edukalt vahele jäetud. Järgmine makse on uuendatud.",
+                "editSuccess": "Püsitellimuse andmed salvestati"
             },
             "list": {
                 "title": "Mollie Tellimused",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Staatus (alates)",
                     "colStatusTo": "Staatus (kuni)",
                     "colMollieSubscription": "Mollie tellimus"
+                },
+                "edit": {
+                    "cardTitle": "Muuda Mollie andmeid",
+                    "warning": "Muuda neid andmeid ainult erandjuhtudel, nt kui tellimuse loomisel läks midagi valesti. Mollie'le muudatusi ei saadeta.",
+                    "labelOrder": "Tellimus",
+                    "buttonSave": "Salvesta"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Tagasimakse Haldur",
                 "btnOpenRefundManager": "Ava tagasimaksete haldur",
                 "btnCloseRefundManager": "Sulge tagasimaksete haldur"
+            },
+            "editMollieIds": {
+                "title": "Muuda Mollie andmeid",
+                "warning": "Muuda neid andmeid ainult erandjuhtudel, nt kui maksmisel läks midagi valesti. Valed ID-d takistavad makse oleku uuendamist, tagasimakseid ja tarnet.",
+                "labelPaymentId": "Mollie makse ID",
+                "labelOrderId": "Mollie tellimuse ID",
+                "buttonSave": "Salvesta",
+                "confirmTitle": "Muuda Mollie andmeid",
+                "confirmText": "Kas oled kindel, et soovid selle tellimuse Mollie ID-sid muuta?"
             }
         }
     },

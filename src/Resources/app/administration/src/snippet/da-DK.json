@@ -365,13 +365,16 @@
                 "resumeTitle": "Genoptag abonnement?",
                 "resume": "Fortsæt abonnementet igen.",
                 "skipTitle": "Spring næste rate over?",
-                "skip": "Spring den næste rate i abonnementet over. Det fortsætter automatisk herefter."
+                "skip": "Spring den næste rate i abonnementet over. Det fortsætter automatisk herefter.",
+                "editTitle": "Skift abonnementsdata?",
+                "edit": "Er du sikker på, at du vil ændre dataene for dette abonnement?"
             },
             "alerts": {
                 "cancelSuccess": "Abonnementet er blevet annulleret",
                 "pauseSuccess": "Abonnementet er blevet sat på pause",
                 "resumeSuccess": "Abonnementet er blevet genoptaget",
-                "skipSuccess": "Abonnementet er blevet sprunget over. Den næste betaling er blevet opdateret."
+                "skipSuccess": "Abonnementet er blevet sprunget over. Den næste betaling er blevet opdateret.",
+                "editSuccess": "Abonnementsdataene er gemt"
             },
             "list": {
                 "title": "Mollie Abonnementer",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Status (fra)",
                     "colStatusTo": "Status (til)",
                     "colMollieSubscription": "Mollie abonnement"
+                },
+                "edit": {
+                    "cardTitle": "Rediger Mollie-data",
+                    "warning": "Rediger kun disse data i undtagelsestilfælde, f.eks. hvis noget gik galt ved oprettelsen af abonnementet. Der sendes ingen ændringer til Mollie.",
+                    "labelOrder": "Ordre",
+                    "buttonSave": "Gem"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Mollie Refusionsansvarlig",
                 "btnOpenRefundManager": "Åben Refusion Manager",
                 "btnCloseRefundManager": "Luk Refusion Manager"
+            },
+            "editMollieIds": {
+                "title": "Rediger Mollie-data",
+                "warning": "Rediger kun disse data i undtagelsestilfælde, f.eks. hvis noget gik galt under betalingen. Forkerte ID'er forhindrer opdatering af betalingsstatus, refusioner og forsendelse.",
+                "labelPaymentId": "Mollie betalings-ID",
+                "labelOrderId": "Mollie ordre-ID",
+                "buttonSave": "Gem",
+                "confirmTitle": "Skift Mollie-data",
+                "confirmText": "Er du sikker på, at du vil ændre Mollie-ID'erne for denne ordre?"
             }
         }
     },

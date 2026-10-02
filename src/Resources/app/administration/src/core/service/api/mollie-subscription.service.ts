@@ -21,6 +21,14 @@ export default class MolliePaymentsSubscriptionService extends ApiService {
         return this.__post('/skip', data);
     }
 
+    edit(data: Record<string, any> = { id: null, status: null, mollieId: null, orderId: null }): Promise<any> {
+        return this.__post(`/${data.id}/edit`, {
+            status: data.status,
+            mollieId: data.mollieId,
+            orderId: data.orderId,
+        });
+    }
+
     getUserSubscriptions(data: Record<string, any> = { id: null, salesChannelId: null }): Promise<any> {
         return this.__get('/' + data.id);
     }

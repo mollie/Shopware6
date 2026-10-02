@@ -365,13 +365,16 @@
                 "resumeTitle": "Retomar a subscrição?",
                 "resume": "Continuar a subscrição novamente.",
                 "skipTitle": "Saltar a próxima prestação?",
-                "skip": "Saltar a próxima prestação na subscrição. Continuará automaticamente depois disso."
+                "skip": "Saltar a próxima prestação na subscrição. Continuará automaticamente depois disso.",
+                "editTitle": "Alterar dados da subscrição?",
+                "edit": "Tem a certeza de que pretende alterar os dados desta subscrição?"
             },
             "alerts": {
                 "cancelSuccess": "A subscrição foi cancelada com sucesso",
                 "pauseSuccess": "A subscrição foi colocada em pausa com sucesso",
                 "resumeSuccess": "A subscrição foi retomada com sucesso",
-                "skipSuccess": "A subscrição foi saltada com sucesso. O próximo pagamento foi atualizado."
+                "skipSuccess": "A subscrição foi saltada com sucesso. O próximo pagamento foi atualizado.",
+                "editSuccess": "Os dados da subscrição foram guardados com sucesso"
             },
             "list": {
                 "title": "Subscrições Mollie",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Estado (de)",
                     "colStatusTo": "Estado (para)",
                     "colMollieSubscription": "Subscrição Mollie"
+                },
+                "edit": {
+                    "cardTitle": "Editar dados Mollie",
+                    "warning": "Edite estes dados apenas em casos excecionais, p. ex. se algo correu mal ao criar a subscrição. Nenhuma alteração é enviada para a Mollie.",
+                    "labelOrder": "Encomenda",
+                    "buttonSave": "Guardar"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Gestor de Reembolsos da Mollie",
                 "btnOpenRefundManager": "Abrir Gestor de Reembolsos",
                 "btnCloseRefundManager": "Fechar Gerente de Reembolsos"
+            },
+            "editMollieIds": {
+                "title": "Editar dados Mollie",
+                "warning": "Edite estes dados apenas em casos excecionais, p. ex. se algo correu mal durante o pagamento. IDs incorretos impedem atualizações do estado de pagamento, reembolsos e envios.",
+                "labelPaymentId": "ID de pagamento Mollie",
+                "labelOrderId": "ID de encomenda Mollie",
+                "buttonSave": "Guardar",
+                "confirmTitle": "Alterar dados Mollie",
+                "confirmText": "Tem a certeza de que pretende alterar os IDs Mollie desta encomenda?"
             }
         }
     },

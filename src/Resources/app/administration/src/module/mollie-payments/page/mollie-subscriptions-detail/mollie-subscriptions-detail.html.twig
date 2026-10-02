@@ -65,6 +65,16 @@
             @cancel="btnCloseAnyModal_Click()"
         >
         </sw-confirm-modal>
+        {% endblock %} {% block sw_order_detail_confirm_modal_edit %}
+        <sw-confirm-modal
+            v-if="showConfirmEdit"
+            :title="$tc('mollie-payments.subscriptions.confirm.editTitle')"
+            :text="$tc('mollie-payments.subscriptions.confirm.edit')"
+            @confirm="btnConfirmEdit_Click()"
+            @close="btnCloseAnyModal_Click()"
+            @cancel="btnCloseAnyModal_Click()"
+        >
+        </sw-confirm-modal>
         {% endblock %}
 
         <sw-card-view v-if="!isLoading">
@@ -292,6 +302,59 @@
                     </sw-button>
                     {% endblock %}
                 </sw-container>
+            </sw-card>
+            {% endblock %} {% block sw_order_detail_card_edit %}
+            <sw-card
+                v-if="isAclEditAllowed"
+                :title="$tc('mollie-payments.subscriptions.detail.edit.cardTitle')"
+                :hero="false"
+                :isLoading="false"
+                :large="false"
+            >
+                <sw-alert
+                    :variant="editWarningVariant"
+                    :showIcon="true"
+                    :closable="false"
+                >
+                    {{ $tc('mollie-payments.subscriptions.detail.edit.warning') }}
+                </sw-alert>
+                <sw-container
+                    columns="1fr 1fr"
+                    gap="0px 30px"
+                >
+                    {% block sw_order_detail_card_edit_field_status %}
+                    <sw-single-select
+                        v-model:value="editStatus"
+                        :options="statusOptions"
+                        :label="$tc('mollie-payments.subscriptions.detail.labelStatus')"
+                    >
+                    </sw-single-select>
+                    {% endblock %} {% block sw_order_detail_card_edit_field_mollie_id %}
+                    <sw-text-field
+                        v-model:value="editMollieId"
+                        :label="$tc('mollie-payments.subscriptions.detail.labelMollieSubscription')"
+                    >
+                    </sw-text-field>
+                    {% endblock %}
+                </sw-container>
+                {% block sw_order_detail_card_edit_field_order %}
+                <sw-entity-single-select
+                    v-model:value="editOrderId"
+                    entity="order"
+                    labelProperty="orderNumber"
+                    :label="$tc('mollie-payments.subscriptions.detail.edit.labelOrder')"
+                >
+                </sw-entity-single-select>
+                {% endblock %} {% block sw_order_detail_card_edit_action_save %}
+                <sw-button
+                    variant="primary"
+                    :isLoading="isSavingEdit"
+                    :disabled="!editStatus || !editOrderId"
+                    @click="btnSaveEdit_Click()"
+                >
+                    {{ $tc('mollie-payments.subscriptions.detail.edit.buttonSave') }}
+                </sw-button>
+                {% endblock %}
             </sw-card>
             {% endblock %} {% block sw_order_detail_card_history %}
             <sw-card

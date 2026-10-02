@@ -365,13 +365,16 @@
                 "resumeTitle": "Riprendere l'abbonamento?",
                 "resume": "Continua l'abbonamento di nuovo.",
                 "skipTitle": "Saltare la prossima rata?",
-                "skip": "Salta la prossima rata dell'abbonamento. Successivamente, l'abbonamento continuerà automaticamente."
+                "skip": "Salta la prossima rata dell'abbonamento. Successivamente, l'abbonamento continuerà automaticamente.",
+                "editTitle": "Modificare i dati dell'abbonamento?",
+                "edit": "Sei sicuro di voler modificare i dati di questo abbonamento?"
             },
             "alerts": {
                 "cancelSuccess": "L'abbonamento è stato annullato con successo",
                 "pauseSuccess": "L'abbonamento è stato messo in pausa con successo",
                 "resumeSuccess": "L'abbonamento è stato ripreso con successo",
-                "skipSuccess": "L'abbonamento è stato saltato con successo. Il prossimo pagamento è stato aggiornato."
+                "skipSuccess": "L'abbonamento è stato saltato con successo. Il prossimo pagamento è stato aggiornato.",
+                "editSuccess": "I dati dell'abbonamento sono stati salvati correttamente"
             },
             "list": {
                 "title": "Abbonamenti Mollie",
@@ -419,6 +422,12 @@
                     "colStatusFrom": "Stato (da)",
                     "colStatusTo": "Stato (a)",
                     "colMollieSubscription": "Abbonamento Mollie"
+                },
+                "edit": {
+                    "cardTitle": "Modifica dati Mollie",
+                    "warning": "Modifica questi dati solo in casi eccezionali, ad es. se qualcosa è andato storto durante la creazione dell'abbonamento. Nessuna modifica viene inviata a Mollie.",
+                    "labelOrder": "Ordine",
+                    "buttonSave": "Salva"
                 }
             },
             "product": {
@@ -463,6 +472,15 @@
                 "title": "Gestore Rimborsi Mollie",
                 "btnOpenRefundManager": "Apri Gestore Rimborsi",
                 "btnCloseRefundManager": "Chiudi Gestore Rimborsi"
+            },
+            "editMollieIds": {
+                "title": "Modifica dati Mollie",
+                "warning": "Modifica questi dati solo in casi eccezionali, ad es. se qualcosa è andato storto durante il pagamento. ID errati compromettono aggiornamenti dello stato di pagamento, rimborsi e spedizioni.",
+                "labelPaymentId": "ID pagamento Mollie",
+                "labelOrderId": "ID ordine Mollie",
+                "buttonSave": "Salva",
+                "confirmTitle": "Modifica dati Mollie",
+                "confirmText": "Sei sicuro di voler modificare gli ID Mollie di questo ordine?"
             }
         }
     },

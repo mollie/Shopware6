@@ -506,3 +506,11 @@ under `/api/mollie/ship/`, uses the core `order:update`: the plugin registers no
 own, and an integration that reports shipments already needs `order:update` to set the delivery state.
 Admin users and integrations with the admin flag pass every check. A new admin route that changes
 something gets its `_acl` in the same change, and `tests/Unit/Router/AdminRoutePrivilegesTest` lists it.
+
+## `sw-alert` on 6.7 is an `mt-banner` with other variant names
+
+From Shopware 6.7 `sw-alert` renders `mt-banner`, which only knows `neutral`, `info`, `attention`,
+`critical`, `positive` and `inherited`. The old names `warning` and `error` are not mapped and silently
+render as the grey neutral banner, while 6.5 and 6.6 still render the old `sw-alert` and need `error`
+for red. An alert that must stand out therefore binds its variant to the Shopware version
+(`critical` from 6.7, `error` before).
