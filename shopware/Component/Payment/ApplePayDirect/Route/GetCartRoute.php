@@ -15,6 +15,7 @@ use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
+use Shopware\Core\Checkout\Cart\LineItem\LineItemCollection;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTax;
@@ -104,7 +105,7 @@ final class GetCartRoute extends AbstractGetCartRoute
         $taxAmount = 0.0;
         $subTotal = 0.0;
 
-        $filteredCartItems = $cart->getLineItems()->filter($this->lineItemFilter->isItemAllowed(...));
+        $filteredCartItems = (new LineItemCollection($cart->getLineItems()->getFlat()))->filter($this->lineItemFilter->isItemAllowed(...));
 
         foreach ($filteredCartItems as $lineItem) {
             $totalPrice = 0.0;

@@ -87,6 +87,20 @@ final class GetCartRouteTest extends TestCase
         $this->assertSame(25.0, (float) $subtotal['amount']);
     }
 
+    public function testTheProductsInsideABundleContainerAreShownInsteadOfTheContainer(): void
+    {
+        $container = new LineItem('container', 'moorl_pa_accessory', 'container');
+        $container->setLabel('Voucher MEAL');
+        $container->setPrice(new CalculatedPrice(38.99, 38.99, new CalculatedTaxCollection(), new TaxRuleCollection()));
+        $container->addChild($this->lineItem('main-product', 'Voucher MEAL', 19.0));
+        $container->addChild($this->lineItem('accessory', 'Variant product', 19.99));
+
+        $applePayCart = $this->applePayCart($this->cart([$container]));
+
+        $this->assertSame(19.99, (float) $this->itemByLabel($applePayCart, 'Variant product')['amount']);
+        $this->assertSame(38.99, (float) $this->itemByLabel($applePayCart, 'Subtotal')['amount']);
+    }
+
     public function testTheShippingCostsAreTheirOwnLineItem(): void
     {
         $cart = $this->cart([$this->lineItem('line-1', 'Product A', 20.0)], shippingCosts: 4.99);
