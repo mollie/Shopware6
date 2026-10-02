@@ -113,15 +113,15 @@ final class MollieGateway implements MollieGatewayInterface
         $shopwareOrderNumber = $molliePayment->getShopwareOrderNumber();
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = $molliePayment->toArray();
+            $requestBody = $molliePayment->toArray();
 
             $response = $client->post('payments', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Mollie Payment created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'orderNumber' => $shopwareOrderNumber,
                 'salesChannelId' => $salesChannelId,
@@ -141,16 +141,16 @@ final class MollieGateway implements MollieGatewayInterface
             // The Mollie update-payment endpoint only accepts a subset of the create payload; amount
             // and lines are immutable (a changed cart total makes Shopware open a new transaction).
             $updatableFields = ['description', 'redirectUrl', 'cancelUrl', 'webhookUrl', 'metadata', 'locale'];
-            $formParams = array_intersect_key($molliePayment->toArray(), array_flip($updatableFields));
+            $requestBody = array_intersect_key($molliePayment->toArray(), array_flip($updatableFields));
 
             $response = $client->patch('payments/' . $molliePaymentId, [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Mollie Payment updated', [
                 'molliePaymentId' => $molliePaymentId,
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'orderNumber' => $orderNumber,
                 'salesChannelId' => $salesChannelId,
             ]);
@@ -166,16 +166,16 @@ final class MollieGateway implements MollieGatewayInterface
         $orderNumber = $createOrder->getOrderNumber();
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = $createOrder->toArray();
+            $requestBody = $createOrder->toArray();
 
             $response = $client->post('orders', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
                 'query' => ['embed' => 'payments'],
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Mollie Order created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'orderNumber' => $orderNumber,
                 'salesChannelId' => $salesChannelId,
@@ -233,7 +233,7 @@ final class MollieGateway implements MollieGatewayInterface
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = [
+            $requestBody = [
                 'name' => sprintf('%s %s', $customer->getFirstName(), $customer->getLastName()),
                 'email' => $customer->getEmail(),
                 'metadata' => [
@@ -242,10 +242,10 @@ final class MollieGateway implements MollieGatewayInterface
             ];
             $customerLanguage = $customer->getLanguage();
             if ($customerLanguage instanceof LanguageEntity) {
-                $formParams['locale'] = Locale::fromLanguage($customerLanguage)->value;
+                $requestBody['locale'] = Locale::fromLanguage($customerLanguage)->value;
             }
             $response = $client->post('customers', [
-                'form_params' => $formParams
+                'json' => $requestBody
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
@@ -431,16 +431,16 @@ final class MollieGateway implements MollieGatewayInterface
         try {
             $client = $this->clientFactory->create($salesChannelId);
 
-            $formParams = $createCapture->toArray();
+            $requestBody = $createCapture->toArray();
 
             $response = $client->post('payments/' . $paymentId . '/captures', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Capture created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'paymentId' => $paymentId,
                 'orderNumber' => $orderNumber,
@@ -457,16 +457,16 @@ final class MollieGateway implements MollieGatewayInterface
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = $createShipment->toArray();
+            $requestBody = $createShipment->toArray();
 
             $response = $client->post('orders/' . $mollieOrderId . '/shipments', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
 
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Shipment created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'mollieOrderId' => $mollieOrderId,
                 'orderNumber' => $orderNumber,

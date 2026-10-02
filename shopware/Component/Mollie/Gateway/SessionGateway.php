@@ -37,20 +37,20 @@ final class SessionGateway implements SessionGatewayInterface
         try {
             $salesChannelId = $salesChannelContext->getSalesChannelId();
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = $createSession->toArray();
+            $requestBody = $createSession->toArray();
 
             $this->logger->debug('Creating mollie session', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'salesChannelId' => $salesChannelId,
             ]);
 
             $response = $client->post('sessions', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Mollie session created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'salesChannelId' => $salesChannelId,
             ]);
@@ -78,7 +78,7 @@ final class SessionGateway implements SessionGatewayInterface
                 $cancelUrl = $this->routeBuilder->getPaypalExpressCancelUrl();
             }
 
-            $formParams = [
+            $requestBody = [
                 'method' => $method->value,
                 'methodDetails' => [
                     'checkoutFlow' => 'express',
@@ -89,12 +89,12 @@ final class SessionGateway implements SessionGatewayInterface
             ];
 
             $response = $client->post('sessions', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Paypal express session created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'salesChannelId' => $salesChannelId,
             ]);

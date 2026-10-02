@@ -30,7 +30,7 @@ final class ApplePayGateway implements ApplePayGatewayInterface
         try {
             $client = $this->clientFactory->create($salesChannelId, true);
             $response = $client->post('wallets/applepay/sessions', [
-                'form_params' => [
+                'json' => [
                     'validationUrl' => $validationUrl,
                     'domain' => $this->extractHost($domain),
                 ]

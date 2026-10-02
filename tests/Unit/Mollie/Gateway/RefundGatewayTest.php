@@ -38,10 +38,10 @@ final class RefundGatewayTest extends TestCase
 
         $this->gateway($client)->createRefund(new CreatePaymentRefund('tr_1', new Money(10.0, 'EUR'), 'Reason'), '10001', self::SALES_CHANNEL);
 
-        $formParams = $client->getLastPostOptions()['form_params'];
+        $requestBody = $client->getLastPostOptions()['json'];
 
-        $this->assertSame(['value' => '10.00', 'currency' => 'EUR'], $formParams['amount']);
-        $this->assertSame('Reason', $formParams['description']);
+        $this->assertSame(['value' => '10.00', 'currency' => 'EUR'], $requestBody['amount']);
+        $this->assertSame('Reason', $requestBody['description']);
     }
 
     public function testAnOrderRefundIsPostedToTheOrderRefundEndpoint(): void
@@ -63,7 +63,6 @@ final class RefundGatewayTest extends TestCase
 
         $options = $client->getLastPostOptions();
 
-        $this->assertArrayNotHasKey('form_params', $options);
         $this->assertCount(1, $options['json']['lines']);
     }
 

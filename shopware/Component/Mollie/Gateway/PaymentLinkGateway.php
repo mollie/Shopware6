@@ -29,15 +29,15 @@ final class PaymentLinkGateway implements PaymentLinkGatewayInterface
     {
         try {
             $client = $this->clientFactory->create($salesChannelId);
-            $formParams = $createPaymentLink->toArray();
+            $requestBody = $createPaymentLink->toArray();
 
             $response = $client->post('payment-links', [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Mollie payment link created', [
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'responseParameter' => $body,
                 'orderNumber' => $orderNumber,
                 'salesChannelId' => $salesChannelId,
@@ -55,16 +55,16 @@ final class PaymentLinkGateway implements PaymentLinkGatewayInterface
             $client = $this->clientFactory->create($salesChannelId);
 
             // PATCH accepts only a subset of the create payload, so we must not send the full one.
-            $formParams = $createPaymentLink->toUpdateArray();
+            $requestBody = $createPaymentLink->toUpdateArray();
 
             $response = $client->patch('payment-links/' . $paymentLinkId, [
-                'form_params' => $formParams,
+                'json' => $requestBody,
             ]);
             $body = json_decode($response->getBody()->getContents(), true);
 
             $this->logger->info('Mollie payment link updated', [
                 'paymentLinkId' => $paymentLinkId,
-                'requestParameter' => $formParams,
+                'requestParameter' => $requestBody,
                 'orderNumber' => $orderNumber,
                 'salesChannelId' => $salesChannelId,
             ]);

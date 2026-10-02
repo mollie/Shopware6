@@ -33,11 +33,11 @@ final class PaymentLinkGatewayTest extends TestCase
 
         $gateway->updatePaymentLink('pl_test', $this->createPaymentLink(), '10000', 'salesChannelId');
 
-        $formParams = $fakeClient->getLastPatchOptions()['form_params'];
+        $requestBody = $fakeClient->getLastPatchOptions()['json'];
 
-        $this->assertSame(['description', 'lines', 'billingAddress', 'shippingAddress', 'allowedMethods'], array_keys($formParams));
-        $this->assertSame('Order 10000', $formParams['description']);
-        $this->assertSame(['paypal'], $formParams['allowedMethods']);
+        $this->assertSame(['description', 'lines', 'billingAddress', 'shippingAddress', 'allowedMethods'], array_keys($requestBody));
+        $this->assertSame('Order 10000', $requestBody['description']);
+        $this->assertSame(['paypal'], $requestBody['allowedMethods']);
     }
 
     public function testCreateSendsTheFullPayload(): void
@@ -47,13 +47,13 @@ final class PaymentLinkGatewayTest extends TestCase
 
         $gateway->createPaymentLink($this->createPaymentLink(), '10000', 'salesChannelId');
 
-        $formParams = $fakeClient->getLastPostOptions()['form_params'];
+        $requestBody = $fakeClient->getLastPostOptions()['json'];
 
-        $this->assertSame(['value' => '10.00', 'currency' => 'EUR'], $formParams['amount']);
-        $this->assertSame('https://shop.test/return', $formParams['redirectUrl']);
-        $this->assertSame(SequenceType::ONEOFF->value, $formParams['sequenceType']);
-        $this->assertSame('https://shop.test/webhook', $formParams['webhookUrl']);
-        $this->assertSame('cst_123', $formParams['customerId']);
+        $this->assertSame(['value' => '10.00', 'currency' => 'EUR'], $requestBody['amount']);
+        $this->assertSame('https://shop.test/return', $requestBody['redirectUrl']);
+        $this->assertSame(SequenceType::ONEOFF->value, $requestBody['sequenceType']);
+        $this->assertSame('https://shop.test/webhook', $requestBody['webhookUrl']);
+        $this->assertSame('cst_123', $requestBody['customerId']);
     }
 
     public function testTheCreatedLinkCarriesTheIdAndUrlMollieAnswered(): void
