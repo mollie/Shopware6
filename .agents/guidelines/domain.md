@@ -364,6 +364,19 @@ The last point caused a real defect: `SkipAction` set the shifted start date, th
 the whole object with the cancel response, so the replacement subscription was created with
 the original creation date. `SkipActionTest` now covers it.
 
+### A subscription payment is never `oneoff`
+
+The first payment of a subscription is `first` without a stored card and `recurring` with the
+selected `mandateId`; Mollie turns the card's mandate into a separate subscription mandate. The
+checkout only lists `customer-present` mandates (`MollieGateway::listMandates()`), so subscription
+mandates never show up there. A `oneoff` payment carries no `mandateId` in the webhook, so
+`PendingSubscriptionSubscriber` cannot confirm the subscription and the webhook fails on every
+retry. Paying a stored card as `oneoff` is a recent card-only rule for ordinary purchases, so
+`CardPayment` leaves the sequence type alone when the payload is marked as a subscription payment.
+PayPal with a `mandateId` stays `recurring` outside subscriptions too. PayPal Express accepts `first`
+and `recurring` on the Orders API although its session is created without a sequence type, which
+is why `buildOrder()` carries `sequenceType`, `mandateId` and the subscription marker over.
+
 ### A failed renewal is repaired by hand, not by a retry
 
 The renewal creates the follow-up order through the normal cart and order route, so anything

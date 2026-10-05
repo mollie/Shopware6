@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Payment\Method\CardPayment;
+use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -490,6 +491,37 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame($mandateId, $actual->getMandateId());
     }
 
+    public function testBuildKeepsSequenceTypeRecurringForASubscriptionPaidWithAStoredCard(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $mandateId = 'tr_test_mandate_id';
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId, subscriptionSettings: new SubscriptionSettings(enabled: true));
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => $mandateId]);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+        $transactionService->withSubscriptionLineItem();
+
+        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertSame('recurring', $actual->getSequenceType()->value);
+        $this->assertSame($mandateId, $actual->getMandateId());
+    }
+
+    public function testBuildKeepsSequenceTypeOneoffForAnOrdinaryPurchaseWithAStoredCard(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+
+        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+    }
+
     public function testBuildKeepsSequenceTypeFirstWhenMandateIdMissingEvenIfRecurringHandler(): void
     {
         $mollieCustomerId = 'cust_test_mollie_id';
@@ -810,19 +842,17 @@ final class PayloadBuilderTest extends TestCase
 
         $this->assertArrayHasKey('authenticationId', $array);
         $this->assertSame('auth_test_123', $array['authenticationId']);
-        $this->assertArrayNotHasKey('payment', $array);
+        $this->assertArrayNotHasKey('authenticationId', $array['payment']);
     }
 
-    public function testBuildOrderWithoutAuthenticationIdHasNoPaymentSubArray(): void
+    public function testBuildOrderSendsTheOneoffSequenceForAnOrdinaryPurchase(): void
     {
         $builder = $this->createBuilder();
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
 
         $actual = $builder->buildOrder($transactionData, new FakeOrdersApiAwarePaymentHandler(), new RequestDataBag(), $this->context);
 
-        $array = $actual->toArray();
-
-        $this->assertArrayNotHasKey('payment', $array);
+        $this->assertSame('oneoff', $actual->toArray()['payment']['sequenceType']);
     }
 
     public function testBuildOrderContainsOrderNumberAndRedirectUrl(): void
@@ -866,6 +896,52 @@ final class PayloadBuilderTest extends TestCase
 
         $this->assertArrayHasKey('metadata', $array);
         $this->assertSame('10000', $array['metadata']['shopwareOrderNumber']);
+    }
+
+    public function testBuildOrderSendsTheFirstSequenceForASubscription(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(profileId: $profileId, subscriptionSettings: new SubscriptionSettings(enabled: true));
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+        $transactionService->withSubscriptionLineItem();
+
+        $actual = $builder->buildOrder($transactionService->findById('test', $this->context), new PayPalExpressPayment(new FakePay(), new FakeFinalize(), new NullLogger()), new RequestDataBag(), $this->context);
+
+        $this->assertSame('first', $actual->toArray()['payment']['sequenceType']);
+    }
+
+    public function testBuildOrderKeepsTheRecurringSequenceOfASubscriptionPaidWithAStoredCard(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId, subscriptionSettings: new SubscriptionSettings(enabled: true));
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+        $transactionService->withSubscriptionLineItem();
+
+        $actual = $builder->buildOrder($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
+
+        $this->assertSame('recurring', $actual->toArray()['payment']['sequenceType']);
+    }
+
+    public function testBuildOrderSendsTheMandateOfARecurringPayment(): void
+    {
+        $profileId = 'pfl_test_profile';
+        $mandateId = 'tr_test_mandate_id';
+        $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
+        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => $mandateId]);
+
+        $transactionService = new FakeTransactionService();
+        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+
+        $actual = $builder->buildOrder($transactionService->findById('test', $this->context), new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
+
+        $payment = $actual->toArray()['payment'];
+        $this->assertSame('recurring', $payment['sequenceType']);
+        $this->assertSame($mandateId, $payment['mandateId']);
     }
 
     public function testSubscriptionOrderFallsBackToAOneOffPaymentForAMethodWithoutSubscriptionSupport(): void

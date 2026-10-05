@@ -168,6 +168,16 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $createOrder->setCustomerId($createPayment->getCustomerId());
         }
 
+        $createOrder->setSequenceType($createPayment->getSequenceType());
+
+        if ($createPayment->getMandateId() !== null) {
+            $createOrder->setMandateId($createPayment->getMandateId());
+        }
+
+        if ($createPayment->isSubscriptionPayment()) {
+            $createOrder->markAsSubscriptionPayment();
+        }
+
         /** @var CreateOrder $createOrder */
         $createOrder = $paymentHandler->applyPaymentSpecificParameters($createOrder, $dataBag, $transactionData->getCustomer());
 
@@ -324,6 +334,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
         // cannot handle subscriptions.
         if ($hasSubscriptionLineItem) {
             $createPaymentStruct->setSequenceType(SequenceType::FIRST);
+            $createPaymentStruct->markAsSubscriptionPayment();
         }
 
         // An existing Mollie customer id is always sent, regardless of subscription/sequence type.

@@ -64,6 +64,44 @@ final class RenewActionTest extends TestCase
         $this->assertInstanceOf(SubscriptionRenewedEvent::class, $events[0]);
     }
 
+    public function testExecuteStoresTheMandateOfTheRenewalPayment(): void
+    {
+        $repository = new FakeSubscriptionRepository();
+        $action = new RenewAction($repository, new EventSpy(), new FakeSubscriptionActionHandler(), new NullLogger());
+        $payment = new Payment('payment-id');
+        $payment->setMandateId('mdt_renewal');
+
+        $action->execute(
+            SubscriptionEntityBuilder::create()->withMandateId('mdt_stored')->build(),
+            MollieSubscriptionBuilder::create()->withNextPaymentDate(new \DateTimeImmutable('2099-06-01'))->build(),
+            $payment,
+            SubscriptionStatus::ACTIVE,
+            CustomerBuilder::create()->build(),
+            null,
+            Context::createDefaultContext()
+        );
+
+        $this->assertSame('mdt_renewal', $repository->getLastUpsert()['mandateId']);
+    }
+
+    public function testExecuteKeepsTheStoredMandateWhenTheRenewalPaymentHasNone(): void
+    {
+        $repository = new FakeSubscriptionRepository();
+        $action = new RenewAction($repository, new EventSpy(), new FakeSubscriptionActionHandler(), new NullLogger());
+
+        $action->execute(
+            SubscriptionEntityBuilder::create()->withMandateId('mdt_stored')->build(),
+            MollieSubscriptionBuilder::create()->withNextPaymentDate(new \DateTimeImmutable('2099-06-01'))->build(),
+            new Payment('payment-id'),
+            SubscriptionStatus::ACTIVE,
+            CustomerBuilder::create()->build(),
+            null,
+            Context::createDefaultContext()
+        );
+
+        $this->assertSame('mdt_stored', $repository->getLastUpsert()['mandateId']);
+    }
+
     public function testExecuteAddsResumedHistoryWhenPreviousStatusIsInterrupted(): void
     {
         $repository = new FakeSubscriptionRepository();

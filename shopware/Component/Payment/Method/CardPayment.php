@@ -33,7 +33,13 @@ final class CardPayment extends AbstractMolliePaymentHandler implements Subscrip
 
     public function applyPaymentSpecificParameters(PaymentParameterInterface $payment, RequestDataBag $dataBag, CustomerEntity $customer): PaymentParameterInterface
     {
-        if ($payment->getMandateId() !== null) {
+        $paysWithStoredCard = $payment->getMandateId() !== null;
+
+        if ($paysWithStoredCard && $payment->isSubscriptionPayment()) {
+            return $payment;
+        }
+
+        if ($paysWithStoredCard) {
             $payment->setSequenceType(SequenceType::ONEOFF);
 
             return $payment;
@@ -47,6 +53,10 @@ final class CardPayment extends AbstractMolliePaymentHandler implements Subscrip
             return $payment;
         }
         $payment->setCardToken($cardToken);
+
+        if ($payment->isSubscriptionPayment()) {
+            return $payment;
+        }
 
         $savePaymentDetails = $dataBag->get(self::FIELD_SAVE_PAYMENT_DETAILS, false);
         if ($savePaymentDetails) {

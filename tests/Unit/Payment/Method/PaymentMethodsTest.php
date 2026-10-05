@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreatePayment;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
+use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Handler\OpenStatusFailedAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\AlmaPayment;
 use Mollie\Shopware\Component\Payment\Method\ApplePayPayment;
@@ -234,6 +235,34 @@ final class PaymentMethodsTest extends TestCase
 
         $this->assertSame($payment, $result);
         $this->assertNull($payment->getCardToken());
+    }
+
+    public function testCardPaymentKeepsTheRecurringSequenceOfASubscriptionPaidWithAStoredCard(): void
+    {
+        $handler = new CardPayment(new FakePay(), new FakeFinalize(), new NullLogger());
+        $payment = $this->createPayment();
+        $payment->markAsSubscriptionPayment();
+        $payment->setMandateId('mandate-123');
+        $payment->setSequenceType(SequenceType::RECURRING);
+
+        $handler->applyPaymentSpecificParameters($payment, new RequestDataBag(), new CustomerEntity());
+
+        $this->assertSame(SequenceType::RECURRING, $payment->getSequenceType());
+    }
+
+    public function testCardPaymentSetsTheCardTokenButKeepsTheFirstSequenceOfASubscription(): void
+    {
+        $handler = new CardPayment(new FakePay(), new FakeFinalize(), new NullLogger());
+        $payment = $this->createPayment();
+        $payment->markAsSubscriptionPayment();
+        $payment->setSequenceType(SequenceType::FIRST);
+        $dataBag = new RequestDataBag(['creditCardToken' => 'card-token-abc', 'savePaymentDetails' => true]);
+
+        $handler->applyPaymentSpecificParameters($payment, $dataBag, new CustomerEntity());
+
+        $this->assertSame('card-token-abc', $payment->getCardToken());
+        $this->assertSame(SequenceType::FIRST, $payment->getSequenceType());
+        $this->assertFalse($payment->isStoreCredentials());
     }
 
     public function testCardPaymentSetsCardTokenFromDataBag(): void

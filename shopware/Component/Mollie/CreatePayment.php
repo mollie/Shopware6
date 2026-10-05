@@ -43,6 +43,7 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
 
     private bool $storeCredentials = false;
     private bool $omitRedirectUrl = false;
+    private bool $subscriptionPayment = false;
 
     public function __construct(private string $description,private string $redirectUrl,private Money $amount)
     {
@@ -194,7 +195,7 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
         if (count($this->methods) > 0) {
             $createPaymentBody['method'] = $this->methods;
         }
-        unset($createPaymentBody['methods'], $createPaymentBody['omitRedirectUrl']);
+        unset($createPaymentBody['methods'], $createPaymentBody['omitRedirectUrl'], $createPaymentBody['subscriptionPayment']);
 
         if ($this->omitRedirectUrl) {
             unset($createPaymentBody['redirectUrl']);
@@ -315,5 +316,15 @@ final class CreatePayment implements \JsonSerializable, PaymentParameterInterfac
     public function isStoreCredentials(): bool
     {
         return $this->storeCredentials;
+    }
+
+    public function markAsSubscriptionPayment(): void
+    {
+        $this->subscriptionPayment = true;
+    }
+
+    public function isSubscriptionPayment(): bool
+    {
+        return $this->subscriptionPayment;
     }
 }
