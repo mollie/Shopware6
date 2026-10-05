@@ -72,7 +72,7 @@ final class RenewAction
 
         $this->subscriptionRepository->upsert([[
             'id' => $subscriptionId,
-            'mandateId' => (string) $molliePayment->getMandateId(),
+            'mandateId' => $molliePayment->getMandateId() ?? $subscription->getMandateId(),
             'nextPaymentAt' => $nextPaymentDate->format('Y-m-d'),
             'historyEntries' => $historyEntries,
         ]], $context);

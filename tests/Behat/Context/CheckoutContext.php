@@ -17,6 +17,7 @@ use Mollie\Shopware\Component\Mollie\MandateCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\ShippingItemCollection;
+use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Payment\Mandate\Route\ListMandatesRoute;
 use Mollie\Shopware\Component\Payment\Method\CardPayment;
 use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
@@ -719,12 +720,12 @@ final class CheckoutContext extends ShopwareContext
         }
 
         if (Storage::get(self::STORAGE_SAVE_PAYMENT_DETAILS, false)) {
-            $paymentData[CardPayment::FIELD_SAVE_PAYMENT_DETAILS] = true;
+            $paymentData[RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS] = true;
         }
 
         $mandateId = Storage::get(self::STORAGE_MANDATE_ID, '');
         if ($mandateId !== '') {
-            $paymentData[CardPayment::FIELD_MANDATE_ID] = $mandateId;
+            $paymentData[RecurringAwareInterface::FIELD_MANDATE_ID] = $mandateId;
         }
 
         return $paymentData;

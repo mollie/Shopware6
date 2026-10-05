@@ -19,6 +19,7 @@ final class CreateOrder implements PaymentParameterInterface
     private string $webhookUrl = '';
     private ?PaymentMethod $method = null;
     private ?string $authenticationId = null;
+    private ?string $mandateId = null;
     /**
      * @var array<string, mixed>
      */
@@ -77,9 +78,15 @@ final class CreateOrder implements PaymentParameterInterface
         $this->paymentParams['sequenceType'] = $sequenceType->value;
     }
 
+    public function setMandateId(string $mandateId): void
+    {
+        $this->mandateId = $mandateId;
+        $this->paymentParams['mandateId'] = $mandateId;
+    }
+
     public function getMandateId(): ?string
     {
-        return null;
+        return $this->mandateId;
     }
 
     public function getBillingAddress(): Address

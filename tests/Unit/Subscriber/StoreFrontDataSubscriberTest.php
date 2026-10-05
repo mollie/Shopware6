@@ -16,6 +16,7 @@ use Mollie\Shopware\Component\SalesChannel\LocaleProvider;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Component\Settings\Struct\CreditCardSettings;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
+use Mollie\Shopware\Component\Settings\Struct\SubscriptionSettings;
 use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as PaymentMethodExtension;
 use Mollie\Shopware\Entity\Product\Product;
@@ -180,6 +181,20 @@ final class StoreFrontDataSubscriberTest extends TestCase
         self::assertCount(0, $page->getExtension('MollieCreditCardMandateCollection'));
     }
 
+    public function testMandatesAreNotLoadedForASubscriptionCart(): void
+    {
+        $mandatesRoute = new FakeListMandatesRoute(new MandateCollection([
+            new Mandate('mdt_creditcard', PaymentMethod::CREDIT_CARD, []),
+        ]));
+        $subscriber = $this->createSubscriber(settings: $this->settingsWithStoredCardsEnabled(), mandatesRoute: $mandatesRoute);
+        $page = $this->confirmPage($this->subscriptionLineItems());
+
+        $subscriber->addDataToPage($this->confirmEvent($page, $this->molliePaymentMethod(PaymentMethod::CREDIT_CARD), $this->registeredCustomer()));
+
+        self::assertSame(0, $mandatesRoute->getCallCount());
+        self::assertCount(0, $page->getExtension('MollieCreditCardMandateCollection'));
+    }
+
     public function testCreditCardComponentAndOneClickSettingsAreAssignedToThePage(): void
     {
         $subscriber = $this->createSubscriber(
@@ -331,6 +346,7 @@ final class StoreFrontDataSubscriberTest extends TestCase
         return new FakeSettingsService(
             paymentSettings: new PaymentSettings('', 0, oneClickPayment: true),
             creditCardSettings: new CreditCardSettings(true),
+            subscriptionSettings: new SubscriptionSettings(enabled: true),
         );
     }
 

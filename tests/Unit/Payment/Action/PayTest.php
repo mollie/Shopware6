@@ -118,7 +118,7 @@ final class PayTest extends TestCase
         $orderArray = $orderPayloads[0]->toArray();
         $this->assertArrayHasKey('authenticationId', $orderArray);
         $this->assertSame('auth_express_token', $orderArray['authenticationId']);
-        $this->assertArrayNotHasKey('payment', $orderArray);
+        $this->assertArrayNotHasKey('authenticationId', $orderArray['payment']);
     }
 
     public function testOpenExistingPaymentIsReusedViaUpdate(): void

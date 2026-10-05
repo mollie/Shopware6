@@ -18,6 +18,7 @@ final class SubscriptionEntityBuilder
     private string $id = 'subscription-id';
     private string $mollieId = 'sub_test123';
     private string $mollieCustomerId = 'cst_test123';
+    private string $mandateId = '';
     private string $salesChannelId = 'sales-channel-id';
     private string $orderId = 'order-id';
     private SubscriptionStatus $status = SubscriptionStatus::ACTIVE;
@@ -45,6 +46,13 @@ final class SubscriptionEntityBuilder
     public function withMollieId(string $mollieId): self
     {
         $this->mollieId = $mollieId;
+
+        return $this;
+    }
+
+    public function withMandateId(string $mandateId): self
+    {
+        $this->mandateId = $mandateId;
 
         return $this;
     }
@@ -121,6 +129,7 @@ final class SubscriptionEntityBuilder
         $entity->setCustomerId($this->customerId);
         $entity->setMollieId($this->mollieId);
         $entity->setMollieCustomerId($this->mollieCustomerId);
+        $entity->setMandateId($this->mandateId);
         $entity->setSalesChannelId($this->salesChannelId);
         $entity->setOrderId($this->orderId);
         $entity->setOrderVersionId('order-version-id');

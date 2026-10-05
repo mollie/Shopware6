@@ -106,23 +106,20 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         $salesChannelId = $salesChannelContext->getSalesChannelId();
         $creditCardSettings = $this->settings->getCreditCardSettings($salesChannelId);
         $paymentSettings = $this->settings->getPaymentSettings($salesChannelId);
+        $hasSubscriptionProduct = $this->hasSubscriptionProduct($page, $salesChannelId);
 
-        $page->addExtension('MollieCreditCardMandateCollection', $this->findSelectableMandates($creditCardSettings, $paymentSettings, $salesChannelContext));
+        $selectableMandates = $this->findSelectableMandates($hasSubscriptionProduct, $creditCardSettings, $paymentSettings, $salesChannelContext);
+        $page->addExtension('MollieCreditCardMandateCollection', $selectableMandates);
 
         $page->assign([
             'enable_credit_card_components' => $creditCardSettings->isCreditCardComponentsEnabled(),
             'enable_one_click_payments' => $paymentSettings->isOneClickPayment(),
             'enable_one_click_payments_compact_view' => $paymentSettings->isOneClickCompactView(),
-            'mollie_show_save_card_checkbox' => $this->showSaveCardCheckbox($page, $creditCardSettings, $paymentSettings, $salesChannelContext),
+            'mollie_show_save_card_checkbox' => $this->showSaveCardCheckbox($hasSubscriptionProduct, $creditCardSettings, $paymentSettings, $salesChannelContext),
         ]);
     }
 
-    /**
-     * A guest has no account to reuse the card from, and a subscription order gets its mandate from
-     * the first payment either way - PayloadBuilder drops the field in both cases, so offering the
-     * checkbox would promise something the payload ignores.
-     */
-    private function showSaveCardCheckbox(Page $page, CreditCardSettings $creditCardSettings, PaymentSettings $paymentSettings, SalesChannelContext $salesChannelContext): bool
+    private function showSaveCardCheckbox(bool $hasSubscriptionProduct, CreditCardSettings $creditCardSettings, PaymentSettings $paymentSettings, SalesChannelContext $salesChannelContext): bool
     {
         if (! $creditCardSettings->isCreditCardComponentsEnabled()) {
             return false;
@@ -137,7 +134,18 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
             return false;
         }
 
-        return ! $this->lineItemAnalyzer->hasSubscriptionProduct($this->resolveLineItems($page));
+        return ! $hasSubscriptionProduct;
+    }
+
+    private function hasSubscriptionProduct(Page $page, string $salesChannelId): bool
+    {
+        if (! $this->settings->getSubscriptionSettings($salesChannelId)->isEnabled()) {
+            return false;
+        }
+
+        $lineItems = $this->resolveLineItems($page);
+
+        return $this->lineItemAnalyzer->hasSubscriptionProduct($lineItems);
     }
 
     /**
@@ -156,17 +164,17 @@ final class StoreFrontDataSubscriber implements EventSubscriberInterface
         return new LineItemCollection();
     }
 
-    /**
-     * A stored card is picked inside the card form, so with either switch off there is nothing the
-     * customer could select and no reason to ask Mollie for the mandates.
-     */
-    private function findSelectableMandates(CreditCardSettings $creditCardSettings, PaymentSettings $paymentSettings, SalesChannelContext $salesChannelContext): MandateCollection
+    private function findSelectableMandates(bool $hasSubscriptionProduct, CreditCardSettings $creditCardSettings, PaymentSettings $paymentSettings, SalesChannelContext $salesChannelContext): MandateCollection
     {
         if (! $creditCardSettings->isCreditCardComponentsEnabled()) {
             return new MandateCollection();
         }
 
         if (! $paymentSettings->isOneClickPayment()) {
+            return new MandateCollection();
+        }
+
+        if ($hasSubscriptionProduct) {
             return new MandateCollection();
         }
 
