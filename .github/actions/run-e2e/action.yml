@@ -120,7 +120,7 @@ runs:
         # every bin/console call. Disable the runtime check and regenerate the autoloader.
         docker exec shop bash -c 'composer config platform-check false'
         docker exec shop bash -c 'composer dump-autoload --no-scripts' || true
-    - name: Disable Usage-Data Consent Banner
+    - name: Disable Admin Consent Banner and Announcement Modals
       shell: bash
       run: |
         # Sets the "Help us improve Shopware" consent so the banner does not overlay the
@@ -137,6 +137,7 @@ runs:
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) SELECT UNHEX(REPLACE(UUID(),'-','')), 'product_analytics', LOWER(HEX(u.id)), 'declined', u.username, NOW(3) FROM \\\`user\\\` u ON DUPLICATE KEY UPDATE state=VALUES(state), updated_at=VALUES(updated_at);\"" || true
         # The Settings > Usage data page card is gated by the 'backend_data'/'system' row.
         docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO consent_state (id, name, identifier, state, actor, updated_at) VALUES (UNHEX(REPLACE(UUID(),'-','')), 'backend_data', 'system', 'accepted', 'migration', NOW(3)) ON DUPLICATE KEY UPDATE state='accepted', updated_at=NOW(3);\"" || true
+        docker exec shop bash -c "mysql -h 127.0.0.1 -u root -proot shopware -e \"INSERT INTO user_config (id, user_id, \\\`key\\\`, value, created_at) SELECT UNHEX(REPLACE(UUID(),'-','')), u.id, 'core.uiShellUpdate2026ModalSeen', '{\\\"seen\\\": true}', NOW(3) FROM \\\`user\\\` u ON DUPLICATE KEY UPDATE value=VALUES(value), updated_at=NOW(3);\"" || true
     - name: Update Shopware Config
       shell: bash
       run: |
