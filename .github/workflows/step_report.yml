@@ -128,7 +128,23 @@ jobs:
           # This branch does not serve anything any more, Pages is deployed from the run
           # itself. Everything except the trend is derived, so none of it is kept.
           find . -mindepth 1 -maxdepth 1 -not -name .git -exec rm -rf {} +
-          cp "$GITHUB_WORKSPACE/.reports/allure/history.jsonl" history.jsonl
+          node -e '
+            const fs = require("fs");
+            const [source, target] = process.argv.slice(1);
+            const since = Date.now() - 7 * 24 * 60 * 60 * 1000;
+            const maxBytes = 90 * 1024 * 1024;
+
+            const entries = fs.readFileSync(source, "utf8")
+              .split("\n")
+              .filter(Boolean)
+              .filter((line) => JSON.parse(line).timestamp >= since);
+
+            while (entries.length > 1 && Buffer.byteLength(entries.join("\n")) > maxBytes) {
+              entries.shift();
+            }
+
+            fs.writeFileSync(target, entries.join("\n") + "\n");
+          ' "$GITHUB_WORKSPACE/.reports/allure/history.jsonl" history.jsonl
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
