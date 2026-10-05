@@ -30,6 +30,4 @@ interface PaymentParameterInterface
     public function getBillingAddress(): Address;
 
     public function storeCredentials(): void;
-
-    public function isSubscriptionPayment(): bool;
 }

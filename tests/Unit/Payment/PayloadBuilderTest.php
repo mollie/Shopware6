@@ -11,6 +11,7 @@ use Mollie\Shopware\Component\Mollie\LineItemCollection;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
+use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Payment\Method\CardPayment;
 use Mollie\Shopware\Component\Payment\Method\PayPalExpressPayment;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
@@ -246,7 +247,7 @@ final class PayloadBuilderTest extends TestCase
         $this->assertNull($actual->getCustomerId());
     }
 
-    public function testBuildSetsSequenceTypeFirstWhenNotGuestAndSavePaymentDetails(): void
+    public function testBuildKeepsSequenceTypeOneoffWhenSavePaymentDetails(): void
     {
         $mollieCustomerId = 'cust_test_mollie_id';
         $profileId = 'pfl_test_profile';
@@ -262,7 +263,7 @@ final class PayloadBuilderTest extends TestCase
         $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
-        $this->assertSame('first', $actual->getSequenceType()->value);
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
     }
 
     public function testBuildKeepsSequenceTypeOneoffWhenGuestEvenIfSavePaymentDetails(): void
@@ -311,7 +312,7 @@ final class PayloadBuilderTest extends TestCase
         $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, true), profileId: $profileId);
         $requestDataBag = new RequestDataBag([
             CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
-            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+            RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS => true,
         ]);
 
         $transactionService = new FakeTransactionService();
@@ -328,7 +329,7 @@ final class PayloadBuilderTest extends TestCase
         $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), profileId: $profileId);
         $requestDataBag = new RequestDataBag([
             CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
-            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+            RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS => true,
         ]);
 
         $transactionService = new FakeTransactionService();
@@ -345,7 +346,7 @@ final class PayloadBuilderTest extends TestCase
         $builder = $this->createBuilder();
         $requestDataBag = new RequestDataBag([
             CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
-            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+            RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS => true,
         ]);
 
         $transactionData = (new FakeTransactionService())->findById('test', $this->context);
@@ -356,17 +357,13 @@ final class PayloadBuilderTest extends TestCase
         $this->assertFalse($actual->isStoreCredentials());
     }
 
-    /**
-     * The mandate a subscription needs comes from its first payment, and storing the credentials
-     * would turn that back into a one-off.
-     */
     public function testBuildDoesNotStoreTheCredentialsForASubscriptionOrder(): void
     {
         $profileId = 'pfl_test_profile';
         $builder = $this->createBuilder(profileId: $profileId, subscriptionSettings: new SubscriptionSettings(enabled: true));
         $requestDataBag = new RequestDataBag([
             CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
-            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
+            RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS => true,
         ]);
 
         $transactionService = new FakeTransactionService();
@@ -387,7 +384,7 @@ final class PayloadBuilderTest extends TestCase
     {
         $profileId = 'pfl_test_profile';
         $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
-        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+        $requestDataBag = new RequestDataBag([RecurringAwareInterface::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
 
         $transactionService = new FakeTransactionService();
         $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
@@ -404,18 +401,14 @@ final class PayloadBuilderTest extends TestCase
     /**
      * The one click guard is handler agnostic, so it has to hold for a method that is not a card.
      */
-    public function testBuildDoesNotPromoteToFirstForAnyHandlerWhenOneClickPaymentsAreDisabled(): void
+    public function testBuildDoesNotCreateACustomerForAnyHandlerWhenOneClickPaymentsAreDisabled(): void
     {
-        $profileId = 'pfl_test_profile';
-        $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), profileId: $profileId);
-        $requestDataBag = new RequestDataBag([CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true]);
+        $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), profileId: 'pfl_test_profile');
+        $requestDataBag = new RequestDataBag([RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS => true]);
 
-        $transactionService = new FakeTransactionService();
-        $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
+        $actual = $builder->buildPayment((new FakeTransactionService())->findById('test', $this->context), new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
-        $actual = $builder->buildPayment($transactionService->findById('test', $this->context), new FakePaymentMethodHandler(), $requestDataBag, $this->context);
-
-        $this->assertSame('oneoff', $actual->getSequenceType()->value);
+        $this->assertNull($actual->getCustomerId());
     }
 
     /**
@@ -438,7 +431,7 @@ final class PayloadBuilderTest extends TestCase
         $profileId = 'pfl_test_profile';
 
         $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), profileId: $profileId);
-        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+        $requestDataBag = new RequestDataBag([RecurringAwareInterface::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
 
         $transactionService = new FakeTransactionService();
         $transactionService->withMollieCustomerId($profileId, $mollieCustomerId);
@@ -458,18 +451,18 @@ final class PayloadBuilderTest extends TestCase
         $builder = $this->createBuilder(paymentSettings: new PaymentSettings('', 0, false), creditCardSettings: new CreditCardSettings(false));
         $requestDataBag = new RequestDataBag([
             CardPayment::FIELD_CREDIT_CARD_TOKEN => 'tkn_test_card',
-            CardPayment::FIELD_SAVE_PAYMENT_DETAILS => true,
-            CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id',
+            RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS => true,
+            RecurringAwareInterface::FIELD_MANDATE_ID => 'tr_test_mandate_id',
         ]);
 
         $builder->buildPayment((new FakeTransactionService())->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
 
         $this->assertSame('tkn_test_card', $requestDataBag->get(CardPayment::FIELD_CREDIT_CARD_TOKEN));
-        $this->assertTrue($requestDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS));
-        $this->assertSame('tr_test_mandate_id', $requestDataBag->get(CardPayment::FIELD_MANDATE_ID));
+        $this->assertTrue($requestDataBag->get(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS));
+        $this->assertSame('tr_test_mandate_id', $requestDataBag->get(RecurringAwareInterface::FIELD_MANDATE_ID));
     }
 
-    public function testBuildSetsSequenceTypeRecurringWhenAllConditionsMet(): void
+    public function testBuildSetsTheSelectedMandateWithoutARecurringSequence(): void
     {
         $mollieCustomerId = 'cust_test_mollie_id';
         $profileId = 'pfl_test_profile';
@@ -487,16 +480,15 @@ final class PayloadBuilderTest extends TestCase
         $actual = $builder->buildPayment($transactionData, new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
-        $this->assertSame('recurring', $actual->getSequenceType()->value);
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
         $this->assertSame($mandateId, $actual->getMandateId());
     }
 
-    public function testBuildKeepsSequenceTypeRecurringForASubscriptionPaidWithAStoredCard(): void
+    public function testBuildIgnoresTheStoredCardForASubscriptionOrder(): void
     {
         $profileId = 'pfl_test_profile';
-        $mandateId = 'tr_test_mandate_id';
         $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId, subscriptionSettings: new SubscriptionSettings(enabled: true));
-        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => $mandateId]);
+        $requestDataBag = new RequestDataBag([RecurringAwareInterface::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
 
         $transactionService = new FakeTransactionService();
         $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
@@ -504,15 +496,15 @@ final class PayloadBuilderTest extends TestCase
 
         $actual = $builder->buildPayment($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
 
-        $this->assertSame('recurring', $actual->getSequenceType()->value);
-        $this->assertSame($mandateId, $actual->getMandateId());
+        $this->assertSame('first', $actual->getSequenceType()->value);
+        $this->assertNull($actual->getMandateId());
     }
 
     public function testBuildKeepsSequenceTypeOneoffForAnOrdinaryPurchaseWithAStoredCard(): void
     {
         $profileId = 'pfl_test_profile';
         $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
-        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+        $requestDataBag = new RequestDataBag([RecurringAwareInterface::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
 
         $transactionService = new FakeTransactionService();
         $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
@@ -522,7 +514,7 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('oneoff', $actual->getSequenceType()->value);
     }
 
-    public function testBuildKeepsSequenceTypeFirstWhenMandateIdMissingEvenIfRecurringHandler(): void
+    public function testBuildKeepsSequenceTypeOneoffWithoutAMandateWhenSavePaymentDetails(): void
     {
         $mollieCustomerId = 'cust_test_mollie_id';
         $profileId = 'pfl_test_profile';
@@ -538,7 +530,7 @@ final class PayloadBuilderTest extends TestCase
         $actual = $builder->buildPayment($transactionData, new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
-        $this->assertSame('first', $actual->getSequenceType()->value);
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
         $this->assertNull($actual->getMandateId());
     }
 
@@ -599,7 +591,7 @@ final class PayloadBuilderTest extends TestCase
         $this->assertNull($actual->getMandateId());
     }
 
-    public function testBuildCreatesCustomerWhenSequenceTypeIsFirstAndNoCustomerId(): void
+    public function testBuildCreatesCustomerWhenSavePaymentDetailsAndNoCustomerId(): void
     {
         $profileId = 'pfl_test_profile';
 
@@ -612,7 +604,7 @@ final class PayloadBuilderTest extends TestCase
         $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
-        $this->assertSame('first', $actual->getSequenceType()->value);
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
         $this->assertNotNull($actual->getCustomerId());
         $this->assertStringStartsWith('cust_fake_', $actual->getCustomerId());
     }
@@ -648,7 +640,7 @@ final class PayloadBuilderTest extends TestCase
         $actual = $builder->buildPayment($transactionData, new FakePaymentMethodHandler(), $requestDataBag, $this->context);
 
         $this->assertInstanceOf(CreatePayment::class, $actual);
-        $this->assertSame('first', $actual->getSequenceType()->value);
+        $this->assertSame('oneoff', $actual->getSequenceType()->value);
         $this->assertSame($mollieCustomerId, $actual->getCustomerId());
     }
 
@@ -912,11 +904,11 @@ final class PayloadBuilderTest extends TestCase
         $this->assertSame('first', $actual->toArray()['payment']['sequenceType']);
     }
 
-    public function testBuildOrderKeepsTheRecurringSequenceOfASubscriptionPaidWithAStoredCard(): void
+    public function testBuildOrderIgnoresTheStoredCardForASubscriptionOrder(): void
     {
         $profileId = 'pfl_test_profile';
         $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId, subscriptionSettings: new SubscriptionSettings(enabled: true));
-        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
+        $requestDataBag = new RequestDataBag([RecurringAwareInterface::FIELD_MANDATE_ID => 'tr_test_mandate_id']);
 
         $transactionService = new FakeTransactionService();
         $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
@@ -924,15 +916,17 @@ final class PayloadBuilderTest extends TestCase
 
         $actual = $builder->buildOrder($transactionService->findById('test', $this->context), $this->createCardPayment(), $requestDataBag, $this->context);
 
-        $this->assertSame('recurring', $actual->toArray()['payment']['sequenceType']);
+        $payment = $actual->toArray()['payment'];
+        $this->assertSame('first', $payment['sequenceType']);
+        $this->assertArrayNotHasKey('mandateId', $payment);
     }
 
-    public function testBuildOrderSendsTheMandateOfARecurringPayment(): void
+    public function testBuildOrderSendsTheSelectedMandate(): void
     {
         $profileId = 'pfl_test_profile';
         $mandateId = 'tr_test_mandate_id';
         $builder = $this->createBuilder(paymentSettings: $this->oneClickSettings(), profileId: $profileId);
-        $requestDataBag = new RequestDataBag([CardPayment::FIELD_MANDATE_ID => $mandateId]);
+        $requestDataBag = new RequestDataBag([RecurringAwareInterface::FIELD_MANDATE_ID => $mandateId]);
 
         $transactionService = new FakeTransactionService();
         $transactionService->withMollieCustomerId($profileId, 'cust_test_mollie_id');
@@ -940,7 +934,7 @@ final class PayloadBuilderTest extends TestCase
         $actual = $builder->buildOrder($transactionService->findById('test', $this->context), new FakeRecurringAwarePaymentHandler(), $requestDataBag, $this->context);
 
         $payment = $actual->toArray()['payment'];
-        $this->assertSame('recurring', $payment['sequenceType']);
+        $this->assertSame('oneoff', $payment['sequenceType']);
         $this->assertSame($mandateId, $payment['mandateId']);
     }
 

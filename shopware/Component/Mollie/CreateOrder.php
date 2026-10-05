@@ -20,7 +20,6 @@ final class CreateOrder implements PaymentParameterInterface
     private ?PaymentMethod $method = null;
     private ?string $authenticationId = null;
     private ?string $mandateId = null;
-    private bool $subscriptionPayment = false;
     /**
      * @var array<string, mixed>
      */
@@ -98,16 +97,6 @@ final class CreateOrder implements PaymentParameterInterface
     public function storeCredentials(): void
     {
         $this->paymentParams['storeCredentials'] = true;
-    }
-
-    public function markAsSubscriptionPayment(): void
-    {
-        $this->subscriptionPayment = true;
-    }
-
-    public function isSubscriptionPayment(): bool
-    {
-        return $this->subscriptionPayment;
     }
 
     // -------------------------------------------------------------------------

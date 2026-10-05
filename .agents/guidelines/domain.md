@@ -287,10 +287,10 @@ which stays in `tests/` for the reason above.
 A stored card is a `storeCredentials` payment, not a `first` one. Mollie creates the mandate for a
 saved card from `storeCredentials: true` plus a `customerId` on an ordinary `oneoff` payment
 ([create payment](https://docs.mollie.com/reference/create-payment)); `sequenceType: first` is for a
-recurring sequence the merchant starts later. That is why `PayloadBuilder` sets `first` when
-`savePaymentDetails` arrives and `CardPayment` sets it back to `oneoff`: the `first` is only there to
-make `ensureMollieCustomerId()` create the Mollie customer that `storeCredentials` needs. Without a
-`customerId` the flag stores nothing, so a guest cannot save a card.
+recurring sequence the merchant starts later. `savePaymentDetails` therefore leaves the sequence type
+at `oneoff` and only makes `ensureMollieCustomerId()` create the Mollie customer that
+`storeCredentials` needs. Without a `customerId` the flag stores nothing, so a guest cannot save a
+card.
 
 The one-click checkout submits an **empty** `creditCardToken` alongside the `mandateId`: the card
 template always renders the hidden token field and mollie.js skips the tokenisation when a stored
@@ -364,18 +364,25 @@ The last point caused a real defect: `SkipAction` set the shifted start date, th
 the whole object with the cancel response, so the replacement subscription was created with
 the original creation date. `SkipActionTest` now covers it.
 
-### A subscription payment is never `oneoff`
+### The plugin never sends `recurring`, and a subscription is always `first`
 
-The first payment of a subscription is `first` without a stored card and `recurring` with the
-selected `mandateId`; Mollie turns the card's mandate into a separate subscription mandate. The
-checkout only lists `customer-present` mandates (`MollieGateway::listMandates()`), so subscription
-mandates never show up there. A `oneoff` payment carries no `mandateId` in the webhook, so
-`PendingSubscriptionSubscriber` cannot confirm the subscription and the webhook fails on every
-retry. Paying a stored card as `oneoff` is a recent card-only rule for ordinary purchases, so
-`CardPayment` leaves the sequence type alone when the payload is marked as a subscription payment.
-PayPal with a `mandateId` stays `recurring` outside subscriptions too. PayPal Express accepts `first`
-and `recurring` on the Orders API although its session is created without a sequence type, which
-is why `buildOrder()` carries `sequenceType`, `mandateId` and the subscription marker over.
+The plugin uses Mollie's Subscriptions API: Mollie charges the renewals itself with the mandate the
+first payment created. `sequenceType: recurring` with a `mandateId` is only for a shop that charges
+a mandate on its own, so the plugin sends `first` or `oneoff`, never `recurring`. A stored card is
+paid as `oneoff` with its `mandateId`. Today only cards support `oneoff` + `mandateId`; the other
+`RecurringAwareInterface` methods are meant to store and reuse their mandates the same way later,
+which is why `modifySequenceType()` applies a submitted mandate for all of them instead of
+dropping it for non-card methods.
+
+The first payment of a subscription is `first`, for every method. Stored card mandates are
+`customer-present` - Mollie answers `recurring` with one of them with "The mandate scope is not
+allowed to be used by this sequence type" (422), and there is no `customer-not-present` card
+mandate to use instead. That is why the checkout hides stored cards for a subscription cart and
+`PayloadBuilder` drops a submitted `mandateId` for a subscription order. A `oneoff` payment carries
+no `mandateId` in the webhook, so `PendingSubscriptionSubscriber` cannot confirm the subscription
+and the webhook fails on every retry. PayPal Express accepts `first` on the Orders API although
+its session is created without a sequence type, which is why `buildOrder()` carries the sequence
+type over.
 
 ### A failed renewal is repaired by hand, not by a retry
 

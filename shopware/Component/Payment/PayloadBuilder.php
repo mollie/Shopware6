@@ -129,7 +129,8 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $createPaymentStruct = $this->modifySequenceType($createPaymentStruct, $paymentHandler, $dataBag, $salesChannelId);
         }
 
-        $createPaymentStruct = $this->ensureMollieCustomerId($createPaymentStruct, $customer, $salesChannelId, $context, $logData);
+        $savePaymentDetails = (bool) $dataBag->get(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS, false);
+        $createPaymentStruct = $this->ensureMollieCustomerId($createPaymentStruct, $customer, $savePaymentDetails, $salesChannelId, $context, $logData);
 
         /** @var CreatePayment $createPaymentStruct */
         $createPaymentStruct = $paymentHandler->applyPaymentSpecificParameters($createPaymentStruct, $dataBag, $customer);
@@ -174,10 +175,6 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $createOrder->setMandateId($createPayment->getMandateId());
         }
 
-        if ($createPayment->isSubscriptionPayment()) {
-            $createOrder->markAsSubscriptionPayment();
-        }
-
         /** @var CreateOrder $createOrder */
         $createOrder = $paymentHandler->applyPaymentSpecificParameters($createOrder, $dataBag, $transactionData->getCustomer());
 
@@ -204,7 +201,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
         // A payment link reuses the regular payment payload; the sequence type (first for
         // subscription orders) is already set by buildBaseCreatePayment().
         $createPayment = $this->buildBaseCreatePayment($transactionData);
-        $createPayment = $this->ensureMollieCustomerId($createPayment, $customer, $salesChannelId, $context, $logData);
+        $createPayment = $this->ensureMollieCustomerId($createPayment, $customer, false, $salesChannelId, $context, $logData);
 
         // With exactly one allowed method the link behaves like that method's checkout, so its
         // payment-specific parameters are applied (there is no request data in this flow).
@@ -334,12 +331,8 @@ final class PayloadBuilder implements PayloadBuilderInterface
         // cannot handle subscriptions.
         if ($hasSubscriptionLineItem) {
             $createPaymentStruct->setSequenceType(SequenceType::FIRST);
-            $createPaymentStruct->markAsSubscriptionPayment();
         }
 
-        // An existing Mollie customer id is always sent, regardless of subscription/sequence type.
-        // Creating a customer (forced by settings or required by the sequence type) is left to the
-        // caller via ensureMollieCustomerId(), once the sequence type is known.
         $existingCustomerId = $this->resolveExistingMollieCustomerId($customer, $salesChannelId);
         if ($existingCustomerId !== null) {
             $createPaymentStruct->setCustomerId($existingCustomerId);
@@ -365,24 +358,16 @@ final class PayloadBuilder implements PayloadBuilderInterface
     }
 
     /**
-     * Ensures the payment has a Mollie customer id and returns the struct:
-     * - keeps an already assigned customer id
-     * - returns unchanged when neither the plugin setting forces a customer nor the sequence type
-     *   requires one
-     * - otherwise creates a Mollie customer and persists it on the Shopware customer - for guests
-     *   too. A non-oneoff sequence (subscription/recurring) always needs a customer for the mandate,
-     *   regardless of the force setting.
-     *
      * @param array<string, mixed> $logData
      */
-    private function ensureMollieCustomerId(CreatePayment $createPaymentStruct, CustomerEntity $customer, string $salesChannelId, Context $context, array $logData): CreatePayment
+    private function ensureMollieCustomerId(CreatePayment $createPaymentStruct, CustomerEntity $customer, bool $savePaymentDetails, string $salesChannelId, Context $context, array $logData): CreatePayment
     {
         if ($createPaymentStruct->getCustomerId() !== null) {
             return $createPaymentStruct;
         }
 
         $paymentSettings = $this->settingsService->getPaymentSettings($salesChannelId);
-        if (! $paymentSettings->forceCustomerCreation() && $createPaymentStruct->getSequenceType() === SequenceType::ONEOFF) {
+        if (! $paymentSettings->forceCustomerCreation() && ! $savePaymentDetails && $createPaymentStruct->getSequenceType() === SequenceType::ONEOFF) {
             return $createPaymentStruct;
         }
 
@@ -409,6 +394,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
         $salesChannelId = $transactionData->getOrder()->getSalesChannelId();
         $isCardPayment = $paymentHandler instanceof CardPayment;
+        $hasSubscriptionProduct = $this->hasSubscriptionProduct($transactionData->getOrder(), $salesChannelId);
 
         // An absent config key reads as "components off" while config.xml declares them on, so a
         // Store-API client posting a token to a shop that never saved the config loses it.
@@ -420,28 +406,31 @@ final class PayloadBuilder implements PayloadBuilderInterface
 
         $oneClickDisabled = ! $this->settingsService->getPaymentSettings($salesChannelId)->isOneClickPayment();
 
-        if ($filteredDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false) && $oneClickDisabled) {
-            $filteredDataBag->remove(CardPayment::FIELD_SAVE_PAYMENT_DETAILS);
+        if ($filteredDataBag->get(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS, false) && $oneClickDisabled) {
+            $filteredDataBag->remove(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS);
             $this->logger->warning('One click payments are disabled, the request to store the payment details is ignored', $logData);
         }
 
-        if ($filteredDataBag->get(CardPayment::FIELD_MANDATE_ID) && $oneClickDisabled) {
-            $filteredDataBag->remove(CardPayment::FIELD_MANDATE_ID);
+        if ($filteredDataBag->get(RecurringAwareInterface::FIELD_MANDATE_ID) && $oneClickDisabled) {
+            $filteredDataBag->remove(RecurringAwareInterface::FIELD_MANDATE_ID);
             $this->logger->warning('One click payments are disabled, the submitted mandate is ignored', $logData);
         }
 
         // A guest gets no account to pay from later, and with createCustomersAtMollie the mandate
         // would be stored on a Mollie customer the guest can never see or revoke.
-        if ($filteredDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false) && $transactionData->getCustomer()->getGuest()) {
-            $filteredDataBag->remove(CardPayment::FIELD_SAVE_PAYMENT_DETAILS);
+        if ($filteredDataBag->get(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS, false) && $transactionData->getCustomer()->getGuest()) {
+            $filteredDataBag->remove(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS);
             $this->logger->warning('Customer is a guest, the request to store the payment details is ignored', $logData);
         }
 
-        // CardPayment would turn the subscription's "first" payment into a one-off, leaving the
-        // renewal without a mandate.
-        if ($filteredDataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false) && $isCardPayment && $this->hasSubscriptionProduct($transactionData->getOrder(), $salesChannelId)) {
-            $filteredDataBag->remove(CardPayment::FIELD_SAVE_PAYMENT_DETAILS);
+        if ($filteredDataBag->get(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS, false) && $hasSubscriptionProduct) {
+            $filteredDataBag->remove(RecurringAwareInterface::FIELD_SAVE_PAYMENT_DETAILS);
             $this->logger->info('Order contains a subscription, the request to store the payment details is ignored', $logData);
+        }
+
+        if ($filteredDataBag->get(RecurringAwareInterface::FIELD_MANDATE_ID) && $hasSubscriptionProduct) {
+            $filteredDataBag->remove(RecurringAwareInterface::FIELD_MANDATE_ID);
+            $this->logger->info('Order contains a subscription, the submitted mandate is ignored', $logData);
         }
 
         return $filteredDataBag;
@@ -480,13 +469,7 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $createPaymentStruct->setSequenceType(SequenceType::ONEOFF);
         }
 
-        // Storing payment details for later (customer-initiated) use also needs a first payment.
-        $savePaymentDetails = $dataBag->get(CardPayment::FIELD_SAVE_PAYMENT_DETAILS, false);
-        if ($savePaymentDetails) {
-            $createPaymentStruct->setSequenceType(SequenceType::FIRST);
-        }
-
-        $mandateId = $dataBag->get(CardPayment::FIELD_MANDATE_ID);
+        $mandateId = $dataBag->get(RecurringAwareInterface::FIELD_MANDATE_ID);
         $mollieCustomerId = $createPaymentStruct->getCustomerId();
 
         if (
@@ -499,7 +482,6 @@ final class PayloadBuilder implements PayloadBuilderInterface
             $mandate = $paymentMethodMandates->get($mandateId);
             if ($mandate instanceof Mandate) {
                 $createPaymentStruct->setMandateId($mandateId);
-                $createPaymentStruct->setSequenceType(SequenceType::RECURRING);
             }
         }
 
