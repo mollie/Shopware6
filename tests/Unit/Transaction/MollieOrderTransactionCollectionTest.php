@@ -5,10 +5,12 @@ namespace Mollie\Shopware\Unit\Transaction;
 
 use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\StateMachine\Aggregation\StateMachineState\StateMachineStateEntity;
 
 #[CoversClass(MollieOrderTransactionCollection::class)]
@@ -54,6 +56,87 @@ final class MollieOrderTransactionCollectionTest extends TestCase
         $transactions = new MollieOrderTransactionCollection(new OrderTransactionCollection([$authorized]));
 
         self::assertSame($authorized, $transactions->getCurrentOrderTransaction());
+    }
+
+    public function testThePrimaryTransactionWinsOverAnOlderPaidOne(): void
+    {
+        $olderPaid = $this->createTransaction('older-paid', OrderTransactionStates::STATE_PAID, 1000);
+        $primaryAuthorized = $this->createTransaction('primary-authorized', OrderTransactionStates::STATE_AUTHORIZED, 2000);
+
+        $transactions = new MollieOrderTransactionCollection(new OrderTransactionCollection([$olderPaid, $primaryAuthorized]), 'primary-authorized');
+
+        self::assertSame($primaryAuthorized, $transactions->getCurrentOrderTransaction());
+    }
+
+    #[DataProvider('settledWithoutPaymentStates')]
+    public function testASettledPrimaryTransactionFallsBackToTheOldestValidOne(string $primaryState): void
+    {
+        $olderPaid = $this->createTransaction('older-paid', OrderTransactionStates::STATE_PAID, 1000);
+        $primary = $this->createTransaction('primary', $primaryState, 2000);
+
+        $transactions = new MollieOrderTransactionCollection(new OrderTransactionCollection([$olderPaid, $primary]), 'primary');
+
+        self::assertSame($olderPaid, $transactions->getCurrentOrderTransaction());
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function settledWithoutPaymentStates(): array
+    {
+        return [
+            'cancelled primary' => [OrderTransactionStates::STATE_CANCELLED],
+            'failed primary' => [OrderTransactionStates::STATE_FAILED],
+        ];
+    }
+
+    public function testAPrimaryTransactionWithoutALoadedStateFallsBackToTheOldestValidOne(): void
+    {
+        $olderPaid = $this->createTransaction('older-paid', OrderTransactionStates::STATE_PAID, 1000);
+        $stateless = new OrderTransactionEntity();
+        $stateless->setId('stateless');
+        $stateless->setCreatedAt((new \DateTimeImmutable())->setTimestamp(2000));
+
+        $transactions = new MollieOrderTransactionCollection(new OrderTransactionCollection([$olderPaid, $stateless]), 'stateless');
+
+        self::assertSame($olderPaid, $transactions->getCurrentOrderTransaction());
+    }
+
+    public function testAnUnknownPrimaryTransactionFallsBackToTheOldestValidOne(): void
+    {
+        $olderPaid = $this->createTransaction('older-paid', OrderTransactionStates::STATE_PAID, 1000);
+        $newerAuthorized = $this->createTransaction('newer-authorized', OrderTransactionStates::STATE_AUTHORIZED, 2000);
+
+        $transactions = new MollieOrderTransactionCollection(new OrderTransactionCollection([$olderPaid, $newerAuthorized]), 'missing');
+
+        self::assertSame($olderPaid, $transactions->getCurrentOrderTransaction());
+    }
+
+    public function testAnOrderWithoutPrimaryTransactionUsesTheOldestValidOne(): void
+    {
+        $olderPaid = $this->createTransaction('older-paid', OrderTransactionStates::STATE_PAID, 1000);
+        $newerAuthorized = $this->createTransaction('newer-authorized', OrderTransactionStates::STATE_AUTHORIZED, 2000);
+
+        $order = new OrderEntity();
+        $order->setTransactions(new OrderTransactionCollection([$olderPaid, $newerAuthorized]));
+
+        self::assertSame($olderPaid, MollieOrderTransactionCollection::fromOrder($order)->getCurrentOrderTransaction());
+    }
+
+    public function testAnOrderWithAPrimaryTransactionPrefersIt(): void
+    {
+        if (! method_exists(OrderEntity::class, 'setPrimaryOrderTransactionId')) {
+            self::markTestSkipped('Shopware version has no primary order transaction');
+        }
+
+        $olderPaid = $this->createTransaction('older-paid', OrderTransactionStates::STATE_PAID, 1000);
+        $primaryAuthorized = $this->createTransaction('primary-authorized', OrderTransactionStates::STATE_AUTHORIZED, 2000);
+
+        $order = new OrderEntity();
+        $order->setTransactions(new OrderTransactionCollection([$olderPaid, $primaryAuthorized]));
+        $order->setPrimaryOrderTransactionId('primary-authorized');
+
+        self::assertSame($primaryAuthorized, MollieOrderTransactionCollection::fromOrder($order)->getCurrentOrderTransaction());
     }
 
     public function testARetryMakesTheEarlierTransactionOutdated(): void

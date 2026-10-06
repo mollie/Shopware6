@@ -170,6 +170,21 @@ link for such an order must not start a second attempt - the transaction's Molli
 
 ---
 
+## The current transaction is the primary one, from Shopware 6.7.1 on
+
+`primaryOrderTransactionId` exists on the order only from Shopware 6.7.1.0 - not in 6.6, not even
+behind a feature flag, and not in 6.7.0.x. Shopware sets it on order placement and when the customer
+changes the payment method in the storefront, not when an ERP adds a transaction through the Admin
+API. The admin header keeps showing the oldest transaction that is neither cancelled nor failed
+until 6.8. An ERP may set an old third-party transaction back to `paid`; picking the oldest then
+lands on that transaction and the Mollie capture on shipment is skipped silently.
+
+`MollieOrderTransactionCollection::fromOrder()` reads the field via `has()`/`get()` so 6.5 to 6.7.0
+keep working, and `getCurrentOrderTransaction()` prefers the primary unless it is cancelled, failed
+or its state is not loaded - then the oldest valid one, as before.
+
+---
+
 ## Order state mapping is the simple alternative to the Flow Builder
 
 Shopware's own answer to "set the order state when the payment status changes" is the Flow

@@ -72,7 +72,7 @@ class RefundOrderLoader
 
     public function findPayment(OrderEntity $order, Context $context): ?Payment
     {
-        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transactions = MollieOrderTransactionCollection::fromOrder($order);
         $transaction = $transactions->getCurrentOrderTransaction();
         if ($transaction === null) {
             return null;

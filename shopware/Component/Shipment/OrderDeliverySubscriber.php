@@ -73,7 +73,7 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transactions = MollieOrderTransactionCollection::fromOrder($order);
         $transaction = $transactions->getCurrentOrderTransaction();
         if (! $transaction instanceof OrderTransactionEntity) {
             return;

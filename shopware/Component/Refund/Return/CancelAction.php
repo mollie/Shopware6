@@ -100,7 +100,7 @@ class CancelAction extends AbstractReturnAction
 
     private function extractMolliePayment(OrderEntity $order): ?Payment
     {
-        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transactions = MollieOrderTransactionCollection::fromOrder($order);
         $transaction = $transactions->getCurrentOrderTransaction();
         if ($transaction === null) {
             return null;

@@ -77,7 +77,7 @@ final class CancelOrderSubscriber implements EventSubscriberInterface
         }
 
         // Only cancel when the order's current payment is a Mollie payment.
-        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transactions = MollieOrderTransactionCollection::fromOrder($order);
         $transaction = $transactions->getCurrentOrderTransaction();
         if (! $transaction instanceof OrderTransactionEntity) {
             return;

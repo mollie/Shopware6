@@ -129,7 +129,7 @@ final class ApiController extends AbstractController
                 return $this->buildErrorResponse(sprintf('Order with id %s was not found', $orderId), Response::HTTP_NOT_FOUND);
             }
 
-            $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+            $transactions = MollieOrderTransactionCollection::fromOrder($order);
             $molliePayment = $transactions->getCurrentOrderTransaction()?->getCustomFields()[Mollie::EXTENSION] ?? [];
 
             $upsert['orderId'] = $order->getId();

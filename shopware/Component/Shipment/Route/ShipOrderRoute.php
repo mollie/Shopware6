@@ -131,7 +131,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
             throw ShippingException::orderNotFound($orderId);
         }
 
-        $mollieTransactions = new MollieOrderTransactionCollection($transactions);
+        $mollieTransactions = MollieOrderTransactionCollection::fromOrder($order);
         $currentTransaction = $mollieTransactions->getCurrentOrderTransaction();
 
         // We no longer gate on the payment being authorized: merchants may flip an authorized order to
