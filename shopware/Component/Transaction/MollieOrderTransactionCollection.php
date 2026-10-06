@@ -6,29 +6,38 @@ namespace Mollie\Shopware\Component\Transaction;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
+use Shopware\Core\Checkout\Order\OrderEntity;
 
-/**
- * Wraps the order's Shopware transaction collection to expose the single transaction that represents
- * the order's current payment - the same one Shopware shows the payment status for in the admin.
- */
 final class MollieOrderTransactionCollection
 {
-    public function __construct(private readonly ?OrderTransactionCollection $transactions)
-    {
+    private const PRIMARY_TRANSACTION_PROPERTY = 'primaryOrderTransactionId';
+    private const SETTLED_WITHOUT_PAYMENT_STATES = [OrderTransactionStates::STATE_CANCELLED, OrderTransactionStates::STATE_FAILED];
+
+    public function __construct(
+        private readonly ?OrderTransactionCollection $transactions,
+        private readonly string $primaryTransactionId = '',
+    ) {
     }
 
-    /**
-     * Mirrors Shopware's admin payment-status selection: the oldest transaction (by createdAt) whose
-     * state is neither cancelled nor failed, falling back to the newest when every transaction is
-     * cancelled/failed. Additional cancelled/failed transactions created on retries are therefore
-     * ignored, and the transaction the merchant sees as current is the one we ship/cancel/refund.
-     */
+    public static function fromOrder(OrderEntity $order): self
+    {
+        $primaryTransactionId = $order->has(self::PRIMARY_TRANSACTION_PROPERTY) ? (string) $order->get(self::PRIMARY_TRANSACTION_PROPERTY) : '';
+
+        return new self($order->getTransactions(), $primaryTransactionId);
+    }
+
     public function getCurrentOrderTransaction(): ?OrderTransactionEntity
     {
+        $primaryTransaction = $this->transactions?->get($this->primaryTransactionId);
+        $primaryState = $primaryTransaction?->getStateMachineState()?->getTechnicalName();
+        if ($primaryTransaction instanceof OrderTransactionEntity && $primaryState !== null && ! in_array($primaryState, self::SETTLED_WITHOUT_PAYMENT_STATES, true)) {
+            return $primaryTransaction;
+        }
+
         // Oldest first, fall back to the newest: additional cancelled/failed retries are skipped, so
         // the transaction the merchant sees as current is the one we ship/cancel/refund.
         return $this->findTransaction(
-            [OrderTransactionStates::STATE_CANCELLED, OrderTransactionStates::STATE_FAILED],
+            self::SETTLED_WITHOUT_PAYMENT_STATES,
             false,
             true,
             true

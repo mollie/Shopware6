@@ -99,7 +99,7 @@ final class RenewalOrderCreator
             throw RenewException::orderNotFound($subscriptionId, $orderId);
         }
 
-        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transactions = MollieOrderTransactionCollection::fromOrder($order);
         $transaction = $transactions->getCurrentOrderTransaction();
         if (! $transaction instanceof OrderTransactionEntity) {
             $this->logger->error('Order to link with the subscription renewal has no transaction', $logData);

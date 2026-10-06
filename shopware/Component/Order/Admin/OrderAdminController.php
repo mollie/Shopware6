@@ -76,7 +76,7 @@ final class OrderAdminController extends AbstractController
             return new JsonResponse(['error' => 'Order not found'], Response::HTTP_NOT_FOUND);
         }
 
-        $transactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $transactions = MollieOrderTransactionCollection::fromOrder($order);
         $effectiveTransaction = $transactions->getCurrentOrderTransaction();
 
         if ($effectiveTransaction === null) {

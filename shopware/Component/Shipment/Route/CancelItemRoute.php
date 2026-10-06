@@ -86,7 +86,7 @@ final class CancelItemRoute
         // Cancelling items only applies to an authorized (manual capture / pay-later) payment. A paid
         // payment is already captured and would need a refund instead, so we only proceed when the
         // order's current payment is authorized.
-        $mollieTransactions = new MollieOrderTransactionCollection($order->getTransactions());
+        $mollieTransactions = MollieOrderTransactionCollection::fromOrder($order);
         $latestAuthorized = $mollieTransactions->getCurrentOrderTransaction();
         $currentState = $latestAuthorized?->getStateMachineState();
         if ($latestAuthorized === null || $currentState === null || $currentState->getTechnicalName() !== OrderTransactionStates::STATE_AUTHORIZED) {
