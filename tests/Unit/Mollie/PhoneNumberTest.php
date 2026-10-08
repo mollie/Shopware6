@@ -38,7 +38,7 @@ final class PhoneNumberTest extends TestCase
             'letters after plus' => ['+49abc171', 'DE', ''],
             'only country code' => ['+33', 'FR', ''],
             'international 00 prefix with only country code' => ['0033', 'FR', ''],
-            'too long' =>['+4917112345678901234', 'DE', ''],
+            'too long' => ['+4917112345678901234', 'DE', ''],
             'only separators' => [' - / ', 'DE', ''],
             'empty' => ['', 'DE', ''],
         ];
