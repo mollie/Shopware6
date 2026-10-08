@@ -59,38 +59,50 @@ final class OrderDeliverySubscriber implements EventSubscriberInterface
 
         $context = $event->getContext();
         $orderDeliveryId = $event->getTransition()->getEntityId();
+        $logArray = [
+            'orderDeliveryId' => $orderDeliveryId,
+        ];
+
+        $this->logger->debug('Order delivery was shipped, checking automatic shipment', $logArray);
 
         $criteria = new Criteria([$orderDeliveryId]);
         $criteria->addAssociation('order.transactions.stateMachineState');
 
         $orderDelivery = $this->orderDeliveryRepository->search($criteria, $context)->getEntities()->first();
         if (! $orderDelivery instanceof OrderDeliveryEntity) {
+            $this->logger->debug('Order delivery not found, skipping automatic shipment', $logArray);
+
             return;
         }
 
         $order = $orderDelivery->getOrder();
         if ($order === null) {
+            $this->logger->debug('Order delivery has no order, skipping automatic shipment', $logArray);
+
             return;
         }
+
+        $logArray['orderId'] = $order->getId();
+        $logArray['orderNumber'] = (string) $order->getOrderNumber();
+        $logArray['salesChannelId'] = $order->getSalesChannelId();
 
         $transactions = MollieOrderTransactionCollection::fromOrder($order);
         $transaction = $transactions->getCurrentOrderTransaction();
         if (! $transaction instanceof OrderTransactionEntity) {
+            $this->logger->debug('Order has no current transaction, skipping automatic shipment', $logArray);
+
             return;
         }
 
-        /** @var ?Payment $molliePayment */
-        $molliePayment = $transaction->getExtension(Mollie::EXTENSION);
-        if (! $molliePayment instanceof Payment) {
+        $logArray['transactionId'] = $transaction->getId();
+
+        $isMollieTransaction = $transaction->getExtension(Mollie::EXTENSION) instanceof Payment;
+        $isLegacyMollieTransaction = isset($transaction->getCustomFields()[Mollie::EXTENSION]);
+        if (! $isMollieTransaction && ! $isLegacyMollieTransaction) {
+            $this->logger->debug('Order is not a Mollie order, skipping automatic shipment', $logArray);
+
             return;
         }
-
-        $logArray = [
-            'orderId' => $order->getId(),
-            'orderNumber' => (string) $order->getOrderNumber(),
-            'orderDeliveryId' => $orderDeliveryId,
-            'salesChannelId' => $order->getSalesChannelId(),
-        ];
 
         if (! $this->settingsService->getPaymentSettings($order->getSalesChannelId())->isAutomaticShipment()) {
             $this->logger->debug('Automatic shipment is disabled for the saleschannel',$logArray);
