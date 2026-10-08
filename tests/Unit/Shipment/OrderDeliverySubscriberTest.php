@@ -110,6 +110,26 @@ class OrderDeliverySubscriberTest extends TestCase
         static::assertTrue($this->shipOrderRoute->wasCalled());
     }
 
+    public function testDelegatesLegacyTransactionWithoutMolliePaymentToShipRoute(): void
+    {
+        $this->prepareDelivery($this->createLegacyOrder());
+
+        $this->subscriber->onOrderDeliveryChanged($this->createShipEvent());
+
+        static::assertTrue($this->shipOrderRoute->wasCalled());
+    }
+
+    public function testDoesNotShipNonMollieOrder(): void
+    {
+        $order = $this->createOrder();
+        $order->getTransactions()?->first()?->removeExtension(Mollie::EXTENSION);
+        $this->prepareDelivery($order);
+
+        $this->subscriber->onOrderDeliveryChanged($this->createShipEvent());
+
+        static::assertFalse($this->shipOrderRoute->wasCalled());
+    }
+
     private function createSubscriber(): OrderDeliverySubscriber
     {
         return new OrderDeliverySubscriber(
@@ -143,6 +163,16 @@ class OrderDeliverySubscriberTest extends TestCase
         $orderTransaction->addExtension(Mollie::EXTENSION, new Payment('fake-mollie-payment-id'));
 
         $order->setTransactions(new OrderTransactionCollection([$orderTransaction]));
+
+        return $order;
+    }
+
+    private function createLegacyOrder(): OrderEntity
+    {
+        $order = $this->createOrder();
+        $transaction = $order->getTransactions()?->first();
+        $transaction?->removeExtension(Mollie::EXTENSION);
+        $transaction?->setCustomFields([Mollie::EXTENSION => ['order_id' => 'ord_legacy', 'payment_id' => 'tr_legacy']]);
 
         return $order;
     }

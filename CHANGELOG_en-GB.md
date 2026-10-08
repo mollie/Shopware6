@@ -1,4 +1,5 @@
 # Unreleased
+- Fixed: The automatic shipment reports orders that were placed with version 4 to Mollie again.
 
 # 5.7.0
 - Added: The webhook retries writing the payment status on a database deadlock.
