@@ -1,4 +1,5 @@
 # Unreleased
+- Geändert: Wiederholte Anfragen bei Verbindungsproblemen mit Mollie legen keine doppelten Zahlungen mehr an.
 - Behoben: Der automatische Versand meldet Bestellungen, die noch mit Version 4 aufgegeben wurden, wieder an Mollie.
 
 # 5.7.0
