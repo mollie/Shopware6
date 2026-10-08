@@ -6,9 +6,9 @@ namespace Mollie\Shopware\Component\Mollie;
 final class PhoneNumber
 {
     /**
-     * E.164 phone numbers start with a "+", a non-zero country code and hold at most 15 digits.
+     * E.164 phone numbers start with a "+", a non-zero country code and hold 7 to 15 digits.
      */
-    public const E164_PATTERN = '/^\+[1-9]\d{1,14}$/';
+    public const E164_PATTERN = '/^\+[1-9]\d{6,14}$/';
 
     /**
      * Country calling codes for countries whose national number format uses a "0" trunk
