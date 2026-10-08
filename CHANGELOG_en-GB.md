@@ -1,4 +1,5 @@
 # Unreleased
+- Changed: Retried requests during connection problems with Mollie no longer create duplicate payments.
 
 # 5.7.0
 - Added: The webhook retries writing the payment status on a database deadlock.

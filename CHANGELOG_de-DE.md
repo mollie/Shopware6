@@ -1,4 +1,5 @@
 # Unreleased
+- Geändert: Wiederholte Anfragen bei Verbindungsproblemen mit Mollie legen keine doppelten Zahlungen mehr an.
 
 # 5.7.0
 - Hinzugefügt: Der Webhook wiederholt das Schreiben des Zahlungsstatus bei einem Datenbank-Deadlock.
