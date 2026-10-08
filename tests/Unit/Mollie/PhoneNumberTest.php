@@ -36,7 +36,9 @@ final class PhoneNumberTest extends TestCase
             'national with country without trunk prefix' => ['0612345678', 'ES', ''],
             'letters' => ['no phone', 'DE', ''],
             'letters after plus' => ['+49abc171', 'DE', ''],
-            'too long' => ['+4917112345678901234', 'DE', ''],
+            'only country code' => ['+33', 'FR', ''],
+            'international 00 prefix with only country code' => ['0033', 'FR', ''],
+            'too long' =>['+4917112345678901234', 'DE', ''],
             'only separators' => [' - / ', 'DE', ''],
             'empty' => ['', 'DE', ''],
         ];
