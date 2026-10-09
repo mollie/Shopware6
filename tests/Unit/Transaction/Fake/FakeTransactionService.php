@@ -81,7 +81,7 @@ final class FakeTransactionService implements TransactionServiceInterface
         return $this->transaction;
     }
 
-    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null): EntityWrittenContainerEvent
+    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null, bool $expressCheckout = false): EntityWrittenContainerEvent
     {
         $this->savedPaymentExtensions[] = ['transactionId' => $transactionId, 'payment' => $payment];
 

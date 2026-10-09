@@ -13,5 +13,5 @@ interface TransactionServiceInterface
 {
     public function findById(string $transactionId, Context $context): TransactionDataStruct;
 
-    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null): EntityWrittenContainerEvent;
+    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null, bool $expressCheckout = false): EntityWrittenContainerEvent;
 }

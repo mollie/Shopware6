@@ -11,7 +11,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 
 interface SessionLineBuilderInterface
 {
-    public function build(Cart $cart, Money $amount, SalesChannelContext $salesChannelContext): LineItemCollection;
+    public function build(Cart $cart, Money $amount, bool $withShippingLines, SalesChannelContext $salesChannelContext): LineItemCollection;
 
     public function buildFromOrder(OrderEntity $order, Money $amount, SalesChannelContext $salesChannelContext): LineItemCollection;
 }

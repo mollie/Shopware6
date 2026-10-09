@@ -32,6 +32,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 final class TransactionService implements TransactionServiceInterface
 {
+    public const TRANSACTION_CUSTOM_FIELD_EXPRESS_CHECKOUT = 'mollie_express_checkout';
+
     /**
      * @param EntityRepository<OrderTransactionCollection<OrderTransactionEntity>> $orderTransactionRepository
      */
@@ -146,7 +148,7 @@ final class TransactionService implements TransactionServiceInterface
         );
     }
 
-    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null): EntityWrittenContainerEvent
+    public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null, bool $expressCheckout = false): EntityWrittenContainerEvent
     {
         $salesChannel = $order->getSalesChannelId();
         $orderNumber = $order->getOrderNumber();
@@ -179,11 +181,16 @@ final class TransactionService implements TransactionServiceInterface
             'customFields' => $orderCustomFields,
         ];
 
+        $transactionCustomFields = [
+            Mollie::EXTENSION => $legacyPaymentData,
+        ];
+        if ($expressCheckout) {
+            $transactionCustomFields[self::TRANSACTION_CUSTOM_FIELD_EXPRESS_CHECKOUT] = true;
+        }
+
         $upsertArray = [
             'id' => $transactionId,
-            'customFields' => [
-                Mollie::EXTENSION => $legacyPaymentData,
-            ],
+            'customFields' => $transactionCustomFields,
             'order' => $orderData,
         ];
 
