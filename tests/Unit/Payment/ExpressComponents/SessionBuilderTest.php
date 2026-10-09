@@ -7,8 +7,6 @@ use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Mollie\SessionStatus;
-use Mollie\Shopware\Component\Mollie\ShippingOption;
-use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionBuilder;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Entity\Customer\Customer;
@@ -22,7 +20,6 @@ use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionLineBuilder;
-use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeShippingOptionsResolver;
 use Mollie\Shopware\Unit\Payment\Fake\FakeSessionGateway;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -49,7 +46,6 @@ final class SessionBuilderTest extends TestCase
 
     private FakeSessionGateway $sessionGateway;
     private FakeSessionLineBuilder $lineBuilder;
-    private FakeShippingOptionsResolver $shippingOptionsResolver;
     private FakeRouteBuilder $routeBuilder;
     private FakeSettingsService $settings;
     private FakeCartPersister $cartPersister;
@@ -60,7 +56,6 @@ final class SessionBuilderTest extends TestCase
     {
         $this->sessionGateway = new FakeSessionGateway($this->createSession('ses_created'));
         $this->lineBuilder = new FakeSessionLineBuilder();
-        $this->shippingOptionsResolver = new FakeShippingOptionsResolver();
         $this->routeBuilder = new FakeRouteBuilder(expressComponentsRedirectUrl: 'https://shop.test/mollie/express/return');
         $this->settings = new FakeSettingsService(apiSettings: new ApiSettings('test_key', 'live_key', Mode::TEST, self::PROFILE_ID));
         $this->cartPersister = new FakeCartPersister();
@@ -375,33 +370,28 @@ final class SessionBuilderTest extends TestCase
     }
 
     /**
-     * Mollie rejects a session with shipping options that does not ask for the shipping address.
+     * Mollie rejects a session with a shipping callback that does not ask for the shipping address.
      */
-    public function testCustomerCartSessionOffersNoShippingOptions(): void
+    public function testCustomerCartSessionHasNoShippingCallbackUrl(): void
     {
-        $this->shippingOptionsResolver = new FakeShippingOptionsResolver(new ShippingOptionCollection([
-            new ShippingOption('Standard', 'shipping-method-id', new Money(5.95, 'EUR')),
-        ]));
+        $this->routeBuilder = new FakeRouteBuilder(expressComponentsShippingCallbackUrl: 'https://shop.test/api/mollie/express-components/shipping-options');
         $sessionBuilder = $this->createSessionBuilder();
 
         $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createCustomerContext());
 
-        $this->assertSame(0, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
+        $this->assertSame('', $this->sessionGateway->getLastCreateSession()->getShippingCallbackUrl());
     }
 
-    public function testCartSessionShippingOptionsAreResolvedForTheShippingCountryOfTheContext(): void
+    public function testGuestCartSessionAsksTheShippingCallbackUrlForTheShippingOptions(): void
     {
-        $context = $this->createSalesChannelContext();
-        $context->setShippingLocation(ShippingLocation::createFromCountry($this->createCountry('NL')));
-        $this->shippingOptionsResolver = new FakeShippingOptionsResolver(new ShippingOptionCollection([
-            new ShippingOption('Standard', 'shipping-method-id', new Money(5.95, 'EUR')),
-        ]));
+        $this->routeBuilder = new FakeRouteBuilder(expressComponentsShippingCallbackUrl: 'https://shop.test/api/mollie/express-components/shipping-options');
         $sessionBuilder = $this->createSessionBuilder();
 
-        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $context);
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createSalesChannelContext());
 
-        $this->assertSame('NL', $this->shippingOptionsResolver->getLastAddress()->getCountry());
-        $this->assertSame(1, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
+        $createSession = $this->sessionGateway->getLastCreateSession();
+        $this->assertSame('https://shop.test/api/mollie/express-components/shipping-options', $createSession->getShippingCallbackUrl());
+        $this->assertSame(0, $createSession->getShippingOptions()->count());
     }
 
     public function testGuestCartSessionCarriesNoAddresses(): void
@@ -714,7 +704,6 @@ final class SessionBuilderTest extends TestCase
         return new SessionBuilder(
             $this->sessionGateway,
             $this->lineBuilder,
-            $this->shippingOptionsResolver,
             $this->routeBuilder,
             $this->settings,
             $this->cartPersister,
@@ -756,7 +745,6 @@ final class SessionBuilderTest extends TestCase
         $previousRequest = new SessionBuilder(
             new FakeSessionGateway($session),
             new FakeSessionLineBuilder(),
-            new FakeShippingOptionsResolver(),
             $this->routeBuilder,
             $settings,
             new FakeCartPersister(),

@@ -488,6 +488,20 @@ final class RouteBuilderTest extends TestCase
         $this->assertSame(['salesChannelId' => 'sales-channel-id', 'cartToken' => 'cart-token'], $router->getLastParameters());
     }
 
+    public function testExpressComponentsShippingCallbackUrlUsesTheShopDomain(): void
+    {
+        $routeBuilder = $this->createRouteBuilder(
+            'https://storefront.example/api/mollie/express-components/shipping-options/sales-channel-id/cart-token',
+            $this->createStorefrontRequestStack(),
+            'https://shop.example',
+            'https://123.eu.ngrok.io'
+        );
+
+        $url = $routeBuilder->getExpressComponentsShippingCallbackUrl('sales-channel-id', 'cart-token');
+
+        $this->assertSame('https://123.eu.ngrok.io/api/mollie/express-components/shipping-options/sales-channel-id/cart-token', $url);
+    }
+
     public function testCheckoutFinishUrlPointsAtTheOrder(): void
     {
         $router = new FakeRouter('https://storefront.example/checkout/finish?orderId=order-id');
