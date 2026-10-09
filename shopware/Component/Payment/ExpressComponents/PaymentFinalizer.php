@@ -102,7 +102,7 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
 
         $payment = $this->mollieGateway->getPayment($paymentId, (string) $order->getOrderNumber(), $salesChannelContext->getSalesChannelId());
 
-        $this->transactionService->savePaymentExtension($transaction->getId(), $order, $payment, $salesChannelContext->getContext());
+        $this->transactionService->savePaymentExtension($transaction->getId(), $order, $payment, $salesChannelContext->getContext(), expressCheckout: true);
     }
 
     /**
