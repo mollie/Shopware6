@@ -456,6 +456,22 @@ no changelog entry, because the feature has not reached merchants yet. For the s
 response is read from both shapes: nothing guarantees that request and resource move in the
 same release.
 
+As of October 2026 a session with `shipping.options` (or `shipping.callbackUrl`) is rejected unless
+`requiredCustomerDetails` contains `shipping-address` — even when both addresses are sent
+along: *requiredCustomerDetails must contain "shipping-address" when shipping.options or
+shipping.callbackUrl are provided.* A logged-in customer must not be asked for addresses, so their
+session gets the shop addresses, no `requiredCustomerDetails`, no options, and the shipping
+costs as `shipping_fee` lines with the amount including shipping. Options and `shipping_fee`
+lines are mutually exclusive. Once Mollie drops the rule, customer sessions can offer options
+again.
+
+A session expires: one that was mounted in the express component reported `expired` less than 20
+minutes after creation, while an untouched API-only session was still `open` after 95 minutes —
+`expiresAt` is not part of the response. The express component redirects an expired session
+straight to the `redirectUrl`, and the finish route sends the shopper back to the cart, which
+renders the same session again: an endless reload. So a stored session is only reused while its
+status is `open`.
+
 ## The cart of the page is not the cart of the CartService
 
 `StorefrontCartFacade::get()` is what a storefront page renders. When the cart carries a blocked
