@@ -156,7 +156,7 @@ final class RouteBuilder implements RouteBuilderInterface
             RouterInterface::ABSOLUTE_URL
         );
 
-        return $this->normalizeUrl($url);
+        return $this->applyShopDomain($this->normalizeUrl($url));
     }
 
     /**
