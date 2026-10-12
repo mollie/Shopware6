@@ -179,6 +179,32 @@ final class AccountServiceTest extends TestCase
         $this->assertFalse($registrationData->get('acceptedDataProtection'));
     }
 
+    public function testWalletPhoneIsForwardedToRegistration(): void
+    {
+        $registerRoute = new FakeRegisterRoute($this->makeCustomer('customer-new', guest: true));
+        $billingAddress = $this->makeAddress();
+        $billingAddress->setPhone('+4915112345678');
+
+        $service = $this->buildService(
+            customersFoundByEmail: [],
+            syncSpy: new FakeAddressSynchronizer(),
+            registerRoute: $registerRoute,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $billingAddress,
+            $billingAddress,
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $registrationData = $registerRoute->getRegistrationData();
+
+        $this->assertNotNull($registrationData);
+        $this->assertSame('+4915112345678', $registrationData->get('billingAddress')->get('phoneNumber'));
+    }
+
     /**
      * Country map is always built once upfront and forwarded to syncAddresses —
      * regardless of whether the customer is new, returning, or already logged in.

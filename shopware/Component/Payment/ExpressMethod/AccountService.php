@@ -224,6 +224,9 @@ final class AccountService extends AbstractAccountService
         if ($billingAddress->getStreetAdditional() !== '') {
             $billingAddressData->set('additionalAddressLine1', $billingAddress->getStreetAdditional());
         }
+        if ($billingAddress->getPhone() !== '') {
+            $billingAddressData->set('phoneNumber', $billingAddress->getPhone());
+        }
 
         $data->set('guest', true);
         $data->set('salutationId', $defaultSalutation->getId());

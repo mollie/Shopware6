@@ -79,7 +79,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - shopware: '6.7.15.0'
+          - shopware: '6.7.15.1'
             php: '8.2'
             image: 'dockware/shopware'
           - shopware: '6.6.10.23'
@@ -124,10 +124,10 @@ jobs:
   report:
     name: Test Report
     needs: [ review, e2e ]
-    # always(), because a red suite is exactly the report worth reading. A pull request
+    # !cancelled(), because a red suite is exactly the report worth reading. A pull request
     # does not publish, it attaches the report to the run as an artifact, so this also
     # works for contributions from a fork.
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     uses: ./.github/workflows/step_report.yml
     permissions:
       contents: read

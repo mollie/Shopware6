@@ -15,12 +15,14 @@ use Shopware\Core\Checkout\Payment\SalesChannel\AbstractHandlePaymentMethodRoute
 use Shopware\Core\Checkout\Payment\SalesChannel\HandlePaymentMethodRoute;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
+use Shopware\Core\Framework\Validation\Exception\ConstraintViolationException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['store-api']])]
@@ -87,6 +89,20 @@ final class PayRoute extends AbstractPayRoute
         }
         $shippingAddress = $billingAddress;
 
+        $logData['request'] = [
+            'hasEmail' => $email !== '',
+            'hasFirstname' => $firstname !== '',
+            'hasLastname' => $lastname !== '',
+            'hasStreet' => $street !== '',
+            'hasPostalCode' => $zipcode !== '',
+            'hasCity' => $city !== '',
+            'countryCode' => $countryCode,
+            'hasPhone' => $phone !== '',
+            'hasValidPhone' => $billingAddress->getPhone() !== '',
+            'acceptedDataProtection' => $acceptedDataProtection,
+        ];
+        $this->logger->debug('Apple pay direct contact data received', $logData);
+
         try {
             $salesChannelContext = $this->accountService->loginOrCreateAccount((string) $applePayPaymentMethodId, $billingAddress, $shippingAddress, $acceptedDataProtection, $salesChannelContext);
             $customer = $salesChannelContext->getCustomer();
@@ -98,6 +114,12 @@ final class PayRoute extends AbstractPayRoute
             $this->logger->debug('Login or create account successfull', $logData);
         } catch (\Throwable $exception) {
             $logData['message'] = $exception->getMessage();
+            if ($exception instanceof ConstraintViolationException) {
+                $logData['violations'] = array_map(
+                    fn (ConstraintViolationInterface $violation) => $violation->getPropertyPath() . ': ' . $violation->getMessage(),
+                    iterator_to_array($exception->getViolations()),
+                );
+            }
             $this->logger->error('Failed to create a guest account or login with existing customer', $logData);
             throw ApplePayDirectException::customerActionFailed($exception);
         }
