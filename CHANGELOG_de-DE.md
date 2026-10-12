@@ -2,6 +2,7 @@
 - Geändert: Wiederholte Anfragen bei Verbindungsproblemen mit Mollie legen keine doppelten Zahlungen mehr an.
 - Behoben: Der automatische Versand meldet Bestellungen, die noch mit Version 4 aufgegeben wurden, wieder an Mollie.
 - Behoben: Eine Telefonnummer, die nur aus der Ländervorwahl besteht (z. B. "+49"), lässt die Zahlung nicht mehr fehlschlagen.
+- Behoben: Apple Pay Direct legt Gastkonten wieder an, wenn der Shop bei der Registrierung eine Telefonnummer verlangt.
 
 # 5.7.0
 - Hinzugefügt: Der Webhook wiederholt das Schreiben des Zahlungsstatus bei einem Datenbank-Deadlock.
