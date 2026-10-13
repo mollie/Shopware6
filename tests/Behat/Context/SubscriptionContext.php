@@ -363,7 +363,19 @@ final class SubscriptionContext extends ShopwareContext
 
         /** @var PriceMigrationHandler $handler */
         $handler = $this->getContainer()->get(PriceMigrationHandler::class);
-        $handler->migrate($this->getCurrentSalesChannelContext()->getContext());
+
+        $failures = $this->countPriceMigrationFailures();
+        for ($attempt = 0; $attempt < 5; ++$attempt) {
+            $handler->migrate($this->getCurrentSalesChannelContext()->getContext());
+
+            $failuresAfterRun = $this->countPriceMigrationFailures();
+            if ($failuresAfterRun === $failures) {
+                return;
+            }
+
+            $failures = $failuresAfterRun;
+            sleep(2);
+        }
     }
 
     #[Then('the subscription price update state is :arg1')]
@@ -412,6 +424,21 @@ final class SubscriptionContext extends ShopwareContext
         }
 
         Assert::fail(sprintf('No history entry contains "%s" for subscription %s', $needle, $subscription->getId()));
+    }
+
+    private function countPriceMigrationFailures(): int
+    {
+        $subscription = $this->reloadStoredSubscription(['historyEntries']);
+
+        $failures = 0;
+        foreach ($subscription->getHistoryEntries() as $entry) {
+            /** @var SubscriptionHistoryEntity $entry */
+            if (str_contains((string) $entry->getComment(), 'price_migration_failed')) {
+                ++$failures;
+            }
+        }
+
+        return $failures;
     }
 
     /**
