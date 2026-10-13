@@ -12,6 +12,7 @@ use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeRegisterRoute;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContextService;
 use Mollie\Shopware\Unit\Fake\FakeSalutationRepository;
+use Mollie\Shopware\Unit\Fake\FakeShippingMethodRepository;
 use Mollie\Shopware\Unit\Fake\FakeShopwareAccountService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -19,6 +20,7 @@ use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
+use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\System\Country\CountryEntity;
@@ -274,6 +276,76 @@ final class AccountServiceTest extends TestCase
         $this->assertArrayNotHasKey(SalesChannelContextService::BILLING_ADDRESS_ID, $switch);
     }
 
+    public function testAShopperWhoWasNotLoggedInKeepsTheChosenShippingMethodCurrencyAndLanguage(): void
+    {
+        $contextSwitchRoute = new FakeContextSwitchRoute();
+        $service = $this->buildService(
+            customersFoundByEmail: [$this->makeCustomer('customer-registered')],
+            syncSpy: new FakeAddressSynchronizer(),
+            contextSwitchRoute: $contextSwitchRoute,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $switch = $contextSwitchRoute->getLastSwitch();
+        $this->assertSame('express-shipping', $switch[SalesChannelContextService::SHIPPING_METHOD_ID]);
+        $this->assertSame('currency-chf', $switch[SalesChannelContextService::CURRENCY_ID]);
+        $this->assertSame('language-fr', $switch[SalesChannelContextService::LANGUAGE_ID]);
+    }
+
+    public function testAShippingMethodNoLongerAssignedToTheSalesChannelFallsBackToTheDefault(): void
+    {
+        $contextSwitchRoute = new FakeContextSwitchRoute();
+        $service = $this->buildService(
+            customersFoundByEmail: [$this->makeCustomer('customer-registered')],
+            syncSpy: new FakeAddressSynchronizer(),
+            contextSwitchRoute: $contextSwitchRoute,
+            salesChannelIdsByShippingMethodId: ['express-shipping' => ['other-sales-channel-id']],
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $switch = $contextSwitchRoute->getLastSwitch();
+        $this->assertArrayNotHasKey(SalesChannelContextService::SHIPPING_METHOD_ID, $switch);
+        $this->assertSame('currency-chf', $switch[SalesChannelContextService::CURRENCY_ID]);
+        $this->assertSame('language-fr', $switch[SalesChannelContextService::LANGUAGE_ID]);
+    }
+
+    public function testALoggedInShopperGetsNoShippingMethodCurrencyOrLanguagePinned(): void
+    {
+        $contextSwitchRoute = new FakeContextSwitchRoute();
+        $service = $this->buildService(
+            customersFoundByEmail: [],
+            syncSpy: new FakeAddressSynchronizer(),
+            contextSwitchRoute: $contextSwitchRoute,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext($this->makeCustomer('customer-logged-in')),
+        );
+
+        $switch = $contextSwitchRoute->getLastSwitch();
+        $this->assertArrayNotHasKey(SalesChannelContextService::SHIPPING_METHOD_ID, $switch);
+        $this->assertArrayNotHasKey(SalesChannelContextService::CURRENCY_ID, $switch);
+        $this->assertArrayNotHasKey(SalesChannelContextService::LANGUAGE_ID, $switch);
+    }
+
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
@@ -300,12 +372,18 @@ final class AccountServiceTest extends TestCase
         $paymentMethod = new PaymentMethodEntity();
         $paymentMethod->setId('payment-method-id');
 
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId('express-shipping');
+
         $context = $this->createMock(SalesChannelContext::class);
         $context->method('getCustomer')->willReturn($customer);
         $context->method('getPaymentMethod')->willReturn($paymentMethod);
         $context->method('getSalesChannelId')->willReturn('sales-channel-id');
         $context->method('getContext')->willReturn($this->context);
         $context->method('getDomainId')->willReturn(null);
+        $context->method('getShippingMethod')->willReturn($shippingMethod);
+        $context->method('getCurrencyId')->willReturn('currency-chf');
+        $context->method('getLanguageId')->willReturn('language-fr');
 
         return $context;
     }
@@ -317,6 +395,7 @@ final class AccountServiceTest extends TestCase
         ?FakeRegisterRoute $registerRoute = null,
         ?SalesChannelContext $newContext = null,
         ?FakeContextSwitchRoute $contextSwitchRoute = null,
+        array $salesChannelIdsByShippingMethodId = ['express-shipping' => ['sales-channel-id']],
     ): AccountService {
         $newContext ??= $this->createMock(SalesChannelContext::class);
 
@@ -332,6 +411,7 @@ final class AccountServiceTest extends TestCase
             customerRepository: new FakeCustomerRepository(new CustomerCollection($customersFoundByEmail)),
             countryRepository: new FakeCountryRepository([$country]),
             salutationRepository: new FakeSalutationRepository([$salutation]),
+            shippingMethodRepository: new FakeShippingMethodRepository($salesChannelIdsByShippingMethodId),
             registerRoute: $registerRoute ?? new FakeRegisterRoute($this->makeCustomer('fallback')),
             accountService: $loginTracker ?? new FakeShopwareAccountService(),
             contextSwitchRoute: $contextSwitchRoute ?? new FakeContextSwitchRoute(),

@@ -4,6 +4,7 @@
 - Fixed: The automatic shipment reports orders that were placed with version 4 to Mollie again.
 - Fixed: A phone number consisting of the country code only (e.g. "+49") no longer makes the payment fail.
 - Fixed: Apple Pay Direct creates guest accounts again when the shop requires a phone number on registration.
+- Fixed: Apple Pay Direct and PayPal Express no longer lose the chosen shipping method, currency and language for existing customers who are not logged in.
 
 # 5.7.0
 - Added: The webhook retries writing the payment status on a database deadlock.

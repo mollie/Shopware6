@@ -11,6 +11,7 @@ use Shopware\Core\Checkout\Customer\CustomerException;
 use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
 use Shopware\Core\Checkout\Customer\SalesChannel\AccountService as ShopwareAccountService;
 use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
+use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsAnyFilter;
@@ -42,6 +43,7 @@ final class AccountService extends AbstractAccountService
      * @param EntityRepository<CustomerCollection<CustomerEntity>> $customerRepository
      * @param EntityRepository<CountryCollection<CountryEntity>> $countryRepository
      * @param EntityRepository<SalutationCollection<SalutationEntity>> $salutationRepository
+     * @param EntityRepository<ShippingMethodCollection> $shippingMethodRepository
      */
     public function __construct(
         #[Autowire(service: 'customer.repository')]
@@ -50,6 +52,8 @@ final class AccountService extends AbstractAccountService
         private EntityRepository $countryRepository,
         #[Autowire(service: 'salutation.repository')]
         private EntityRepository $salutationRepository,
+        #[Autowire(service: 'shipping_method.repository')]
+        private EntityRepository $shippingMethodRepository,
         #[Autowire(service: RegisterRoute::class)]
         private AbstractRegisterRoute $registerRoute,
         private ShopwareAccountService $accountService,
@@ -88,6 +92,7 @@ final class AccountService extends AbstractAccountService
         $customer = $salesChannelContext->getCustomer();
         if ($customer === null) {
             $this->logger->debug('Customer not logged in, try to login or create an account', $logData);
+            $requestDataBag->add($this->getGuestContextSettings($salesChannelContext)->all());
             try {
                 $customer = $this->getCustomerByEmail($email, $salesChannelContext);
                 $logData['customerId'] = $customer->getId();
@@ -147,6 +152,30 @@ final class AccountService extends AbstractAccountService
         }
 
         return $countryIsoMapping;
+    }
+
+    private function getGuestContextSettings(SalesChannelContext $salesChannelContext): RequestDataBag
+    {
+        $settings = new RequestDataBag([
+            SalesChannelContextService::CURRENCY_ID => $salesChannelContext->getCurrencyId(),
+            SalesChannelContextService::LANGUAGE_ID => $salesChannelContext->getLanguageId(),
+        ]);
+
+        $shippingMethodId = $salesChannelContext->getShippingMethod()->getId();
+        if (! $this->isShippingMethodAssigned($shippingMethodId, $salesChannelContext)) {
+            return $settings;
+        }
+        $settings->set(SalesChannelContextService::SHIPPING_METHOD_ID, $shippingMethodId);
+
+        return $settings;
+    }
+
+    private function isShippingMethodAssigned(string $shippingMethodId, SalesChannelContext $salesChannelContext): bool
+    {
+        $criteria = new Criteria([$shippingMethodId]);
+        $criteria->addFilter(new EqualsFilter('salesChannels.id', $salesChannelContext->getSalesChannelId()));
+
+        return $this->shippingMethodRepository->searchIds($criteria, $salesChannelContext->getContext())->getTotal() > 0;
     }
 
     private function getCustomerByEmail(string $email, SalesChannelContext $salesChannelContext): CustomerEntity
