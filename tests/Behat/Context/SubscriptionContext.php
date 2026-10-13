@@ -378,21 +378,6 @@ final class SubscriptionContext extends ShopwareContext
         }
     }
 
-    private function countPriceMigrationFailures(): int
-    {
-        $subscription = $this->reloadStoredSubscription(['historyEntries']);
-
-        $failures = 0;
-        foreach ($subscription->getHistoryEntries() as $entry) {
-            /** @var SubscriptionHistoryEntity $entry */
-            if (str_contains((string) $entry->getComment(), 'price_migration_failed')) {
-                ++$failures;
-            }
-        }
-
-        return $failures;
-    }
-
     #[Then('the subscription price update state is :arg1')]
     public function theSubscriptionPriceUpdateStateIs(string $expectedState): void
     {
@@ -439,6 +424,21 @@ final class SubscriptionContext extends ShopwareContext
         }
 
         Assert::fail(sprintf('No history entry contains "%s" for subscription %s', $needle, $subscription->getId()));
+    }
+
+    private function countPriceMigrationFailures(): int
+    {
+        $subscription = $this->reloadStoredSubscription(['historyEntries']);
+
+        $failures = 0;
+        foreach ($subscription->getHistoryEntries() as $entry) {
+            /** @var SubscriptionHistoryEntity $entry */
+            if (str_contains((string) $entry->getComment(), 'price_migration_failed')) {
+                ++$failures;
+            }
+        }
+
+        return $failures;
     }
 
     /**
