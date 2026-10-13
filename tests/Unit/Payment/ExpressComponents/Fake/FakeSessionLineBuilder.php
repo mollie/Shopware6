@@ -13,15 +13,12 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 final class FakeSessionLineBuilder implements SessionLineBuilderInterface
 {
     private ?Money $lastAmount = null;
+    private ?bool $lastWithShippingLines = null;
 
     public function __construct(private LineItemCollection $lines = new LineItemCollection())
     {
     }
 
-    /**
-     * The amount the builder was asked to distribute over the lines. The session must not contain
-     * the shipping costs, so this is what a test asserts the deduction against.
-     */
     public function getLastAmount(): Money
     {
         if (! $this->lastAmount instanceof Money) {
@@ -31,9 +28,19 @@ final class FakeSessionLineBuilder implements SessionLineBuilderInterface
         return $this->lastAmount;
     }
 
-    public function build(Cart $cart, Money $amount, SalesChannelContext $salesChannelContext): LineItemCollection
+    public function wasLastAskedForShippingLines(): bool
+    {
+        if ($this->lastWithShippingLines === null) {
+            throw new \RuntimeException('FakeSessionLineBuilder::build() was never called.');
+        }
+
+        return $this->lastWithShippingLines;
+    }
+
+    public function build(Cart $cart, Money $amount, bool $withShippingLines, SalesChannelContext $salesChannelContext): LineItemCollection
     {
         $this->lastAmount = $amount;
+        $this->lastWithShippingLines = $withShippingLines;
 
         return $this->lines;
     }

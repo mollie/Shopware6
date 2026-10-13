@@ -10,9 +10,11 @@ use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixerInterface;
+use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -22,11 +24,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * POST /v2/sessions rejects a payload whose lines do not add up to the amount, and it
  * validates the transmitted, rounded values. Unlike the Orders API payload the rounding
  * correction is therefore not optional here.
- *
- * The deliveries of the cart are deliberately left out: the session carries them as
- * shippingOptions instead, and Mollie rejects a payload that has both
- * ("A shipping_fee line is not allowed when shippingOptions are provided"). The amount
- * passed in therefore has to be the cart total without shipping.
  */
 final class SessionLineBuilder implements SessionLineBuilderInterface
 {
@@ -38,7 +35,7 @@ final class SessionLineBuilder implements SessionLineBuilderInterface
     ) {
     }
 
-    public function build(Cart $cart, Money $amount, SalesChannelContext $salesChannelContext): LineItemCollection
+    public function build(Cart $cart, Money $amount, bool $withShippingLines, SalesChannelContext $salesChannelContext): LineItemCollection
     {
         $currency = $salesChannelContext->getCurrency();
         $taxStatus = $cart->getPrice()->getTaxStatus();
@@ -54,6 +51,8 @@ final class SessionLineBuilder implements SessionLineBuilderInterface
 
             $lines->add(LineItem::fromCartLineItem($cartLineItem, $currency, $taxStatus));
         }
+
+        $lines = $this->addCartShippingLines($lines, $cart, $withShippingLines, $currency, $taxStatus);
 
         return $this->fixRoundingDiff($amount, $lines);
     }
@@ -79,7 +78,36 @@ final class SessionLineBuilder implements SessionLineBuilderInterface
             $lines->add(LineItem::fromOrderLine($orderLineItem, $currency, $taxStatus));
         }
 
+        $shippingDiscountLabel = LineItem::resolveDeliveryDiscountLabel($orderLineItems);
+
+        foreach ($order->getDeliveries() ?? [] as $delivery) {
+            $shippingCosts = $delivery->getShippingCosts()->getTotalPrice();
+            if (round($shippingCosts, Mollie::ROUNDING_PRECISION) === 0.0) {
+                continue;
+            }
+
+            $descriptionOverride = $shippingCosts < 0 ? $shippingDiscountLabel : null;
+            $lines->add(LineItem::fromDelivery($delivery, $currency, $taxStatus, $descriptionOverride));
+        }
+
         return $this->fixRoundingDiff($amount, $lines);
+    }
+
+    private function addCartShippingLines(LineItemCollection $lines, Cart $cart, bool $withShippingLines, CurrencyEntity $currency, string $taxStatus): LineItemCollection
+    {
+        if (! $withShippingLines) {
+            return $lines;
+        }
+
+        foreach ($cart->getDeliveries() as $delivery) {
+            if (round($delivery->getShippingCosts()->getTotalPrice(), Mollie::ROUNDING_PRECISION) === 0.0) {
+                continue;
+            }
+
+            $lines->add(LineItem::fromCartDelivery($delivery, $currency, $taxStatus));
+        }
+
+        return $lines;
     }
 
     private function fixRoundingDiff(Money $amount, LineItemCollection $lines): LineItemCollection

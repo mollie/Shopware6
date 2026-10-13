@@ -7,8 +7,6 @@ use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Mollie\SessionStatus;
-use Mollie\Shopware\Component\Mollie\ShippingOption;
-use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionBuilder;
 use Mollie\Shopware\Component\Settings\Struct\ApiSettings;
 use Mollie\Shopware\Entity\Customer\Customer;
@@ -22,7 +20,6 @@ use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionLineBuilder;
-use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeShippingOptionsResolver;
 use Mollie\Shopware\Unit\Payment\Fake\FakeSessionGateway;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -49,7 +46,6 @@ final class SessionBuilderTest extends TestCase
 
     private FakeSessionGateway $sessionGateway;
     private FakeSessionLineBuilder $lineBuilder;
-    private FakeShippingOptionsResolver $shippingOptionsResolver;
     private FakeRouteBuilder $routeBuilder;
     private FakeSettingsService $settings;
     private FakeCartPersister $cartPersister;
@@ -60,7 +56,6 @@ final class SessionBuilderTest extends TestCase
     {
         $this->sessionGateway = new FakeSessionGateway($this->createSession('ses_created'));
         $this->lineBuilder = new FakeSessionLineBuilder();
-        $this->shippingOptionsResolver = new FakeShippingOptionsResolver();
         $this->routeBuilder = new FakeRouteBuilder(expressComponentsRedirectUrl: 'https://shop.test/mollie/express/return');
         $this->settings = new FakeSettingsService(apiSettings: new ApiSettings('test_key', 'live_key', Mode::TEST, self::PROFILE_ID));
         $this->cartPersister = new FakeCartPersister();
@@ -138,7 +133,7 @@ final class SessionBuilderTest extends TestCase
         $storedSession = $this->createSession('ses_stored', new Money(113.05, 'EUR'));
         $this->sessionGateway->setExistingSession($storedSession);
         $cart = $this->createGrossCart(119.00, 5.95);
-        $cart->addExtension(SessionBuilder::cartExtensionKey(Mode::TEST), $storedSession);
+        $this->storeCartSession($cart, $storedSession, $this->createSalesChannelContext());
         $sessionBuilder = $this->createSessionBuilder();
 
         $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
@@ -152,7 +147,7 @@ final class SessionBuilderTest extends TestCase
         $storedSession = $this->createSession('ses_stored', new Money(99.99, 'EUR'));
         $this->sessionGateway->setExistingSession($storedSession);
         $cart = $this->createGrossCart(119.00, 5.95);
-        $cart->addExtension(SessionBuilder::cartExtensionKey(Mode::TEST), $storedSession);
+        $this->storeCartSession($cart, $storedSession, $this->createSalesChannelContext());
         $sessionBuilder = $this->createSessionBuilder();
 
         $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
@@ -165,7 +160,7 @@ final class SessionBuilderTest extends TestCase
         $storedSession = $this->createSession('ses_stored', new Money(113.05, 'USD'));
         $this->sessionGateway->setExistingSession($storedSession);
         $cart = $this->createGrossCart(119.00, 5.95);
-        $cart->addExtension(SessionBuilder::cartExtensionKey(Mode::TEST), $storedSession);
+        $this->storeCartSession($cart, $storedSession, $this->createSalesChannelContext());
         $sessionBuilder = $this->createSessionBuilder();
 
         $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
@@ -178,7 +173,7 @@ final class SessionBuilderTest extends TestCase
         $storedSession = $this->createSession('ses_stored');
         $this->sessionGateway->setExistingSession($storedSession);
         $cart = $this->createGrossCart(119.00, 5.95);
-        $cart->addExtension(SessionBuilder::cartExtensionKey(Mode::TEST), $storedSession);
+        $this->storeCartSession($cart, $storedSession, $this->createSalesChannelContext());
         $sessionBuilder = $this->createSessionBuilder();
 
         $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
@@ -190,7 +185,7 @@ final class SessionBuilderTest extends TestCase
     {
         $this->sessionGateway->failGetSessionWith(new \RuntimeException('session is gone'));
         $cart = $this->createGrossCart(119.00, 5.95);
-        $cart->addExtension(SessionBuilder::cartExtensionKey(Mode::TEST), $this->createSession('ses_stored', new Money(113.05, 'EUR')));
+        $this->storeCartSession($cart, $this->createSession('ses_stored', new Money(113.05, 'EUR')), $this->createSalesChannelContext());
         $sessionBuilder = $this->createSessionBuilder();
 
         $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
@@ -199,12 +194,111 @@ final class SessionBuilderTest extends TestCase
         $this->assertTrue($this->logger->hasRecordThatContains('warning', 'Stored express components session could not be loaded'));
     }
 
+    public function testStoredCartSessionWithoutACustomerKeyIsReplaced(): void
+    {
+        $storedSession = $this->createSession('ses_stored', new Money(113.05, 'EUR'));
+        $this->sessionGateway->setExistingSession($storedSession);
+        $cart = $this->createGrossCart(119.00, 5.95);
+        $cart->addExtension(SessionBuilder::cartExtensionKey(Mode::TEST), $storedSession);
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
+
+        $this->assertSame('ses_created', $session->getId());
+    }
+
+    public function testExpiredCartSessionIsReplaced(): void
+    {
+        $expiredSession = $this->createSession('ses_stored', new Money(113.05, 'EUR'));
+        $expiredSession->setStatus(SessionStatus::EXPIRED);
+        $this->sessionGateway->setExistingSession($expiredSession);
+        $cart = $this->createGrossCart(119.00, 5.95);
+        $this->storeCartSession($cart, $expiredSession, $this->createSalesChannelContext());
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
+
+        $this->assertSame('ses_created', $session->getId());
+    }
+
+    public function testGuestCartSessionIsReplacedOnceTheShopperLoggedIn(): void
+    {
+        $guestSession = $this->createSession('ses_stored', new Money(119.00, 'EUR'));
+        $this->sessionGateway->setExistingSession($guestSession);
+        $cart = $this->createGrossCart(119.00, 0.0);
+        $this->storeCartSession($cart, $guestSession, $this->createSalesChannelContext());
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromCart($cart, $this->createCustomerContext());
+
+        $this->assertSame('ses_created', $session->getId());
+        $this->assertSame([], $this->sessionGateway->getLastCreateSession()->getRequiredCustomerDetails());
+    }
+
+    public function testCustomerCartSessionIsReusedForTheSameCustomer(): void
+    {
+        $storedSession = $this->createSession('ses_stored', new Money(119.00, 'EUR'));
+        $this->sessionGateway->setExistingSession($storedSession);
+        $cart = $this->createGrossCart(119.00, 5.95);
+        $this->storeCartSession($cart, $storedSession, $this->createCustomerContext());
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromCart($cart, $this->createCustomerContext());
+
+        $this->assertSame('ses_stored', $session->getId());
+    }
+
+    public function testCustomerCartSessionIsReplacedAfterTheShippingAddressChanged(): void
+    {
+        $storedSession = $this->createSession('ses_stored', new Money(119.00, 'EUR'));
+        $this->sessionGateway->setExistingSession($storedSession);
+        $cart = $this->createGrossCart(119.00, 5.95);
+        $this->storeCartSession($cart, $storedSession, $this->createCustomerContext());
+        $context = $this->createCustomerContext();
+        $context->getCustomer()?->setActiveShippingAddress($this->createAddress('Other Street 3'));
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromCart($cart, $context);
+
+        $this->assertSame('ses_created', $session->getId());
+    }
+
+    public function testCustomerCartSessionIsReplacedAfterTheBillingAddressChanged(): void
+    {
+        $storedSession = $this->createSession('ses_stored', new Money(119.00, 'EUR'));
+        $this->sessionGateway->setExistingSession($storedSession);
+        $cart = $this->createGrossCart(119.00, 5.95);
+        $this->storeCartSession($cart, $storedSession, $this->createCustomerContext());
+        $context = $this->createCustomerContext();
+        $context->getCustomer()?->setActiveBillingAddress($this->createAddress('Other Street 3'));
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromCart($cart, $context);
+
+        $this->assertSame('ses_created', $session->getId());
+    }
+
+    public function testCustomerCartSessionIsReplacedAfterTheShippingMethodChanged(): void
+    {
+        $storedSession = $this->createSession('ses_stored', new Money(119.00, 'EUR'));
+        $this->sessionGateway->setExistingSession($storedSession);
+        $cart = $this->createGrossCart(119.00, 5.95);
+        $this->storeCartSession($cart, $storedSession, $this->createCustomerContext());
+        $context = $this->createCustomerContext();
+        $context->setShippingMethod($this->createShippingMethod('other-shipping-method-id'));
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromCart($cart, $context);
+
+        $this->assertSame('ses_created', $session->getId());
+    }
+
     public function testCartSessionOfTheOtherModeIsNotReused(): void
     {
         $storedSession = $this->createSession('ses_stored', new Money(113.05, 'EUR'));
         $this->sessionGateway->setExistingSession($storedSession);
         $cart = $this->createGrossCart(119.00, 5.95);
-        $cart->addExtension(SessionBuilder::cartExtensionKey(Mode::LIVE), $storedSession);
+        $this->storeCartSession($cart, $storedSession, $this->createSalesChannelContext(), Mode::LIVE);
         $sessionBuilder = $this->createSessionBuilder();
 
         $session = $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
@@ -230,7 +324,7 @@ final class SessionBuilderTest extends TestCase
         $this->assertSame('https://shop.test/mollie/express/return', $this->sessionGateway->getLastCreateSession()->getRedirectUrl());
     }
 
-    public function testCartSessionAsksTheWalletForEmailAndBothAddresses(): void
+    public function testGuestCartSessionAsksTheWalletForEmailAndBothAddresses(): void
     {
         $sessionBuilder = $this->createSessionBuilder();
 
@@ -239,19 +333,65 @@ final class SessionBuilderTest extends TestCase
         $this->assertSame(['email', 'billing-address', 'shipping-address'], $this->sessionGateway->getLastCreateSession()->getRequiredCustomerDetails());
     }
 
-    public function testCartSessionShippingOptionsAreResolvedForTheShippingCountryOfTheContext(): void
+    public function testCustomerCartSessionAsksTheWalletForNothing(): void
     {
-        $context = $this->createSalesChannelContext();
-        $context->setShippingLocation(ShippingLocation::createFromCountry($this->createCountry('NL')));
-        $this->shippingOptionsResolver = new FakeShippingOptionsResolver(new ShippingOptionCollection([
-            new ShippingOption('Standard', 'shipping-method-id', new Money(5.95, 'EUR')),
-        ]));
         $sessionBuilder = $this->createSessionBuilder();
 
-        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $context);
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createCustomerContext());
 
-        $this->assertSame('NL', $this->shippingOptionsResolver->getLastAddress()->getCountry());
-        $this->assertSame(1, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
+        $this->assertSame([], $this->sessionGateway->getLastCreateSession()->getRequiredCustomerDetails());
+    }
+
+    public function testCustomerCartSessionAmountContainsTheShippingCosts(): void
+    {
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createCustomerContext());
+
+        $this->assertSame(119.00, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
+    }
+
+    public function testCustomerCartSessionAsksForShippingLines(): void
+    {
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createCustomerContext());
+
+        $this->assertTrue($this->lineBuilder->wasLastAskedForShippingLines());
+    }
+
+    public function testGuestCartSessionCarriesNoShippingLines(): void
+    {
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createSalesChannelContext());
+
+        $this->assertFalse($this->lineBuilder->wasLastAskedForShippingLines());
+    }
+
+    /**
+     * Mollie rejects a session with a shipping callback that does not ask for the shipping address.
+     */
+    public function testCustomerCartSessionHasNoShippingCallbackUrl(): void
+    {
+        $this->routeBuilder = new FakeRouteBuilder(expressComponentsShippingCallbackUrl: 'https://shop.test/api/mollie/express-components/shipping-options');
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createCustomerContext());
+
+        $this->assertSame('', $this->sessionGateway->getLastCreateSession()->getShippingCallbackUrl());
+    }
+
+    public function testGuestCartSessionAsksTheShippingCallbackUrlForTheShippingOptions(): void
+    {
+        $this->routeBuilder = new FakeRouteBuilder(expressComponentsShippingCallbackUrl: 'https://shop.test/api/mollie/express-components/shipping-options');
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createSalesChannelContext());
+
+        $createSession = $this->sessionGateway->getLastCreateSession();
+        $this->assertSame('https://shop.test/api/mollie/express-components/shipping-options', $createSession->getShippingCallbackUrl());
+        $this->assertSame(0, $createSession->getShippingOptions()->count());
     }
 
     public function testGuestCartSessionCarriesNoAddresses(): void
@@ -360,24 +500,24 @@ final class SessionBuilderTest extends TestCase
         $this->assertNull($this->sessionGateway->getLastCreateSession()->getCustomerId());
     }
 
-    public function testOrderSessionAmountLeavesOutTheShippingCosts(): void
+    public function testOrderSessionAmountContainsTheShippingCosts(): void
     {
         $order = $this->createOrder(119.00, 5.95);
         $sessionBuilder = $this->createSessionBuilder();
 
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
-        $this->assertSame(113.05, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
+        $this->assertSame(119.00, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
     }
 
-    public function testOrderSessionAmountOfANetOrderLeavesOutTheShippingTaxAsWell(): void
+    public function testOrderSessionAmountOfANetOrderIsItsGrossTotal(): void
     {
         $order = $this->createOrder(119.00, 5.00, CartPrice::TAX_STATE_NET, new CalculatedTaxCollection([new CalculatedTax(0.95, 19.0, 5.00)]));
         $sessionBuilder = $this->createSessionBuilder();
 
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
-        $this->assertSame(113.05, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
+        $this->assertSame(119.00, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
     }
 
     public function testTaxFreeOrderSessionUsesTheNetAmountOfTheOrder(): void
@@ -388,7 +528,7 @@ final class SessionBuilderTest extends TestCase
 
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
-        $this->assertSame(94.05, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
+        $this->assertSame(100.00, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
     }
 
     /**
@@ -405,7 +545,7 @@ final class SessionBuilderTest extends TestCase
 
         $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
 
-        $this->assertSame(113.05, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
+        $this->assertSame(119.00, $this->sessionGateway->getLastCreateSession()->getAmount()->getValue());
     }
 
     public function testCreatedOrderSessionIdIsStoredOnTheOrderForTheCurrentMode(): void
@@ -445,7 +585,7 @@ final class SessionBuilderTest extends TestCase
 
     public function testStoredOrderSessionIsReusedWhileItStillMatchesTheOrderTotal(): void
     {
-        $this->sessionGateway->setExistingSession($this->createSession('ses_stored', new Money(113.05, 'EUR')));
+        $this->sessionGateway->setExistingSession($this->createSession('ses_stored', new Money(119.00, 'EUR')));
         $order = $this->createOrderWithStoredSession('ses_stored');
         $sessionBuilder = $this->createSessionBuilder();
 
@@ -457,9 +597,22 @@ final class SessionBuilderTest extends TestCase
 
     public function testCompletedOrderSessionIsNotOfferedAgain(): void
     {
-        $completedSession = $this->createSession('ses_stored', new Money(113.05, 'EUR'));
+        $completedSession = $this->createSession('ses_stored', new Money(119.00, 'EUR'));
         $completedSession->setStatus(SessionStatus::COMPLETED);
         $this->sessionGateway->setExistingSession($completedSession);
+        $order = $this->createOrderWithStoredSession('ses_stored');
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $session = $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
+
+        $this->assertSame('ses_created', $session->getId());
+    }
+
+    public function testExpiredOrderSessionIsReplaced(): void
+    {
+        $expiredSession = $this->createSession('ses_stored', new Money(119.00, 'EUR'));
+        $expiredSession->setStatus(SessionStatus::EXPIRED);
+        $this->sessionGateway->setExistingSession($expiredSession);
         $order = $this->createOrderWithStoredSession('ses_stored');
         $sessionBuilder = $this->createSessionBuilder();
 
@@ -491,54 +644,24 @@ final class SessionBuilderTest extends TestCase
         $this->assertTrue($this->logger->hasRecordThatContains('warning', 'Stored express components order session could not be loaded'));
     }
 
-    public function testOrderSessionOffersTheShippingMethodTheCustomerAlreadyDecidedOn(): void
-    {
-        $order = $this->createOrder(119.00, 5.95, shippingMethodName: 'DHL Express');
-        $sessionBuilder = $this->createSessionBuilder();
-
-        $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
-
-        $shippingOptions = $this->sessionGateway->getLastCreateSession()->getShippingOptions();
-        $shippingOption = $shippingOptions->first();
-        $this->assertSame('DHL Express', $shippingOption?->getDescription());
-        $this->assertSame('shipping-method-id', $shippingOption?->getReference());
-        $this->assertSame(5.95, $shippingOption?->getAmount()->getValue());
-    }
-
-    public function testOrderShippingOptionWithoutAShippingMethodNameFallsBackToAGenericDescription(): void
-    {
-        $order = $this->createOrder(119.00, 5.95, shippingMethodName: '  ');
-        $sessionBuilder = $this->createSessionBuilder();
-
-        $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
-
-        $this->assertSame('Shipping', $this->sessionGateway->getLastCreateSession()->getShippingOptions()->first()?->getDescription());
-    }
-
-    public function testOrderDeliveryWithoutAShippingMethodIsNotOfferedAsAnOption(): void
+    public function testOrderSessionOffersNoShippingOptions(): void
     {
         $order = $this->createOrder(119.00, 5.95);
-        $delivery = new OrderDeliveryEntity();
-        $delivery->setId('delivery-without-shipping-method');
-        $delivery->setShippingCosts($this->createShippingCosts(0.0));
-        $order->setDeliveries(new OrderDeliveryCollection([$delivery]));
         $sessionBuilder = $this->createSessionBuilder();
 
-        $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
+        $sessionBuilder->buildFromOrder($order, $this->createCustomerContext());
 
         $this->assertSame(0, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
     }
 
-    public function testOrderWithoutDeliveriesOffersNoShippingOption(): void
+    public function testOrderSessionOfTheLoggedInCustomerAsksTheWalletForNothing(): void
     {
         $order = $this->createOrder(119.00, 5.95);
-        // a digital order has no delivery at all, the setter of the association is not nullable
-        $order->assign(['deliveries' => null]);
         $sessionBuilder = $this->createSessionBuilder();
 
-        $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
+        $sessionBuilder->buildFromOrder($order, $this->createCustomerContext());
 
-        $this->assertSame(0, $this->sessionGateway->getLastCreateSession()->getShippingOptions()->count());
+        $this->assertSame([], $this->sessionGateway->getLastCreateSession()->getRequiredCustomerDetails());
     }
 
     /**
@@ -581,7 +704,6 @@ final class SessionBuilderTest extends TestCase
         return new SessionBuilder(
             $this->sessionGateway,
             $this->lineBuilder,
-            $this->shippingOptionsResolver,
             $this->routeBuilder,
             $this->settings,
             $this->cartPersister,
@@ -594,8 +716,51 @@ final class SessionBuilderTest extends TestCase
     {
         $context = new FakeSalesChannelContext();
         $context->setShippingLocation(ShippingLocation::createFromCountry($this->createCountry('DE')));
+        $context->setShippingMethod($this->createShippingMethod('shipping-method-id'));
 
         return $context;
+    }
+
+    private function createCustomerContext(): FakeSalesChannelContext
+    {
+        $customer = CustomerBuilder::create()
+            ->withEmail('shopper@example.com')
+            ->withActiveBillingAddress($this->createAddress('Billing Street 1'))
+            ->withActiveShippingAddress($this->createAddress('Shipping Street 2'))
+            ->build()
+        ;
+        $context = $this->createSalesChannelContext();
+        $context->setCustomer($customer);
+
+        return $context;
+    }
+
+    /**
+     * Stores the session on the cart the way a previous request did, so it carries the customer it
+     * was created for.
+     */
+    private function storeCartSession(Cart $cart, Session $session, FakeSalesChannelContext $context, Mode $mode = Mode::TEST): void
+    {
+        $settings = new FakeSettingsService(apiSettings: new ApiSettings('test_key', 'live_key', $mode, self::PROFILE_ID));
+        $previousRequest = new SessionBuilder(
+            new FakeSessionGateway($session),
+            new FakeSessionLineBuilder(),
+            $this->routeBuilder,
+            $settings,
+            new FakeCartPersister(),
+            new FakeOrderRepository(),
+            new FakeLogger()
+        );
+
+        $previousRequest->buildFromCart($cart, $context);
+    }
+
+    private function createShippingMethod(string $id): ShippingMethodEntity
+    {
+        $shippingMethod = new ShippingMethodEntity();
+        $shippingMethod->setId($id);
+
+        return $shippingMethod;
     }
 
     private function createSession(string $id, ?Money $amount = null): Session
@@ -638,12 +803,11 @@ final class SessionBuilderTest extends TestCase
         float $amountTotal,
         float $shippingCosts,
         string $taxStatus = CartPrice::TAX_STATE_GROSS,
-        ?CalculatedTaxCollection $shippingTaxes = null,
-        string $shippingMethodName = 'Standard'
+        ?CalculatedTaxCollection $shippingTaxes = null
     ): OrderEntity {
         $shippingMethod = new ShippingMethodEntity();
         $shippingMethod->setId('shipping-method-id');
-        $shippingMethod->setName($shippingMethodName);
+        $shippingMethod->setName('Standard');
 
         $delivery = new OrderDeliveryEntity();
         $delivery->setId('delivery-id');

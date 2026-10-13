@@ -78,14 +78,21 @@ final class ShippingOptionsRoute extends AbstractShippingOptionsRoute
             'salesChannelId' => $salesChannelId,
         ]);
 
-        if ($address->getCountry() === '') {
-            return new ShippingOptionsResponse(new ShippingOptionCollection());
+        $shippingOptions = new ShippingOptionCollection();
+        if ($address->getCountry() !== '') {
+            $salesChannelContext = $this->salesChannelContextService->get(
+                new SalesChannelContextServiceParameters($salesChannelId, $cartToken)
+            );
+            $shippingOptions = $this->shippingOptionsResolver->resolve($address, $salesChannelContext);
         }
 
-        $salesChannelContext = $this->salesChannelContextService->get(
-            new SalesChannelContextServiceParameters($salesChannelId, $cartToken)
-        );
+        $this->logger->info('Express components shipping options responded', [
+            'sessionId' => (string) ($body['sessionId'] ?? ''),
+            'cartToken' => $cartToken,
+            'responseParameter' => ['shippingOptions' => $shippingOptions->toArray()],
+            'salesChannelId' => $salesChannelId,
+        ]);
 
-        return new ShippingOptionsResponse($this->shippingOptionsResolver->resolve($address, $salesChannelContext));
+        return new ShippingOptionsResponse($shippingOptions);
     }
 }

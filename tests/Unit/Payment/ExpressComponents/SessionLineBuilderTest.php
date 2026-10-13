@@ -8,6 +8,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\RoundingDifferenceFixer;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionLineBuilder;
 use Mollie\Shopware\Unit\Builder\CartBuilder;
+use Mollie\Shopware\Unit\Builder\CustomerBuilder;
 use Mollie\Shopware\Unit\Builder\LineItemBuilder;
 use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
@@ -19,6 +20,7 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Cart\Tax\Struct\CalculatedTaxCollection;
 use Shopware\Core\Checkout\Cart\Tax\Struct\TaxRuleCollection;
+use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 
@@ -39,7 +41,7 @@ final class SessionLineBuilderTest extends TestCase
             ->build()
         ;
 
-        $lines = $this->sessionLineBuilder()->build($cart, new Money(49.98, 'EUR'), new FakeSalesChannelContext());
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(49.98, 'EUR'), false, new FakeSalesChannelContext());
 
         $this->assertCount(2, $lines);
         $this->assertSame('Shirt', $lines->first()?->getDescription());
@@ -59,7 +61,7 @@ final class SessionLineBuilderTest extends TestCase
         ;
         $cart = CartBuilder::create()->withLineItem($parent)->withPrice($this->grossCartPrice(19.98))->build();
 
-        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), new FakeSalesChannelContext());
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), false, new FakeSalesChannelContext());
 
         $this->assertCount(2, $lines);
     }
@@ -79,17 +81,13 @@ final class SessionLineBuilderTest extends TestCase
             ->build()
         ;
 
-        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), new FakeSalesChannelContext());
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), false, new FakeSalesChannelContext());
 
         $this->assertCount(1, $lines);
         $this->assertSame('Shirt', $lines->first()?->getDescription());
     }
 
-    /**
-     * The session carries the shipping costs as shippingOptions instead. Mollie rejects a payload
-     * that has both: "A shipping_fee line is not allowed when shippingOptions are provided".
-     */
-    public function testTheShippingCostsOfTheCartDoNotBecomeALine(): void
+    public function testTheShippingCostsOfTheCartDoNotBecomeALineWithoutShippingLines(): void
     {
         $cart = CartBuilder::create()
             ->withLineItem($this->cartLineItem('shirt', 'Shirt', 19.98))
@@ -98,7 +96,38 @@ final class SessionLineBuilderTest extends TestCase
             ->build()
         ;
 
-        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), new FakeSalesChannelContext());
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), false, new FakeSalesChannelContext());
+
+        $this->assertCount(1, $lines);
+        $this->assertSame(LineItemType::PHYSICAL, $lines->first()?->getType());
+    }
+
+    public function testTheShippingCostsOfTheCartBecomeAShippingLineWhenAskedFor(): void
+    {
+        $cart = CartBuilder::create()
+            ->withLineItem($this->cartLineItem('shirt', 'Shirt', 19.98))
+            ->withPrice($this->grossCartPrice(25.93))
+            ->withShippingCosts($this->price(5.95))
+            ->build()
+        ;
+
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(25.93, 'EUR'), true, new FakeSalesChannelContext());
+
+        $this->assertCount(2, $lines);
+        $this->assertSame(LineItemType::SHIPPING, $lines->last()?->getType());
+        $this->assertSame(5.95, $lines->last()?->getAmount()->getValue());
+    }
+
+    public function testFreeShippingOfTheCartBecomesNoLine(): void
+    {
+        $cart = CartBuilder::create()
+            ->withLineItem($this->cartLineItem('shirt', 'Shirt', 19.98))
+            ->withPrice($this->grossCartPrice(19.98))
+            ->withShippingCosts($this->price(0.00))
+            ->build()
+        ;
+
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), true, new FakeSalesChannelContext());
 
         $this->assertCount(1, $lines);
         $this->assertSame(LineItemType::PHYSICAL, $lines->first()?->getType());
@@ -112,7 +141,7 @@ final class SessionLineBuilderTest extends TestCase
             ->build()
         ;
 
-        $lines = $this->sessionLineBuilder()->build($cart, new Money(20.00, 'EUR'), new FakeSalesChannelContext());
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(20.00, 'EUR'), false, new FakeSalesChannelContext());
 
         $this->assertCount(2, $lines);
         $this->assertSame(RoundingDifferenceFixer::SKU, $lines->last()?->getSku());
@@ -127,7 +156,7 @@ final class SessionLineBuilderTest extends TestCase
             ->build()
         ;
 
-        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), new FakeSalesChannelContext());
+        $lines = $this->sessionLineBuilder()->build($cart, new Money(19.98, 'EUR'), false, new FakeSalesChannelContext());
 
         $this->assertCount(1, $lines);
     }
@@ -158,6 +187,36 @@ final class SessionLineBuilderTest extends TestCase
         $lines = $this->sessionLineBuilder()->buildFromOrder($order, new Money(19.98, 'EUR'), new FakeSalesChannelContext());
 
         $this->assertCount(1, $lines);
+    }
+
+    public function testTheDeliveriesOfAnOrderBecomeShippingLinesWithoutTheFreeOne(): void
+    {
+        $orderBuilder = new OrderEntityBuilder();
+        $order = $this->order(new OrderLineItemCollection([
+            $orderBuilder->createOrderLineItemWithType('order-line-item-id', CartLineItem::PRODUCT_LINE_ITEM_TYPE, 19.98),
+        ]));
+        $order->setDeliveries($orderBuilder->getOrderDeliveries(CustomerBuilder::create()->build()));
+
+        $lines = $this->sessionLineBuilder()->buildFromOrder($order, new Money(24.97, 'EUR'), new FakeSalesChannelContext());
+
+        $this->assertCount(2, $lines);
+        $this->assertSame(LineItemType::SHIPPING, $lines->last()?->getType());
+        $this->assertSame(4.99, $lines->last()?->getAmount()->getValue());
+    }
+
+    public function testAShippingDiscountOfAnOrderIsDescribedByTheLabelOfItsPromotion(): void
+    {
+        $orderBuilder = new OrderEntityBuilder();
+        $order = $this->order(new OrderLineItemCollection([
+            $orderBuilder->createOrderLineItemWithType('order-line-item-id', CartLineItem::PRODUCT_LINE_ITEM_TYPE, 19.98),
+            $orderBuilder->getDeliveryDiscountPromotionLineItem('Free shipping weekend'),
+        ]));
+        $order->setDeliveries(new OrderDeliveryCollection([$orderBuilder->getShippingDiscountDelivery(CustomerBuilder::create()->build())]));
+
+        $lines = $this->sessionLineBuilder()->buildFromOrder($order, new Money(14.99, 'EUR'), new FakeSalesChannelContext());
+
+        $this->assertSame('Free shipping weekend', $lines->last()?->getDescription());
+        $this->assertSame(LineItemType::DISCOUNT, $lines->last()?->getType());
     }
 
     private function sessionLineBuilder(): SessionLineBuilder

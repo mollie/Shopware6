@@ -12,7 +12,9 @@ use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Mollie\Shopware\Component\Shipment\CancelItemEvent;
 use Mollie\Shopware\Component\Shipment\OrderShippedEvent;
+use Mollie\Shopware\Component\Transaction\TransactionService;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -48,13 +50,20 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
     public function handleFinalizeEvent(PaymentFinalizeEvent $event): void
     {
         $environmentSettings = $this->settingsService->getEnvironmentSettings();
-
-        if (! $environmentSettings->isDevMode() && ! $environmentSettings->isCypressMode()) {
-            return;
-        }
-        $this->logger->warning('Executing Webhook in Dev mode');
         $payment = $event->getPayment();
         $transaction = $payment->getShopwareTransaction();
+        $isExpressCheckout = $this->isExpressCheckout($transaction);
+
+        if (! $isExpressCheckout && ! $environmentSettings->isDevMode() && ! $environmentSettings->isCypressMode()) {
+            return;
+        }
+
+        if ($isExpressCheckout) {
+            $this->logger->info('Executing Webhook after express checkout', ['transactionId' => $transaction->getId()]);
+        } else {
+            $this->logger->warning('Executing Webhook in Dev mode');
+        }
+
         $this->webhookRoute->notify($transaction->getId(), $event->getContext());
     }
 
@@ -85,5 +94,12 @@ final class DevWebHookSubscriber implements EventSubscriberInterface
         sleep(2);
         $this->mollieGateway->clearCache();
         $this->webhookRoute->notify($event->getTransactionId(), $event->getContext());
+    }
+
+    private function isExpressCheckout(OrderTransactionEntity $transaction): bool
+    {
+        $customFields = $transaction->getCustomFields() ?? [];
+
+        return ($customFields[TransactionService::TRANSACTION_CUSTOM_FIELD_EXPRESS_CHECKOUT] ?? false) === true;
     }
 }

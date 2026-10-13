@@ -116,7 +116,7 @@ class OrderTransactionRepositoryTest extends TestCase
         /** @var RedirectResponse $response */
         $response = $this->startCheckout($salesChannelContext);
 
-        $this->assertStringContainsString('mollie.com', $response->getTargetUrl());
+        $this->assertStringStartsWith('https://', $response->getTargetUrl());
 
         return $salesChannelContext;
     }

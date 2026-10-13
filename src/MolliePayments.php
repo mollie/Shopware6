@@ -15,7 +15,7 @@ use Shopware\Core\Framework\Plugin\Context\UpdateContext;
 
 class MolliePayments extends Plugin
 {
-    public const PLUGIN_VERSION = '5.7.0';
+    public const PLUGIN_VERSION = '5.7.0-703ad14bb';
 
     public function install(InstallContext $context): void
     {

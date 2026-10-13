@@ -10,8 +10,6 @@ use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Mode;
 use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\Session;
-use Mollie\Shopware\Component\Mollie\ShippingOption;
-use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
@@ -27,8 +25,8 @@ use Shopware\Core\Checkout\Customer\Aggregate\CustomerAddress\CustomerAddressEnt
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\Struct\ArrayStruct;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -49,13 +47,10 @@ final class SessionBuilder implements SessionBuilderInterface
     public const ORDER_CUSTOM_FIELD = 'mollie_express_components';
     public const ORDER_CUSTOM_FIELD_SESSION_ID = 'session_id';
 
-    /**
-     * Details Mollie collects from the shopper inside the express component. They are sent for a
-     * logged in customer too: Mollie rejects a session that offers shippingOptions without asking
-     * for a shipping address, and the shopper may well pick another address inside the wallet than
-     * the one on the account.
-     */
     private const REQUIRED_CUSTOMER_DETAILS = ['email', 'billing-address', 'shipping-address'];
+
+    private const SESSION_CUSTOMER_EXTENSION = 'mollie_express_components_customer';
+    private const SESSION_CUSTOMER_KEY = 'key';
 
     /**
      * @param EntityRepository<OrderCollection<OrderEntity>> $orderRepository
@@ -65,8 +60,6 @@ final class SessionBuilder implements SessionBuilderInterface
         private SessionGatewayInterface $sessionGateway,
         #[Autowire(service: SessionLineBuilder::class)]
         private SessionLineBuilderInterface $lineBuilder,
-        #[Autowire(service: ShippingOptionsResolver::class)]
-        private ShippingOptionsResolverInterface $shippingOptionsResolver,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
         #[Autowire(service: SettingsService::class)]
@@ -102,33 +95,30 @@ final class SessionBuilder implements SessionBuilderInterface
 
     public function buildFromCart(Cart $cart, SalesChannelContext $salesChannelContext): Session
     {
-        $amount = new Money($this->getAmountWithoutShipping($cart), $salesChannelContext->getCurrency()->getIsoCode());
+        $isCustomer = $salesChannelContext->getCustomer() instanceof CustomerEntity;
+        $total = $isCustomer ? $cart->getPrice()->getTotalPrice() : $this->getAmountWithoutShipping($cart);
+        $amount = new Money($total, $salesChannelContext->getCurrency()->getIsoCode());
         $mode = $this->getMode($salesChannelContext);
+        $customerKey = $this->getCustomerKey($salesChannelContext);
 
-        $existingSession = $this->loadExistingSession($cart, $amount, $mode, $salesChannelContext);
+        $existingSession = $this->loadExistingSession($cart, $amount, $customerKey, $mode, $salesChannelContext);
         if ($existingSession instanceof Session) {
             return $existingSession;
         }
 
-        $session = $this->sessionGateway->createSession(
-            $this->buildCreateSession($cart, $amount, $salesChannelContext),
-            $salesChannelContext
-        );
+        $createSession = $this->buildCreateSession($cart, $amount, $isCustomer, $salesChannelContext);
+        $session = $this->sessionGateway->createSession($createSession, $salesChannelContext);
 
+        $session->addArrayExtension(self::SESSION_CUSTOMER_EXTENSION, [self::SESSION_CUSTOMER_KEY => $customerKey]);
         $cart->addExtension(self::cartExtensionKey($mode), $session);
         $this->cartPersister->save($cart, $salesChannelContext);
 
         return $session;
     }
 
-    /**
-     * The edit order page has no cart, the session is built from the order instead and kept in its
-     * custom fields. The shipping method of an order is already decided, so a single shipping
-     * option is offered - Mollie requires at least one whenever the shopper may pick an address.
-     */
     public function buildFromOrder(OrderEntity $order, SalesChannelContext $salesChannelContext): Session
     {
-        $amount = new Money($this->getOrderAmountWithoutShipping($order), $salesChannelContext->getCurrency()->getIsoCode());
+        $amount = new Money($this->getOrderAmount($order), $salesChannelContext->getCurrency()->getIsoCode());
         $mode = $this->getMode($salesChannelContext);
 
         $existingSession = $this->loadExistingOrderSession($order, $amount, $mode, $salesChannelContext);
@@ -141,8 +131,8 @@ final class SessionBuilder implements SessionBuilderInterface
             $this->routeBuilder->getExpressComponentsOrderRedirectUrl($salesChannelContext->getSalesChannelId(), $order->getId()),
             $amount
         );
-        $createSession->setLines($this->lineBuilder->buildFromOrder($order, $amount, $salesChannelContext));
-        $createSession->setShippingOptions($this->buildOrderShippingOptions($order, $salesChannelContext));
+        $lines = $this->lineBuilder->buildFromOrder($order, $amount, $salesChannelContext);
+        $createSession->setLines($lines);
 
         $this->applyCustomer($createSession, $salesChannelContext);
 
@@ -173,8 +163,7 @@ final class SessionBuilder implements SessionBuilderInterface
             return null;
         }
 
-        // a completed session belongs to a payment that already happened, it must not be offered again
-        if ($session->getStatus()->isCompleted() || ! $this->matchesAmount($session, $amount)) {
+        if (! $session->getStatus()->isOpen() || ! $this->matchesAmount($session, $amount)) {
             return null;
         }
 
@@ -198,58 +187,33 @@ final class SessionBuilder implements SessionBuilderInterface
         ], $salesChannelContext->getContext());
     }
 
-    /**
-     * The delivery of the order already carries the shipping method the customer decided on, so
-     * that one option is all Mollie gets. Recalculating alternatives is not possible here anyway:
-     * the resolver prices them through the cart, and on the edit order page there is none.
-     */
-    private function buildOrderShippingOptions(OrderEntity $order, SalesChannelContext $salesChannelContext): ShippingOptionCollection
-    {
-        $shippingOptions = new ShippingOptionCollection();
-        $currencyIso = $salesChannelContext->getCurrency()->getIsoCode();
-
-        foreach ($order->getDeliveries() ?? [] as $delivery) {
-            $shippingMethod = $delivery->getShippingMethod();
-            if (! $shippingMethod instanceof ShippingMethodEntity) {
-                continue;
-            }
-
-            $description = trim((string) ($shippingMethod->getTranslation('name') ?? $shippingMethod->getName()));
-            $shippingOptions->add(new ShippingOption(
-                $description !== '' ? $description : 'Shipping',
-                $shippingMethod->getId(),
-                new Money($delivery->getShippingCosts()->getTotalPrice(), $currencyIso)
-            ));
-        }
-
-        return $shippingOptions;
-    }
-
-    private function getOrderAmountWithoutShipping(OrderEntity $order): float
+    private function getOrderAmount(OrderEntity $order): float
     {
         $currency = $order->getCurrency();
-        $total = $currency instanceof CurrencyEntity
+
+        return $currency instanceof CurrencyEntity
             ? Money::fromOrder($order, $currency)->getValue()
             : $order->getAmountTotal();
-
-        $shippingCosts = $order->getShippingCosts();
-        $shipping = $shippingCosts->getTotalPrice();
-
-        if ((string) $order->getTaxStatus() === CartPrice::TAX_STATE_NET) {
-            $shipping += $shippingCosts->getCalculatedTaxes()->getAmount();
-        }
-
-        return $total - $shipping;
     }
 
     /**
      * A session cannot be edited after it was created, so it is only reused while it still
      * matches the cart. Any change to the total means a new session has to be created.
      */
-    private function loadExistingSession(Cart $cart, Money $amount, Mode $mode, SalesChannelContext $salesChannelContext): ?Session
+    private function loadExistingSession(Cart $cart, Money $amount, string $customerKey, Mode $mode, SalesChannelContext $salesChannelContext): ?Session
     {
         $storedSession = $cart->getExtension(self::cartExtensionKey($mode));
         if (! $storedSession instanceof Session) {
+            return null;
+        }
+
+        $storedCustomer = $storedSession->getExtension(self::SESSION_CUSTOMER_EXTENSION);
+        if (! $storedCustomer instanceof ArrayStruct || $storedCustomer->get(self::SESSION_CUSTOMER_KEY) !== $customerKey) {
+            $this->logger->debug('Express components session was created for another customer or address, creating a new one', [
+                'sessionId' => $storedSession->getId(),
+                'salesChannelId' => $salesChannelContext->getSalesChannelId(),
+            ]);
+
             return null;
         }
 
@@ -259,6 +223,16 @@ final class SessionBuilder implements SessionBuilderInterface
             $this->logger->warning('Stored express components session could not be loaded, creating a new one', [
                 'error' => $exception->getMessage(),
                 'sessionId' => $storedSession->getId(),
+                'salesChannelId' => $salesChannelContext->getSalesChannelId(),
+            ]);
+
+            return null;
+        }
+
+        if (! $session->getStatus()->isOpen()) {
+            $this->logger->debug('Express components session is no longer open, creating a new one', [
+                'sessionId' => $session->getId(),
+                'status' => $session->getStatus()->value,
                 'salesChannelId' => $salesChannelContext->getSalesChannelId(),
             ]);
 
@@ -315,37 +289,25 @@ final class SessionBuilder implements SessionBuilderInterface
         return round($sessionAmount->getValue(), $decimals) === round($amount->getValue(), $decimals);
     }
 
-    private function buildCreateSession(Cart $cart, Money $amount, SalesChannelContext $salesChannelContext): CreateSession
+    private function buildCreateSession(Cart $cart, Money $amount, bool $isCustomer, SalesChannelContext $salesChannelContext): CreateSession
     {
         $createSession = new CreateSession(
             $this->buildDescription($salesChannelContext),
             $this->routeBuilder->getExpressComponentsRedirectUrl($salesChannelContext->getSalesChannelId(), $cart->getToken()),
             $amount
         );
-        $createSession->setLines($this->lineBuilder->build($cart, $amount, $salesChannelContext));
+        $withShippingLines = $isCustomer;
+        $lines = $this->lineBuilder->build($cart, $amount, $withShippingLines, $salesChannelContext);
+        $createSession->setLines($lines);
 
         $this->applyCustomer($createSession, $salesChannelContext);
-        $this->applyShippingOptions($createSession, $salesChannelContext);
+        if (! $isCustomer) {
+            $createSession->setShippingCallbackUrl(
+                $this->routeBuilder->getExpressComponentsShippingCallbackUrl($salesChannelContext->getSalesChannelId(), $cart->getToken())
+            );
+        }
 
         return $createSession;
-    }
-
-    /**
-     * The options are built for the shipping country of the current context. Once the shopper
-     * picks a different address inside the component, Mollie asks the callback url for the
-     * options of that address.
-     */
-    private function applyShippingOptions(CreateSession $createSession, SalesChannelContext $salesChannelContext): void
-    {
-        // The callback url is not sent yet: sessions rejected it as a non-existent body parameter
-        // until the feature is released for the account, and it has not been retested since it
-        // became shipping.callbackUrl. Everything behind it
-        // (RouteBuilder::getExpressComponentsShippingCallbackUrl and the api route) is in place, so
-        // enabling it is a one line change here.
-        $country = $salesChannelContext->getShippingLocation()->getCountry();
-        $address = new ShippingCallbackAddress((string) $country->getIso());
-
-        $createSession->setShippingOptions($this->shippingOptionsResolver->resolve($address, $salesChannelContext));
     }
 
     private function buildDescription(SalesChannelContext $salesChannelContext): string
@@ -355,29 +317,63 @@ final class SessionBuilder implements SessionBuilderInterface
 
     private function applyCustomer(CreateSession $createSession, SalesChannelContext $salesChannelContext): void
     {
-        $createSession->setRequiredCustomerDetails(self::REQUIRED_CUSTOMER_DETAILS);
-
         $customer = $salesChannelContext->getCustomer();
         if (! $customer instanceof CustomerEntity) {
+            $createSession->setRequiredCustomerDetails(self::REQUIRED_CUSTOMER_DETAILS);
+
             return;
         }
 
-        $email = $customer->getEmail();
-
-        $billingAddress = $customer->getActiveBillingAddress() ?? $customer->getDefaultBillingAddress();
-        if ($billingAddress instanceof CustomerAddressEntity) {
-            $createSession->setBillingAddress(Address::fromCustomerAddress($billingAddress, $email));
+        $billingAddress = $this->getBillingAddress($customer);
+        if ($billingAddress instanceof Address) {
+            $createSession->setBillingAddress($billingAddress);
         }
 
-        $shippingAddress = $customer->getActiveShippingAddress() ?? $customer->getDefaultShippingAddress();
-        if ($shippingAddress instanceof CustomerAddressEntity) {
-            $createSession->setShippingAddress(Address::fromCustomerAddress($shippingAddress, $email));
+        $shippingAddress = $this->getShippingAddress($customer);
+        if ($shippingAddress instanceof Address) {
+            $createSession->setShippingAddress($shippingAddress);
         }
 
         $mollieCustomerId = $this->getMollieCustomerId($customer, $salesChannelContext->getSalesChannelId());
         if ($mollieCustomerId !== null) {
             $createSession->setCustomerId($mollieCustomerId);
         }
+    }
+
+    private function getCustomerKey(SalesChannelContext $salesChannelContext): string
+    {
+        $customer = $salesChannelContext->getCustomer();
+        if (! $customer instanceof CustomerEntity) {
+            return '';
+        }
+
+        $payload = (string) json_encode([
+            $this->getBillingAddress($customer),
+            $this->getShippingAddress($customer),
+            $salesChannelContext->getShippingMethod()->getId(),
+        ]);
+
+        return hash('sha256', $payload);
+    }
+
+    private function getBillingAddress(CustomerEntity $customer): ?Address
+    {
+        $customerAddress = $customer->getActiveBillingAddress() ?? $customer->getDefaultBillingAddress();
+        if (! $customerAddress instanceof CustomerAddressEntity) {
+            return null;
+        }
+
+        return Address::fromCustomerAddress($customerAddress, $customer->getEmail());
+    }
+
+    private function getShippingAddress(CustomerEntity $customer): ?Address
+    {
+        $customerAddress = $customer->getActiveShippingAddress() ?? $customer->getDefaultShippingAddress();
+        if (! $customerAddress instanceof CustomerAddressEntity) {
+            return null;
+        }
+
+        return Address::fromCustomerAddress($customerAddress, $customer->getEmail());
     }
 
     private function getMollieCustomerId(CustomerEntity $customer, string $salesChannelId): ?string
