@@ -18,6 +18,8 @@ final class FakePaymentLinkGateway implements PaymentLinkGatewayInterface
 
     private PaymentCollection $payments;
 
+    private ?\Throwable $createFailure = null;
+
     public function __construct(
         private PaymentLink $createdLink = new PaymentLink('pl_created', 'https://mollie.test/pl_created'),
         private PaymentLink $updatedLink = new PaymentLink('pl_existing', 'https://mollie.test/pl_existing'),
@@ -34,8 +36,17 @@ final class FakePaymentLinkGateway implements PaymentLinkGatewayInterface
         $this->payments = $payments;
     }
 
+    public function withCreateFailure(\Throwable $failure): void
+    {
+        $this->createFailure = $failure;
+    }
+
     public function createPaymentLink(CreatePaymentLink $createPaymentLink, string $orderNumber, string $salesChannelId): PaymentLink
     {
+        if ($this->createFailure !== null) {
+            throw $this->createFailure;
+        }
+
         $this->createdPayloads[] = $createPaymentLink;
 
         return $this->createdLink;

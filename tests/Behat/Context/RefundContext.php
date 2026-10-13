@@ -145,14 +145,21 @@ final class RefundContext extends ShopwareContext
 
         /** @var RefundGatewayInterface $gateway */
         $gateway = $this->getContainer()->get(RefundGateway::class);
-        $refunds = $gateway->listRefunds($mollieExtension->getId(), (string) $order->getOrderNumber(), (string) $order->getSalesChannelId());
 
-        $pendingCount = count(array_filter(
-            $refunds->jsonSerialize(),
-            function ($refund) {
-                return $refund->getStatus() === RefundStatus::Pending || $refund->getStatus() === RefundStatus::Queued;
+        $pendingCount = 0;
+        for ($attempt = 0; $attempt < 5; ++$attempt) {
+            $refunds = $gateway->listRefunds($mollieExtension->getId(), (string) $order->getOrderNumber(), (string) $order->getSalesChannelId());
+            $pendingCount = count(array_filter(
+                $refunds->jsonSerialize(),
+                function ($refund) {
+                    return $refund->getStatus() === RefundStatus::Pending || $refund->getStatus() === RefundStatus::Queued;
+                }
+            ));
+            if ($pendingCount === $count) {
+                break;
             }
-        ));
+            sleep(2);
+        }
 
         Assert::assertSame($count, $pendingCount, sprintf('Expected %d pending refunds but got %d', $count, $pendingCount));
     }

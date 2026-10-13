@@ -16,6 +16,9 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
     private ?\Throwable $failure = null;
     private int $failureAttempts = 0;
 
+    /** @var list<string> */
+    private array $transitions = [];
+
     public function __construct()
     {
     }
@@ -46,69 +49,78 @@ final class FakeOrderTransactionStateHandler extends OrderTransactionStateHandle
         return $this->callCount;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function getTransitions(): array
+    {
+        return $this->transitions;
+    }
+
     public function reopen(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function fail(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function process(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function processUnconfirmed(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function paid(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function payPartially(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function refund(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function refundPartially(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function cancel(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function remind(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function authorize(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
     public function chargeback(string $transactionId, Context $context): void
     {
-        $this->throwIfNeeded();
+        $this->throwIfNeeded(__FUNCTION__);
     }
 
-    private function throwIfNeeded(): void
+    private function throwIfNeeded(string $transition): void
     {
         $this->called = true;
+        $this->transitions[] = $transition;
         ++$this->callCount;
         if ($this->failure !== null && $this->callCount <= $this->failureAttempts) {
             throw $this->failure;
