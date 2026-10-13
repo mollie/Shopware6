@@ -1,6 +1,11 @@
 import Devices from "Services/utils/Devices";
 import Session from "Services/utils/Session";
 import Shopware from "Services/shopware/Shopware";
+import AdminAPIClient from "Services/shopware/AdminAPIClient";
+// ------------------------------------------------------
+import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
+import PaymentAction from "Actions/storefront/checkout/PaymentAction";
+import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 // ------------------------------------------------------
 import ShopConfigurationAction from "Actions/admin/ShopConfigurationAction";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
@@ -29,6 +34,11 @@ const adminLogin = new AdminLoginAction();
 const createOrder = new AdminCreateOrderAction();
 const adminOrders = new AdminOrdersAction();
 const adminSubscriptions = new AdminSubscriptionsAction();
+const adminApi = new AdminAPIClient();
+
+const checkout = new CheckoutAction();
+const paymentAction = new PaymentAction();
+const scenarioDummyBasket = new DummyBasketScenario(1);
 
 const repoSubscriptionsList = new SubscriptionsListRepository();
 const repoSubscriptionDetails = new SubscriptionDetailsRepository();
@@ -77,15 +87,19 @@ function configurePaymentLink(allowMethodSelection) {
  * Mollie can show intermediate steps on that page, so we always continue to the method list.
  */
 function openPaymentLink(orderId) {
+    visitPayUrl(orderId);
+
+    cy.url({timeout: 30000}).should('include', 'mollie.com');
+
+    mollieCheckout.continueToCheckout();
+}
+
+function visitPayUrl(orderId) {
     shopware.prepareDomainChange();
 
     cy.window().then((win) => {
         win.location.href = '/mollie/pay/' + orderId;
     });
-
-    cy.url({timeout: 30000}).should('include', 'mollie.com');
-
-    mollieCheckout.continueToCheckout();
 }
 
 
@@ -120,6 +134,78 @@ context("Payment Link", () => {
                 // finalize ran through: the order is paid. We are still logged into the admin from
                 // creating the order, so we can go straight to the order list.
                 adminOrders.assertLatestPaymentStatus('Paid');
+            });
+        });
+
+        it('pay a failed checkout via the payment link', () => {
+
+            beforeEach(device);
+
+            configurePaymentLink(false);
+
+            scenarioDummyBasket.execute();
+            paymentAction.switchPaymentMethod('PayPal');
+
+            shopware.prepareDomainChange();
+            checkout.placeOrderOnConfirm();
+
+            mollieSandbox.initSandboxCookie();
+            molliePayment.selectFailed();
+
+            cy.url({timeout: 30000}).should('include', '/account/order/edit/');
+
+            cy.url().then((url) => {
+                const orderId = url.split('/account/order/edit/')[1].split(/[?#]/)[0];
+
+                openPaymentLink(orderId);
+
+                molliePaymentMethods.selectPaypal();
+                molliePayment.selectPaid();
+
+                cy.url({timeout: 30000}).should('include', '/checkout/finish');
+                cy.contains('Thank you for your order');
+
+                adminLogin.login();
+                adminOrders.assertLatestPaymentStatus('Paid');
+            });
+        });
+
+        it('redirect the payment link to the checkout of a payment that is still open', () => {
+
+            beforeEach(device);
+
+            configurePaymentLink(false);
+
+            scenarioDummyBasket.execute();
+            paymentAction.switchPaymentMethod('PayPal');
+
+            shopware.prepareDomainChange();
+            checkout.placeOrderOnConfirm();
+
+            cy.url({timeout: 30000}).should('include', 'mollie.com');
+
+            cy.url().then((mollieCheckoutUrl) => {
+                cy.wrap(null).then(() => {
+                    return adminApi.post('/search/order', {
+                        limit: 1,
+                        sort: [{field: 'createdAt', order: 'DESC'}],
+                    });
+                }).then((order) => {
+                    cy.visit('/');
+
+                    visitPayUrl(order.id);
+
+                    cy.url({timeout: 30000}).should('eq', mollieCheckoutUrl);
+
+                    cy.wrap(null).then(() => {
+                        return adminApi.post('/search/order-transaction', {
+                            limit: 1,
+                            filter: [{type: 'equals', field: 'orderId', value: order.id}],
+                        });
+                    }).then((transaction) => {
+                        expect(transaction.attributes.customFields.mollie_payments.paymentLinkId).to.be.undefined;
+                    });
+                });
             });
         });
 

@@ -168,6 +168,14 @@ link for such an order must not start a second attempt - the transaction's Molli
 `MollieOrderTransactionCollection::getLatestPayableTransaction()` therefore accepts `open`,
 `reminded` and `unconfirmed`.
 
+A newest transaction in `failed` is made payable again once the link exists, like the checkout
+does when it redirects to Mollie - never back to `open`. The target is `unconfirmed`, because
+Shopware does not allow a transaction in `in_progress` to be paid again. The one exception is a
+link that can only be paid by bank transfer (method selection disabled in the plugin settings and
+the order was placed with bank transfer): there `in_progress` is right, as in the checkout. A
+`cancelled` transaction stays final - the buyer cancelled explicitly - so the payment link must not
+revive it. The order state plays no part in this; only the transaction state decides.
+
 ---
 
 ## The current transaction is the primary one, from Shopware 6.7.1 on

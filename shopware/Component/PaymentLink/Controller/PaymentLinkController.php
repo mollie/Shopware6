@@ -15,6 +15,7 @@ use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentLinkPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentLinkCreatedEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
@@ -24,6 +25,7 @@ use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
 use Mollie\Shopware\Component\Transaction\MollieOrderTransactionCollection;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
+use Mollie\Shopware\Entity\Order\MollieShopwareOrder;
 use Mollie\Shopware\Entity\PaymentMethod\PaymentMethod as MolliePaymentMethodExtension;
 use Mollie\Shopware\Mollie;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -31,6 +33,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\SalesChannel\AccountService;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStateHandler;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\Token\JWTFactoryV2;
@@ -44,6 +48,7 @@ use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -102,6 +107,8 @@ final class PaymentLinkController extends StorefrontController
         private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: SystemConfigService::class)]
         private SystemConfigService $systemConfigService,
+        #[Autowire(service: OrderTransactionStateHandler::class)]
+        private OrderTransactionStateHandler $transactionStateHandler,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -126,7 +133,7 @@ final class PaymentLinkController extends StorefrontController
         $logData['orderNumber'] = $orderNumber;
 
         $transactionCollection = new MollieOrderTransactionCollection($order->getTransactions());
-        $transaction = $transactionCollection->getLatestPayableTransaction();
+        $transaction = $transactionCollection->getLatestPayableTransaction() ?? $this->findLatestFailedTransaction($order);
 
         if (! $transaction instanceof OrderTransactionEntity) {
             $this->logger->warning('Payment link requested but order has no open transaction', $logData);
@@ -207,6 +214,7 @@ final class PaymentLinkController extends StorefrontController
         $logData['paymentLinkId'] = $paymentLinkId;
 
         $this->storePaymentLinkData($transaction, $paymentLinkId, $finalizeUrl, $baseContext);
+        $this->reopenFailedTransaction($transaction, $paymentSettings, $paymentHandler, $logData, $baseContext);
 
         // Mirror the checkout: this creates the pending subscription for a subscription order (the
         // paid webhook confirms it afterwards). PaymentLinkCreatedEvent shares the base event with
@@ -228,6 +236,61 @@ final class PaymentLinkController extends StorefrontController
         $order = $this->orderRepository->search($criteria, $context)->getEntities()->first();
 
         return $order instanceof OrderEntity ? $order : null;
+    }
+
+    private function findLatestFailedTransaction(OrderEntity $order): ?OrderTransactionEntity
+    {
+        $transaction = (new MollieShopwareOrder($order))->getLatestTransaction();
+        if (! $transaction instanceof OrderTransactionEntity) {
+            return null;
+        }
+
+        if (! $this->isFailed($transaction)) {
+            return null;
+        }
+
+        return $transaction;
+    }
+
+    private function isFailed(OrderTransactionEntity $transaction): bool
+    {
+        return $transaction->getStateMachineState()?->getTechnicalName() === OrderTransactionStates::STATE_FAILED;
+    }
+
+    /**
+     * @param array<string, string> $logData
+     */
+    private function reopenFailedTransaction(OrderTransactionEntity $transaction, PaymentSettings $paymentSettings, ?AbstractMolliePaymentHandler $paymentHandler, array $logData, Context $context): bool
+    {
+        if (! $this->isFailed($transaction)) {
+            return false;
+        }
+
+        try {
+            $logData['shopwareStatus'] = $this->transitionFailedTransaction($transaction->getId(), $paymentSettings, $paymentHandler, $context);
+        } catch (IllegalTransitionException $exception) {
+            $logData['error'] = $exception->getMessage();
+            $this->logger->error('Could not reopen the failed transaction for the payment link', $logData);
+
+            return false;
+        }
+
+        $this->logger->info('Reopened the failed transaction for the payment link', $logData);
+
+        return true;
+    }
+
+    private function transitionFailedTransaction(string $transactionId, PaymentSettings $paymentSettings, ?AbstractMolliePaymentHandler $paymentHandler, Context $context): string
+    {
+        if ($paymentSettings->isPaymentLinkMethodSelectionAllowed() || ! $paymentHandler instanceof BankTransferAwareInterface) {
+            $this->transactionStateHandler->processUnconfirmed($transactionId, $context);
+
+            return OrderTransactionStates::STATE_UNCONFIRMED;
+        }
+
+        $this->transactionStateHandler->process($transactionId, $context);
+
+        return OrderTransactionStates::STATE_IN_PROGRESS;
     }
 
     /**
@@ -453,10 +516,10 @@ final class PaymentLinkController extends StorefrontController
     private function storePaymentLinkData(OrderTransactionEntity $transaction, string $paymentLinkId, string $finalizeUrl, Context $context): void
     {
         $customFields = $transaction->getCustomFields() ?? [];
-        $mollieData = $customFields[Mollie::EXTENSION] ?? [];
-        $mollieData['paymentLinkId'] = $paymentLinkId;
-        $mollieData['finalizeUrl'] = $finalizeUrl;
-        $customFields[Mollie::EXTENSION] = $mollieData;
+        $customFields[Mollie::EXTENSION] = [
+            'paymentLinkId' => $paymentLinkId,
+            'finalizeUrl' => $finalizeUrl,
+        ];
 
         $this->orderTransactionRepository->upsert([
             [

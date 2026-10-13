@@ -28,7 +28,9 @@ use Mollie\Shopware\Unit\Fake\FakeSalesChannelContextPersister;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Fake\FakeShopwareAccountService;
 use Mollie\Shopware\Unit\Fake\FakeTokenFactory;
+use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferPaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
+use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionStateHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePayloadBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\MethodRemover\Fake\FakePaymentMethodRoute;
@@ -43,6 +45,7 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\PaymentMethodCollection;
+use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
@@ -69,6 +72,7 @@ final class PaymentLinkControllerTest extends TestCase
 {
     private const ORDER_ID = 'order-1';
     private const TRANSACTION_ID = 'transaction-1';
+    private const NEWER_TRANSACTION_ID = 'transaction-2';
     private const CUSTOMER_ID = 'test-customer-id';
     private const GENERATED_URL = 'https://shop.test/generated';
     private const CHECKOUT_URL = 'https://mollie.test/checkout/tr_open';
@@ -109,6 +113,8 @@ final class PaymentLinkControllerTest extends TestCase
 
     private SystemConfigService $systemConfigService;
 
+    private FakeOrderTransactionStateHandler $transactionStateHandler;
+
     /** @var list<FakePaymentMethodHandler> */
     private array $paymentHandlers = [];
 
@@ -130,6 +136,7 @@ final class PaymentLinkControllerTest extends TestCase
         $this->eventDispatcher = new EventSpy();
         $this->paymentSettings = new PaymentSettings('', 0);
         $this->systemConfigService = new StaticSystemConfigService();
+        $this->transactionStateHandler = new FakeOrderTransactionStateHandler();
         $this->paymentHandlers = [new FakePaymentMethodHandler(MolliePaymentMethod::PAYPAL)];
 
         $this->session = new Session(new MockArraySessionStorage());
@@ -389,14 +396,175 @@ final class PaymentLinkControllerTest extends TestCase
         $this->assertSame(self::GENERATED_URL, $row['customFields'][Mollie::EXTENSION]['finalizeUrl']);
     }
 
-    public function testPayKeepsTheExistingMollieCustomFieldsOfTheTransaction(): void
+    /**
+     * The webhook loads the payment id stored on the transaction before it looks at the link. A
+     * leftover id of an earlier, failed attempt would set the transaction back to failed.
+     */
+    public function testPayDropsThePaymentOfAnEarlierAttemptFromTheTransaction(): void
     {
-        $this->givenOrder(transactionCustomFields: [Mollie::EXTENSION => ['keepMe' => 'yes']]);
+        $this->givenOrder(
+            transactionState: OrderTransactionStates::STATE_FAILED,
+            transactionCustomFields: [Mollie::EXTENSION => ['id' => 'tr_failed', 'payment_id' => 'tr_failed']],
+        );
 
         $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
 
         $row = $this->orderTransactionRepository->data[0][0];
-        $this->assertSame('yes', $row['customFields'][Mollie::EXTENSION]['keepMe']);
+        $this->assertSame(['paymentLinkId', 'finalizeUrl'], array_keys($row['customFields'][Mollie::EXTENSION]));
+    }
+
+    // -------------------------------------------------------- failed transaction
+
+    public function testPayCreatesALinkForAFailedTransaction(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED);
+
+        $response = $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertCount(1, $this->paymentLinkGateway->getCreatedPayloads());
+        $this->assertSame('https://mollie.test/pl_created', $response->getTargetUrl());
+    }
+
+    public function testPayMovesAFailedTransactionToUnconfirmed(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame(['processUnconfirmed'], $this->transactionStateHandler->getTransitions());
+    }
+
+    /**
+     * Without method selection the link can only be paid by bank transfer, so the transaction is
+     * in progress like after a regular bank transfer checkout.
+     */
+    public function testPayMovesAFailedBankTransferTransactionToInProgress(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED, mollieMethod: MolliePaymentMethod::BANK_TRANSFER);
+        $this->paymentHandlers = [new FakeBankTransferPaymentHandler()];
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame(['process'], $this->transactionStateHandler->getTransitions());
+    }
+
+    /**
+     * Shopware does not let a transaction in progress be paid again, so as soon as the customer may
+     * pick a method at Mollie the transaction is unconfirmed - even when bank transfer is the only
+     * method offered right now.
+     */
+    public function testPayMovesAFailedBankTransferTransactionToUnconfirmedWhenMethodSelectionIsAllowed(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED, mollieMethod: MolliePaymentMethod::BANK_TRANSFER);
+        $this->paymentHandlers = [new FakeBankTransferPaymentHandler()];
+        $this->allowMethodSelection();
+        $this->givenAvailableMethods(MolliePaymentMethod::BANK_TRANSFER);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame(['processUnconfirmed'], $this->transactionStateHandler->getTransitions());
+    }
+
+    public function testPayLeavesAnOpenTransactionInItsState(): void
+    {
+        $this->givenOrder();
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame([], $this->transactionStateHandler->getTransitions());
+    }
+
+    public function testPayDoesNotReopenACancelledTransaction(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_CANCELLED);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame('frontend.account.order.page', $this->router->getLastRouteName());
+        $this->assertSame([], $this->transactionStateHandler->getTransitions());
+    }
+
+    /**
+     * The transaction only leaves failed once the link exists, so an early exit does not leave it
+     * unconfirmed without anything to pay with.
+     */
+    public function testPayKeepsTheTransactionFailedWhenNoLinkIsCreated(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED, mollieMethod: null);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame([], $this->transactionStateHandler->getTransitions());
+    }
+
+    public function testPayStillRedirectsToTheLinkWhenTheTransactionCannotLeaveFailed(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED);
+        $this->transactionStateHandler->setShouldThrowIllegalTransition(true);
+
+        $response = $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame('https://mollie.test/pl_created', $response->getTargetUrl());
+        $this->assertSame('https://mollie.test/pl_created', $this->firstEventOfType(PaymentLinkCreatedEvent::class)->getPaymentLinkUrl());
+    }
+
+    public function testPayKeepsTheTransactionFailedWhenMollieRejectsTheLink(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED);
+        $this->paymentLinkGateway->withCreateFailure(new \RuntimeException('Mollie rejected the link'));
+
+        try {
+            $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+        } catch (\RuntimeException) {
+        }
+
+        $this->assertSame([], $this->transactionStateHandler->getTransitions());
+    }
+
+    public function testPayMovesAFailedTransactionToUnconfirmedWhenItUpdatesTheExistingLink(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED, existingPaymentLinkId: 'pl_existing');
+        $this->paymentLinkGateway->withPayments($this->paymentsWithStatus(PaymentStatus::FAILED));
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertCount(1, $this->paymentLinkGateway->getUpdatedPayloads());
+        $this->assertSame(['processUnconfirmed'], $this->transactionStateHandler->getTransitions());
+    }
+
+    public function testPayKeepsTheTransactionFailedWhenTheExistingLinkWasAlreadyPaid(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED, existingPaymentLinkId: 'pl_existing');
+        $this->paymentLinkGateway->withPayments($this->paymentsWithStatus(PaymentStatus::PAID));
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame('frontend.account.order.page', $this->router->getLastRouteName());
+        $this->assertSame([], $this->transactionStateHandler->getTransitions());
+    }
+
+    /**
+     * Only the newest transaction counts: an older failed attempt must not revive an order whose
+     * latest transaction was cancelled.
+     */
+    public function testPayDoesNotReopenAnOlderFailedTransaction(): void
+    {
+        $this->givenOrder(transactionState: OrderTransactionStates::STATE_FAILED, newerTransactionState: OrderTransactionStates::STATE_CANCELLED);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame('frontend.account.order.page', $this->router->getLastRouteName());
+        $this->assertSame([], $this->transactionStateHandler->getTransitions());
+    }
+
+    public function testPayPrefersAnOpenTransactionOverANewerFailedOne(): void
+    {
+        $this->givenOrder(newerTransactionState: OrderTransactionStates::STATE_FAILED);
+
+        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
+
+        $this->assertSame(self::TRANSACTION_ID, $this->orderTransactionRepository->data[0][0]['id']);
+        $this->assertSame([], $this->transactionStateHandler->getTransitions());
     }
 
     // ------------------------------------------------------------------- login
@@ -616,23 +784,21 @@ final class PaymentLinkControllerTest extends TestCase
         ?string $existingPaymentLinkId = null,
         array $transactionCustomFields = [],
         ?string $molliePaymentId = null,
+        ?string $newerTransactionState = null,
     ): void {
-        $state = new StateMachineStateEntity();
-        $state->setId('transaction-state');
-        $state->setTechnicalName($transactionState);
-
         $paymentMethodBuilder = PaymentMethodBuilder::create()->withId('payment-method-1');
         if ($mollieMethod !== null) {
             $paymentMethodBuilder = $paymentMethodBuilder->withMollieMethod($mollieMethod);
         }
+        $paymentMethod = $paymentMethodBuilder->build();
 
-        $transaction = new OrderTransactionEntity();
-        $transaction->setId(self::TRANSACTION_ID);
-        $transaction->setPaymentMethodId('payment-method-1');
-        $transaction->setPaymentMethod($paymentMethodBuilder->build());
-        $transaction->setStateMachineState($state);
+        $transaction = $this->transaction(self::TRANSACTION_ID, $transactionState, '2026-01-01T10:00:00+00:00', $paymentMethod);
         $transaction->setCustomFields($transactionCustomFields);
-        $transaction->setCreatedAt(new \DateTimeImmutable('2026-01-01T10:00:00+00:00'));
+        $transactions = new OrderTransactionCollection([$transaction]);
+
+        if ($newerTransactionState !== null) {
+            $transactions->add($this->transaction(self::NEWER_TRANSACTION_ID, $newerTransactionState, '2026-01-02T10:00:00+00:00', $paymentMethod));
+        }
 
         if ($existingPaymentLinkId !== null || $molliePaymentId !== null) {
             $payment = new Payment($molliePaymentId ?? 'tr_1');
@@ -646,9 +812,25 @@ final class PaymentLinkControllerTest extends TestCase
         $order->setId(self::ORDER_ID);
         $order->setOrderNumber('10000');
         $order->setSalesChannelId('sales-channel-1');
-        $order->setTransactions(new OrderTransactionCollection([$transaction]));
+        $order->setTransactions($transactions);
 
         $this->orderRepository->add($order);
+    }
+
+    private function transaction(string $id, string $stateName, string $createdAt, PaymentMethodEntity $paymentMethod): OrderTransactionEntity
+    {
+        $state = new StateMachineStateEntity();
+        $state->setId('state-' . $id);
+        $state->setTechnicalName($stateName);
+
+        $transaction = new OrderTransactionEntity();
+        $transaction->setId($id);
+        $transaction->setPaymentMethodId($paymentMethod->getId());
+        $transaction->setPaymentMethod($paymentMethod);
+        $transaction->setStateMachineState($state);
+        $transaction->setCreatedAt(new \DateTimeImmutable($createdAt));
+
+        return $transaction;
     }
 
     private function allowMethodSelection(): void
@@ -724,6 +906,7 @@ final class PaymentLinkControllerTest extends TestCase
             $this->requestStack,
             $this->eventDispatcher,
             $this->systemConfigService,
+            $this->transactionStateHandler,
             new NullLogger()
         );
 
