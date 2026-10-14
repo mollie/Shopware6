@@ -32,6 +32,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class PaymentMethodInstaller
 {
+    private const ICON_TEMP_FILE_PREFIX = 'mollie-icon-';
+
     /**
      * @param EntityRepository<PaymentMethodCollection<PaymentMethodEntity>> $shopwarePaymentMethodRepository
      * @param EntityRepository<MediaCollection<MediaEntity>> $mediaRepository
@@ -234,7 +236,7 @@ final class PaymentMethodInstaller
                     'extension' => $extension,
                 ]);
             } finally {
-                $this->cleanupTempFile($mediaFile);
+                $this->cleanupTempFile($mediaFile->getFileName());
             }
         }
 
@@ -251,10 +253,13 @@ final class PaymentMethodInstaller
         $request = new Request();
         $request->request->set('url', $url);
         $request->query->set('extension', ltrim($extension, '.'));
+        $tempFilePath = (string) tempnam(sys_get_temp_dir(), self::ICON_TEMP_FILE_PREFIX);
 
         try {
-            return $this->fileFetcher->fetchFileFromURL($request, $fileName);
+            return $this->fileFetcher->fetchFileFromURL($request, $tempFilePath);
         } catch (MediaException $e) {
+            $this->cleanupTempFile($tempFilePath);
+
             $this->logger->warning('Failed to fetch payment method icon', [
                 'exception' => $e->getMessage(),
                 'file' => $fileName,
@@ -265,9 +270,8 @@ final class PaymentMethodInstaller
         }
     }
 
-    private function cleanupTempFile(MediaFile $mediaFile): void
+    private function cleanupTempFile(string $tempFilePath): void
     {
-        $tempFilePath = $mediaFile->getFileName();
         if (file_exists($tempFilePath)) {
             unlink($tempFilePath);
         }

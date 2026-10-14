@@ -191,6 +191,26 @@ final class PaymentMethodInstallerTest extends TestCase
         $this->assertSame('https://www.mollie.com/external/icons/payment-methods/ideal.svg', $this->fileFetcher->requestedUrls[0]);
     }
 
+    public function testTheIconIsDownloadedIntoTheTempDirectoryInsteadOfTheWorkingDirectory(): void
+    {
+        $this->install([new FakePaymentMethodHandler(PaymentMethod::IDEAL, 'iDEAL')]);
+
+        $destination = $this->fileFetcher->destinationPaths[0];
+        $this->assertStringStartsWith(sys_get_temp_dir() . DIRECTORY_SEPARATOR, $destination);
+        $this->assertFileDoesNotExist($destination);
+    }
+
+    public function testAFailedIconDownloadLeavesNoTempFileBehind(): void
+    {
+        $this->fileFetcher = new FakeFileFetcher(iconAvailable: false);
+
+        $this->install([new FakePaymentMethodHandler(PaymentMethod::IDEAL, 'iDEAL')]);
+
+        $this->assertCount(2, $this->fileFetcher->destinationPaths);
+        $this->assertFileDoesNotExist($this->fileFetcher->destinationPaths[0]);
+        $this->assertFileDoesNotExist($this->fileFetcher->destinationPaths[1]);
+    }
+
     public function testAMethodWithoutAReachableIconIsStillInstalled(): void
     {
         $this->fileFetcher = new FakeFileFetcher(iconAvailable: false);
