@@ -13,6 +13,9 @@ final class FakeFileFetcher extends FileFetcher
     /** @var list<string> */
     public array $requestedUrls = [];
 
+    /** @var list<string> */
+    public array $destinationPaths = [];
+
     public function __construct(private readonly bool $iconAvailable = true)
     {
     }
@@ -20,15 +23,14 @@ final class FakeFileFetcher extends FileFetcher
     public function fetchFileFromURL(Request $request, string $fileName): MediaFile
     {
         $this->requestedUrls[] = (string) $request->request->get('url');
+        $this->destinationPaths[] = $fileName;
 
         if (! $this->iconAvailable) {
             throw MediaException::cannotOpenSourceStreamToRead($fileName);
         }
 
-        // PaymentMethodInstaller::cleanupTempFile() unlinks this path when it exists, so it
-        // must never collide with a real file on the machine running the suite.
         return new MediaFile(
-            sys_get_temp_dir() . '/mollie-fake-icon-' . bin2hex(random_bytes(8)),
+            $fileName,
             'image/svg+xml',
             'svg',
             1024
