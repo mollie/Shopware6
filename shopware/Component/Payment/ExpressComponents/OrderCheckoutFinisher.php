@@ -76,7 +76,7 @@ final class OrderCheckoutFinisher implements OrderCheckoutFinisherInterface
         // Mollie fills a session asynchronously, so right after the redirect it can still come
         // back without addresses - loadSession waits for them instead of failing the checkout
         $sessionId = $this->getSessionId($order, $salesChannelContext);
-        $session = $this->sessionGateway->loadSession($sessionId, $salesChannelContext);
+        $session = $this->sessionGateway->loadSession($sessionId, $salesChannelContext, true);
         $logData['sessionId'] = $session->getId();
 
         if (! $session->getStatus()->isCompleted()) {

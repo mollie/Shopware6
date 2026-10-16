@@ -16,7 +16,7 @@ interface SessionGatewayInterface
 
     public function getSession(string $sessionId, SalesChannelContext $salesChannelContext): Session;
 
-    public function loadSession(string $sessionId, SalesChannelContext $salesChannelContext): Session;
+    public function loadSession(string $sessionId, SalesChannelContext $salesChannelContext, bool $requirePaymentId = false): Session;
 
     public function cancelSession(string $sessionId, SalesChannelContext $salesChannelContext): Session;
 }
