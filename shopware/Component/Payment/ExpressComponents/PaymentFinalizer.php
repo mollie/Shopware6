@@ -58,9 +58,16 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
             'transactionId' => $transaction->getId(),
         ];
 
-        $this->attachPayment($session, $order, $transaction, $salesChannelContext, $logData);
+        $finishUrls = $this->getFinishUrls();
+        if ($session->getPaymentId() === '') {
+            $this->logger->error('Express components session carries no payment id, payment handling skipped', $logData);
 
-        return $this->handlePayment($orderId, $salesChannelContext, $logData);
+            return $this->getFinishUrl($finishUrls, $orderId);
+        }
+
+        $this->attachPayment($session, $order, $transaction, $salesChannelContext);
+
+        return $this->handlePayment($finishUrls, $orderId, $salesChannelContext, $logData);
     }
 
     /**
@@ -88,19 +95,10 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
      * The payment already exists on Mollie's side, it is loaded once and written onto the
      * order transaction the same way a regular payment would be, so webhooks, refunds and the
      * ERP exports find it under the usual keys.
-     *
-     * @param array<mixed> $logData
      */
-    private function attachPayment(Session $session, OrderEntity $order, OrderTransactionEntity $transaction, SalesChannelContext $salesChannelContext, array $logData): void
+    private function attachPayment(Session $session, OrderEntity $order, OrderTransactionEntity $transaction, SalesChannelContext $salesChannelContext): void
     {
-        $paymentId = $session->getPaymentId();
-        if ($paymentId === '') {
-            $this->logger->error('Express components session carries no payment id', $logData);
-
-            return;
-        }
-
-        $payment = $this->mollieGateway->getPayment($paymentId, (string) $order->getOrderNumber(), $salesChannelContext->getSalesChannelId());
+        $payment = $this->mollieGateway->getPayment($session->getPaymentId(), (string) $order->getOrderNumber(), $salesChannelContext->getSalesChannelId());
 
         $this->transactionService->savePaymentExtension($transaction->getId(), $order, $payment, $salesChannelContext->getContext(), expressCheckout: true);
     }
@@ -115,14 +113,9 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
      *
      * @param array<mixed> $logData
      */
-    private function handlePayment(string $orderId, SalesChannelContext $salesChannelContext, array $logData): string
+    private function handlePayment(FinishUrls $finishUrls, string $orderId, SalesChannelContext $salesChannelContext, array $logData): string
     {
-        $finishUrls = $this->getFinishUrls();
-
-        $finishUrl = $finishUrls->getFinishUrl($orderId);
-        if ($finishUrl === '') {
-            $finishUrl = $this->routeBuilder->getCheckoutFinishUrl($orderId);
-        }
+        $finishUrl = $this->getFinishUrl($finishUrls, $orderId);
 
         $errorUrl = $finishUrls->getErrorUrl($orderId);
         if ($errorUrl === '') {
@@ -145,6 +138,16 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         } catch (\Throwable $exception) {
             $logData['error'] = $exception->getMessage();
             $this->logger->error('Failed to handle the express components payment', $logData);
+        }
+
+        return $finishUrl;
+    }
+
+    private function getFinishUrl(FinishUrls $finishUrls, string $orderId): string
+    {
+        $finishUrl = $finishUrls->getFinishUrl($orderId);
+        if ($finishUrl === '') {
+            return $this->routeBuilder->getCheckoutFinishUrl($orderId);
         }
 
         return $finishUrl;

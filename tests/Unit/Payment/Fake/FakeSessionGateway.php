@@ -85,7 +85,7 @@ final class FakeSessionGateway implements SessionGatewayInterface
         return $this->existingSession ?? $this->session;
     }
 
-    public function loadSession(string $sessionId, SalesChannelContext $salesChannelContext): Session
+    public function loadSession(string $sessionId, SalesChannelContext $salesChannelContext, bool $requirePaymentId = false): Session
     {
         return $this->session;
     }
