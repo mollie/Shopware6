@@ -68,22 +68,21 @@ class LineItemFilterTest extends TestCase
     }
 
     /**
-     * A product tagged as zeobv bundle parent must be removed.
-     * Its children (separate items without the payload key) must stay.
+     * The zeobv bundle product carries the bundle price, its bundle_product_item children must be removed.
      */
-    public function testZeobvBundleParentIsSkipped(): void
+    public function testZeobvBundleChildrenAreSkipped(): void
     {
         $parent = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 50.0);
-        $parent->setPayload(['zeobvCustomLineItemType' => 'bundle_product_item']);
 
-        $child1 = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 25.0);
-        $child2 = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 25.0);
+        $child1 = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'bundle_product_item', 25.0);
+        $child1->setPayload(['zeobvCustomLineItemType' => 'bundle_product_item']);
+        $child2 = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), 'bundle_product_item', 25.0);
+        $child2->setPayload(['zeobvCustomLineItemType' => 'bundle_product_item']);
 
         $result = $this->filterOrderItems(new OrderLineItemCollection([$parent, $child1, $child2]));
 
-        $this->assertCount(2, $result);
-        $ids = array_keys(iterator_to_array($result));
-        $this->assertNotContains($parent->getId(), $ids);
+        $this->assertCount(1, $result);
+        $this->assertSame($parent->getId(), $result->first()->getId());
     }
 
     /**
@@ -271,19 +270,19 @@ class LineItemFilterTest extends TestCase
     }
 
     /**
-     * zeobv bundle parent in cart must be removed.
+     * zeobv bundle children in cart must be removed.
      */
-    public function testCartZeobvBundleParentIsSkipped(): void
+    public function testCartZeobvBundleChildIsSkipped(): void
     {
         $parent = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
-        $parent->setPayload(['zeobvCustomLineItemType' => 'bundle_product_item']);
 
-        $child = new CartLineItem(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE);
+        $child = new CartLineItem(Uuid::randomHex(), 'bundle_product_item');
+        $child->setPayload(['zeobvCustomLineItemType' => 'bundle_product_item']);
 
         $result = $this->filterCartItems(new CartLineItemCollection([$parent, $child]));
 
         $this->assertCount(1, $result);
-        $this->assertSame($child->getId(), $result->first()->getId());
+        $this->assertSame($parent->getId(), $result->first()->getId());
     }
 
     /**
