@@ -9,6 +9,7 @@ use Mollie\Shopware\Component\Payment\ExpressComponents\Subscriber\ExpressCompon
 use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestriction;
 use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
 use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Builder\CartBuilder;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
@@ -97,7 +98,9 @@ final class ExpressComponentsCartSubscriberTest extends TestCase
         $route = new CreateSessionRoute(
             new FakeSettingsService(expressComponentsSettings: $settings),
             $this->sessionBuilder,
-            new FakeOrderSearchRepository()
+            new FakeOrderSearchRepository(),
+            new LineItemAnalyzer(),
+            new FakeLogger()
         );
 
         return new ExpressComponentsCartSubscriber(

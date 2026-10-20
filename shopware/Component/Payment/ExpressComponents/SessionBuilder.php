@@ -5,6 +5,7 @@ namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\CreateSession;
+use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Mode;
@@ -107,7 +108,7 @@ final class SessionBuilder implements SessionBuilderInterface
         }
 
         $createSession = $this->buildCreateSession($cart, $amount, $isCustomer, $salesChannelContext);
-        $session = $this->sessionGateway->createSession($createSession, $salesChannelContext);
+        $session = $this->createCartSession($createSession, $salesChannelContext);
 
         $session->addArrayExtension(self::SESSION_CUSTOMER_EXTENSION, [self::SESSION_CUSTOMER_KEY => $customerKey]);
         $cart->addExtension(self::cartExtensionKey($mode), $session);
@@ -141,6 +142,26 @@ final class SessionBuilder implements SessionBuilderInterface
         $this->saveSessionOnOrder($order, $session->getId(), $mode, $salesChannelContext);
 
         return $session;
+    }
+
+    private function createCartSession(CreateSession $createSession, SalesChannelContext $salesChannelContext): Session
+    {
+        try {
+            return $this->sessionGateway->createSession($createSession, $salesChannelContext);
+        } catch (ApiException $exception) {
+            if (! $exception->isShippingCallbackUrlRejected()) {
+                throw $exception;
+            }
+
+            $this->logger->warning('Mollie rejected the shipping callback url, creating the express components session without it', [
+                'shippingCallbackUrl' => $createSession->getShippingCallbackUrl(),
+                'salesChannelId' => $salesChannelContext->getSalesChannelId(),
+            ]);
+
+            $createSession->setShippingCallbackUrl('');
+
+            return $this->sessionGateway->createSession($createSession, $salesChannelContext);
+        }
     }
 
     private function loadExistingOrderSession(OrderEntity $order, Money $amount, Mode $mode, SalesChannelContext $salesChannelContext): ?Session
