@@ -54,7 +54,8 @@ final class ZugferdInvoiceGeneratedSubscriberTest extends TestCase
 
         $xml = $builder->getContent();
         $this->assertStringContainsString('ApplicableTradeSettlementFinancialCard', $xml);
-        $this->assertStringContainsString('schemeID="Mastercard">6787</ram:ID>', $xml);
+        $this->assertStringContainsString('<ram:ID>6787</ram:ID>', $xml);
+        $this->assertStringNotContainsString('schemeID="Mastercard"', $xml);
         $this->assertStringContainsString('<ram:CardholderName>T. TEST</ram:CardholderName>', $xml);
     }
 

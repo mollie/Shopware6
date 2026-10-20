@@ -40,7 +40,6 @@ final class ZugferdInvoiceGeneratedSubscriber implements EventSubscriberInterfac
         $event->document->getBuilder()->addDocumentPaymentMean(
             typeCode: (string) $method->eInvoicePaymentMeansCode(),
             information: $transaction->getPaymentMethod()?->getName(),
-            cardType: $payment->getCreditCardLabel(),
             cardId: $payment->getCreditCardNumber(),
             cardHolderName: $payment->getCreditCardHolder()
         );
