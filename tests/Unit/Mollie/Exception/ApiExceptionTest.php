@@ -41,4 +41,23 @@ final class ApiExceptionTest extends TestCase
             'unrelated error' => ['The amount is invalid', false],
         ];
     }
+
+    #[DataProvider('applePayDomainDetailsProvider')]
+    public function testDetectsApplePayDomainNotVerified(string $details, bool $expected): void
+    {
+        $exception = new ApiException(422, 'Unprocessable Entity', $details, 'no field');
+
+        $this->assertSame($expected, $exception->isApplePayDomainNotVerified());
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: bool}>
+     */
+    public static function applePayDomainDetailsProvider(): array
+    {
+        return [
+            'domain not verified' => ['Apple is not able to verify your domain. Check if the domain validation file is worldwide accessible', true],
+            'unrelated error' => ['The validation url is invalid', false],
+        ];
+    }
 }

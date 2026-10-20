@@ -5,6 +5,8 @@ namespace Mollie\Shopware\Component\Mollie\Exception;
 
 final class ApiException extends \Exception
 {
+    private const APPLE_PAY_DOMAIN_NOT_VERIFIED = 'not able to verify your domain';
+
     private string $title;
 
     private string $details;
@@ -44,5 +46,10 @@ final class ApiException extends \Exception
     public function isCancellationNotPossible(): bool
     {
         return stripos($this->details, 'cannot be cancel') !== false;
+    }
+
+    public function isApplePayDomainNotVerified(): bool
+    {
+        return stripos($this->details, self::APPLE_PAY_DOMAIN_NOT_VERIFIED) !== false;
     }
 }

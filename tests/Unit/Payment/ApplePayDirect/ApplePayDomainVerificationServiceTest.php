@@ -95,6 +95,34 @@ class ApplePayDomainVerificationServiceTest extends TestCase
         self::assertFalse($filesystem->has(ApplePayDomainVerificationService::LOCAL_FILE));
     }
 
+    public function testDownloadMissingKeepsExistingFileWithoutDownloading(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $filesystem->write(ApplePayDomainVerificationService::LOCAL_FILE, 'existing-content');
+        $mockHandler = new MockHandler([new Response(200, [], 'new-content')]);
+        $service = new ApplePayDomainVerificationService($filesystem, $this->createClient($mockHandler));
+
+        $result = $service->downloadMissingDomainAssociationFile();
+
+        self::assertTrue($result);
+        self::assertSame('existing-content', $filesystem->read(ApplePayDomainVerificationService::LOCAL_FILE));
+        self::assertCount(1, $mockHandler);
+    }
+
+    public function testDownloadMissingDownloadsAbsentFile(): void
+    {
+        $filesystem = $this->createFilesystem();
+        $service = new ApplePayDomainVerificationService(
+            $filesystem,
+            $this->createClient(new MockHandler([new Response(200, [], 'verification-content')]))
+        );
+
+        $result = $service->downloadMissingDomainAssociationFile();
+
+        self::assertTrue($result);
+        self::assertSame('verification-content', $filesystem->read(ApplePayDomainVerificationService::LOCAL_FILE));
+    }
+
     private function createClient(MockHandler $mockHandler): Client
     {
         $handlerStack = HandlerStack::create($mockHandler);
