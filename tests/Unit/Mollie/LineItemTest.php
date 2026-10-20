@@ -12,6 +12,7 @@ use Mollie\Shopware\Mollie;
 use Mollie\Shopware\Unit\Fake\CustomerEntityBuilder;
 use Mollie\Shopware\Unit\Fake\OrderEntityBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\Delivery;
 use Shopware\Core\Checkout\Cart\Delivery\Struct\DeliveryDate;
@@ -553,6 +554,30 @@ final class LineItemTest extends TestCase
 
         $this->assertSame('12.68', $actual->getVatRate());
         $this->assertSame(['value' => '2.25', 'currency' => 'EUR'], $actual->getVatAmount()->toArray());
+    }
+
+    #[DataProvider('halfCentVatAmounts')]
+    public function testHalfCentVatAmountIsRoundedDownLikeThePaymentLinksApiExpects(float $totalPrice, float $shopwareTax, string $expectedVatAmount): void
+    {
+        $taxes = new CalculatedTaxCollection([new CalculatedTax($shopwareTax, 20.0, $totalPrice)]);
+        $orderLineItem = $this->orderLineItemWithTaxes($totalPrice, $taxes);
+
+        $actual = LineItem::fromOrderLine($orderLineItem, $this->euro());
+
+        $this->assertSame(['value' => $expectedVatAmount, 'currency' => 'EUR'], $actual->getVatAmount()->toArray());
+    }
+
+    /**
+     * @return array<string, array{0: float, 1: float, 2: string}>
+     */
+    public static function halfCentVatAmounts(): array
+    {
+        return [
+            'half cent stored just below the half as float' => [49.41, 8.24, '8.23'],
+            'half cent stored just above the half as float' => [6.03, 1.01, '1.00'],
+            'half cent on a discount rounds toward zero' => [-49.41, -8.24, '-8.23'],
+            'more than half a cent still rounds up' => [49.43, 8.24, '8.24'],
+        ];
     }
 
     public function testLineWhoseTaxesCancelEachOtherOutHasNoVatRate(): void

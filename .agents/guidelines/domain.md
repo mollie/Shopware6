@@ -241,6 +241,13 @@ values actually transmitted and rejects the payment with *"The 'vatAmount' field
 they disagree. Whenever an amount that goes to Mollie changes, the VAT amount has to be
 re-derived from that same transmitted amount.
 
+The two APIs do not check it equally strictly. The Payments API accepts a `vatAmount` one cent
+off, the Payment Links API accepts only the exact value and rounds a half cent **down**
+(49.41 at 20 % = 8.235 → 8.23, never 8.24), for discounts toward zero (-8.235 → -8.23). The plugin therefore rounds half down, which both
+accept. PHP's `round()` works on the float, and since PHP 8.4 without pre-rounding, so
+`49.41 × 20 / 120` lands just below the half and `6.03 × 20 / 120` just above it; the quotient is
+rounded to a few extra decimals first to remove that noise.
+
 ## Since 5.x there is one log file per order
 
 As soon as an order number is known, everything Mollie-related for that order is written to its
