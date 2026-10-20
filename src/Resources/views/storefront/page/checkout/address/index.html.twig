@@ -17,4 +17,8 @@
             </div>
         {% endblock %}
     {% endif %}
+
+    {% block page_checkout_address_mollie_express_components %}
+        {% sw_include '@MolliePayments/mollie/component/express-component.html.twig' %}
+    {% endblock %}
 {% endblock %}

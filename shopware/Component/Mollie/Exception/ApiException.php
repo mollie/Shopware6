@@ -6,6 +6,7 @@ namespace Mollie\Shopware\Component\Mollie\Exception;
 final class ApiException extends \Exception
 {
     private const APPLE_PAY_DOMAIN_NOT_VERIFIED = 'not able to verify your domain';
+    private const FIELD_SHIPPING_CALLBACK_URL = 'shipping.callbackUrl';
 
     private string $title;
 
@@ -51,5 +52,10 @@ final class ApiException extends \Exception
     public function isApplePayDomainNotVerified(): bool
     {
         return stripos($this->details, self::APPLE_PAY_DOMAIN_NOT_VERIFIED) !== false;
+    }
+
+    public function isShippingCallbackUrlRejected(): bool
+    {
+        return $this->field === self::FIELD_SHIPPING_CALLBACK_URL;
     }
 }

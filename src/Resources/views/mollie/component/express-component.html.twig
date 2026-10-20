@@ -17,9 +17,11 @@
         }
     } %}
 
-    <div class="mt-2 mollie-express-component"
-         data-mollie-express-component
-         data-client-access-token="{{ mollieExpress.clientAccessToken }}"
-         data-locale="{{ app.request.locale }}"
-         data-options="{{ mollieExpressOptions|json_encode }}"></div>
+    {% block mollie_express_component %}
+        <div class="mt-2 mollie-express-component"
+             data-mollie-express-component
+             data-client-access-token="{{ mollieExpress.clientAccessToken }}"
+             data-locale="{{ app.request.locale }}"
+             data-options="{{ mollieExpressOptions|json_encode }}"></div>
+    {% endblock %}
 {% endif %}

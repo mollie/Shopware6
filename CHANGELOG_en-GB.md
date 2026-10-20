@@ -1,5 +1,6 @@
 # Unreleased
 - Added: Orders with bundles from Shopware Commercial can be paid with Mollie.
+- Added: The express components are also shown on the registration page of the checkout.
 - Changed: Retried requests during connection problems with Mollie no longer create duplicate payments.
 - Changed: The payment link can also be used after a failed payment.
 - Changed: zeobv bundles are sent to Mollie as a single line.

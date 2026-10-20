@@ -13,10 +13,12 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Cart\Cart;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
+use Shopware\Storefront\Page\Account\Order\AccountEditOrderPage;
 use Shopware\Storefront\Page\Account\Order\AccountEditOrderPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Offcanvas\OffcanvasCartPageLoadedEvent;
+use Shopware\Storefront\Page\Checkout\Register\CheckoutRegisterPageLoadedEvent;
 use Shopware\Storefront\Page\Page;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -44,6 +46,7 @@ final class ExpressComponentsCartSubscriber implements EventSubscriberInterface
         return [
             CheckoutCartPageLoadedEvent::class => 'onCartPageLoaded',
             OffcanvasCartPageLoadedEvent::class => 'onOffcanvasCartPageLoaded',
+            CheckoutRegisterPageLoadedEvent::class => 'onRegisterPageLoaded',
             CheckoutConfirmPageLoadedEvent::class => 'onConfirmPageLoaded',
             AccountEditOrderPageLoadedEvent::class => 'onEditOrderPageLoaded',
         ];
@@ -61,6 +64,13 @@ final class ExpressComponentsCartSubscriber implements EventSubscriberInterface
         $page = $event->getPage();
 
         $this->assignData($page, VisibilityRestriction::OFF_CANVAS, $event->getSalesChannelContext(), $page->getCart());
+    }
+
+    public function onRegisterPageLoaded(CheckoutRegisterPageLoadedEvent $event): void
+    {
+        $page = $event->getPage();
+
+        $this->assignData($page, VisibilityRestriction::REGISTER, $event->getSalesChannelContext(), $page->getCart());
     }
 
     public function onConfirmPageLoaded(CheckoutConfirmPageLoadedEvent $event): void
@@ -95,6 +105,15 @@ final class ExpressComponentsCartSubscriber implements EventSubscriberInterface
             $page->addExtension(ExpressComponentsData::EXTENSION, new ExpressComponentsData(true, $restrictions->toArray()));
 
             if ($restrictions->contains($position)) {
+                return;
+            }
+
+            if ($page instanceof AccountEditOrderPage && $page->isPaymentChangeable() === false) {
+                $this->logger->debug('Express components session not created, the payment of the order cannot be changed', [
+                    'salesChannelId' => $salesChannelId,
+                    'orderId' => $page->getOrder()->getId(),
+                ]);
+
                 return;
             }
 
