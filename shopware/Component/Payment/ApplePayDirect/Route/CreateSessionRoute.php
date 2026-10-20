@@ -3,9 +3,13 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ApplePayDirect\Route;
 
+use GuzzleHttp\Exception\GuzzleException;
+use League\Flysystem\FilesystemException;
+use Mollie\Shopware\Component\Mollie\Exception\ApiException;
 use Mollie\Shopware\Component\Mollie\Gateway\ApplePayGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\ApplePayGatewayInterface;
 use Mollie\Shopware\Component\Payment\ApplePayDirect\ApplePayDirectException;
+use Mollie\Shopware\Component\Payment\ApplePayDirect\Service\ApplePayDomainVerificationService;
 use Mollie\Shopware\Component\Settings\AbstractSettingsService;
 use Mollie\Shopware\Component\Settings\SettingsService;
 use Psr\Log\LoggerInterface;
@@ -27,6 +31,7 @@ final class CreateSessionRoute extends AbstractCreateSessionRoute
         private ApplePayGatewayInterface $gateway,
         #[Autowire(service: SettingsService::class)]
         private AbstractSettingsService $settingsService,
+        private ApplePayDomainVerificationService $domainVerification,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -77,11 +82,25 @@ final class CreateSessionRoute extends AbstractCreateSessionRoute
         }
 
         try {
+            $domainFileAvailable = $this->domainVerification->downloadMissingDomainAssociationFile();
+        } catch (FilesystemException|GuzzleException $exception) {
+            $logData['exception'] = $exception->getMessage();
+            $domainFileAvailable = false;
+        }
+
+        if (! $domainFileAvailable) {
+            $this->logger->warning('Apple Pay domain verification file is missing and could not be downloaded from Mollie', $logData);
+        }
+
+        try {
             $session = $this->gateway->requestSession($domain, $validationUrl, $salesChannelContext->getSalesChannelId());
             $this->logger->info('Apple pay session successfully requested', $logData);
         } catch (\Throwable $exception) {
             $logData['exception'] = $exception->getMessage();
             $this->logger->error('Failed to request apple pay direct session', $logData);
+            if ($exception instanceof ApiException && $exception->isApplePayDomainNotVerified()) {
+                $this->logger->error('Apple could not verify the domain. The file /.well-known/apple-developer-merchantid-domain-association must be the one from Mollie and publicly reachable, it may be served by another plugin or lost after a deployment. Run bin/console mollie:applepay:download-verification', $logData);
+            }
             throw ApplePayDirectException::sessionRequestFailed($exception);
         }
 

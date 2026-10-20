@@ -355,6 +355,13 @@ the same: call
 Only if that file is served does Apple Pay Direct work. A merchant reporting the feature as
 broken should be asked for that URL before anything in the code is investigated.
 
+Release-folder deployments (Deployer and similar) do not share `public/.well-known/`, so the file
+is gone after every release; the session request therefore downloads it again when it is missing.
+When it is missing, Shopware handles the path itself and another plugin may answer it: SwagPayPal
+serves its own Apple Pay file there. Apple accepts only one file per domain, so Mollie and PayPal
+cannot both offer Apple Pay on the same domain. Mollie then answers the session request with 422
+"Apple is not able to verify your domain".
+
 ---
 
 ## Subscriptions: the start date is the charge date

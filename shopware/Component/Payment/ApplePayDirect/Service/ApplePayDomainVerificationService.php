@@ -14,6 +14,8 @@ final class ApplePayDomainVerificationService
 
     public const LOCAL_FILE = '/.well-known/apple-developer-merchantid-domain-association';
 
+    private const DOWNLOAD_TIMEOUT_SECONDS = 5;
+
     public function __construct(
         #[Autowire(service: 'shopware.filesystem.public')]
         private readonly Filesystem $filesystem,
@@ -24,7 +26,7 @@ final class ApplePayDomainVerificationService
 
     public function downloadDomainAssociationFile(): bool
     {
-        $response = $this->httpClient->get(self::URL_FILE, ['http_errors' => false]);
+        $response = $this->httpClient->get(self::URL_FILE, ['http_errors' => false, 'timeout' => self::DOWNLOAD_TIMEOUT_SECONDS]);
 
         if ($response->getStatusCode() < Response::HTTP_OK || $response->getStatusCode() >= Response::HTTP_MULTIPLE_CHOICES) {
             return false;
@@ -37,5 +39,14 @@ final class ApplePayDomainVerificationService
         $this->filesystem->write(self::LOCAL_FILE, (string) $response->getBody(), ['ContentType' => 'text/plain']);
 
         return true;
+    }
+
+    public function downloadMissingDomainAssociationFile(): bool
+    {
+        if ($this->filesystem->has(self::LOCAL_FILE)) {
+            return true;
+        }
+
+        return $this->downloadDomainAssociationFile();
     }
 }
