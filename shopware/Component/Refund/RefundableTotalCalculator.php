@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Refund;
 
-use Mollie\Shopware\Component\Mollie\LineItem;
+use Mollie\Shopware\Component\Mollie\LineItemFilter;
+use Mollie\Shopware\Component\Mollie\LineItemFilterInterface;
 use Mollie\Shopware\Mollie;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as ShopwareLineItem;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
@@ -11,9 +12,16 @@ use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class RefundableTotalCalculator
 {
+    public function __construct(
+        #[Autowire(service: LineItemFilter::class)]
+        private readonly LineItemFilterInterface $lineItemFilter,
+    ) {
+    }
+
     /**
      * Computes the original refundable total of the order: the sum of the non-credit line items
      * plus shipping, always as gross amount.
@@ -27,13 +35,14 @@ final class RefundableTotalCalculator
     {
         $isNet = (string) $order->getTaxStatus() === CartPrice::TAX_STATE_NET;
         $total = 0.0;
+        $lineItems = $order->getLineItems() ?? new OrderLineItemCollection();
 
-        foreach ($order->getLineItems() ?? new OrderLineItemCollection() as $lineItem) {
+        foreach ($lineItems as $lineItem) {
             if ($lineItem->getType() === ShopwareLineItem::CREDIT_LINE_ITEM_TYPE) {
                 continue;
             }
 
-            if (LineItem::isDeliveryDiscountPlaceholder($lineItem)) {
+            if ($this->lineItemFilter->isItemAllowed($lineItem, $lineItems) === false) {
                 continue;
             }
 

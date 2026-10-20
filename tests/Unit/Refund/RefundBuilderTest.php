@@ -12,6 +12,7 @@ use Mollie\Shopware\Component\Mollie\Order;
 use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Refund\RefundableTotalCalculator;
 use Mollie\Shopware\Component\Refund\RefundBuilder;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -66,7 +67,7 @@ final class RefundBuilderTest extends TestCase
         $transactionPayment = new Payment('tr_test');
         $transactionPayment->setOrderId('ord_test');
 
-        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(), new FakeLogger());
+        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(LineItemFilterBuilder::build()), new FakeLogger());
 
         $createRefund = $builder->build($transactionPayment, $order, [
             ['id' => 'line-1', 'quantity' => 2, 'amount' => 50.20, 'resetStock' => 0],
@@ -138,7 +139,7 @@ final class RefundBuilderTest extends TestCase
         $order->setOrderNumber('10047');
         $order->setSalesChannelId('sales-channel-id');
 
-        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(), new FakeLogger());
+        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(LineItemFilterBuilder::build()), new FakeLogger());
 
         $this->expectException(\RuntimeException::class);
 
@@ -245,7 +246,7 @@ final class RefundBuilderTest extends TestCase
         $gateway = new FakeGateway('', $payment);
         $gateway->withOrder(new Order('ord_test', '', null, $mollieLines));
 
-        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(), new FakeLogger());
+        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(LineItemFilterBuilder::build()), new FakeLogger());
 
         // the request RefundAction builds: the positions plus the total of the return
         $createRefund = $builder->build($payment, $order, [
@@ -259,7 +260,7 @@ final class RefundBuilderTest extends TestCase
 
     public function testRefundingTheShippingCostsAloneUsesTheDeliveryAmount(): void
     {
-        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(), new FakeLogger());
+        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(LineItemFilterBuilder::build()), new FakeLogger());
 
         $createRefund = $builder->build(
             new Payment('tr_test'),
@@ -274,7 +275,7 @@ final class RefundBuilderTest extends TestCase
 
     public function testAnUnknownRequestedItemIsRejected(): void
     {
-        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(), new FakeLogger());
+        $builder = new RefundBuilder(new FakeGateway('', new Payment('tr_test')), new RefundableTotalCalculator(LineItemFilterBuilder::build()), new FakeLogger());
 
         $this->expectException(\RuntimeException::class);
 
@@ -311,7 +312,7 @@ final class RefundBuilderTest extends TestCase
         $gateway = new FakeGateway('', $payment);
         $gateway->withOrder($mollieOrder);
 
-        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(), $logger ?? new FakeLogger());
+        $builder = new RefundBuilder($gateway, new RefundableTotalCalculator(LineItemFilterBuilder::build()), $logger ?? new FakeLogger());
 
         return $builder->build($payment, $this->buildNetOrder(), [], '', $requestAmount);
     }
@@ -319,7 +320,7 @@ final class RefundBuilderTest extends TestCase
     private function buildRefund(Payment $molliePayment, ?float $requestAmount): CreatePaymentRefund
     {
         $gateway = new FakeGateway('', $molliePayment);
-        $calculator = new RefundableTotalCalculator();
+        $calculator = new RefundableTotalCalculator(LineItemFilterBuilder::build());
         $logger = new FakeLogger();
         $builder = new RefundBuilder($gateway, $calculator, $logger);
 

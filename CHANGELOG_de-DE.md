@@ -1,4 +1,5 @@
 # Unreleased
+- Hinzugefügt: Bestellungen mit Bundles aus Shopware Commercial lassen sich mit Mollie bezahlen.
 - Geändert: Wiederholte Anfragen bei Verbindungsproblemen mit Mollie legen keine doppelten Zahlungen mehr an.
 - Geändert: Der Bezahllink lässt sich auch nach einer fehlgeschlagenen Zahlung nutzen.
 - Geändert: zeobv-Bundles werden als eine Position an Mollie übertragen.

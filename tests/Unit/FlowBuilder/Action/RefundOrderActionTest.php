@@ -18,6 +18,7 @@ use Mollie\Shopware\Component\Refund\RefundPersister;
 use Mollie\Shopware\Component\Refund\RefundTotalsBuilder;
 use Mollie\Shopware\Component\Refund\Route\CreateRefundRoute;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeEntityRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
@@ -223,7 +224,7 @@ final class RefundOrderActionTest extends TestCase
                 new EventSpy()
             ),
             new RefundCompositionBuilder(),
-            new RefundTotalsBuilder(new RefundableTotalCalculator(), $logger),
+            new RefundTotalsBuilder(new RefundableTotalCalculator(LineItemFilterBuilder::build()), $logger),
             $this->refundGateway,
             $this->refundBuilder,
             new RefundPersister($this->refundRepository, new FakeStockStorage(), new RefundItemSplitter()),
