@@ -10,6 +10,7 @@
 - Behoben: Apple Pay Direct und PayPal Express behalten bei nicht eingeloggten Bestandskunden die gewählte Versandart, Währung und Sprache.
 - Behoben: Beim Einrichten der Zahlungsarten bleiben keine Icon-Dateien mehr im Shop-Verzeichnis liegen.
 - Behoben: ZUGFeRD-Rechnungen von Kreditkartenzahlungen sind valide.
+- Behoben: Der Bezahllink schlägt nicht mehr fehl, wenn die Mehrwertsteuer einer Position genau auf einen halben Cent fällt.
 
 # 5.7.0
 - Hinzugefügt: Der Webhook wiederholt das Schreiben des Zahlungsstatus bei einem Datenbank-Deadlock.

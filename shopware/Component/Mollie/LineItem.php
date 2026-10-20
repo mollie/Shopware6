@@ -24,6 +24,8 @@ use Shopware\Core\System\Currency\CurrencyEntity;
 
 final class LineItem implements \JsonSerializable
 {
+    private const FLOAT_NOISE_DECIMALS = 4;
+
     private LineItemType $type;
 
     private string $quantityUnit;
@@ -549,7 +551,8 @@ final class LineItem implements \JsonSerializable
             // If the Shopware tax breaks that invariant, derive the vatAmount from the transmitted totalAmount.
             $decimals = $totalPrice->getDecimals();
             $transmittedTotal = round($totalPrice->getValue(), $decimals);
-            $expectedVatAmount = round($transmittedTotal * $vatRate / (100 + $vatRate), $decimals);
+            $denoisedVatAmount = round($transmittedTotal * $vatRate / (100 + $vatRate), $decimals + self::FLOAT_NOISE_DECIMALS);
+            $expectedVatAmount = round($denoisedVatAmount, $decimals, PHP_ROUND_HALF_DOWN);
             if (round($vatAmount->getValue(), $decimals) !== $expectedVatAmount) {
                 $vatAmount = new Money($expectedVatAmount, $currency->getIsoCode());
             }
