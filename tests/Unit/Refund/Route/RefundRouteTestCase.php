@@ -25,6 +25,7 @@ use Mollie\Shopware\Component\Refund\Route\CreateRefundRoute;
 use Mollie\Shopware\Component\Refund\Route\RefundOverviewRoute;
 use Mollie\Shopware\Component\Settings\Struct\RefundSettings;
 use Mollie\Shopware\Mollie;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeEntityRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
@@ -303,7 +304,7 @@ abstract class RefundRouteTestCase extends TestCase
 
     protected function totalsBuilder(): RefundTotalsBuilder
     {
-        return new RefundTotalsBuilder(new RefundableTotalCalculator(), new NullLogger());
+        return new RefundTotalsBuilder(new RefundableTotalCalculator(LineItemFilterBuilder::build()), new NullLogger());
     }
 
     protected function creditNoteService(): CreditNoteService

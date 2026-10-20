@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Unit\Refund;
 
 use Mollie\Shopware\Component\Refund\RefundableTotalCalculator;
+use Mollie\Shopware\Unit\Builder\LineItemFilterBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Shopware\Core\Checkout\Cart\LineItem\LineItem as ShopwareLineItem;
@@ -33,7 +34,7 @@ final class RefundableTotalCalculatorTest extends TestCase
             $this->buildDelivery('delivery-1', 4.85, 15.75),
         ]));
 
-        $calculator = new RefundableTotalCalculator();
+        $calculator = new RefundableTotalCalculator(LineItemFilterBuilder::build());
 
         $this->assertSame(84.49, $calculator->calculate($order));
     }
@@ -54,7 +55,7 @@ final class RefundableTotalCalculatorTest extends TestCase
             $this->buildNetDelivery('delivery-1', 4.19, 15.75, 0.66),
         ]));
 
-        $calculator = new RefundableTotalCalculator();
+        $calculator = new RefundableTotalCalculator(LineItemFilterBuilder::build());
 
         $this->assertSame(84.49, $calculator->calculate($order));
     }
@@ -72,7 +73,7 @@ final class RefundableTotalCalculatorTest extends TestCase
         ]));
         $order->setDeliveries(new OrderDeliveryCollection());
 
-        $calculator = new RefundableTotalCalculator();
+        $calculator = new RefundableTotalCalculator(LineItemFilterBuilder::build());
 
         $this->assertSame(20.0, $calculator->calculate($order));
     }
@@ -93,7 +94,7 @@ final class RefundableTotalCalculatorTest extends TestCase
             $this->buildDelivery('delivery-1', 0.0, 19.0),
         ]));
 
-        $calculator = new RefundableTotalCalculator();
+        $calculator = new RefundableTotalCalculator(LineItemFilterBuilder::build());
 
         $this->assertSame(20.0, $calculator->calculate($order));
     }
@@ -103,7 +104,7 @@ final class RefundableTotalCalculatorTest extends TestCase
         $order = new OrderEntity();
         $order->setTaxStatus(CartPrice::TAX_STATE_GROSS);
 
-        $calculator = new RefundableTotalCalculator();
+        $calculator = new RefundableTotalCalculator(LineItemFilterBuilder::build());
 
         $this->assertSame(0.0, $calculator->calculate($order));
     }
