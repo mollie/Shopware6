@@ -8,8 +8,10 @@ use Mollie\Shopware\Component\Payment\ExpressComponents\Route\CreateSessionRoute
 use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestriction;
 use Mollie\Shopware\Component\Payment\ExpressMethod\VisibilityRestrictionCollection;
 use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
+use Mollie\Shopware\Component\Subscription\LineItemAnalyzer;
 use Mollie\Shopware\Unit\Builder\CartBuilder;
 use Mollie\Shopware\Unit\Builder\CustomerBuilder;
+use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
@@ -188,7 +190,9 @@ final class CreateSessionRouteTest extends TestCase
         return new CreateSessionRoute(
             new FakeSettingsService(expressComponentsSettings: $settings),
             $this->sessionBuilder,
-            $this->orderRepository
+            $this->orderRepository,
+            new LineItemAnalyzer(),
+            new FakeLogger()
         );
     }
 
