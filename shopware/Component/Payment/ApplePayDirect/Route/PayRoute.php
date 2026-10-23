@@ -83,11 +83,11 @@ final class PayRoute extends AbstractPayRoute
         $phone = (string) $request->get('phone', '');
         $acceptedDataProtection = (int) $request->get('acceptedDataProtection', '0') === 1;
 
-        $billingAddress = new Address($email, '', $firstname, $lastname, $street, $zipcode, $city, $countryCode);
+        $shippingAddress = new Address($email, '', $firstname, $lastname, $street, $zipcode, $city, $countryCode);
         if (mb_strlen($phone) > 0) {
-            $billingAddress->setPhone($phone);
+            $shippingAddress->setPhone($phone);
         }
-        $shippingAddress = $billingAddress;
+        $billingAddress = $this->getBillingAddress($request, $shippingAddress);
 
         $logData['request'] = [
             'hasEmail' => $email !== '',
@@ -98,7 +98,8 @@ final class PayRoute extends AbstractPayRoute
             'hasCity' => $city !== '',
             'countryCode' => $countryCode,
             'hasPhone' => $phone !== '',
-            'hasValidPhone' => $billingAddress->getPhone() !== '',
+            'hasValidPhone' => $shippingAddress->getPhone() !== '',
+            'hasSeparateBillingAddress' => $billingAddress->getId() !== $shippingAddress->getId(),
             'acceptedDataProtection' => $acceptedDataProtection,
         ];
         $this->logger->debug('Apple pay direct contact data received', $logData);
@@ -167,5 +168,29 @@ final class PayRoute extends AbstractPayRoute
 
         /** @phpstan-ignore shopware.noEmptyResponse */
         return new PayResponse(true, $redirectUrl, '', $orderId,$salesChannelContext);
+    }
+
+    private function getBillingAddress(Request $request, Address $shippingAddress): Address
+    {
+        $street = (string) $request->get('billingStreet', '');
+        if ($street === '') {
+            return $shippingAddress;
+        }
+
+        $billingAddress = new Address(
+            $shippingAddress->getEmail(),
+            '',
+            (string) $request->get('billingFirstname', $shippingAddress->getGivenName()),
+            (string) $request->get('billingLastname', $shippingAddress->getFamilyName()),
+            $street,
+            (string) $request->get('billingPostalCode', ''),
+            (string) $request->get('billingCity', ''),
+            (string) $request->get('billingCountryCode', $shippingAddress->getCountry()),
+        );
+        if ($shippingAddress->getPhone() !== '') {
+            $billingAddress->setPhone($shippingAddress->getPhone());
+        }
+
+        return $billingAddress;
     }
 }
