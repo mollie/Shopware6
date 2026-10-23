@@ -24,17 +24,18 @@ export default class ApplePaySessionFactoryService {
      */
     create(isProductMode, country, currency, withPhone, shopSlug, acceptedDataProtection, clickedButton) {
         const me = this;
-        var shippingFields = ['name', 'email', 'postalAddress'];
+        var addressFields = ['name', 'email', 'postalAddress'];
         var selectedCountryCode = '';
 
         if (withPhone === 1) {
-            shippingFields.push('phone');
+            addressFields.push('phone');
         }
 
         var request = {
             countryCode: country,
             currencyCode: currency,
-            requiredShippingContactFields: shippingFields,
+            requiredShippingContactFields: addressFields,
+            requiredBillingContactFields: addressFields,
             supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
             merchantCapabilities: ['supports3DS'],
             total: {
@@ -195,17 +196,29 @@ export default class ApplePaySessionFactoryService {
         form.action = checkoutURL;
         form.method = 'POST';
 
-        let street = payment.shippingContact.addressLines[0];
-
-        if (payment.shippingContact.addressLines.length > 1) {
-            street += ' ' + payment.shippingContact.addressLines[1];
-        }
+        const street = this.joinAddressLines(payment.shippingContact.addressLines);
 
         // add billing data
         form.insertAdjacentElement('beforeend', createInput('email', payment.shippingContact.emailAddress));
         form.insertAdjacentElement('beforeend', createInput('lastname', payment.shippingContact.familyName));
         form.insertAdjacentElement('beforeend', createInput('firstname', payment.shippingContact.givenName));
         form.insertAdjacentElement('beforeend', createInput('street', street));
+
+        const billingContact = payment.billingContact;
+        if (billingContact && Array.isArray(billingContact.addressLines) && billingContact.addressLines.length > 0) {
+            form.insertAdjacentElement('beforeend', createInput('billingFirstname', billingContact.givenName || ''));
+            form.insertAdjacentElement('beforeend', createInput('billingLastname', billingContact.familyName || ''));
+            form.insertAdjacentElement(
+                'beforeend',
+                createInput('billingStreet', this.joinAddressLines(billingContact.addressLines)),
+            );
+            form.insertAdjacentElement('beforeend', createInput('billingPostalCode', billingContact.postalCode || ''));
+            form.insertAdjacentElement('beforeend', createInput('billingCity', billingContact.locality || ''));
+            form.insertAdjacentElement(
+                'beforeend',
+                createInput('billingCountryCode', billingContact.countryCode || ''),
+            );
+        }
         form.insertAdjacentElement('beforeend', createInput('postalCode', payment.shippingContact.postalCode));
         form.insertAdjacentElement('beforeend', createInput('city', payment.shippingContact.locality));
         form.insertAdjacentElement('beforeend', createInput('acceptedDataProtection', acceptedDataProtection));
@@ -224,6 +237,21 @@ export default class ApplePaySessionFactoryService {
         document.body.insertAdjacentElement('beforeend', form);
 
         form.submit();
+    }
+
+    /**
+     *
+     * @param addressLines
+     * @returns {string}
+     */
+    joinAddressLines(addressLines) {
+        let street = addressLines[0];
+
+        if (addressLines.length > 1) {
+            street += ' ' + addressLines[1];
+        }
+
+        return street;
     }
 
     /**
