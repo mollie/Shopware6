@@ -568,6 +568,20 @@ the synchronised ids explicitly for that reason, but only when the context alrea
 customer: `ContextSwitchRoute` answers an address id with `customerNotLoggedIn()` when it does
 not, and the express login path still holds the pre-login context object at that point.
 
+## Express checkout reuses guests by email, never registered accounts
+
+A shopper who is not logged in and pays by express checkout gets the newest guest account with
+the wallet email, because merchants complained about dozens of single-order guests with the same
+address. A registered account is never taken over this way: the wallet email proves nothing about
+who owns the shop account, so logging it in would hand the account to anyone who types the email.
+Like Shopware's own checkout, such a shopper gets a new guest.
+
+The reused guest is logged in without `AccountService::loginById()`. Its `CartRestorer` merges the
+express cart into the cart of the guest's previous context and deletes the current one, which ends
+in "Cart is empty." or an order with foreign line items. `AccountService` does what `RegisterRoute`
+does instead: replace the token, save the customer with the address ids reset, and dispatch
+`CustomerLoginEvent` — the storefront session follows the new token only on that event.
+
 ## Admin routes that change something check the role on the server
 
 Every admin route that changes something carries `_acl` in its route defaults, and Shopware's

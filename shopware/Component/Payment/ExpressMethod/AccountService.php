@@ -8,8 +8,8 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Customer\CustomerException;
+use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Customer\SalesChannel\AbstractRegisterRoute;
-use Shopware\Core\Checkout\Customer\SalesChannel\AccountService as ShopwareAccountService;
 use Shopware\Core\Checkout\Customer\SalesChannel\RegisterRoute;
 use Shopware\Core\Checkout\Shipping\ShippingMethodCollection;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
@@ -22,6 +22,7 @@ use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\Country\CountryCollection;
 use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\SalesChannel\Aggregate\SalesChannelDomain\SalesChannelDomainEntity;
+use Shopware\Core\System\SalesChannel\Context\SalesChannelContextPersister;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceInterface;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextServiceParameters;
@@ -31,6 +32,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Core\System\Salutation\SalutationCollection;
 use Shopware\Core\System\Salutation\SalutationEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * This is basically a copy of Shopware Account Service, was necessary,
@@ -56,13 +58,14 @@ final class AccountService extends AbstractAccountService
         private EntityRepository $shippingMethodRepository,
         #[Autowire(service: RegisterRoute::class)]
         private AbstractRegisterRoute $registerRoute,
-        private ShopwareAccountService $accountService,
+        private SalesChannelContextPersister $contextPersister,
         #[Autowire(service: ContextSwitchRoute::class)]
         private AbstractContextSwitchRoute $contextSwitchRoute,
         #[Autowire(service: SalesChannelContextService::class)]
         private SalesChannelContextServiceInterface $salesChannelContextService,
         #[Autowire(service: AddressSynchronizer::class)]
         private AddressSynchronizerInterface $addressSynchronizer,
+        private EventDispatcherInterface $eventDispatcher,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger,
     ) {
@@ -94,11 +97,11 @@ final class AccountService extends AbstractAccountService
             $this->logger->debug('Customer not logged in, try to login or create an account', $logData);
             $requestDataBag->add($this->getGuestContextSettings($salesChannelContext)->all());
             try {
-                $customer = $this->getCustomerByEmail($email, $salesChannelContext);
+                $customer = $this->getGuestCustomerByEmail($email, $salesChannelContext);
                 $logData['customerId'] = $customer->getId();
                 $logData['customerNumber'] = $customer->getCustomerNumber();
-                $this->logger->debug('Customer was found by email', $logData);
-                $this->accountService->loginById($customer->getId(), $salesChannelContext);
+                $this->logger->debug('Guest customer was found by email', $logData);
+                $this->loginGuest($customer, $salesChannelContext);
             } catch (\Throwable $e) {
                 $customer = $this->createNewGuestAccount($billingAddress, $countryMap, $acceptedDataProtection, $salesChannelContext);
                 $logData['customerId'] = $customer->getId();
@@ -178,17 +181,48 @@ final class AccountService extends AbstractAccountService
         return $this->shippingMethodRepository->searchIds($criteria, $salesChannelContext->getContext())->getTotal() > 0;
     }
 
-    private function getCustomerByEmail(string $email, SalesChannelContext $salesChannelContext): CustomerEntity
+    private function getGuestCustomerByEmail(string $email, SalesChannelContext $salesChannelContext): CustomerEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('email', $email));
 
-        $customer = $this->fetchCustomer($criteria, $salesChannelContext, true);
+        $customer = $this->fetchGuestCustomer($criteria, $salesChannelContext);
         if ($customer === null) {
             throw CustomerException::customerNotFound($email);
         }
 
         return $customer;
+    }
+
+    private function loginGuest(CustomerEntity $customer, SalesChannelContext $salesChannelContext): string
+    {
+        $newToken = $this->contextPersister->replace($salesChannelContext->getToken(), $salesChannelContext);
+
+        $this->contextPersister->save(
+            $newToken,
+            [
+                SalesChannelContextService::CUSTOMER_ID => $customer->getId(),
+                SalesChannelContextService::BILLING_ADDRESS_ID => null,
+                SalesChannelContextService::SHIPPING_ADDRESS_ID => null,
+                SalesChannelContextService::DOMAIN_ID => $salesChannelContext->getDomainId(),
+            ],
+            $salesChannelContext->getSalesChannelId(),
+            $customer->getId()
+        );
+
+        $loggedInContext = $this->salesChannelContextService->get(new SalesChannelContextServiceParameters(
+            $salesChannelContext->getSalesChannelId(),
+            $newToken,
+            $salesChannelContext->getLanguageId(),
+            $salesChannelContext->getCurrencyId(),
+            $salesChannelContext->getDomainId(),
+            $salesChannelContext->getContext(),
+            $customer->getId()
+        ));
+
+        $this->eventDispatcher->dispatch(new CustomerLoginEvent($loggedInContext, $customer, $newToken));
+
+        return $newToken;
     }
 
     private function getNotSpecifiedSalutation(SalesChannelContext $context): SalutationEntity
@@ -279,9 +313,9 @@ final class AccountService extends AbstractAccountService
      * should be done via PHP because it's a lot faster to filter a few entities on PHP side with the same email
      * address, than to filter a huge numbers of rows in the DB on a not indexed column.
      */
-    private function fetchCustomer(Criteria $criteria, SalesChannelContext $context, bool $includeGuest = false): ?CustomerEntity
+    private function fetchGuestCustomer(Criteria $criteria, SalesChannelContext $context): ?CustomerEntity
     {
-        $criteria->setTitle('account-service::fetchCustomer');
+        $criteria->setTitle('account-service::fetchGuestCustomer');
 
         $result = $this->customerRepository->search($criteria, $context->getContext())->getEntities();
         $customers = $result->getElements();
@@ -292,8 +326,7 @@ final class AccountService extends AbstractAccountService
             if (! $customer->getActive()) {
                 continue;
             }
-            // Skip guest if not required
-            if (! $includeGuest && $customer->getGuest()) {
+            if (! $customer->getGuest()) {
                 continue;
             }
             // It is bound, but not to the current one. Skip it
@@ -306,9 +339,6 @@ final class AccountService extends AbstractAccountService
         if (count($resultArray) === 0) {
             return null;
         }
-        // If there is more than one account we want to return the latest, this is important
-        // for guest accounts, real customer accounts should only occur once, otherwise the
-        // wrong password will be validated
         if (count($resultArray) > 1) {
             usort($resultArray, function (CustomerEntity $a, CustomerEntity $b) {
                 return $b->getCreatedAt() <=> $a->getCreatedAt();

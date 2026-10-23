@@ -10,6 +10,7 @@ use Mollie\Shopware\Component\ItemFilter\Subscriber\GiftConfiguratorSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\MoorlProductAccessoriesSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\NetiBundleSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\RepertusProductSetSubscriber;
+use Mollie\Shopware\Component\ItemFilter\Subscriber\SwagCommercialBundleSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\SwkwebProductSetSubscriber;
 use Mollie\Shopware\Component\ItemFilter\Subscriber\ZeobvBundleSubscriber;
 use Mollie\Shopware\Component\Mollie\Event\FilterLineItemEvent;
@@ -38,6 +39,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[CoversClass(MoorlProductAccessoriesSubscriber::class)]
 #[CoversClass(NetiBundleSubscriber::class)]
 #[CoversClass(RepertusProductSetSubscriber::class)]
+#[CoversClass(SwagCommercialBundleSubscriber::class)]
 #[CoversClass(SwkwebProductSetSubscriber::class)]
 #[CoversClass(ZeobvBundleSubscriber::class)]
 class LineItemFilterTest extends TestCase
@@ -250,6 +252,24 @@ class LineItemFilterTest extends TestCase
         $result = $this->filterOrderItems(new OrderLineItemCollection([$container, $mainProduct, $accessory]));
 
         $this->assertSame([$mainProduct->getId(), $accessory->getId()], array_keys(iterator_to_array($result)));
+    }
+
+    public function testSwagCommercialBundleDiscountIsSkipped(): void
+    {
+        $product = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 14.99);
+        $bundleProduct = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::PRODUCT_LINE_ITEM_TYPE, 11.45);
+        $bundleProduct->setPayload(['bundleId' => '01a15d4b500778999c02120678f63930', 'bundleLabel' => 'Skincare-Bundle']);
+        $bundleDiscount = $this->orderBuilder->createOrderLineItemWithType(Uuid::randomHex(), CartLineItem::DISCOUNT_LINE_ITEM, -3.54);
+        $bundleDiscount->setParentId($bundleProduct->getId());
+        $bundleDiscount->setPayload([
+            'bundleId' => '01a15d4b500778999c02120678f63930',
+            'bundleDiscountId' => '01a15d4c44ce7cf2bd1c575568dc82fa',
+            'bundleLineItemId' => '01a15d4b500778999c02120678f63930-019dfce58a897294918817954e886e78',
+        ]);
+
+        $result = $this->filterOrderItems(new OrderLineItemCollection([$product, $bundleProduct, $bundleDiscount]));
+
+        $this->assertSame([$product->getId(), $bundleProduct->getId()], array_keys(iterator_to_array($result)));
     }
 
     // -------------------------------------------------------------------------

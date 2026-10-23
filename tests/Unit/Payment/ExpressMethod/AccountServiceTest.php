@@ -5,20 +5,22 @@ namespace Mollie\Shopware\Unit\Payment\ExpressMethod;
 
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Payment\ExpressMethod\AccountService;
+use Mollie\Shopware\Unit\Fake\EventSpy;
 use Mollie\Shopware\Unit\Fake\FakeAddressSynchronizer;
 use Mollie\Shopware\Unit\Fake\FakeContextSwitchRoute;
 use Mollie\Shopware\Unit\Fake\FakeCountryRepository;
 use Mollie\Shopware\Unit\Fake\FakeCustomerRepository;
 use Mollie\Shopware\Unit\Fake\FakeRegisterRoute;
+use Mollie\Shopware\Unit\Fake\FakeSalesChannelContextPersister;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContextService;
 use Mollie\Shopware\Unit\Fake\FakeSalutationRepository;
 use Mollie\Shopware\Unit\Fake\FakeShippingMethodRepository;
-use Mollie\Shopware\Unit\Fake\FakeShopwareAccountService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Shopware\Core\Checkout\Customer\CustomerCollection;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
+use Shopware\Core\Checkout\Customer\Event\CustomerLoginEvent;
 use Shopware\Core\Checkout\Payment\PaymentMethodEntity;
 use Shopware\Core\Checkout\Shipping\ShippingMethodEntity;
 use Shopware\Core\Framework\Api\Context\SystemSource;
@@ -45,13 +47,13 @@ final class AccountServiceTest extends TestCase
     {
         $customer = $this->makeCustomer('customer-logged-in');
         $syncSpy = new FakeAddressSynchronizer();
-        $loginTracker = new FakeShopwareAccountService();
+        $contextPersister = new FakeSalesChannelContextPersister();
         $newContext = $this->createMock(SalesChannelContext::class);
 
         $service = $this->buildService(
             customersFoundByEmail: [],
             syncSpy: $syncSpy,
-            loginTracker: $loginTracker,
+            contextPersister: $contextPersister,
             newContext: $newContext,
         );
 
@@ -64,23 +66,18 @@ final class AccountServiceTest extends TestCase
         );
 
         $this->assertSame('customer-logged-in', $syncSpy->getLastSyncedCustomerId());
-        $this->assertNull($loginTracker->getLoggedInId(), 'loginById must not be called when customer is already in context');
+        $this->assertSame([], $contextPersister->getReplacedTokens());
         $this->assertSame($newContext, $result);
     }
 
-    /**
-     * Guest found by email → loginById called, then syncAddresses with that guest.
-     */
-    public function testReturningGuestGetsLoggedInAndSynced(): void
+    public function testReturningGuestIsSynced(): void
     {
         $guest = $this->makeCustomer('customer-returning', guest: true);
         $syncSpy = new FakeAddressSynchronizer();
-        $loginTracker = new FakeShopwareAccountService();
 
         $service = $this->buildService(
             customersFoundByEmail: [$guest],
             syncSpy: $syncSpy,
-            loginTracker: $loginTracker,
         );
 
         $service->loginOrCreateAccount(
@@ -91,7 +88,102 @@ final class AccountServiceTest extends TestCase
             $this->makeSalesChannelContext(null),
         );
 
-        $this->assertSame('customer-returning', $loginTracker->getLoggedInId(), 'loginById must be called with the found guest ID');
+        $this->assertSame('customer-returning', $syncSpy->getLastSyncedCustomerId());
+    }
+
+    public function testReturningGuestIsLoggedInOnARotatedTokenWithoutStoredAddresses(): void
+    {
+        $contextPersister = new FakeSalesChannelContextPersister();
+        $service = $this->buildService(
+            customersFoundByEmail: [$this->makeCustomer('customer-returning', guest: true)],
+            syncSpy: new FakeAddressSynchronizer(),
+            contextPersister: $contextPersister,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $saved = $contextPersister->getSaved()[0];
+        $this->assertSame(['current-token'], $contextPersister->getReplacedTokens());
+        $this->assertSame('replaced-current-token', $saved['token']);
+        $this->assertSame('customer-returning', $saved['parameters'][SalesChannelContextService::CUSTOMER_ID]);
+        $this->assertNull($saved['parameters'][SalesChannelContextService::BILLING_ADDRESS_ID]);
+        $this->assertNull($saved['parameters'][SalesChannelContextService::SHIPPING_ADDRESS_ID]);
+    }
+
+    public function testReturningGuestLoginMovesTheStorefrontSessionToTheNewToken(): void
+    {
+        $eventSpy = new EventSpy();
+        $service = $this->buildService(
+            customersFoundByEmail: [$this->makeCustomer('customer-returning', guest: true)],
+            syncSpy: new FakeAddressSynchronizer(),
+            eventDispatcher: $eventSpy,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $event = $eventSpy->getEvent();
+        $this->assertInstanceOf(CustomerLoginEvent::class, $event);
+        $this->assertSame('replaced-current-token', $event->getContextToken());
+        $this->assertSame('customer-returning', $event->getCustomerId());
+    }
+
+    public function testRegisteredCustomerWithTheSameEmailIsNotLoggedInButGetsANewGuest(): void
+    {
+        $contextPersister = new FakeSalesChannelContextPersister();
+        $eventSpy = new EventSpy();
+        $registerRoute = new FakeRegisterRoute($this->makeCustomer('customer-new', guest: true));
+        $service = $this->buildService(
+            customersFoundByEmail: [$this->makeCustomer('customer-registered')],
+            syncSpy: new FakeAddressSynchronizer(),
+            registerRoute: $registerRoute,
+            contextPersister: $contextPersister,
+            eventDispatcher: $eventSpy,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
+        $this->assertTrue($registerRoute->wasRegistrationCalled());
+        $this->assertSame([], $contextPersister->getReplacedTokens());
+        $this->assertSame(0, $eventSpy->getEventCount());
+    }
+
+    public function testGuestIsReusedEvenWhenARegisteredAccountWithTheSameEmailIsNewer(): void
+    {
+        $syncSpy = new FakeAddressSynchronizer();
+        $service = $this->buildService(
+            customersFoundByEmail: [
+                $this->makeCustomer('customer-returning', guest: true, createdAt: new \DateTimeImmutable('2026-01-01')),
+                $this->makeCustomer('customer-registered', createdAt: new \DateTimeImmutable('2026-06-01')),
+            ],
+            syncSpy: $syncSpy,
+        );
+
+        $service->loginOrCreateAccount(
+            'pm-id',
+            $this->makeAddress(),
+            $this->makeAddress(),
+            true,
+            $this->makeSalesChannelContext(null),
+        );
+
         $this->assertSame('customer-returning', $syncSpy->getLastSyncedCustomerId());
     }
 
@@ -102,14 +194,14 @@ final class AccountServiceTest extends TestCase
     {
         $newGuest = $this->makeCustomer('customer-new', guest: true);
         $syncSpy = new FakeAddressSynchronizer();
-        $loginTracker = new FakeShopwareAccountService();
+        $contextPersister = new FakeSalesChannelContextPersister();
         $registerRoute = new FakeRegisterRoute($newGuest);
 
         $service = $this->buildService(
             customersFoundByEmail: [],
             syncSpy: $syncSpy,
-            loginTracker: $loginTracker,
             registerRoute: $registerRoute,
+            contextPersister: $contextPersister,
         );
 
         $service->loginOrCreateAccount(
@@ -121,7 +213,7 @@ final class AccountServiceTest extends TestCase
         );
 
         $this->assertTrue($registerRoute->wasRegistrationCalled(), 'RegisterRoute::register must be called for unknown guests');
-        $this->assertNull($loginTracker->getLoggedInId(), 'loginById must not be called when creating a new guest');
+        $this->assertSame([], $contextPersister->getReplacedTokens());
         $this->assertSame('customer-new', $syncSpy->getLastSyncedCustomerId());
     }
 
@@ -350,9 +442,12 @@ final class AccountServiceTest extends TestCase
     // Helpers
     // -------------------------------------------------------------------------
 
-    private function makeCustomer(string $id, bool $guest = false): CustomerEntity
+    private function makeCustomer(string $id, bool $guest = false, ?\DateTimeImmutable $createdAt = null): CustomerEntity
     {
         $customer = new CustomerEntity();
+        if ($createdAt !== null) {
+            $customer->setCreatedAt($createdAt);
+        }
         $customer->setId($id);
         $customer->setActive(true);
         $customer->setGuest($guest);
@@ -379,6 +474,7 @@ final class AccountServiceTest extends TestCase
         $context->method('getCustomer')->willReturn($customer);
         $context->method('getPaymentMethod')->willReturn($paymentMethod);
         $context->method('getSalesChannelId')->willReturn('sales-channel-id');
+        $context->method('getToken')->willReturn('current-token');
         $context->method('getContext')->willReturn($this->context);
         $context->method('getDomainId')->willReturn(null);
         $context->method('getShippingMethod')->willReturn($shippingMethod);
@@ -391,8 +487,9 @@ final class AccountServiceTest extends TestCase
     private function buildService(
         array $customersFoundByEmail,
         FakeAddressSynchronizer $syncSpy,
-        ?FakeShopwareAccountService $loginTracker = null,
         ?FakeRegisterRoute $registerRoute = null,
+        ?FakeSalesChannelContextPersister $contextPersister = null,
+        ?EventSpy $eventDispatcher = null,
         ?SalesChannelContext $newContext = null,
         ?FakeContextSwitchRoute $contextSwitchRoute = null,
         array $salesChannelIdsByShippingMethodId = ['express-shipping' => ['sales-channel-id']],
@@ -413,10 +510,11 @@ final class AccountServiceTest extends TestCase
             salutationRepository: new FakeSalutationRepository([$salutation]),
             shippingMethodRepository: new FakeShippingMethodRepository($salesChannelIdsByShippingMethodId),
             registerRoute: $registerRoute ?? new FakeRegisterRoute($this->makeCustomer('fallback')),
-            accountService: $loginTracker ?? new FakeShopwareAccountService(),
+            contextPersister: $contextPersister ?? new FakeSalesChannelContextPersister(),
             contextSwitchRoute: $contextSwitchRoute ?? new FakeContextSwitchRoute(),
             salesChannelContextService: new FakeSalesChannelContextService($newContext),
             addressSynchronizer: $syncSpy,
+            eventDispatcher: $eventDispatcher ?? new EventSpy(),
             logger: new NullLogger(),
         );
     }
