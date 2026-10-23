@@ -5,10 +5,11 @@
 - Changed: The payment link can also be used after a failed payment.
 - Changed: zeobv bundles are sent to Mollie as a single line.
 - Changed: Apple Pay Direct automatically downloads a missing domain verification file, e.g. after a deployment.
+- Changed: Express orders without login are always placed as a guest.
 - Fixed: The automatic shipment reports orders that were placed with version 4 to Mollie again.
 - Fixed: A phone number consisting of the country code only (e.g. "+49") no longer makes the payment fail.
 - Fixed: Apple Pay Direct creates guest accounts again when the shop requires a phone number on registration.
-- Fixed: Apple Pay Direct and PayPal Express no longer lose the chosen shipping method, currency and language for existing customers who are not logged in.
+- Fixed: Returning guests can order with Apple Pay Direct and PayPal Express again.
 - Fixed: Setting up the payment methods no longer leaves icon files behind in the shop directory.
 - Fixed: ZUGFeRD invoices of credit card payments are valid.
 - Fixed: The payment link no longer fails when the VAT of a line lands exactly on half a cent.
