@@ -1,8 +1,7 @@
 # PHP Guidelines — Senior Review Standard
 
-Applies to all PHP in `shopware/`, when writing code and when reviewing it.
-`AGENTS.md` section 7 carries the short version; this file is the full standard and the
-basis for `.agents/skills/review-conventions/SKILL.md`.
+Applies to all PHP in `shopware/`, when writing code and when reviewing it with the
+`review` skill.
 
 State the consequence in a review, not just the rule name.
 
@@ -181,6 +180,24 @@ result.
 
 ---
 
+## Shopware
+
+- Services, tags, subscribers and route defaults wired via **PHP attributes**, not
+  `services.xml`.
+- Store-API routes: `#[Route]` with `_routeScope` in `defaults`; the response is a
+  `StoreApiResponse`/struct, not a raw array.
+- DAL: entity, definition and collection complete; no raw SQL where the repository does it;
+  a search over a merchant-sized table has a limit; needed associations are loaded, not
+  lazy-loaded per row.
+- Order state changes go through the state machine, never by writing the state field.
+- Storefront and admin strings come from snippet files.
+- Cross-version Shopware APIs live in `shopware/Component/Compatibility/`, not behind an
+  inline `version_compare()`.
+- Config keys via `SystemConfigService` and constants, never a literal key string.
+- A decorator on a core service where an event would do is a finding.
+
+---
+
 ## Tests
 
 Fakes, Spies and Builders, no mocking framework. Details in `.agents/guidelines/testing.md`.
@@ -192,7 +209,7 @@ Fakes, Spies and Builders, no mocking framework. Details in `.agents/guidelines/
 Priority order: **readability → maintainability → testability → explicitness → cleverness
 (never).**
 
-Two rules here pull against the minimal-change rule in `AGENTS.md` section 2 — "extract
+Two rules here pull against "Smallest change" in `AGENTS.md` — "extract
 into dedicated services" and "an injected dependency needs an interface". Resolution:
 these rules govern the code you are *already* writing or touching. They are not a licence
 to add a service or an interface that the current change does not need. When in doubt the

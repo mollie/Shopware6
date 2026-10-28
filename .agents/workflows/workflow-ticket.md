@@ -1,7 +1,7 @@
 # Ticket Workflow — Maintainers
 
 Internal process for the maintainers. **External contributors:** fork,
-branch however you like, follow `AGENTS.md` sections 2 to 7.
+branch however you like, follow `AGENTS.md`.
 
 Only the git mechanics live here. Everything else is `AGENTS.md`.
 

@@ -1,6 +1,6 @@
 ---
 name: payment-methods
-description: Add or remove a Mollie payment method in this Shopware 6 plugin. Adding = new enum case plus a handler with marker interfaces (manual capture, automatic capture, bank transfer, B2B-only, subscriptions, recurring mandate, Orders API); registration is automatic, no migration or icon needed. Removing = add DeprecatedMethodAwareInterface so the method is deactivated but stays in the shop, keeping old orders intact — never delete a handler. Use when asked to add, implement, register, remove, deprecate or disable a payment method such as Blik, Twint, Pay by Bank, Payconiq, Trustly.
+description: Add or remove a Mollie payment method in this Shopware 6 plugin. Adding = new enum case plus a handler with marker interfaces (manual capture, automatic capture, bank transfer, B2B-only, subscriptions, recurring mandate, Orders API); registration is automatic, no migration or icon needed. Removing = add DeprecatedMethodAwareInterface so the method is deactivated but stays in the shop, keeping old orders intact — never delete a handler. Use when asked to add, implement, register, remove, deprecate or disable a payment method such as Blik, Twint, Pay by Bank, Payconiq, Trustly. Trigger words — "add payment method", "new payment method", "remove payment method", "deprecate payment method", "neue Zahlungsart", "Zahlungsart hinzufügen", "Zahlungsart entfernen", "Zahlart einbauen".
 ---
 
 # Skill: Add or Remove a Mollie Payment Method
@@ -127,7 +127,7 @@ No icon file (fetched from Mollie's CDN via the API name), no technical name (de
 migration (id is hashed from the technical name), no `services.xml`, no snippet, no
 `config.xml`. Say so in your answer so nobody looks for them.
 
-Changelog: one `Hinzugefügt`/`Added` line per file — `AGENTS.md` section 6.
+Changelog: one `Hinzugefügt`/`Added` line per file — `changelog` skill.
 
 ### Expected diff
 
