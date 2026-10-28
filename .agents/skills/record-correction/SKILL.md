@@ -1,55 +1,41 @@
 ---
 name: record-correction
-description: Turn a correction from the developer into a permanent rule change, so the same mistake cannot come back. Use whenever the developer rejects, corrects or overrides something you did or proposed — "no, do it this way", "that is wrong", "not like that", "I already told you" — and after a review finding that the checklists should have caught. Decides which rule file was defective, edits that one file, and reports the change.
+description: Turn a correction from the developer into a permanent rule change so the same mistake does not come back, and write down Mollie or Shopware behaviour a maintainer explained. Use whenever the developer rejects, corrects or overrides something, and whenever a maintainer explains how Mollie or Shopware really behaves. Trigger words — "no, do it this way", "that is wrong", "not like that", "I already told you", "nein, so nicht", "das ist falsch", "hab ich schon gesagt", "merk dir das", "schreib das auf", "das macht Mollie so".
 ---
 
 # Record a correction
 
-A correction is a defect in the rule files, not just in the change. `AGENTS.md` section 9
-holds the principle and the routing table; this skill is how you execute it.
+Run after the correction itself is applied, in the same turn.
 
-Run this **after** the correction itself is applied to the code, in the same turn.
+## 1. Rule or fact?
 
-## 1. Name what was actually wrong
+- **Rule** — how code, tests or work should be done. Name it as a rule, not as the symptom:
+  not "I used `empty()`", but "php.md bans `empty()` without naming `count()`/`strlen()`".
+- **Fact** — how Mollie or Shopware actually behaves. Only when a maintainer confirmed it;
+  never a guess.
 
-One sentence, in terms of the rule — not the symptom.
+## 2. Pick the one file
 
-> Not: *"I used `empty()`."* — Instead: *"the conventions checklist lists `empty()` but not
-> the `!count()` replacement, so the fix was not obvious."*
+| About | File |
+|---|---|
+| how to work: scope, order, what to run, how to answer | `AGENTS.md` |
+| PHP or Shopware code rule, review check | `.agents/guidelines/php.md` or `.agents/skills/review/SKILL.md` |
+| test rule | `.agents/guidelines/testing.md` |
+| changelog wording | `.agents/skills/changelog/SKILL.md` |
+| steps of a recurring task | `.agents/skills/<task>/SKILL.md` |
+| Mollie or Shopware behaviour | `.agents/guidelines/domain.md` |
+| support know-how for merchants | `docs/` |
 
-If you cannot phrase it as a rule, it is a **fact**, not process feedback: an undocumented
-Mollie or Shopware quirk, a value only the developer knows. Say so in your answer, ask
-whether to record it, and **stop here**. Do not file it.
+## 3. Edit it
 
-## 2. Pick the one file that should have caught it
+- Sharpen the existing line instead of adding a second one beside it.
+- No new file, no log of learnings, no dated entries.
+- In `domain.md`: one `##` section per topic, a handful of sentences, fact first, then what
+  follows for the code. Extend an existing section rather than adding one. Nothing that can
+  be read from the code.
 
-Use the routing table in `AGENTS.md` section 9. Two tie-breakers:
+## 4. Report
 
-- **Prefer the reviewer.** A guideline gets read if someone looks; a checklist line gets
-  checked. If the correction fits both a guideline and a `review-*` skill, edit the skill.
-- **Does the rule hold beyond this repository?** Then it belongs in `.ai/`, if that directory
-  is present at all. Do not edit it — it is not maintained here and the edit does not
-  survive. Name the file and the line that should change and leave it to the developer.
+One line: which file, and how the rule now reads.
 
-## 3. Edit that one file
-
-- **Sharpen the vague line and delete it.** Do not append a second rule beside it. Two rules
-  covering the same ground is how these files rot.
-- **No new file.** The homes in the section 9 table are enough. If the correction fits none
-  of them, say so and ask.
-- **No running log.** No `learnings.md`, no `corrections.md`, no dated entries. An unbounded
-  list of past mistakes adds noise and gets skimmed.
-- Keep the line in the voice of the file it lands in: a checklist gets a checkable line, a
-  guideline gets a rule.
-
-## 4. Report it, one line
-
-Which file, and how the rule now reads differently. Not what you learned.
-
-> `.agents/skills/review-conventions/SKILL.md` — the `empty()` line now names `count()` /
-> `strlen()` as the replacement instead of only banning it.
-
-## The test
-
-Would this correction now be caught **without the developer saying anything**? If the answer
-is no, it went in the wrong file — go back to step 2.
+Test: would this now be caught without the developer saying anything? If not, wrong file.

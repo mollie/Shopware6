@@ -1,7 +1,6 @@
 # Testing Guidelines
 
 Read this when writing tests — after the implementation review has passed.
-Review the result against `.agents/skills/review-tests/SKILL.md`.
 
 ## Layout
 
@@ -19,6 +18,23 @@ Mirror the production path: `shopware/Component/Refund/RefundBuilder.php` →
 
 **No mocking framework.** No `createMock()`, no `getMockBuilder()`. Write or reuse a fake in
 the component's `Fake/` folder (`tests/Unit/Refund/Fake/`, `tests/Unit/Payment/Fake/`, …).
+
+**Look for an existing Fake before adding one.** Check both the file name
+(`find tests -name 'FakeX.php'`) and the contract (`implements <Interface>`,
+`extends <Class>` in `tests/Unit`). Never overwrite an existing Fake; give a second one for
+a different contract a distinguishing name (`FakeShopwareTranslator` next to `FakeTranslator`).
+
+**A Fake extending a Shopware `Abstract*` class must not return `$this` from
+`getDecorated()`.** Many base methods call `$this->getDecorated()->sameMethod()`, so the fake
+recurses until PHP segfaults without any message. Check with
+`grep -n 'getDecorated()->' <the abstract class>`, override every hit and let
+`getDecorated()` throw.
+
+**Shopware fixtures that blow up at runtime:** `set*(null)` on an association setter (only
+`OrderEntity::setLanguage()` and `setPrimaryOrderDelivery()` accept it — leave the setter
+out instead); an entity without `setId()` in an `EntityCollection`; two `CalculatedTax` with
+the same `taxRate` in one `CalculatedTaxCollection` (keyed by rate, the second replaces the
+first).
 
 **A dependency without an interface is still fakeable.** When a service is injected by its
 concrete type and that class is not `final` — most Shopware core services, e.g. `AccountService`,
@@ -109,5 +125,5 @@ without the fix. State which assertion carries the regression.
 
 ## Running them
 
-You do not run them. See section 5 of `AGENTS.md`: name the relevant target
+You do not run them. See "Do not run" in `AGENTS.md`: name the relevant target
 (`make phpunit`, `make phpintegration`, `make vitest`, `make behat`) and hand over.
