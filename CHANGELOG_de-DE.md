@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.8.0
 - Hinzugefügt: Bestellungen mit Bundles aus Shopware Commercial lassen sich mit Mollie bezahlen.
 - Hinzugefügt: Die Express Components werden auch auf der Registrierungsseite im Checkout angezeigt.
 - Hinzugefügt: Apple Pay Direct übernimmt eine abweichende Rechnungsadresse aus Apple Pay in die Bestellung.
