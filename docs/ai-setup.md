@@ -4,7 +4,7 @@
 
 | Path | Content |
 |---|---|
-| `.agents/skills/<name>/SKILL.md` | Skills in the [Agent Skills](https://agentskills.io) format: `review`, `changelog`, `record-correction`, `payment-methods` |
+| `.agents/skills/<name>/SKILL.md` | Skills in the [Agent Skills](https://agentskills.io) format: `review`, `changelog`, `record-correction`, `payment-methods`, `increase-version`, `update-shopware-versions` |
 | `.agents/guidelines/php.md` | PHP and Shopware coding standard |
 | `.agents/guidelines/testing.md` | Test rules |
 | `.agents/guidelines/domain.md` | Mollie and Shopware behaviour the code depends on |
