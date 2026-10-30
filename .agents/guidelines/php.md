@@ -140,15 +140,14 @@ own version would be slightly nicer.
 **Descriptive names, no abbreviations.** `$paymentTransaction`, not `$pt`. `$index`, not
 `$i`, outside a trivial loop.
 
-**Write no comments.** Not "few", not "short" — none. Ordinary code is already clear from its
-names, its types and its size; a sentence above it repeating that is noise, and so is one that
-explains why you built it that way. The single exception is an expression a reader cannot decode
-however carefully they read it: a regular expression, a bit operation, a formula. Everything
-else has a better home — a fact about how Mollie or Shopware behaves goes to
-`.agents/guidelines/domain.md`, a caller-facing description into the swagger file, a design
-decision into the pull request. If a piece of code seems to need a comment to be understood,
-rename it or split it until it does not. Beyond that only the `@param`, `@return`, `@extends`
-and `@var` PHPStan cannot infer.
+**Comments only where the code is complex, never where it is obvious.** A short comment
+belongs above logic a reader cannot follow from names and types alone: a regular expression,
+a formula, a workaround for Mollie or Shopware that would otherwise look wrong. One or two
+lines, saying why, not what. No comment that repeats the code, no paragraph above a variable,
+no class docblock summarising the method below. If simple code seems to need a comment, rename
+or split it instead. The longer background of a Mollie or Shopware behaviour goes to
+`.agents/guidelines/domain.md`. Docblocks only for the `@param`, `@return`, `@extends` and
+`@var` PHPStan cannot infer.
 
 ---
 

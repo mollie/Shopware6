@@ -41,7 +41,8 @@ Full standard: `.agents/guidelines/php.md`. In short: `strict_types`, `final`, e
 no `else`, no `empty()`, no `mixed`, no `void`, avoid `null`, structs/collections instead of
 arrays, constants instead of magic values, PHP attributes instead of `services.xml`,
 `LoggerInterface` last with `#[Autowire(service: 'monolog.logger.mollie')]`, domain
-exceptions, no query or API call in a loop, snippets instead of hardcoded strings, **no comments**.
+exceptions, no query or API call in a loop, snippets instead of hardcoded strings. Comments only for complex logic, short, never for the
+obvious.
 
 A rule may be broken, never silently: say which one and why.
 
