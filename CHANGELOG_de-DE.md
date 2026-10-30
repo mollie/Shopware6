@@ -9,6 +9,7 @@
 - Geändert: zeobv-Bundles werden als eine Position an Mollie übertragen.
 - Geändert: Apple Pay Direct lädt eine fehlende Domain-Verifizierungsdatei automatisch herunter, z. B. nach einem Deployment.
 - Geändert: Express-Bestellungen ohne Login werden immer als Gast angelegt.
+- Geändert: Express Components schließen die Bestellung automatisch ab, wenn Mollie die Zahlung erst verzögert meldet, und legen keine zweite Zahlung mehr an.
 - Behoben: Der automatische Versand meldet Bestellungen, die noch mit Version 4 aufgegeben wurden, wieder an Mollie.
 - Behoben: Eine Telefonnummer, die nur aus der Ländervorwahl besteht (z. B. "+49"), lässt die Zahlung nicht mehr fehlschlagen.
 - Behoben: Apple Pay Direct legt Gastkonten wieder an, wenn der Shop bei der Registrierung eine Telefonnummer verlangt.

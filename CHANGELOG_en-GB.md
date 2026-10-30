@@ -9,6 +9,7 @@
 - Changed: zeobv bundles are sent to Mollie as a single line.
 - Changed: Apple Pay Direct automatically downloads a missing domain verification file, e.g. after a deployment.
 - Changed: Express orders without login are always placed as a guest.
+- Changed: Express components complete the order automatically when Mollie reports the payment late, and no longer create a second payment.
 - Fixed: The automatic shipment reports orders that were placed with version 4 to Mollie again.
 - Fixed: A phone number consisting of the country code only (e.g. "+49") no longer makes the payment fail.
 - Fixed: Apple Pay Direct creates guest accounts again when the shop requires a phone number on registration.

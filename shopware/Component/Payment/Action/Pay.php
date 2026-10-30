@@ -36,6 +36,7 @@ use Shopware\Core\System\SalesChannel\SalesChannelEntity;
 use Shopware\Core\System\StateMachine\Exception\IllegalTransitionException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class Pay implements PayInterface
@@ -76,8 +77,10 @@ final class Pay implements PayInterface
 
         // Bank transfer orders take several days to settle and must not be editable
         // afterwards, so we skip the pending-order session key that would redirect
-        // the customer onto the edit-order form on browser back.
-        if (! $paymentHandler instanceof BankTransferAwareInterface) {
+        // the customer onto the edit-order form on browser back. A queue worker has no
+        // request and so no session to remember it in.
+        $request = $this->requestStack->getMainRequest();
+        if (! $paymentHandler instanceof BankTransferAwareInterface && $request instanceof Request && $request->hasSession()) {
             $this->requestStack->getSession()->set(self::SESSION_KEY_PENDING_ORDER, $order->getId());
             $this->logger->debug('[PendingOrderRedirect] session key set', ['orderId' => $order->getId()]);
         }

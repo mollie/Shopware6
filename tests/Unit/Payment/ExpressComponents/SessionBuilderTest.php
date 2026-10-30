@@ -583,6 +583,17 @@ final class SessionBuilderTest extends TestCase
         ], $this->orderRepository->getLastUpdate()['customFields'][SessionBuilder::ORDER_CUSTOM_FIELD]);
     }
 
+    public function testTheSessionOfAFinishedCartIsStoredOnTheOrder(): void
+    {
+        $order = $this->createOrder(119.00, 5.95);
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->saveSessionOnOrder($order, 'ses_cart', $this->createSalesChannelContext());
+
+        $this->assertSame('ses_cart', SessionBuilder::readOrderSessionId($order->getCustomFields() ?? [], Mode::TEST));
+        $this->assertSame('ses_cart', $this->orderRepository->getLastUpdate()['customFields'][SessionBuilder::ORDER_CUSTOM_FIELD]['test'][SessionBuilder::ORDER_CUSTOM_FIELD_SESSION_ID]);
+    }
+
     public function testStoredOrderSessionIsReusedWhileItStillMatchesTheOrderTotal(): void
     {
         $this->sessionGateway->setExistingSession($this->createSession('ses_stored', new Money(119.00, 'EUR')));

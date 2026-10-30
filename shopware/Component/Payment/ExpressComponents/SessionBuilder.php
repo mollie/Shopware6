@@ -139,9 +139,31 @@ final class SessionBuilder implements SessionBuilderInterface
 
         $session = $this->sessionGateway->createSession($createSession, $salesChannelContext);
 
-        $this->saveSessionOnOrder($order, $session->getId(), $mode, $salesChannelContext);
+        $this->saveSessionOnOrder($order, $session->getId(), $salesChannelContext);
 
         return $session;
+    }
+
+    /**
+     * Once a cart became an order the cart is gone, so the order is the only place that still names
+     * the session the shopper paid with.
+     */
+    public function saveSessionOnOrder(OrderEntity $order, string $sessionId, SalesChannelContext $salesChannelContext): void
+    {
+        $mode = $this->getMode($salesChannelContext);
+        $customFields = $order->getCustomFields() ?? [];
+        $modeSessions = is_array($customFields[self::ORDER_CUSTOM_FIELD] ?? null) ? $customFields[self::ORDER_CUSTOM_FIELD] : [];
+        $modeSessions[$mode->value] = [self::ORDER_CUSTOM_FIELD_SESSION_ID => $sessionId];
+        $customFields[self::ORDER_CUSTOM_FIELD] = $modeSessions;
+
+        $order->setCustomFields($customFields);
+
+        $this->orderRepository->update([
+            [
+                'id' => $order->getId(),
+                'customFields' => $customFields,
+            ],
+        ], $salesChannelContext->getContext());
     }
 
     private function createCartSession(CreateSession $createSession, SalesChannelContext $salesChannelContext): Session
@@ -189,23 +211,6 @@ final class SessionBuilder implements SessionBuilderInterface
         }
 
         return $session;
-    }
-
-    private function saveSessionOnOrder(OrderEntity $order, string $sessionId, Mode $mode, SalesChannelContext $salesChannelContext): void
-    {
-        $customFields = $order->getCustomFields() ?? [];
-        $modeSessions = is_array($customFields[self::ORDER_CUSTOM_FIELD] ?? null) ? $customFields[self::ORDER_CUSTOM_FIELD] : [];
-        $modeSessions[$mode->value] = [self::ORDER_CUSTOM_FIELD_SESSION_ID => $sessionId];
-        $customFields[self::ORDER_CUSTOM_FIELD] = $modeSessions;
-
-        $order->setCustomFields($customFields);
-
-        $this->orderRepository->update([
-            [
-                'id' => $order->getId(),
-                'customFields' => $customFields,
-            ],
-        ], $salesChannelContext->getContext());
     }
 
     private function getOrderAmount(OrderEntity $order): float

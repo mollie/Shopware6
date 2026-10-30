@@ -13,4 +13,6 @@ interface SessionBuilderInterface
     public function buildFromCart(Cart $cart, SalesChannelContext $salesChannelContext): Session;
 
     public function buildFromOrder(OrderEntity $order, SalesChannelContext $salesChannelContext): Session;
+
+    public function saveSessionOnOrder(OrderEntity $order, string $sessionId, SalesChannelContext $salesChannelContext): void;
 }

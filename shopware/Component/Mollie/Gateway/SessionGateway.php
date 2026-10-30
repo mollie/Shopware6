@@ -19,8 +19,8 @@ final class SessionGateway implements SessionGatewayInterface
 {
     use ExceptionTrait;
 
-    private const SESSION_MAX_RETRY = 5;
-    private const SESSION_BASE_TIMEOUT = 500_000;
+    private const SESSION_MAX_RETRY = 15;
+    private const SESSION_TIMEOUT = 1_000_000;
 
     public function __construct(
         #[Autowire(service: ClientFactory::class)]
@@ -140,7 +140,7 @@ final class SessionGateway implements SessionGatewayInterface
             $session = Session::createFromClientResponse($sessionBody);
 
             for ($i = 0; $i < self::SESSION_MAX_RETRY && $this->isIncomplete($session, $requirePaymentId); ++$i) {
-                usleep(self::SESSION_BASE_TIMEOUT * ($i + 1));
+                usleep(self::SESSION_TIMEOUT);
                 $response = $client->get('sessions/' . $sessionId);
                 $sessionBody = json_decode($response->getBody()->getContents(), true);
                 $session = Session::createFromClientResponse($sessionBody);
