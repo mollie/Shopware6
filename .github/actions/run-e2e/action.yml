@@ -234,11 +234,17 @@ runs:
 
     # --------------------------------------------------------------------------------------------------------------------------------------
     - name: Integration analyzer
+      id: stan
+      continue-on-error: true
       shell: bash
       run: |
         docker exec shop bash -c 'cd custom/plugins/MolliePayments && make stan -B'
 
+    # The PHP checks must not stop the run: Cypress should still report even if they fail.
+    # continue-on-error keeps the job going, the last step of this action fails it again.
     - name: Integration tests
+      id: integration
+      continue-on-error: true
       shell: bash
       run: |
         docker exec \
@@ -247,7 +253,9 @@ runs:
           shop bash -c 'cd custom/plugins/MolliePayments && make phpintegration groups="${{ inputs.PHPUNIT_GROUPS }}" -B'
 
     - name: Functional tests
+      id: behat
       if: ${{ inputs.RUN_BEHAT == 'true' }}
+      continue-on-error: true
       shell: bash
       run: |
         docker exec shop bash -c 'cd custom/plugins/MolliePayments && make behat allure=${{ inputs._ALLURE_DIR }}/behat -B'
@@ -344,3 +352,12 @@ runs:
           tests/Cypress/cypress/logs
           tests/Cypress/cypress/videos
           tests/Cypress/cypress/screenshots
+
+    # --------------------------------------------------------------------------------------------------------------------------------------
+
+    - name: Fail when a PHP check failed
+      if: ${{ always() && (steps.stan.outcome == 'failure' || steps.integration.outcome == 'failure' || steps.behat.outcome == 'failure') }}
+      shell: bash
+      run: |
+        echo "::error::Analyzer: ${{ steps.stan.outcome }}, Integration tests: ${{ steps.integration.outcome }}, Behat: ${{ steps.behat.outcome }}"
+        exit 1

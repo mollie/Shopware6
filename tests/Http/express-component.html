@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <title>Mollie Express Components</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: sans-serif; max-width: 480px; margin: 2rem auto; padding: 0 1rem; }
+        label { display: block; margin-top: 1rem; font-weight: bold; }
+        input, textarea { width: 100%; box-sizing: border-box; padding: .5rem; font-family: monospace; }
+        button#mount { margin-top: 1rem; padding: .5rem 1rem; }
+        #express-component { margin-top: 2rem; }
+        #error { color: #b00020; margin-top: 1rem; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+<h1>Mollie Express Components</h1>
+<p>
+    Den <code>clientAccessToken</code> aus <code>create-session</code> (<code>express-components.http</code>, Schritt 3)
+    einfügen. Die Komponente zeigt dann alle Zahlungsbuttons an.
+</p>
+
+<label for="token">clientAccessToken</label>
+<textarea id="token" rows="5"></textarea>
+
+<label for="locale">Locale</label>
+<input id="locale" value="de_DE">
+
+<label for="options">Optionen (JSON, optional)</label>
+<input id="options" placeholder='{}'>
+
+<button id="mount" type="button">Anzeigen</button>
+
+<div id="express-component"></div>
+<div id="error"></div>
+
+<script src="https://js.mollie.com/v2/mollie.js"></script>
+<script>
+    const tokenInput = document.getElementById('token');
+    const localeInput = document.getElementById('locale');
+    const optionsInput = document.getElementById('options');
+    const target = document.getElementById('express-component');
+    const errorBox = document.getElementById('error');
+
+    // remember the last token, so a reload does not need the copy and paste again
+    tokenInput.value = localStorage.getItem('mollieExpressToken') || '';
+
+    // v2 registers itself as Mollie2 when v1 already occupies Mollie
+    const mollie = window.Mollie2 && typeof window.Mollie2.Checkout === 'function' ? window.Mollie2 : window.Mollie;
+
+    document.getElementById('mount').addEventListener('click', () => {
+        errorBox.textContent = '';
+        target.innerHTML = '';
+
+        const token = tokenInput.value.trim();
+        if (token === '') {
+            errorBox.textContent = 'Bitte den clientAccessToken eintragen.';
+            return;
+        }
+
+        try {
+            const options = optionsInput.value.trim() === '' ? {} : JSON.parse(optionsInput.value);
+            localStorage.setItem('mollieExpressToken', token);
+
+            const checkout = mollie.Checkout(token, { locale: localeInput.value });
+            checkout.create('express-component', options).mount(target);
+        } catch (error) {
+            errorBox.textContent = String(error);
+            console.error(error);
+        }
+    });
+</script>
+</body>
+</html>

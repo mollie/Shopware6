@@ -14,6 +14,9 @@ final class FakeSessionBuilder implements SessionBuilderInterface
     private ?Cart $lastCart = null;
     private ?OrderEntity $lastOrder = null;
 
+    /** @var array<string, string> */
+    private array $savedSessions = [];
+
     private Session $cartSession;
     private Session $orderSession;
 
@@ -58,6 +61,19 @@ final class FakeSessionBuilder implements SessionBuilderInterface
         $this->lastOrder = $order;
 
         return $this->orderSession;
+    }
+
+    public function saveSessionOnOrder(OrderEntity $order, string $sessionId, SalesChannelContext $salesChannelContext): void
+    {
+        $this->savedSessions[$order->getId()] = $sessionId;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getSavedSessions(): array
+    {
+        return $this->savedSessions;
     }
 
     private static function session(string $id, string $clientAccessToken): Session

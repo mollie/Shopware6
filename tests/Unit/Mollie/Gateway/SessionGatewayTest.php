@@ -169,6 +169,28 @@ final class SessionGatewayTest extends TestCase
         $this->assertSame('Erika', $session->getShippingAddress()?->getGivenName());
     }
 
+    public function testASessionThatAlreadyCarriesThePaymentIdIsReturnedWithoutWaiting(): void
+    {
+        $client = new FakeClient(body: $this->sessionResponse([
+            'shippingAddress' => [
+                'givenName' => 'Erika',
+                'familyName' => 'Mustermann',
+                'email' => 'erika@example.com',
+                'streetAndNumber' => 'Musterstr. 1',
+                'postalCode' => '12345',
+                'city' => 'Berlin',
+                'country' => 'DE',
+            ],
+            '_links' => ['redirect' => ['href' => 'https://www.mollie.com/checkout/return/abcdef']],
+        ]));
+
+        $start = microtime(true);
+        $session = $this->gateway($client)->loadSession('ses_1', new FakeSalesChannelContext(), true);
+
+        $this->assertSame('tr_abcdef', $session->getPaymentId());
+        $this->assertLessThan(1.0, microtime(true) - $start);
+    }
+
     public function testCancellingASessionDeletesItAtMollie(): void
     {
         $client = new FakeClient(body: $this->sessionResponse(['status' => SessionStatus::EXPIRED->value]));

@@ -48,6 +48,8 @@ final class CartCheckoutFinisher implements CartCheckoutFinisherInterface
         private AbstractAccountService $accountService,
         #[Autowire(service: PaymentFinalizer::class)]
         private PaymentFinalizerInterface $paymentFinalizer,
+        #[Autowire(service: SessionBuilder::class)]
+        private SessionBuilderInterface $sessionBuilder,
         #[Autowire(service: CartOrderRoute::class)]
         private AbstractCartOrderRoute $cartOrderRoute,
         #[Autowire(service: SalesChannelContextService::class)]
@@ -111,6 +113,9 @@ final class CartCheckoutFinisher implements CartCheckoutFinisherInterface
 
         $logData['orderId'] = $order->getId();
         $logData['orderNumber'] = $order->getOrderNumber();
+
+        // the cart is gone now, without this the order cannot be traced back to its session
+        $this->sessionBuilder->saveSessionOnOrder($order, $session->getId(), $orderContext);
         $this->logger->debug('Express components order created', $logData);
 
         $redirectUrl = $this->paymentFinalizer->finalize($session, $order, $orderContext);
