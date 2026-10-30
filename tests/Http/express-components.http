@@ -1,0 +1,79 @@
+### Express Components over the Store API (headless)
+###
+### PhpStorm HTTP client. Fill tests/Http/http-client.env.json (host, accessKey, salesChannelId,
+### productId, frontendUrl) and run the requests from top to bottom. The context token is taken
+### over from the first request automatically.
+###
+### The payment itself happens in the Mollie component of the frontend and cannot be sent from
+### here. Mount the component with the sessionId and clientAccessToken of step 3, pay, and
+### Mollie redirects the browser to the finish route (step 4), which ends on the finishUrl.
+
+### 1. Cart of a new context, the response header carries the context token
+GET {{host}}/store-api/checkout/cart
+sw-access-key: {{accessKey}}
+Accept: application/json
+
+> {%
+    client.global.set("contextToken", response.headers.valueOf("sw-context-token"));
+%}
+
+### 2. Add a product to the cart
+POST {{host}}/store-api/checkout/cart/line-item
+sw-access-key: {{accessKey}}
+sw-context-token: {{contextToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "items": [
+    {
+      "type": "product",
+      "referencedId": "{{productId}}",
+      "quantity": 1
+    }
+  ]
+}
+
+> {%
+    client.global.set("contextToken", response.headers.valueOf("sw-context-token"));
+%}
+
+### 3. Create the session, finishUrl and errorUrl are the pages of the frontend
+POST {{host}}/store-api/mollie/express-components/create-session
+sw-access-key: {{accessKey}}
+sw-context-token: {{contextToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "finishUrl": "{{frontendUrl}}/checkout/success?orderId={orderId}",
+  "errorUrl": "{{frontendUrl}}/checkout/error?orderId={orderId}"
+}
+
+> {%
+    client.global.set("sessionId", response.body.sessionId);
+    client.global.set("clientAccessToken", response.body.clientAccessToken);
+%}
+
+### 3b. Create the session for an existing order (failed payment), the customer has to be logged in
+POST {{host}}/store-api/mollie/express-components/create-session
+sw-access-key: {{accessKey}}
+sw-context-token: {{contextToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "orderId": "{{orderId}}",
+  "finishUrl": "{{frontendUrl}}/checkout/success?orderId={orderId}",
+  "errorUrl": "{{frontendUrl}}/checkout/error?orderId={orderId}"
+}
+
+### 4. The return of Mollie after the payment, a browser opens this, no access key needed.
+### Only works for a session that is completed. Do not run it twice, the cart is gone afterwards.
+GET {{host}}/api/mollie/express-components/finish/{{salesChannelId}}?cartToken={{contextToken}}&finishUrl={{frontendUrl}}/checkout/success?orderId%3D%7BorderId%7D&errorUrl={{frontendUrl}}/checkout/error?orderId%3D%7BorderId%7D
+
+### 5. Mollie configuration of the sales channel
+GET {{host}}/store-api/mollie/config
+sw-access-key: {{accessKey}}
+sw-context-token: {{contextToken}}
+Accept: application/json
