@@ -69,6 +69,20 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->applyShopDomain($normalizedUrl);
     }
 
+    public function getSessionWebhookUrl(string $webhookId): string
+    {
+        $routeName = 'frontend.mollie.webhook.session';
+        if ($this->isStoreApiRequest()) {
+            $routeName = 'api.mollie.webhook.session';
+        }
+
+        $url = $this->router->generate($routeName, ['webhookId' => $webhookId], RouterInterface::ABSOLUTE_URL);
+
+        $normalizedUrl = $this->normalizeUrl($url);
+
+        return $this->applyShopDomain($normalizedUrl);
+    }
+
     public function getSubscriptionPaymentUpdateReturnUrl(string $subscriptionId): string
     {
         return $this->router->generate(

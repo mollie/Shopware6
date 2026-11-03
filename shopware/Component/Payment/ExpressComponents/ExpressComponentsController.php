@@ -4,11 +4,16 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\AbstractFinishCheckoutRoute;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\AbstractSessionWebhookRoute;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\FinishCheckoutRoute;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\SessionWebhookRoute;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\ShopwareHttpException;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +30,8 @@ final class ExpressComponentsController extends StorefrontController
     public function __construct(
         #[Autowire(service: FinishCheckoutRoute::class)]
         private AbstractFinishCheckoutRoute $finishCheckoutRoute,
+        #[Autowire(service: SessionWebhookRoute::class)]
+        private AbstractSessionWebhookRoute $sessionWebhookRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -40,8 +47,6 @@ final class ExpressComponentsController extends StorefrontController
         try {
             $response = $this->finishCheckoutRoute->finishCheckout($request, $salesChannelContext);
 
-            // the redirect of the Shopware payment handling, which runs the regular finalize and
-            // ends on the order success or the edit order page
             $redirectUrl = $response->getRedirectUrl();
             if ($redirectUrl !== '') {
                 return new RedirectResponse($redirectUrl);
@@ -55,6 +60,30 @@ final class ExpressComponentsController extends StorefrontController
             ]);
 
             return $this->redirectToRoute('frontend.checkout.cart.page');
+        }
+    }
+
+    #[Route(name: 'frontend.mollie.webhook.session', path: '/mollie/session/webhook/{webhookId}', methods: ['GET', 'POST'], options: ['seo' => false])]
+    public function sessionWebhook(string $webhookId, Request $request, Context $context): Response
+    {
+        try {
+            $response = $this->sessionWebhookRoute->notify($webhookId, $request, $context);
+
+            return new JsonResponse($response->getObject());
+        } catch (ShopwareHttpException $exception) {
+            $this->logger->warning('Express components session webhook failed with warning', [
+                'webhookId' => $webhookId,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], $exception->getStatusCode());
+        } catch (\Throwable $exception) {
+            $this->logger->error('Express components session webhook failed', [
+                'webhookId' => $webhookId,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return new JsonResponse(['success' => false, 'error' => $exception->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
     }
 }

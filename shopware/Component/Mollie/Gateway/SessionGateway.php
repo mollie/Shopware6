@@ -129,7 +129,7 @@ final class SessionGateway implements SessionGatewayInterface
         }
     }
 
-    public function loadSession(string $sessionId, SalesChannelContext $salesChannelContext, bool $requirePaymentId = false): Session
+    public function loadSession(string $sessionId, SalesChannelContext $salesChannelContext): Session
     {
         try {
             $salesChannelId = $salesChannelContext->getSalesChannelId();
@@ -139,7 +139,7 @@ final class SessionGateway implements SessionGatewayInterface
             $sessionBody = json_decode($response->getBody()->getContents(), true);
             $session = Session::createFromClientResponse($sessionBody);
 
-            for ($i = 0; $i < self::SESSION_MAX_RETRY && $this->isIncomplete($session, $requirePaymentId); ++$i) {
+            for ($i = 0; $i < self::SESSION_MAX_RETRY && $this->isIncomplete($session); ++$i) {
                 usleep(self::SESSION_TIMEOUT);
                 $response = $client->get('sessions/' . $sessionId);
                 $sessionBody = json_decode($response->getBody()->getContents(), true);
@@ -179,12 +179,8 @@ final class SessionGateway implements SessionGatewayInterface
         }
     }
 
-    private function isIncomplete(Session $session, bool $requirePaymentId): bool
+    private function isIncomplete(Session $session): bool
     {
-        if ($session->getShippingAddress() === null) {
-            return true;
-        }
-
-        return $requirePaymentId && $session->getPaymentId() === '';
+        return $session->getShippingAddress() === null;
     }
 }

@@ -77,7 +77,7 @@ final class CartCheckoutFinisher implements CartCheckoutFinisherInterface
         // Mollie fills a session asynchronously, so right after the redirect it can still come
         // back without addresses - loadSession waits for them instead of failing the checkout
         $sessionId = $this->getSessionId($cartToken, $cartContext);
-        $session = $this->sessionGateway->loadSession($sessionId, $cartContext, true);
+        $session = $this->sessionGateway->loadSession($sessionId, $cartContext);
         $logData['sessionId'] = $session->getId();
 
         if (! $session->getStatus()->isCompleted()) {

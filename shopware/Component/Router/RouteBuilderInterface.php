@@ -29,6 +29,8 @@ interface RouteBuilderInterface
 
     public function getSubscriptionWebhookUrl(string $subscriptionId): string;
 
+    public function getSessionWebhookUrl(string $webhookId): string;
+
     public function getSubscriptionPaymentUpdateReturnUrl(string $subscriptionId): string;
 
     public function getSubscriptionPaymentUpdateWebhookUrl(string $subscriptionId): string;

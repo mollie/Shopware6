@@ -26,23 +26,6 @@ final class SessionTest extends TestCase
         $this->assertSame('redirect', $session->getNextAction());
     }
 
-    public function testDerivesThePaymentIdFromTheReturnLink(): void
-    {
-        $session = Session::createFromClientResponse($this->completedSessionBody());
-
-        $this->assertSame('tr_TTU7UryAa6hRu8dJeNdVJ', $session->getPaymentId());
-    }
-
-    public function testPaymentIdStaysEmptyWithoutReturnLink(): void
-    {
-        $body = $this->completedSessionBody();
-        unset($body['_links']);
-
-        $session = Session::createFromClientResponse($body);
-
-        $this->assertSame('', $session->getPaymentId());
-    }
-
     public function testResolvesTheSelectedShippingOption(): void
     {
         $session = Session::createFromClientResponse($this->completedSessionBody());

@@ -18,7 +18,6 @@ final class Session extends Struct implements \JsonSerializable
     private ?string $cardToken = null;
     private ?string $wallet = null;
     private string $nextAction = '';
-    private string $paymentId = '';
     private LineItemCollection $lines;
     private ShippingOptionCollection $shippingOptions;
     private ?Money $amount = null;
@@ -52,14 +51,6 @@ final class Session extends Struct implements \JsonSerializable
 
         if (isset($body['amount']['value'], $body['amount']['currency'])) {
             $session->setAmount(Money::fromArray($body['amount']));
-        }
-
-        // the payment created for the session is not part of the body, only the return link
-        // of the checkout carries its id: .../checkout/return/<id> belongs to payment tr_<id>
-        $redirectId = trim((string) parse_url($redirectUrl, PHP_URL_PATH), '/');
-        $redirectId = substr($redirectId, (int) strrpos($redirectId, '/') + 1);
-        if ($redirectId !== '') {
-            $session->setPaymentId('tr_' . $redirectId);
         }
 
         $session->setMethod(PaymentMethod::tryFrom((string) ($body['method'] ?? '')));
@@ -200,16 +191,6 @@ final class Session extends Struct implements \JsonSerializable
     public function setNextAction(string $nextAction): void
     {
         $this->nextAction = $nextAction;
-    }
-
-    public function getPaymentId(): string
-    {
-        return $this->paymentId;
-    }
-
-    public function setPaymentId(string $paymentId): void
-    {
-        $this->paymentId = $paymentId;
     }
 
     public function getLines(): LineItemCollection
