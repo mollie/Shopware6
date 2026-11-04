@@ -18,6 +18,8 @@ final class FakeCartService extends CartService
     /** @var list<Cart> */
     private array $setCarts = [];
 
+    private ?Cart $recalculatedCart = null;
+
     public function __construct(Cart $cart)
     {
         $this->storedCart = $cart;
@@ -31,6 +33,15 @@ final class FakeCartService extends CartService
     public function addCart(string $token, Cart $cart): void
     {
         $this->cartsByToken[$token] = $cart;
+    }
+
+    /**
+     * The real service returns a new cart instance from a recalculation. Tests that need to tell
+     * the cart they handed in apart from the recalculated one put that one here.
+     */
+    public function setRecalculatedCart(Cart $cart): void
+    {
+        $this->recalculatedCart = $cart;
     }
 
     public function getSetCartCount(): int
@@ -66,7 +77,7 @@ final class FakeCartService extends CartService
 
     public function recalculate(Cart $cart, SalesChannelContext $context): Cart
     {
-        return $cart;
+        return $this->recalculatedCart ?? $cart;
     }
 
     public function createNew(string $token): Cart

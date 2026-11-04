@@ -56,7 +56,7 @@ class ExpressCartItemAddRoute extends AbstractCartItemAddRoute
         // clear existing cart and also update it to save it
         $cart->setLineItems(new LineItemCollection());
 
-        $this->cartService->recalculate($cart, $context);
+        $cart = $this->cartService->recalculate($cart, $context);
 
         return $this->getDecorated()->add($request, $cart, $context, $items);
     }

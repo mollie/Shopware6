@@ -1,4 +1,5 @@
 # Unreleased
+- Fixed: Apple Pay Direct on the product page shows the product price again when the cart already contains items.
 
 # 5.8.0
 - Added: Orders with bundles from Shopware Commercial can be paid with Mollie.
