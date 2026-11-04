@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
 use Mollie\Shopware\Component\Mollie\Session;
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentEntity;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\AbstractSessionWebhookRoute;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\SessionWebhookRoute;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Psr\Log\LoggerInterface;
@@ -49,6 +52,8 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         private SessionPaymentRepositoryInterface $sessionPaymentRepository,
         #[Autowire(service: 'order_transaction.repository')]
         private EntityRepository $orderTransactionRepository,
+        #[Autowire(service: SessionWebhookRoute::class)]
+        private AbstractSessionWebhookRoute $sessionWebhookRoute,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
         private RequestStack $requestStack,
@@ -74,8 +79,13 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         ];
 
         $context = $salesChannelContext->getContext();
-        if (! $this->sessionPaymentRepository->assignTransaction($session->getId(), $transaction->getId(), $context)) {
+        $sessionPayment = $this->sessionPaymentRepository->assignTransaction($session->getId(), $transaction->getId(), $context);
+        if ($sessionPayment === null) {
             $this->logger->warning('Express components session has no session payment entry', $logData);
+        }
+
+        if ($sessionPayment instanceof SessionPaymentEntity) {
+            $this->processEarlyWebhook($sessionPayment, $context, $logData);
         }
 
         $finishUrls = $this->getFinishUrls();
@@ -91,6 +101,30 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         $this->logger->info('Express components checkout finished', $logData);
 
         return $this->getFinishUrl($finishUrls, $orderId);
+    }
+
+    /**
+     * Mollie usually calls the session webhook before the shopper is back, it is answered with a
+     * conflict then and only repeated about a minute later. The stored payment id is therefore
+     * processed right away, as if the webhook had just arrived.
+     *
+     * @param array<mixed> $logData
+     */
+    private function processEarlyWebhook(SessionPaymentEntity $sessionPayment, Context $context, array $logData): void
+    {
+        $paymentId = (string) $sessionPayment->getPaymentId();
+        if ($paymentId === '') {
+            return;
+        }
+
+        $webhookRequest = new Request([], ['id' => $paymentId]);
+        try {
+            $this->sessionWebhookRoute->notify($sessionPayment->getId(), $webhookRequest, $context);
+        } catch (\Throwable $exception) {
+            $logData['paymentId'] = $paymentId;
+            $logData['error'] = $exception->getMessage();
+            $this->logger->error('Express components session webhook could not be processed during the finish', $logData);
+        }
     }
 
     /**

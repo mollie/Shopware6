@@ -15,9 +15,9 @@ interface SessionPaymentRepositoryInterface
     public function assignPayment(string $webhookId, string $paymentId, Context $context): void;
 
     /**
-     * @return bool false when no entry exists for the session
+     * @return ?SessionPaymentEntity the entry of the session, null when none exists
      */
-    public function assignTransaction(string $sessionId, string $transactionId, Context $context): bool;
+    public function assignTransaction(string $sessionId, string $transactionId, Context $context): ?SessionPaymentEntity;
 
     public function deleteByTransactionId(string $transactionId, Context $context): void;
 

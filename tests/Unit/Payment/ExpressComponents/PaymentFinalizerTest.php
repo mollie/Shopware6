@@ -12,6 +12,7 @@ use Mollie\Shopware\Unit\Fake\FakeOrderTransactionRepository;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionPaymentRepository;
+use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionWebhookRoute;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ final class PaymentFinalizerTest extends TestCase
 {
     private FakeSessionPaymentRepository $sessionPaymentRepository;
     private FakeOrderTransactionRepository $orderTransactionRepository;
+    private FakeSessionWebhookRoute $sessionWebhookRoute;
     private RequestStack $requestStack;
     private FakeLogger $logger;
 
@@ -37,6 +39,7 @@ final class PaymentFinalizerTest extends TestCase
         $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry('webhook-id', 'ses_1'));
         $this->orderTransactionRepository = new FakeOrderTransactionRepository();
         $this->orderTransactionRepository->withTransaction($this->createTransaction('transaction-1', '2026-11-03 10:00:00', OrderTransactionStates::STATE_PAID));
+        $this->sessionWebhookRoute = new FakeSessionWebhookRoute();
         $this->requestStack = new RequestStack();
         $this->logger = new FakeLogger();
     }
@@ -51,6 +54,37 @@ final class PaymentFinalizerTest extends TestCase
         $this->createPaymentFinalizer()->finalize(new Session('ses_1'), $order, new FakeSalesChannelContext());
 
         $this->assertSame('transaction-new', $this->sessionPaymentRepository->findById('webhook-id', Context::createDefaultContext())?->getTransactionId());
+    }
+
+    public function testEarlyWebhookIsProcessedOnceTheTransactionIsKnown(): void
+    {
+        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry('webhook-id', 'ses_1', 'tr_1'));
+        $order = $this->createOrder($this->createTransaction('transaction-1', '2026-11-03 10:00:00'));
+
+        $this->createPaymentFinalizer()->finalize(new Session('ses_1'), $order, new FakeSalesChannelContext());
+
+        $this->assertSame([['webhookId' => 'webhook-id', 'paymentId' => 'tr_1']], $this->sessionWebhookRoute->getCalls());
+    }
+
+    public function testWebhookIsLeftToMollieWithoutStoredPaymentId(): void
+    {
+        $order = $this->createOrder($this->createTransaction('transaction-1', '2026-11-03 10:00:00'));
+
+        $this->createPaymentFinalizer()->finalize(new Session('ses_1'), $order, new FakeSalesChannelContext());
+
+        $this->assertSame([], $this->sessionWebhookRoute->getCalls());
+    }
+
+    public function testFailingEarlyWebhookDoesNotStopTheFinish(): void
+    {
+        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry('webhook-id', 'ses_1', 'tr_1'));
+        $this->sessionWebhookRoute = new FakeSessionWebhookRoute(new \RuntimeException('Mollie API not reachable'));
+        $order = $this->createOrder($this->createTransaction('transaction-1', '2026-11-03 10:00:00'));
+
+        $finishUrl = $this->createPaymentFinalizer()->finalize(new Session('ses_1'), $order, new FakeSalesChannelContext());
+
+        $this->assertSame('https://shop.test/checkout/finish', $finishUrl);
+        $this->assertTrue($this->logger->hasRecordThatContains('error', 'could not be processed during the finish'));
     }
 
     public function testFinishContinuesWithoutSessionPaymentEntry(): void
@@ -129,6 +163,7 @@ final class PaymentFinalizerTest extends TestCase
         return new PaymentFinalizer(
             $this->sessionPaymentRepository,
             $this->orderTransactionRepository,
+            $this->sessionWebhookRoute,
             new FakeRouteBuilder(checkoutFinishUrl: 'https://shop.test/checkout/finish', editOrderUrl: 'https://shop.test/account/order/edit'),
             $this->requestStack,
             $this->logger

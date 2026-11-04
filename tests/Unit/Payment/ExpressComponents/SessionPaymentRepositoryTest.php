@@ -71,22 +71,32 @@ final class SessionPaymentRepositoryTest extends TestCase
 
     public function testTransactionIsWrittenToTheEntryOfTheSession(): void
     {
-        $this->entityRepository->idSearchResults[] = $this->idResult(self::WEBHOOK_ID);
+        $this->entityRepository->entitySearchResults[] = $this->searchResult(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1'));
         $this->expectWrite();
 
-        $assigned = $this->createRepository()->assignTransaction('ses_1', self::TRANSACTION_ID, $this->context);
+        $this->createRepository()->assignTransaction('ses_1', self::TRANSACTION_ID, $this->context);
 
-        $this->assertTrue($assigned);
         $this->assertSame([['id' => self::WEBHOOK_ID, 'transactionId' => self::TRANSACTION_ID]], $this->entityRepository->data[0]);
+    }
+
+    public function testAssignedEntryCarriesTheStoredPaymentId(): void
+    {
+        $this->entityRepository->entitySearchResults[] = $this->searchResult(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1', 'tr_1'));
+        $this->expectWrite();
+
+        $entry = $this->createRepository()->assignTransaction('ses_1', self::TRANSACTION_ID, $this->context);
+
+        $this->assertSame('tr_1', $entry?->getPaymentId());
+        $this->assertSame(self::TRANSACTION_ID, $entry?->getTransactionId());
     }
 
     public function testTransactionOfAnUnknownSessionIsReported(): void
     {
-        $this->entityRepository->idSearchResults[] = $this->idResult();
+        $this->entityRepository->entitySearchResults[] = new EntitySearchResult(SessionPaymentDefinition::ENTITY_NAME, 0, new SessionPaymentCollection(), null, new Criteria(), $this->context);
 
-        $assigned = $this->createRepository()->assignTransaction('ses_unknown', self::TRANSACTION_ID, $this->context);
+        $entry = $this->createRepository()->assignTransaction('ses_unknown', self::TRANSACTION_ID, $this->context);
 
-        $this->assertFalse($assigned);
+        $this->assertNull($entry);
         $this->assertSame([], $this->entityRepository->data);
     }
 

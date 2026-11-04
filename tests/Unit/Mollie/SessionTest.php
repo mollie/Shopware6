@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\LineItemType;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Mollie\SessionStatus;
+use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -34,7 +35,7 @@ final class SessionTest extends TestCase
         $this->assertNotNull($shippingLine);
         $this->assertSame(LineItemType::SHIPPING, $shippingLine->getType());
 
-        $shippingOption = $session->getSelectedShippingOption();
+        $shippingOption = $session->getSelectedShippingOption($session->getShippingOptions());
         $this->assertNotNull($shippingOption);
         $this->assertSame('18a749392801df0f024c86fbac59b2b4', $shippingOption->getReference());
     }
@@ -53,7 +54,7 @@ final class SessionTest extends TestCase
         $session = Session::createFromClientResponse($body);
 
         $this->assertCount(2, $session->getShippingOptions());
-        $this->assertSame('18a749392801df0f024c86fbac59b2b4', $session->getSelectedShippingOption()?->getReference());
+        $this->assertSame('18a749392801df0f024c86fbac59b2b4', $session->getSelectedShippingOption($session->getShippingOptions())?->getReference());
     }
 
     /**
@@ -72,7 +73,23 @@ final class SessionTest extends TestCase
         $session = Session::createFromClientResponse($body);
 
         $this->assertCount(1, $session->getShippingOptions());
-        $this->assertSame('nested-shipping-method-id', $session->getSelectedShippingOption()?->getReference());
+        $this->assertSame('nested-shipping-method-id', $session->getSelectedShippingOption($session->getShippingOptions())?->getReference());
+    }
+
+    /**
+     * A session with a shipping callback comes back without its options, only the shipping_fee
+     * line names the picked one, so the options have to come from the caller.
+     */
+    public function testShippingLineIsMatchedAgainstTheProvidedOptions(): void
+    {
+        $body = $this->completedSessionBody();
+        $providedOptions = ShippingOptionCollection::fromArray($body['shippingOptions']);
+        unset($body['shippingOptions']);
+
+        $session = Session::createFromClientResponse($body);
+
+        $this->assertCount(0, $session->getShippingOptions());
+        $this->assertSame('18a749392801df0f024c86fbac59b2b4', $session->getSelectedShippingOption($providedOptions)?->getReference());
     }
 
     public function testNoShippingOptionWithoutAShippingLine(): void
@@ -83,7 +100,7 @@ final class SessionTest extends TestCase
         $session = Session::createFromClientResponse($body);
 
         $this->assertNull($session->getSelectedShippingLine());
-        $this->assertNull($session->getSelectedShippingOption());
+        $this->assertNull($session->getSelectedShippingOption($session->getShippingOptions()));
     }
 
     public function testNoShippingOptionWhenTheAmountDiffers(): void
@@ -93,7 +110,7 @@ final class SessionTest extends TestCase
 
         $session = Session::createFromClientResponse($body);
 
-        $this->assertNull($session->getSelectedShippingOption());
+        $this->assertNull($session->getSelectedShippingOption($session->getShippingOptions()));
     }
 
     /**

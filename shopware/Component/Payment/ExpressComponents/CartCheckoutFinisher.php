@@ -6,9 +6,11 @@ namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 use Mollie\Shopware\Component\Mollie\Address;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\SessionGatewayInterface;
+use Mollie\Shopware\Component\Mollie\LineItem;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Mollie\ShippingOption;
+use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\FinishCheckoutResponse;
 use Mollie\Shopware\Component\Payment\ExpressMethod\AbstractAccountService;
 use Mollie\Shopware\Component\Payment\ExpressMethod\AccountService;
@@ -57,6 +59,8 @@ final class CartCheckoutFinisher implements CartCheckoutFinisherInterface
         #[Autowire(service: ContextSwitchRoute::class)]
         private AbstractContextSwitchRoute $contextSwitchRoute,
         private CartService $cartService,
+        #[Autowire(service: ShippingOptionsResolver::class)]
+        private ShippingOptionsResolverInterface $shippingOptionsResolver,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -103,7 +107,7 @@ final class CartCheckoutFinisher implements CartCheckoutFinisherInterface
         $logData['customerId'] = $orderContext->getCustomer()?->getId();
         $this->logger->debug('Express components guest account created or logged in', $logData);
 
-        $orderContext = $this->applyShippingMethod($session, $orderContext, $logData);
+        $orderContext = $this->applyShippingMethod($session, $cartContext, $orderContext, $logData);
 
         // the account and the shipping method changed the context, so the cart has to be
         // recalculated before it becomes an order
@@ -173,9 +177,14 @@ final class CartCheckoutFinisher implements CartCheckoutFinisherInterface
     /**
      * @param array<mixed> $logData
      */
-    private function applyShippingMethod(Session $session, SalesChannelContext $salesChannelContext, array $logData): SalesChannelContext
+    private function applyShippingMethod(Session $session, SalesChannelContext $cartContext, SalesChannelContext $salesChannelContext, array $logData): SalesChannelContext
     {
-        $shippingOption = $session->getSelectedShippingOption();
+        // a customer session offers no options, its shipping method is already the one of the context
+        if (! $session->getSelectedShippingLine() instanceof LineItem) {
+            return $salesChannelContext;
+        }
+
+        $shippingOption = $session->getSelectedShippingOption($this->resolveShippingOptions($session, $cartContext, $logData));
         if (! $shippingOption instanceof ShippingOption) {
             $this->logger->warning('No shipping option could be resolved from the express components session', $logData);
 
@@ -190,6 +199,30 @@ final class CartCheckoutFinisher implements CartCheckoutFinisherInterface
         $this->logger->debug('Express components shipping method applied', $logData);
 
         return $this->switchContext($requestDataBag, $salesChannelContext);
+    }
+
+    /**
+     * Mollie does not return the options of a session with a shipping callback, so they are built
+     * again the way the callback answered them, for the address and the cart of the session.
+     *
+     * @param array<mixed> $logData
+     */
+    private function resolveShippingOptions(Session $session, SalesChannelContext $cartContext, array $logData): ShippingOptionCollection
+    {
+        $shippingAddress = $session->getShippingAddress();
+        if (! $shippingAddress instanceof Address) {
+            return new ShippingOptionCollection();
+        }
+
+        $address = new ShippingCallbackAddress($shippingAddress->getCountry(), $shippingAddress->getPostalCode(), $shippingAddress->getCity());
+        try {
+            return $this->shippingOptionsResolver->resolve($address, $cartContext);
+        } catch (ExpressComponentsException $exception) {
+            $logData['error'] = $exception->getMessage();
+            $this->logger->warning('Shipping options of the express components session could not be resolved', $logData);
+
+            return new ShippingOptionCollection();
+        }
     }
 
     private function restoreContext(string $cartToken, SalesChannelContext $salesChannelContext): SalesChannelContext

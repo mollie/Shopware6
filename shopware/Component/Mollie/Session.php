@@ -223,8 +223,10 @@ final class Session extends Struct implements \JsonSerializable
      * shipping_fee. Matching it back to the option - and with it to the Shopware shipping method
      * in its reference - therefore goes over description and amount. That is ambiguous as soon as
      * two shipping methods share both, and has to be replaced once Mollie exposes the selection.
+     * A session with a shipping callback does not return its options, so the caller has to
+     * provide them.
      */
-    public function getSelectedShippingOption(): ?ShippingOption
+    public function getSelectedShippingOption(ShippingOptionCollection $shippingOptions): ?ShippingOption
     {
         $shippingLine = $this->getSelectedShippingLine();
         if (! $shippingLine instanceof LineItem) {
@@ -233,7 +235,7 @@ final class Session extends Struct implements \JsonSerializable
 
         $amount = $shippingLine->getAmount();
 
-        foreach ($this->shippingOptions as $shippingOption) {
+        foreach ($shippingOptions as $shippingOption) {
             if ($shippingOption->getDescription() !== $shippingLine->getDescription()) {
                 continue;
             }

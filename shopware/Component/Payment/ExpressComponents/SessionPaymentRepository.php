@@ -59,21 +59,20 @@ final class SessionPaymentRepository implements SessionPaymentRepositoryInterfac
         $this->repository->update([['id' => $webhookId, 'paymentId' => $paymentId]], $context);
     }
 
-    public function assignTransaction(string $sessionId, string $transactionId, Context $context): bool
+    public function assignTransaction(string $sessionId, string $transactionId, Context $context): ?SessionPaymentEntity
     {
         $criteria = new Criteria();
         $criteria->addFilter(new EqualsFilter('sessionId', $sessionId));
 
-        /** @var array<string> $ids */
-        $ids = $this->repository->searchIds($criteria, $context)->getIds();
-        if ($ids === []) {
-            return false;
+        $entry = $this->repository->search($criteria, $context)->getEntities()->first();
+        if ($entry === null) {
+            return null;
         }
 
-        $updates = array_map(static fn (string $id): array => ['id' => $id, 'transactionId' => $transactionId], $ids);
-        $this->repository->update(array_values($updates), $context);
+        $this->repository->update([['id' => $entry->getId(), 'transactionId' => $transactionId]], $context);
+        $entry->setTransactionId($transactionId);
 
-        return true;
+        return $entry;
     }
 
     public function deleteByTransactionId(string $transactionId, Context $context): void

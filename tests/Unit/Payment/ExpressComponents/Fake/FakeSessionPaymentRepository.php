@@ -54,19 +54,16 @@ final class FakeSessionPaymentRepository implements SessionPaymentRepositoryInte
         $this->entries[$webhookId]->setPaymentId($paymentId);
     }
 
-    public function assignTransaction(string $sessionId, string $transactionId, Context $context): bool
+    public function assignTransaction(string $sessionId, string $transactionId, Context $context): ?SessionPaymentEntity
     {
-        $assigned = false;
-        foreach ($this->entries as $entry) {
-            if ($entry->getSessionId() !== $sessionId) {
-                continue;
-            }
-
-            $entry->setTransactionId($transactionId);
-            $assigned = true;
+        $entry = $this->findBySessionId($sessionId);
+        if ($entry === null) {
+            return null;
         }
 
-        return $assigned;
+        $entry->setTransactionId($transactionId);
+
+        return self::entry($entry->getId(), $entry->getSessionId(), $entry->getPaymentId(), $transactionId);
     }
 
     public function deleteByTransactionId(string $transactionId, Context $context): void
