@@ -3,75 +3,118 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
-use Doctrine\DBAL\Connection;
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentCollection;
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentEntity;
 use Shopware\Core\Defaults;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\AndFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\NotFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\OrFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\RangeFilter;
 use Shopware\Core\Framework\Uuid\Uuid;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class SessionPaymentRepository implements SessionPaymentRepositoryInterface
 {
-    private const TABLE = 'mollie_session_payments';
+    /**
+     * A new session is created with every change of the cart, most of them are never paid.
+     */
+    private const UNPAID_LIFETIME = '-2 hours';
 
-    public function __construct(private readonly Connection $connection)
-    {
+    /**
+     * Once the shopper is back, Mollie keeps retrying the webhook for about a day.
+     */
+    private const PAID_LIFETIME = '-2 days';
+
+    private const DELETE_BATCH_SIZE = 500;
+
+    /**
+     * @param EntityRepository<SessionPaymentCollection> $repository
+     */
+    public function __construct(
+        #[Autowire(service: 'mollie_session_payments.repository')]
+        private readonly EntityRepository $repository
+    ) {
     }
 
-    public function create(string $webhookId, string $sessionId): void
+    public function create(string $webhookId, string $sessionId, Context $context): void
     {
-        $this->connection->insert(self::TABLE, [
-            'id' => Uuid::fromHexToBytes($webhookId),
-            'session_id' => $sessionId,
-            'created_at' => $this->now(),
-        ]);
+        $this->repository->create([['id' => $webhookId, 'sessionId' => $sessionId]], $context);
     }
 
-    public function findById(string $webhookId): ?SessionPayment
+    public function findById(string $webhookId, Context $context): ?SessionPaymentEntity
     {
         if (! Uuid::isValid($webhookId)) {
             return null;
         }
 
-        /** @var array{session_id: string, payment_id: ?string, transaction_id: ?string}|false $row */
-        $row = $this->connection->fetchAssociative(
-            'SELECT session_id, payment_id, transaction_id FROM ' . self::TABLE . ' WHERE id = :id',
-            ['id' => Uuid::fromHexToBytes($webhookId)]
-        );
+        return $this->repository->search(new Criteria([$webhookId]), $context)->getEntities()->first();
+    }
 
-        if ($row === false) {
-            return null;
+    public function assignPayment(string $webhookId, string $paymentId, Context $context): void
+    {
+        $this->repository->update([['id' => $webhookId, 'paymentId' => $paymentId]], $context);
+    }
+
+    public function assignTransaction(string $sessionId, string $transactionId, Context $context): bool
+    {
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('sessionId', $sessionId));
+
+        /** @var array<string> $ids */
+        $ids = $this->repository->searchIds($criteria, $context)->getIds();
+        if ($ids === []) {
+            return false;
         }
 
-        $transactionId = $row['transaction_id'] !== null ? Uuid::fromBytesToHex($row['transaction_id']) : null;
+        $updates = array_map(static fn (string $id): array => ['id' => $id, 'transactionId' => $transactionId], $ids);
+        $this->repository->update(array_values($updates), $context);
 
-        return new SessionPayment($webhookId, $row['session_id'], $row['payment_id'], $transactionId);
+        return true;
     }
 
-    public function assignPayment(string $webhookId, string $paymentId): void
+    public function deleteByTransactionId(string $transactionId, Context $context): void
     {
-        $this->connection->update(
-            self::TABLE,
-            ['payment_id' => $paymentId, 'updated_at' => $this->now()],
-            ['id' => Uuid::fromHexToBytes($webhookId)]
-        );
+        $criteria = new Criteria();
+        $criteria->addFilter(new EqualsFilter('transactionId', $transactionId));
+
+        $this->deleteMatching($criteria, $context);
     }
 
-    public function assignTransaction(string $sessionId, string $transactionId): bool
+    public function deleteExpired(\DateTimeImmutable $now, Context $context): int
     {
-        $affectedRows = $this->connection->update(
-            self::TABLE,
-            ['transaction_id' => Uuid::fromHexToBytes($transactionId), 'updated_at' => $this->now()],
-            ['session_id' => $sessionId]
-        );
+        $unpaidBefore = $now->modify(self::UNPAID_LIFETIME)->format(Defaults::STORAGE_DATE_TIME_FORMAT);
+        $paidBefore = $now->modify(self::PAID_LIFETIME)->format(Defaults::STORAGE_DATE_TIME_FORMAT);
 
-        return $affectedRows > 0;
+        $criteria = new Criteria();
+        $criteria->setLimit(self::DELETE_BATCH_SIZE);
+        $criteria->addFilter(new OrFilter([
+            new AndFilter([
+                new EqualsFilter('transactionId', null),
+                new RangeFilter('createdAt', [RangeFilter::LT => $unpaidBefore]),
+            ]),
+            new AndFilter([
+                new NotFilter(NotFilter::CONNECTION_AND, [new EqualsFilter('transactionId', null)]),
+                new RangeFilter('createdAt', [RangeFilter::LT => $paidBefore]),
+            ]),
+        ]));
+
+        return $this->deleteMatching($criteria, $context);
     }
 
-    public function deleteByTransactionId(string $transactionId): void
+    private function deleteMatching(Criteria $criteria, Context $context): int
     {
-        $this->connection->delete(self::TABLE, ['transaction_id' => Uuid::fromHexToBytes($transactionId)]);
-    }
+        /** @var array<string> $ids */
+        $ids = $this->repository->searchIds($criteria, $context)->getIds();
+        if ($ids === []) {
+            return 0;
+        }
 
-    private function now(): string
-    {
-        return (new \DateTimeImmutable())->format(Defaults::STORAGE_DATE_TIME_FORMAT);
+        $this->repository->delete(array_values(array_map(static fn (string $id): array => ['id' => $id], $ids)), $context);
+
+        return count($ids);
     }
 }

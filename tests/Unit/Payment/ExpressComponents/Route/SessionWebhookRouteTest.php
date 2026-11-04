@@ -7,7 +7,6 @@ use Mollie\Shopware\Component\Mollie\Payment;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\ExpressComponents\ExpressComponentsException;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\SessionWebhookRoute;
-use Mollie\Shopware\Component\Payment\ExpressComponents\SessionPayment;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
 use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionPaymentRepository;
@@ -36,7 +35,7 @@ final class SessionWebhookRouteTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(new SessionPayment(self::WEBHOOK_ID, 'ses_1', null, 'transaction-1'));
+        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1', null, 'transaction-1'));
         $this->transactionService = new FakeTransactionService();
         $this->gateway = new FakeGateway(payment: $this->createPayment(PaymentMethod::CREDIT_CARD));
         $this->finalize = new FakeFinalize();
@@ -53,12 +52,12 @@ final class SessionWebhookRouteTest extends TestCase
 
     public function testPaymentIdIsStoredAndConflictReturnedWithoutTransaction(): void
     {
-        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(new SessionPayment(self::WEBHOOK_ID, 'ses_1', null, null));
+        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1', null, null));
 
         $exception = $this->notifyExpectingFailure(self::WEBHOOK_ID);
 
         $this->assertSame(Response::HTTP_CONFLICT, $exception->getStatusCode());
-        $this->assertSame('tr_1', $this->sessionPaymentRepository->findById(self::WEBHOOK_ID)?->getPaymentId());
+        $this->assertSame('tr_1', $this->sessionPaymentRepository->findById(self::WEBHOOK_ID, Context::createDefaultContext())?->getPaymentId());
         $this->assertSame(0, $this->finalize->getCallCount());
     }
 
@@ -105,20 +104,20 @@ final class SessionWebhookRouteTest extends TestCase
 
     public function testPaymentIdIsReadFromTheQueryOfAGetRequest(): void
     {
-        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(new SessionPayment(self::WEBHOOK_ID, 'ses_1', null, null));
+        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1', null, null));
 
         $this->notifyExpectingFailure(self::WEBHOOK_ID, new Request(['id' => 'tr_from_query']));
 
-        $this->assertSame('tr_from_query', $this->sessionPaymentRepository->findById(self::WEBHOOK_ID)?->getPaymentId());
+        $this->assertSame('tr_from_query', $this->sessionPaymentRepository->findById(self::WEBHOOK_ID, Context::createDefaultContext())?->getPaymentId());
     }
 
     public function testSecondPaymentIdReplacesTheStoredOneWithAWarning(): void
     {
-        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(new SessionPayment(self::WEBHOOK_ID, 'ses_1', 'tr_old', null));
+        $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1', 'tr_old', null));
 
         $this->notifyExpectingFailure(self::WEBHOOK_ID);
 
-        $this->assertSame('tr_1', $this->sessionPaymentRepository->findById(self::WEBHOOK_ID)?->getPaymentId());
+        $this->assertSame('tr_1', $this->sessionPaymentRepository->findById(self::WEBHOOK_ID, Context::createDefaultContext())?->getPaymentId());
         $this->assertTrue($this->logger->hasRecordThatContains('warning', 'second payment id'));
     }
 

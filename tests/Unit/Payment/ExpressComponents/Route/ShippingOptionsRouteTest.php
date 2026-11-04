@@ -7,6 +7,7 @@ use Mollie\Shopware\Component\Mollie\Money;
 use Mollie\Shopware\Component\Mollie\ShippingOption;
 use Mollie\Shopware\Component\Mollie\ShippingOptionCollection;
 use Mollie\Shopware\Component\Payment\ExpressComponents\ExpressComponentsException;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\ShippingOptionsResponse;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\ShippingOptionsRoute;
 use Mollie\Shopware\Component\Settings\Struct\ExpressComponentsSettings;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
@@ -78,18 +79,38 @@ final class ShippingOptionsRouteTest extends TestCase
      * Without a country there is nothing to price, and rebuilding the context for nothing would
      * reset the cart of the shopper.
      */
-    public function testACallbackWithoutACountryIsAnsweredWithoutOptions(): void
+    public function testACallbackWithoutACountryIsAnsweredAsUnsupportedAddress(): void
     {
         $response = $this->route(enabled: true)->shippingOptions(self::SALES_CHANNEL_ID, self::CART_TOKEN, $this->callbackRequest(''));
 
-        $this->assertCount(0, $response->getShippingOptions());
+        $this->assertUnsupported(ShippingOptionsResponse::ERROR_UNSUPPORTED_ADDRESS, $response);
     }
 
-    public function testABodyThatIsNoJsonObjectIsAnsweredWithoutOptions(): void
+    public function testABodyThatIsNoJsonObjectIsAnsweredAsUnsupportedAddress(): void
     {
         $response = $this->route(enabled: true)->shippingOptions(self::SALES_CHANNEL_ID, self::CART_TOKEN, new Request(content: 'not json'));
 
-        $this->assertCount(0, $response->getShippingOptions());
+        $this->assertUnsupported(ShippingOptionsResponse::ERROR_UNSUPPORTED_ADDRESS, $response);
+    }
+
+    public function testACountryTheShopDoesNotShipToIsAnsweredAsUnsupportedCountry(): void
+    {
+        $this->shippingOptionsResolver = new FakeShippingOptionsResolver(
+            exception: ExpressComponentsException::shippingCountryNotSupported('US', self::SALES_CHANNEL_ID)
+        );
+
+        $response = $this->route(enabled: true)->shippingOptions(self::SALES_CHANNEL_ID, self::CART_TOKEN, $this->callbackRequest('US'));
+
+        $this->assertUnsupported(ShippingOptionsResponse::ERROR_UNSUPPORTED_COUNTRY, $response);
+    }
+
+    public function testAnAddressWithoutAvailableShippingMethodIsAnsweredAsUnsupportedAddress(): void
+    {
+        $this->shippingOptionsResolver = new FakeShippingOptionsResolver(new ShippingOptionCollection());
+
+        $response = $this->route(enabled: true)->shippingOptions(self::SALES_CHANNEL_ID, self::CART_TOKEN, $this->callbackRequest('NL'));
+
+        $this->assertUnsupported(ShippingOptionsResponse::ERROR_UNSUPPORTED_ADDRESS, $response);
     }
 
     public function testACallbackForADisabledSalesChannelIsRejected(): void
@@ -113,6 +134,13 @@ final class ShippingOptionsRouteTest extends TestCase
         $this->route(enabled: true)->getDecorated();
     }
 
+    private function assertUnsupported(string $expectedType, ShippingOptionsResponse $response): void
+    {
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame($expectedType, $response->getObject()->get('type'));
+        $this->assertCount(0, $response->getShippingOptions());
+    }
+
     private function route(bool $enabled): ShippingOptionsRoute
     {
         return new ShippingOptionsRoute(
@@ -126,6 +154,7 @@ final class ShippingOptionsRouteTest extends TestCase
     private function callbackRequest(string $country, string $postalCode = '', string $city = '', string $region = ''): Request
     {
         $body = [
+            'event' => 'shipping-address-changed',
             'sessionId' => 'ses_callback',
             'shippingAddress' => [
                 'country' => $country,

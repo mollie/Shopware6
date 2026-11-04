@@ -3,11 +3,20 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Unit\Payment\ExpressComponents;
 
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentCollection;
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentDefinition;
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentEntity;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionPaymentRepository;
-use Mollie\Shopware\Unit\Fake\FakeConnection;
+use Mollie\Shopware\Unit\Fake\FakeEntityRepository;
+use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionPaymentRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\Event\EntityWrittenContainerEvent;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\EntitySearchResult;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\IdSearchResult;
+use Shopware\Core\Framework\Event\NestedEventCollection;
 
 #[CoversClass(SessionPaymentRepository::class)]
 final class SessionPaymentRepositoryTest extends TestCase
@@ -15,79 +24,122 @@ final class SessionPaymentRepositoryTest extends TestCase
     private const WEBHOOK_ID = '01a1a1e69fa671f3a5042d40067b1597';
     private const TRANSACTION_ID = '0198f2c4e7a5730f9b1d2e3f4a5b6c7d';
 
+    private FakeEntityRepository $entityRepository;
+    private Context $context;
+
+    protected function setUp(): void
+    {
+        $this->entityRepository = new FakeEntityRepository(new SessionPaymentDefinition());
+        $this->context = Context::createDefaultContext();
+    }
+
     public function testCreatedEntryIsStoredUnderTheWebhookId(): void
     {
-        $connection = new FakeConnection();
+        $this->expectWrite();
 
-        (new SessionPaymentRepository($connection))->create(self::WEBHOOK_ID, 'ses_1');
+        $this->createRepository()->create(self::WEBHOOK_ID, 'ses_1', $this->context);
 
-        $this->assertStringStartsWith('INSERT INTO mollie_session_payments', $connection->getExecutedStatements()[0]);
-        $this->assertSame([Uuid::fromHexToBytes(self::WEBHOOK_ID), 'ses_1'], array_slice($connection->getExecutedParameters()[0], 0, 2));
+        $this->assertSame([['id' => self::WEBHOOK_ID, 'sessionId' => 'ses_1']], $this->entityRepository->data[0]);
     }
 
-    public function testStoredEntryIsReadWithHexIds(): void
+    public function testStoredEntryIsFoundByTheWebhookId(): void
     {
-        $connection = new FakeConnection();
-        $connection->withRows([['session_id' => 'ses_1', 'payment_id' => 'tr_1', 'transaction_id' => Uuid::fromHexToBytes(self::TRANSACTION_ID)]]);
+        $this->entityRepository->entitySearchResults[] = $this->searchResult(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1', 'tr_1'));
 
-        $entry = (new SessionPaymentRepository($connection))->findById(self::WEBHOOK_ID);
+        $entry = $this->createRepository()->findById(self::WEBHOOK_ID, $this->context);
 
-        $this->assertNotNull($entry);
-        $this->assertSame(self::WEBHOOK_ID, $entry->getId());
-        $this->assertSame('ses_1', $entry->getSessionId());
-        $this->assertSame('tr_1', $entry->getPaymentId());
-        $this->assertSame(self::TRANSACTION_ID, $entry->getTransactionId());
-    }
-
-    public function testEntryWithoutTransactionHasNoTransactionId(): void
-    {
-        $connection = new FakeConnection();
-        $connection->withRows([['session_id' => 'ses_1', 'payment_id' => null, 'transaction_id' => null]]);
-
-        $entry = (new SessionPaymentRepository($connection))->findById(self::WEBHOOK_ID);
-
-        $this->assertNull($entry?->getTransactionId());
-    }
-
-    public function testUnknownWebhookIdFindsNothing(): void
-    {
-        $connection = new FakeConnection();
-
-        $this->assertNull((new SessionPaymentRepository($connection))->findById(self::WEBHOOK_ID));
+        $this->assertSame('tr_1', $entry?->getPaymentId());
+        $this->assertSame([self::WEBHOOK_ID], $this->entityRepository->criteria[0]->getIds());
     }
 
     public function testInvalidWebhookIdIsNotLookedUp(): void
     {
-        $connection = new FakeConnection();
-
-        $entry = (new SessionPaymentRepository($connection))->findById('not-a-uuid');
+        $entry = $this->createRepository()->findById('not-a-uuid', $this->context);
 
         $this->assertNull($entry);
-        $this->assertSame([], $connection->getFetchedStatements());
+        $this->assertSame([], $this->entityRepository->criteria);
     }
 
-    public function testAssigningATransactionReportsAMatchingSession(): void
+    public function testPaymentIdIsWrittenToTheEntry(): void
     {
-        $connection = new FakeConnection();
-        $connection->withAffectedRows(1);
+        $this->expectWrite();
 
-        $this->assertTrue((new SessionPaymentRepository($connection))->assignTransaction('ses_1', self::TRANSACTION_ID));
+        $this->createRepository()->assignPayment(self::WEBHOOK_ID, 'tr_1', $this->context);
+
+        $this->assertSame([['id' => self::WEBHOOK_ID, 'paymentId' => 'tr_1']], $this->entityRepository->data[0]);
     }
 
-    public function testAssigningATransactionReportsAMissingSession(): void
+    public function testTransactionIsWrittenToTheEntryOfTheSession(): void
     {
-        $connection = new FakeConnection();
+        $this->entityRepository->idSearchResults[] = $this->idResult(self::WEBHOOK_ID);
+        $this->expectWrite();
 
-        $this->assertFalse((new SessionPaymentRepository($connection))->assignTransaction('ses_unknown', self::TRANSACTION_ID));
+        $assigned = $this->createRepository()->assignTransaction('ses_1', self::TRANSACTION_ID, $this->context);
+
+        $this->assertTrue($assigned);
+        $this->assertSame([['id' => self::WEBHOOK_ID, 'transactionId' => self::TRANSACTION_ID]], $this->entityRepository->data[0]);
     }
 
-    public function testEntryIsDeletedByItsTransaction(): void
+    public function testTransactionOfAnUnknownSessionIsReported(): void
     {
-        $connection = new FakeConnection();
+        $this->entityRepository->idSearchResults[] = $this->idResult();
 
-        (new SessionPaymentRepository($connection))->deleteByTransactionId(self::TRANSACTION_ID);
+        $assigned = $this->createRepository()->assignTransaction('ses_unknown', self::TRANSACTION_ID, $this->context);
 
-        $this->assertStringStartsWith('DELETE FROM mollie_session_payments', $connection->getExecutedStatements()[0]);
-        $this->assertSame([Uuid::fromHexToBytes(self::TRANSACTION_ID)], $connection->getExecutedParameters()[0]);
+        $this->assertFalse($assigned);
+        $this->assertSame([], $this->entityRepository->data);
+    }
+
+    public function testEntryOfTheTransactionIsDeleted(): void
+    {
+        $this->entityRepository->idSearchResults[] = $this->idResult(self::WEBHOOK_ID);
+        $this->expectWrite();
+
+        $this->createRepository()->deleteByTransactionId(self::TRANSACTION_ID, $this->context);
+
+        $this->assertSame([['id' => self::WEBHOOK_ID]], $this->entityRepository->data[0]);
+    }
+
+    public function testExpiredEntriesAreDeletedInOneBatch(): void
+    {
+        $this->entityRepository->idSearchResults[] = $this->idResult(self::WEBHOOK_ID, self::TRANSACTION_ID);
+        $this->expectWrite();
+
+        $deleted = $this->createRepository()->deleteExpired(new \DateTimeImmutable('2026-11-04 12:00:00'), $this->context);
+
+        $this->assertSame(2, $deleted);
+        $this->assertSame([['id' => self::WEBHOOK_ID], ['id' => self::TRANSACTION_ID]], $this->entityRepository->data[0]);
+    }
+
+    public function testNothingIsDeletedWithoutExpiredEntries(): void
+    {
+        $this->entityRepository->idSearchResults[] = $this->idResult();
+
+        $deleted = $this->createRepository()->deleteExpired(new \DateTimeImmutable('2026-11-04 12:00:00'), $this->context);
+
+        $this->assertSame(0, $deleted);
+        $this->assertSame([], $this->entityRepository->data);
+    }
+
+    private function createRepository(): SessionPaymentRepository
+    {
+        return new SessionPaymentRepository($this->entityRepository);
+    }
+
+    private function expectWrite(): void
+    {
+        $this->entityRepository->entityWrittenContainerEvents[] = new EntityWrittenContainerEvent($this->context, new NestedEventCollection(), []);
+    }
+
+    private function idResult(string ...$ids): IdSearchResult
+    {
+        $data = array_map(static fn (string $id): array => ['primaryKey' => $id, 'data' => ['id' => $id]], $ids);
+
+        return new IdSearchResult(count($data), $data, new Criteria(), $this->context);
+    }
+
+    private function searchResult(SessionPaymentEntity $entry): EntitySearchResult
+    {
+        return new EntitySearchResult(SessionPaymentDefinition::ENTITY_NAME, 1, new SessionPaymentCollection([$entry]), null, new Criteria(), $this->context);
     }
 }

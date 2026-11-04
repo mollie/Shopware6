@@ -71,7 +71,7 @@ final class SessionWebhookRoute extends AbstractSessionWebhookRoute
         ];
         $this->logger->info('Express components session webhook received', $logData);
 
-        $sessionPayment = $this->sessionPaymentRepository->findById($webhookId);
+        $sessionPayment = $this->sessionPaymentRepository->findById($webhookId, $context);
         if ($sessionPayment === null) {
             $this->logger->error('Express components session webhook for an unknown session', $logData);
             throw ExpressComponentsException::sessionPaymentNotFound($webhookId);
@@ -82,7 +82,7 @@ final class SessionWebhookRoute extends AbstractSessionWebhookRoute
         if ($storedPaymentId !== null && $storedPaymentId !== $paymentId) {
             $this->logger->warning('Express components session received a second payment id', $logData + ['storedPaymentId' => $storedPaymentId]);
         }
-        $this->sessionPaymentRepository->assignPayment($webhookId, $paymentId);
+        $this->sessionPaymentRepository->assignPayment($webhookId, $paymentId, $context);
 
         $transactionId = $sessionPayment->getTransactionId();
         if ($transactionId === null) {

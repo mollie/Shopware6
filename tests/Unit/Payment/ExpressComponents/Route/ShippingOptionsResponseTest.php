@@ -22,14 +22,26 @@ final class ShippingOptionsResponseTest extends TestCase
 
         $response = new ShippingOptionsResponse($options);
 
-        $this->assertCount(2, $response->getObject()->all()['shippingOptions']);
+        $this->assertCount(2, $response->getObject()->all()['options']);
     }
 
     public function testShopWithoutShippingOptionsReturnsAnEmptyList(): void
     {
         $response = new ShippingOptionsResponse(new ShippingOptionCollection([]));
 
-        $this->assertSame(['shippingOptions' => []], $response->getObject()->all());
+        $this->assertSame(['options' => []], $response->getObject()->all());
+    }
+
+    public function testAnUndeliverableAddressIsAnsweredInTheErrorFormatOfMollie(): void
+    {
+        $response = ShippingOptionsResponse::unsupported(ShippingOptionsResponse::ERROR_UNSUPPORTED_COUNTRY, 'not deliverable');
+
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame([
+            'type' => 'https://docs.mollie.com/reference/errors/unsupported-country',
+            'status' => 422,
+            'detail' => 'not deliverable',
+        ], $response->getObject()->all());
     }
 
     public function testApiAliasIdentifiesTheShippingOptionsResponse(): void

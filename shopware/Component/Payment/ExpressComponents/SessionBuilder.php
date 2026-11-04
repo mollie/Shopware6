@@ -113,7 +113,7 @@ final class SessionBuilder implements SessionBuilderInterface
         $createSession = $this->buildCreateSession($cart, $amount, $isCustomer, $salesChannelContext);
         $webhookId = $this->applySessionWebhook($createSession);
         $session = $this->createCartSession($createSession, $salesChannelContext);
-        $this->sessionPaymentRepository->create($webhookId, $session->getId());
+        $this->sessionPaymentRepository->create($webhookId, $session->getId(), $salesChannelContext->getContext());
 
         $session->addArrayExtension(self::SESSION_CUSTOMER_EXTENSION, [self::SESSION_CUSTOMER_KEY => $customerKey]);
         $cart->addExtension(self::cartExtensionKey($mode), $session);
@@ -144,7 +144,7 @@ final class SessionBuilder implements SessionBuilderInterface
         $webhookId = $this->applySessionWebhook($createSession);
 
         $session = $this->sessionGateway->createSession($createSession, $salesChannelContext);
-        $this->sessionPaymentRepository->create($webhookId, $session->getId());
+        $this->sessionPaymentRepository->create($webhookId, $session->getId(), $salesChannelContext->getContext());
 
         $this->saveSessionOnOrder($order, $session->getId(), $salesChannelContext);
 

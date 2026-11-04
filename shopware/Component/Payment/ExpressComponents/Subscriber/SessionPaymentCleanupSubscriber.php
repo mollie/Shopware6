@@ -62,7 +62,7 @@ final class SessionPaymentCleanupSubscriber implements EventSubscriberInterface
             ],
         ], $event->getContext());
 
-        $this->sessionPaymentRepository->deleteByTransactionId($transaction->getId());
+        $this->sessionPaymentRepository->deleteByTransactionId($transaction->getId(), $event->getContext());
 
         $this->logger->info('Express components session removed after finalize', [
             'transactionId' => $transaction->getId(),

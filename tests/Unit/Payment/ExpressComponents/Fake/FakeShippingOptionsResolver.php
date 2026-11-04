@@ -12,8 +12,10 @@ final class FakeShippingOptionsResolver implements ShippingOptionsResolverInterf
 {
     private ?ShippingCallbackAddress $lastAddress = null;
 
-    public function __construct(private ShippingOptionCollection $shippingOptions = new ShippingOptionCollection())
-    {
+    public function __construct(
+        private ShippingOptionCollection $shippingOptions = new ShippingOptionCollection(),
+        private ?\Throwable $exception = null
+    ) {
     }
 
     public function getLastAddress(): ShippingCallbackAddress
@@ -28,6 +30,10 @@ final class FakeShippingOptionsResolver implements ShippingOptionsResolverInterf
     public function resolve(ShippingCallbackAddress $address, SalesChannelContext $salesChannelContext): ShippingOptionCollection
     {
         $this->lastAddress = $address;
+
+        if ($this->exception instanceof \Throwable) {
+            throw $this->exception;
+        }
 
         return $this->shippingOptions;
     }

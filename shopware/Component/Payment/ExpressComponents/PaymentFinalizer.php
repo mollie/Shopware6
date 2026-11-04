@@ -7,8 +7,13 @@ use Mollie\Shopware\Component\Mollie\Session;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,13 +22,33 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * The payment of a session is only known once Mollie calls the session webhook, which may happen
  * before or after the shopper returns. The finish therefore only remembers the transaction of the
- * order, the session webhook attaches the payment to it.
+ * order, the session webhook attaches the payment to it. The shopper is held back until the
+ * webhook set the payment status, so the right page is shown.
  */
 final class PaymentFinalizer implements PaymentFinalizerInterface
 {
+    private const STATUS_MAX_CHECKS = 20;
+
+    private const STATUS_CHECK_INTERVAL_MICROSECONDS = 1000000;
+
+    private const PENDING_STATES = [
+        OrderTransactionStates::STATE_OPEN,
+        OrderTransactionStates::STATE_UNCONFIRMED,
+    ];
+
+    private const FAILED_STATES = [
+        OrderTransactionStates::STATE_FAILED,
+        OrderTransactionStates::STATE_CANCELLED,
+    ];
+
+    /**
+     * @param EntityRepository<OrderTransactionCollection> $orderTransactionRepository
+     */
     public function __construct(
         #[Autowire(service: SessionPaymentRepository::class)]
         private SessionPaymentRepositoryInterface $sessionPaymentRepository,
+        #[Autowire(service: 'order_transaction.repository')]
+        private EntityRepository $orderTransactionRepository,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
         private RequestStack $requestStack,
@@ -48,11 +73,52 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
             'transactionId' => $transaction->getId(),
         ];
 
-        if (! $this->sessionPaymentRepository->assignTransaction($session->getId(), $transaction->getId())) {
+        $context = $salesChannelContext->getContext();
+        if (! $this->sessionPaymentRepository->assignTransaction($session->getId(), $transaction->getId(), $context)) {
             $this->logger->warning('Express components session has no session payment entry', $logData);
         }
 
-        return $this->getFinishUrl($this->getFinishUrls(), $orderId);
+        $finishUrls = $this->getFinishUrls();
+        $state = $this->waitForPaymentStatus($transaction->getId(), $context);
+        $logData['paymentStatus'] = $state;
+
+        if (in_array($state, self::FAILED_STATES, true)) {
+            $this->logger->info('Express components payment failed, shopper is sent to the edit order page', $logData);
+
+            return $this->getErrorUrl($finishUrls, $orderId);
+        }
+
+        $this->logger->info('Express components checkout finished', $logData);
+
+        return $this->getFinishUrl($finishUrls, $orderId);
+    }
+
+    /**
+     * The status is set by the webhook in another request. Should it not arrive in time, the order
+     * page is shown anyway and the webhook corrects the status later.
+     */
+    private function waitForPaymentStatus(string $transactionId, Context $context): string
+    {
+        $state = $this->loadPaymentStatus($transactionId, $context);
+        for ($i = 1; $i < self::STATUS_MAX_CHECKS && in_array($state, self::PENDING_STATES, true); ++$i) {
+            usleep(self::STATUS_CHECK_INTERVAL_MICROSECONDS);
+            $state = $this->loadPaymentStatus($transactionId, $context);
+        }
+
+        return $state;
+    }
+
+    private function loadPaymentStatus(string $transactionId, Context $context): string
+    {
+        $criteria = new Criteria([$transactionId]);
+        $criteria->addAssociation('stateMachineState');
+
+        $transaction = $this->orderTransactionRepository->search($criteria, $context)->getEntities()->first();
+        if (! $transaction instanceof OrderTransactionEntity) {
+            return '';
+        }
+
+        return (string) $transaction->getStateMachineState()?->getTechnicalName();
     }
 
     /**
@@ -86,9 +152,19 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         return $finishUrl;
     }
 
+    private function getErrorUrl(FinishUrls $finishUrls, string $orderId): string
+    {
+        $errorUrl = $finishUrls->getErrorUrl($orderId);
+        if ($errorUrl === '') {
+            return $this->routeBuilder->getEditOrderUrl($orderId);
+        }
+
+        return $errorUrl;
+    }
+
     /**
-     * The finish url is a parameter of the request Mollie sent the shopper back with, so it is read
-     * from that request instead of being handed down through every flow.
+     * The finish and error url are parameters of the request Mollie sent the shopper back with, so
+     * they are read from that request instead of being handed down through every flow.
      */
     private function getFinishUrls(): FinishUrls
     {
