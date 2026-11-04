@@ -18,7 +18,6 @@ final class Session extends Struct implements \JsonSerializable
     private ?string $cardToken = null;
     private ?string $wallet = null;
     private string $nextAction = '';
-    private string $paymentId = '';
     private LineItemCollection $lines;
     private ShippingOptionCollection $shippingOptions;
     private ?Money $amount = null;
@@ -52,14 +51,6 @@ final class Session extends Struct implements \JsonSerializable
 
         if (isset($body['amount']['value'], $body['amount']['currency'])) {
             $session->setAmount(Money::fromArray($body['amount']));
-        }
-
-        // the payment created for the session is not part of the body, only the return link
-        // of the checkout carries its id: .../checkout/return/<id> belongs to payment tr_<id>
-        $redirectId = trim((string) parse_url($redirectUrl, PHP_URL_PATH), '/');
-        $redirectId = substr($redirectId, (int) strrpos($redirectId, '/') + 1);
-        if ($redirectId !== '') {
-            $session->setPaymentId('tr_' . $redirectId);
         }
 
         $session->setMethod(PaymentMethod::tryFrom((string) ($body['method'] ?? '')));
@@ -202,16 +193,6 @@ final class Session extends Struct implements \JsonSerializable
         $this->nextAction = $nextAction;
     }
 
-    public function getPaymentId(): string
-    {
-        return $this->paymentId;
-    }
-
-    public function setPaymentId(string $paymentId): void
-    {
-        $this->paymentId = $paymentId;
-    }
-
     public function getLines(): LineItemCollection
     {
         return $this->lines;
@@ -242,8 +223,10 @@ final class Session extends Struct implements \JsonSerializable
      * shipping_fee. Matching it back to the option - and with it to the Shopware shipping method
      * in its reference - therefore goes over description and amount. That is ambiguous as soon as
      * two shipping methods share both, and has to be replaced once Mollie exposes the selection.
+     * A session with a shipping callback does not return its options, so the caller has to
+     * provide them.
      */
-    public function getSelectedShippingOption(): ?ShippingOption
+    public function getSelectedShippingOption(ShippingOptionCollection $shippingOptions): ?ShippingOption
     {
         $shippingLine = $this->getSelectedShippingLine();
         if (! $shippingLine instanceof LineItem) {
@@ -252,7 +235,7 @@ final class Session extends Struct implements \JsonSerializable
 
         $amount = $shippingLine->getAmount();
 
-        foreach ($this->shippingOptions as $shippingOption) {
+        foreach ($shippingOptions as $shippingOption) {
             if ($shippingOption->getDescription() !== $shippingLine->getDescription()) {
                 continue;
             }

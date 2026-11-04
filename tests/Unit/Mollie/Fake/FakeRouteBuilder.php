@@ -79,6 +79,11 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         return $this->subscriptionWebhookUrl;
     }
 
+    public function getSessionWebhookUrl(string $webhookId): string
+    {
+        return 'https://shop.test/mollie/session/webhook/' . $webhookId;
+    }
+
     public function getSubscriptionPaymentUpdateReturnUrl(string $subscriptionId): string
     {
         return $this->subscriptionPaymentUpdateReturnUrl;

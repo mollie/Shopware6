@@ -3,37 +3,57 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
-use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
-use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Session;
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentEntity;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\AbstractSessionWebhookRoute;
+use Mollie\Shopware\Component\Payment\ExpressComponents\Route\SessionWebhookRoute;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
-use Mollie\Shopware\Component\Transaction\TransactionService;
-use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Checkout\Payment\SalesChannel\AbstractHandlePaymentMethodRoute;
-use Shopware\Core\Checkout\Payment\SalesChannel\HandlePaymentMethodRoute;
+use Shopware\Core\Framework\Context;
+use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Brings the payment that already exists on Mollie's side together with the Shopware order,
- * no matter whether that order was just created from a cart or existed before.
+ * The payment of a session is only known once Mollie calls the session webhook, which may happen
+ * before or after the shopper returns. The finish therefore only remembers the transaction of the
+ * order, the session webhook attaches the payment to it. The shopper is held back until the
+ * webhook set the payment status, so the right page is shown.
  */
 final class PaymentFinalizer implements PaymentFinalizerInterface
 {
+    private const STATUS_MAX_CHECKS = 20;
+
+    private const STATUS_CHECK_INTERVAL_MICROSECONDS = 1000000;
+
+    private const PENDING_STATES = [
+        OrderTransactionStates::STATE_OPEN,
+        OrderTransactionStates::STATE_UNCONFIRMED,
+    ];
+
+    private const FAILED_STATES = [
+        OrderTransactionStates::STATE_FAILED,
+        OrderTransactionStates::STATE_CANCELLED,
+    ];
+
+    /**
+     * @param EntityRepository<OrderTransactionCollection> $orderTransactionRepository
+     */
     public function __construct(
-        #[Autowire(service: MollieGateway::class)]
-        private MollieGatewayInterface $mollieGateway,
-        #[Autowire(service: TransactionService::class)]
-        private TransactionServiceInterface $transactionService,
-        #[Autowire(service: HandlePaymentMethodRoute::class)]
-        private AbstractHandlePaymentMethodRoute $handlePaymentMethodRoute,
+        #[Autowire(service: SessionPaymentRepository::class)]
+        private SessionPaymentRepositoryInterface $sessionPaymentRepository,
+        #[Autowire(service: 'order_transaction.repository')]
+        private EntityRepository $orderTransactionRepository,
+        #[Autowire(service: SessionWebhookRoute::class)]
+        private AbstractSessionWebhookRoute $sessionWebhookRoute,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
         private RequestStack $requestStack,
@@ -58,16 +78,81 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
             'transactionId' => $transaction->getId(),
         ];
 
-        $finishUrls = $this->getFinishUrls();
-        if ($session->getPaymentId() === '') {
-            $this->logger->error('Express components session carries no payment id, payment handling skipped', $logData);
-
-            return $this->getFinishUrl($finishUrls, $orderId);
+        $context = $salesChannelContext->getContext();
+        $sessionPayment = $this->sessionPaymentRepository->assignTransaction($session->getId(), $transaction->getId(), $context);
+        if ($sessionPayment === null) {
+            $this->logger->warning('Express components session has no session payment entry', $logData);
         }
 
-        $this->attachPayment($session, $order, $transaction, $salesChannelContext);
+        if ($sessionPayment instanceof SessionPaymentEntity) {
+            $this->processEarlyWebhook($sessionPayment, $context, $logData);
+        }
 
-        return $this->handlePayment($finishUrls, $orderId, $salesChannelContext, $logData);
+        $finishUrls = $this->getFinishUrls();
+        $state = $this->waitForPaymentStatus($transaction->getId(), $context);
+        $logData['paymentStatus'] = $state;
+
+        if (in_array($state, self::FAILED_STATES, true)) {
+            $this->logger->info('Express components payment failed, shopper is sent to the edit order page', $logData);
+
+            return $this->getErrorUrl($finishUrls, $orderId);
+        }
+
+        $this->logger->info('Express components checkout finished', $logData);
+
+        return $this->getFinishUrl($finishUrls, $orderId);
+    }
+
+    /**
+     * Mollie usually calls the session webhook before the shopper is back, it is answered with a
+     * conflict then and only repeated about a minute later. The stored payment id is therefore
+     * processed right away, as if the webhook had just arrived.
+     *
+     * @param array<mixed> $logData
+     */
+    private function processEarlyWebhook(SessionPaymentEntity $sessionPayment, Context $context, array $logData): void
+    {
+        $paymentId = (string) $sessionPayment->getPaymentId();
+        if ($paymentId === '') {
+            return;
+        }
+
+        $webhookRequest = new Request([], ['id' => $paymentId]);
+        try {
+            $this->sessionWebhookRoute->notify($sessionPayment->getId(), $webhookRequest, $context);
+        } catch (\Throwable $exception) {
+            $logData['paymentId'] = $paymentId;
+            $logData['error'] = $exception->getMessage();
+            $this->logger->error('Express components session webhook could not be processed during the finish', $logData);
+        }
+    }
+
+    /**
+     * The status is set by the webhook in another request. Should it not arrive in time, the order
+     * page is shown anyway and the webhook corrects the status later.
+     */
+    private function waitForPaymentStatus(string $transactionId, Context $context): string
+    {
+        $state = $this->loadPaymentStatus($transactionId, $context);
+        for ($i = 1; $i < self::STATUS_MAX_CHECKS && in_array($state, self::PENDING_STATES, true); ++$i) {
+            usleep(self::STATUS_CHECK_INTERVAL_MICROSECONDS);
+            $state = $this->loadPaymentStatus($transactionId, $context);
+        }
+
+        return $state;
+    }
+
+    private function loadPaymentStatus(string $transactionId, Context $context): string
+    {
+        $criteria = new Criteria([$transactionId]);
+        $criteria->addAssociation('stateMachineState');
+
+        $transaction = $this->orderTransactionRepository->search($criteria, $context)->getEntities()->first();
+        if (! $transaction instanceof OrderTransactionEntity) {
+            return '';
+        }
+
+        return (string) $transaction->getStateMachineState()?->getTechnicalName();
     }
 
     /**
@@ -91,58 +176,6 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         return $latest instanceof OrderTransactionEntity ? $latest : null;
     }
 
-    /**
-     * The payment already exists on Mollie's side, it is loaded once and written onto the
-     * order transaction the same way a regular payment would be, so webhooks, refunds and the
-     * ERP exports find it under the usual keys.
-     */
-    private function attachPayment(Session $session, OrderEntity $order, OrderTransactionEntity $transaction, SalesChannelContext $salesChannelContext): void
-    {
-        $payment = $this->mollieGateway->getPayment($session->getPaymentId(), (string) $order->getOrderNumber(), $salesChannelContext->getSalesChannelId());
-
-        $this->transactionService->savePaymentExtension($transaction->getId(), $order, $payment, $salesChannelContext->getContext(), expressCheckout: true);
-    }
-
-    /**
-     * Runs the regular Shopware payment handling on the order, which is what patches the
-     * Mollie payment with everything only Shopware knows: the description built from the order
-     * number, the webhook url and the metadata. Because the payment id is already on the
-     * transaction, the Pay action updates that payment instead of creating one.
-     *
-     * A failure here must not abort the checkout: the shopper already paid and the order exists.
-     *
-     * @param array<mixed> $logData
-     */
-    private function handlePayment(FinishUrls $finishUrls, string $orderId, SalesChannelContext $salesChannelContext, array $logData): string
-    {
-        $finishUrl = $this->getFinishUrl($finishUrls, $orderId);
-
-        $errorUrl = $finishUrls->getErrorUrl($orderId);
-        if ($errorUrl === '') {
-            $errorUrl = $this->routeBuilder->getEditOrderUrl($orderId);
-        }
-
-        $paymentRequest = new Request();
-        $paymentRequest->request->set('orderId', $orderId);
-        $paymentRequest->request->set(FinishUrls::FINISH_URL_PARAMETER, $finishUrl);
-        $paymentRequest->request->set(FinishUrls::ERROR_URL_PARAMETER, $errorUrl);
-
-        try {
-            $handlePaymentResponse = $this->handlePaymentMethodRoute->load($paymentRequest, $salesChannelContext);
-            $this->logger->debug('Express components payment handled', $logData);
-
-            $redirectResponse = $handlePaymentResponse->getRedirectResponse();
-            if ($redirectResponse instanceof RedirectResponse) {
-                return $redirectResponse->getTargetUrl();
-            }
-        } catch (\Throwable $exception) {
-            $logData['error'] = $exception->getMessage();
-            $this->logger->error('Failed to handle the express components payment', $logData);
-        }
-
-        return $finishUrl;
-    }
-
     private function getFinishUrl(FinishUrls $finishUrls, string $orderId): string
     {
         $finishUrl = $finishUrls->getFinishUrl($orderId);
@@ -153,11 +186,19 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         return $finishUrl;
     }
 
+    private function getErrorUrl(FinishUrls $finishUrls, string $orderId): string
+    {
+        $errorUrl = $finishUrls->getErrorUrl($orderId);
+        if ($errorUrl === '') {
+            return $this->routeBuilder->getEditOrderUrl($orderId);
+        }
+
+        return $errorUrl;
+    }
+
     /**
-     * The finish and error url are parameters of the request Mollie sent the shopper back with,
-     * so they are read from that request instead of being handed down through every flow. Without
-     * a request - a queue worker or the CLI - there is nothing to read and the storefront pages
-     * are used.
+     * The finish and error url are parameters of the request Mollie sent the shopper back with, so
+     * they are read from that request instead of being handed down through every flow.
      */
     private function getFinishUrls(): FinishUrls
     {

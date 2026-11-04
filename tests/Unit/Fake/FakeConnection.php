@@ -21,6 +21,9 @@ final class FakeConnection extends Connection
     /** @var list<string> */
     private array $fetchedStatements = [];
 
+    /** @var list<array<mixed>> */
+    private array $executedParameters = [];
+
     private int $affectedRows = 0;
 
     private mixed $singleValue = false;
@@ -67,6 +70,14 @@ final class FakeConnection extends Connection
     }
 
     /**
+     * @return list<array<mixed>>
+     */
+    public function getExecutedParameters(): array
+    {
+        return $this->executedParameters;
+    }
+
+    /**
      * @return list<string>
      */
     public function getFetchedStatements(): array
@@ -91,6 +102,25 @@ final class FakeConnection extends Connection
     }
 
     /**
+     * Answers with the first prepared row, `false` without one - like DBAL for a query that
+     * matched nothing.
+     *
+     * @param array<mixed> $params
+     * @param array<mixed> $types
+     *
+     * @return array<string, mixed>|false
+     */
+    public function fetchAssociative(string $query, array $params = [], array $types = []): array|false
+    {
+        $this->fetchedStatements[] = $query;
+        if ($this->failure !== null) {
+            throw $this->failure;
+        }
+
+        return $this->rows[0] ?? false;
+    }
+
+    /**
      * @param array<mixed> $params
      * @param array<mixed> $types
      */
@@ -111,6 +141,7 @@ final class FakeConnection extends Connection
     public function executeStatement(string $sql, array $params = [], array $types = []): int|string
     {
         $this->executedStatements[] = $sql;
+        $this->executedParameters[] = $params;
         if ($this->failure !== null) {
             throw $this->failure;
         }

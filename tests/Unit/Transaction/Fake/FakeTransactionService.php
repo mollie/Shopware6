@@ -62,7 +62,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     private array $orderTransactionStates = [];
     private ?string $transactionState = null;
     private bool $withMollieExtensionOnOrderTransactions = false;
-    /** @var list<array{transactionId: string, payment: Payment}> */
+    /** @var list<array{transactionId: string, payment: Payment, expressCheckout: bool}> */
     private array $savedPaymentExtensions = [];
 
     public function __construct()
@@ -83,7 +83,7 @@ final class FakeTransactionService implements TransactionServiceInterface
 
     public function savePaymentExtension(string $transactionId, OrderEntity $order, Payment $payment, Context $context, ?MollieOrder $mollieOrder = null, bool $expressCheckout = false): EntityWrittenContainerEvent
     {
-        $this->savedPaymentExtensions[] = ['transactionId' => $transactionId, 'payment' => $payment];
+        $this->savedPaymentExtensions[] = ['transactionId' => $transactionId, 'payment' => $payment, 'expressCheckout' => $expressCheckout];
 
         $context = new Context(new SystemSource());
         $nestedEventCollection = new NestedEventCollection();
@@ -92,7 +92,7 @@ final class FakeTransactionService implements TransactionServiceInterface
     }
 
     /**
-     * @return list<array{transactionId: string, payment: Payment}>
+     * @return list<array{transactionId: string, payment: Payment, expressCheckout: bool}>
      */
     public function getSavedPaymentExtensions(): array
     {

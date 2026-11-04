@@ -28,6 +28,7 @@ use Shopware\Core\Checkout\Order\OrderCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\Struct\ArrayStruct;
+use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\Currency\CurrencyEntity;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -69,6 +70,8 @@ final class SessionBuilder implements SessionBuilderInterface
         private AbstractCartPersister $cartPersister,
         #[Autowire(service: 'order.repository')]
         private EntityRepository $orderRepository,
+        #[Autowire(service: SessionPaymentRepository::class)]
+        private SessionPaymentRepositoryInterface $sessionPaymentRepository,
         #[Autowire(service: 'monolog.logger.mollie')]
         private LoggerInterface $logger
     ) {
@@ -108,7 +111,9 @@ final class SessionBuilder implements SessionBuilderInterface
         }
 
         $createSession = $this->buildCreateSession($cart, $amount, $isCustomer, $salesChannelContext);
+        $webhookId = $this->applySessionWebhook($createSession);
         $session = $this->createCartSession($createSession, $salesChannelContext);
+        $this->sessionPaymentRepository->create($webhookId, $session->getId(), $salesChannelContext->getContext());
 
         $session->addArrayExtension(self::SESSION_CUSTOMER_EXTENSION, [self::SESSION_CUSTOMER_KEY => $customerKey]);
         $cart->addExtension(self::cartExtensionKey($mode), $session);
@@ -136,8 +141,10 @@ final class SessionBuilder implements SessionBuilderInterface
         $createSession->setLines($lines);
 
         $this->applyCustomer($createSession, $salesChannelContext);
+        $webhookId = $this->applySessionWebhook($createSession);
 
         $session = $this->sessionGateway->createSession($createSession, $salesChannelContext);
+        $this->sessionPaymentRepository->create($webhookId, $session->getId(), $salesChannelContext->getContext());
 
         $this->saveSessionOnOrder($order, $session->getId(), $salesChannelContext);
 
@@ -164,6 +171,18 @@ final class SessionBuilder implements SessionBuilderInterface
                 'customFields' => $customFields,
             ],
         ], $salesChannelContext->getContext());
+    }
+
+    /**
+     * Mollie's payment webhook only carries the payment id, so the url carries an own id that the
+     * session is stored under.
+     */
+    private function applySessionWebhook(CreateSession $createSession): string
+    {
+        $webhookId = Uuid::randomHex();
+        $createSession->setWebhookUrl($this->routeBuilder->getSessionWebhookUrl($webhookId));
+
+        return $webhookId;
     }
 
     private function createCartSession(CreateSession $createSession, SalesChannelContext $salesChannelContext): Session

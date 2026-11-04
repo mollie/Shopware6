@@ -20,6 +20,7 @@ use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
 use Mollie\Shopware\Unit\Mollie\Fake\FakeRouteBuilder;
 use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionLineBuilder;
+use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionPaymentRepository;
 use Mollie\Shopware\Unit\Payment\Fake\FakeSessionGateway;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -50,6 +51,7 @@ final class SessionBuilderTest extends TestCase
     private FakeSettingsService $settings;
     private FakeCartPersister $cartPersister;
     private FakeOrderRepository $orderRepository;
+    private FakeSessionPaymentRepository $sessionPaymentRepository;
     private FakeLogger $logger;
 
     protected function setUp(): void
@@ -60,6 +62,7 @@ final class SessionBuilderTest extends TestCase
         $this->settings = new FakeSettingsService(apiSettings: new ApiSettings('test_key', 'live_key', Mode::TEST, self::PROFILE_ID));
         $this->cartPersister = new FakeCartPersister();
         $this->orderRepository = new FakeOrderRepository();
+        $this->sessionPaymentRepository = new FakeSessionPaymentRepository();
         $this->logger = new FakeLogger();
     }
 
@@ -500,6 +503,71 @@ final class SessionBuilderTest extends TestCase
         $this->assertNull($this->sessionGateway->getLastCreateSession()->getCustomerId());
     }
 
+    public function testCartSessionPaymentReportsToTheSessionWebhook(): void
+    {
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createSalesChannelContext());
+
+        $webhookId = (string) array_key_first($this->sessionPaymentRepository->getEntries());
+        $this->assertSame('https://shop.test/mollie/session/webhook/' . $webhookId, $this->sessionGateway->getLastCreateSession()->getWebhookUrl());
+    }
+
+    public function testCreatedCartSessionIsStoredForTheSessionWebhook(): void
+    {
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($this->createGrossCart(119.00, 5.95), $this->createSalesChannelContext());
+
+        $entry = $this->sessionPaymentRepository->findBySessionId('ses_created');
+        $this->assertNotNull($entry);
+        $this->assertNull($entry->getPaymentId());
+        $this->assertNull($entry->getTransactionId());
+    }
+
+    public function testReusedCartSessionIsNotStoredAgain(): void
+    {
+        $storedSession = $this->createSession('ses_stored', new Money(113.05, 'EUR'));
+        $this->sessionGateway->setExistingSession($storedSession);
+        $cart = $this->createGrossCart(119.00, 5.95);
+        $this->storeCartSession($cart, $storedSession, $this->createSalesChannelContext());
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromCart($cart, $this->createSalesChannelContext());
+
+        $this->assertSame([], $this->sessionPaymentRepository->getEntries());
+    }
+
+    public function testOrderSessionPaymentReportsToTheSessionWebhook(): void
+    {
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromOrder($this->createOrder(119.00, 5.95), $this->createSalesChannelContext());
+
+        $webhookId = (string) array_key_first($this->sessionPaymentRepository->getEntries());
+        $this->assertSame('https://shop.test/mollie/session/webhook/' . $webhookId, $this->sessionGateway->getLastCreateSession()->getWebhookUrl());
+    }
+
+    public function testCreatedOrderSessionIsStoredForTheSessionWebhook(): void
+    {
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromOrder($this->createOrder(119.00, 5.95), $this->createSalesChannelContext());
+
+        $this->assertNotNull($this->sessionPaymentRepository->findBySessionId('ses_created'));
+    }
+
+    public function testReusedOrderSessionIsNotStoredAgain(): void
+    {
+        $this->sessionGateway->setExistingSession($this->createSession('ses_stored', new Money(119.00, 'EUR')));
+        $order = $this->createOrderWithStoredSession('ses_stored');
+        $sessionBuilder = $this->createSessionBuilder();
+
+        $sessionBuilder->buildFromOrder($order, $this->createSalesChannelContext());
+
+        $this->assertSame([], $this->sessionPaymentRepository->getEntries());
+    }
+
     public function testOrderSessionAmountContainsTheShippingCosts(): void
     {
         $order = $this->createOrder(119.00, 5.95);
@@ -719,6 +787,7 @@ final class SessionBuilderTest extends TestCase
             $this->settings,
             $this->cartPersister,
             $this->orderRepository,
+            $this->sessionPaymentRepository,
             $this->logger
         );
     }
@@ -760,6 +829,7 @@ final class SessionBuilderTest extends TestCase
             $settings,
             new FakeCartPersister(),
             new FakeOrderRepository(),
+            new FakeSessionPaymentRepository(),
             new FakeLogger()
         );
 

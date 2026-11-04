@@ -1,4 +1,5 @@
 # Unreleased
+- Geändert: Express Components ordnen die Zahlung der Bestellung zu, sobald Mollie sie per Webhook meldet.
 - Behoben: Apple Pay Direct auf der Produktseite zeigt wieder den Produktpreis an, wenn der Warenkorb bereits Artikel enthält.
 
 # 5.8.0

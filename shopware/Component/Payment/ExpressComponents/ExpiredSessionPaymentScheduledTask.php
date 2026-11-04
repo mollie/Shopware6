@@ -5,18 +5,18 @@ namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
 use Shopware\Core\Framework\MessageQueue\ScheduledTask\ScheduledTask;
 
-final class PendingSessionPaymentScheduledTask extends ScheduledTask
+final class ExpiredSessionPaymentScheduledTask extends ScheduledTask
 {
-    protected const MINUTELY = 60;
+    private const QUARTER_HOURLY = 900;
 
     public static function getTaskName(): string
     {
-        return 'mollie.express-components.pending-session-payment';
+        return 'mollie.express-components.expired-session-payments';
     }
 
     public static function getDefaultInterval(): int
     {
-        return self::MINUTELY;
+        return self::QUARTER_HOURLY;
     }
 
     public static function shouldRescheduleOnFailure(): bool

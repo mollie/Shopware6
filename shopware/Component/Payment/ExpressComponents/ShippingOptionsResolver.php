@@ -74,7 +74,7 @@ final class ShippingOptionsResolver implements ShippingOptionsResolverInterface
         if ($countryId === null) {
             $this->logger->warning('No shipping country found for express components shipping options', $logData);
 
-            return $shippingOptions;
+            throw ExpressComponentsException::shippingCountryNotSupported($address->getCountry(), $salesChannelId);
         }
 
         $selectedShippingMethodId = $salesChannelContext->getShippingMethod()->getId();

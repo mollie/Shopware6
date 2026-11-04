@@ -17,6 +17,11 @@ class ExpressComponentsException extends HttpException
     public const MISSING_ORDER_SESSION_ID = 'MISSING_ORDER_SESSION_ID';
     public const ORDER_NOT_FOUND = 'ORDER_NOT_FOUND';
     public const ORDER_TRANSACTION_MISSING = 'ORDER_TRANSACTION_MISSING';
+    public const SESSION_PAYMENT_NOT_FOUND = 'SESSION_PAYMENT_NOT_FOUND';
+    public const SESSION_TRANSACTION_MISSING = 'SESSION_TRANSACTION_MISSING';
+    public const SESSION_PAYMENT_WITHOUT_METHOD = 'SESSION_PAYMENT_WITHOUT_METHOD';
+    public const PAYMENT_HANDLER_NOT_FOUND = 'PAYMENT_HANDLER_NOT_FOUND';
+    public const SHIPPING_COUNTRY_NOT_SUPPORTED = 'SHIPPING_COUNTRY_NOT_SUPPORTED';
 
     public static function notEnabled(string $salesChannelId): self
     {
@@ -121,6 +126,71 @@ class ExpressComponentsException extends HttpException
             'Session ID is missing in the extensions of cart {{cartToken}}',
             [
                 'cartToken' => $cartToken,
+            ]
+        );
+    }
+
+    public static function sessionPaymentNotFound(string $webhookId): self
+    {
+        return new self(
+            Response::HTTP_NOT_FOUND,
+            self::SESSION_PAYMENT_NOT_FOUND,
+            'No express components session is stored for webhook {{webhookId}}',
+            [
+                'webhookId' => $webhookId,
+            ]
+        );
+    }
+
+    /**
+     * Answered with a conflict on purpose: Mollie repeats the webhook, by then the shopper is back
+     * and the order transaction exists.
+     */
+    public static function sessionTransactionMissing(string $webhookId): self
+    {
+        return new self(
+            Response::HTTP_CONFLICT,
+            self::SESSION_TRANSACTION_MISSING,
+            'The order transaction of the express components session for webhook {{webhookId}} does not exist yet',
+            [
+                'webhookId' => $webhookId,
+            ]
+        );
+    }
+
+    public static function sessionPaymentWithoutMethod(string $paymentId): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::SESSION_PAYMENT_WITHOUT_METHOD,
+            'Mollie payment {{paymentId}} of the express components session has no payment method',
+            [
+                'paymentId' => $paymentId,
+            ]
+        );
+    }
+
+    public static function paymentHandlerNotFound(string $method): self
+    {
+        return new self(
+            Response::HTTP_BAD_REQUEST,
+            self::PAYMENT_HANDLER_NOT_FOUND,
+            'No payment handler found for Mollie payment method {{method}}',
+            [
+                'method' => $method,
+            ]
+        );
+    }
+
+    public static function shippingCountryNotSupported(string $countryIso, string $salesChannelId): self
+    {
+        return new self(
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+            self::SHIPPING_COUNTRY_NOT_SUPPORTED,
+            'Shipping to country {{countryIso}} is not available in SalesChannelId: {{salesChannelId}}',
+            [
+                'countryIso' => $countryIso,
+                'salesChannelId' => $salesChannelId,
             ]
         );
     }

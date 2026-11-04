@@ -23,7 +23,10 @@ final class FakePayloadBuilder implements PayloadBuilderInterface
 
     public function buildPayment(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreatePayment
     {
-        throw new \RuntimeException('Not used by the payment link flow.');
+        $createPayment = new CreatePayment('Order 10000', 'https://shop.test/mollie/payment/transaction-1', new Money(25.0, 'EUR'));
+        $createPayment->setWebhookUrl('https://shop.test/mollie/webhook/' . $transactionData->getTransaction()->getId());
+
+        return $createPayment;
     }
 
     public function buildOrder(TransactionDataStruct $transactionData, AbstractMolliePaymentHandler $paymentHandler, RequestDataBag $dataBag, Context $context): CreateOrder
