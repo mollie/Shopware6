@@ -11,7 +11,6 @@ use Shopware\Core\Checkout\Cart\SalesChannel\CartService as SalesChannelCartServ
 use Shopware\Core\Checkout\Order\Aggregate\OrderLineItem\OrderLineItemCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\Uuid\Uuid;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -45,11 +44,9 @@ final class SubscriptionGroupCartBuilder implements SubscriptionGroupCartBuilder
         }
 
         $overrideOptions = [
-            SalesChannelContextService::PERMISSIONS => [
-                // CheckoutPermissions::SKIP_CART_PERSISTENCE does not exist in Shopware 6.5.x.
-                // Once 6.5 support is dropped, replace this string with the class constant.
-                'skipCartPersistence' => true,
-            ],
+            // the converter defaults to the admin-edit permissions, which include skipCartPersistence;
+            // an empty set gives a persisted cart like in the storefront
+            SalesChannelContextService::PERMISSIONS => [],
         ];
 
         if ($addresses !== null) {
@@ -59,8 +56,8 @@ final class SubscriptionGroupCartBuilder implements SubscriptionGroupCartBuilder
 
         $salesChannelContext = $this->orderConverter->assembleSalesChannelContext($order, $context, $overrideOptions);
 
-        $cartToken = Uuid::randomHex();
-        $cart = $this->cartService->createNew($cartToken);
+        // same token as the context, like in the storefront; the order route deletes the cart by the context token
+        $cart = $this->cartService->createNew($salesChannelContext->getToken());
 
         $cartLineItems = [];
         foreach ($groupLineItems as $orderLineItem) {
