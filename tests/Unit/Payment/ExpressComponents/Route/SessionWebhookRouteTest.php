@@ -9,15 +9,14 @@ use Mollie\Shopware\Component\Payment\ExpressComponents\ExpressComponentsExcepti
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\SessionWebhookRoute;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Unit\Fake\FakeLogger;
+use Mollie\Shopware\Unit\Fake\FakeWebhookRoute;
 use Mollie\Shopware\Unit\Payment\ExpressComponents\Fake\FakeSessionPaymentRepository;
-use Mollie\Shopware\Unit\Payment\Fake\FakeFinalize;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakePayloadBuilder;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Transaction\Fake\FakeTransactionService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +29,7 @@ final class SessionWebhookRouteTest extends TestCase
     private FakeSessionPaymentRepository $sessionPaymentRepository;
     private FakeTransactionService $transactionService;
     private FakeGateway $gateway;
-    private FakeFinalize $finalize;
+    private FakeWebhookRoute $webhookRoute;
     private FakeLogger $logger;
 
     protected function setUp(): void
@@ -38,7 +37,7 @@ final class SessionWebhookRouteTest extends TestCase
         $this->sessionPaymentRepository = new FakeSessionPaymentRepository(FakeSessionPaymentRepository::entry(self::WEBHOOK_ID, 'ses_1', null, 'transaction-1'));
         $this->transactionService = new FakeTransactionService();
         $this->gateway = new FakeGateway(payment: $this->createPayment(PaymentMethod::CREDIT_CARD));
-        $this->finalize = new FakeFinalize();
+        $this->webhookRoute = new FakeWebhookRoute();
         $this->logger = new FakeLogger();
     }
 
@@ -58,7 +57,7 @@ final class SessionWebhookRouteTest extends TestCase
 
         $this->assertSame(Response::HTTP_CONFLICT, $exception->getStatusCode());
         $this->assertSame('tr_1', $this->sessionPaymentRepository->findById(self::WEBHOOK_ID, Context::createDefaultContext())?->getPaymentId());
-        $this->assertSame(0, $this->finalize->getCallCount());
+        $this->assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
     }
 
     public function testPaymentIsAttachedToTheTransactionAsExpressCheckout(): void
@@ -83,23 +82,20 @@ final class SessionWebhookRouteTest extends TestCase
         $this->assertArrayNotHasKey('redirectUrl', $updates[0]['payment']->toArray());
     }
 
-    public function testFinalizeRunsForTheTransaction(): void
+    public function testStatusIsLeftToTheShopwareFinalizeWhileTheShopperWaits(): void
     {
         $this->createRoute()->notify(self::WEBHOOK_ID, $this->createPostRequest(), Context::createDefaultContext());
 
-        $this->assertSame(1, $this->finalize->getCallCount());
-        $this->assertSame('transaction-1', $this->finalize->getLastTransaction()?->getOrderTransactionId());
+        $this->assertSame([], $this->webhookRoute->getNotifiedTransactionIds());
     }
 
-    public function testFailedPaymentIsStillAttachedAndAnsweredSuccessfully(): void
+    public function testStatusIsSetByTheWebhookOnceTheShopperStoppedWaiting(): void
     {
-        $this->finalize = new FakeFinalize(PaymentException::asyncFinalizeInterrupted('transaction-1', 'Payment is failed'));
+        $this->sessionPaymentRepository->letShopperStopWaiting();
 
-        $response = $this->createRoute()->notify(self::WEBHOOK_ID, $this->createPostRequest(), Context::createDefaultContext());
+        $this->createRoute()->notify(self::WEBHOOK_ID, $this->createPostRequest(), Context::createDefaultContext());
 
-        $this->assertSame('success', $response->getObject()->get('status'));
-        $this->assertCount(1, $this->transactionService->getSavedPaymentExtensions());
-        $this->assertCount(1, $this->gateway->getUpdatePayloads());
+        $this->assertSame(['transaction-1'], $this->webhookRoute->getNotifiedTransactionIds());
     }
 
     public function testPaymentIdIsReadFromTheQueryOfAGetRequest(): void
@@ -128,7 +124,7 @@ final class SessionWebhookRouteTest extends TestCase
         $exception = $this->notifyExpectingFailure(self::WEBHOOK_ID);
 
         $this->assertSame(ExpressComponentsException::SESSION_PAYMENT_WITHOUT_METHOD, $exception->getErrorCode());
-        $this->assertSame(0, $this->finalize->getCallCount());
+        $this->assertSame([], $this->transactionService->getSavedPaymentExtensions());
     }
 
     public function testPaymentMethodWithoutHandlerIsRejected(): void
@@ -160,7 +156,7 @@ final class SessionWebhookRouteTest extends TestCase
             $this->gateway,
             new FakePayloadBuilder(),
             new PaymentHandlerLocator([new FakePaymentMethodHandler(PaymentMethod::CREDIT_CARD)]),
-            $this->finalize,
+            $this->webhookRoute,
             $this->logger
         );
     }

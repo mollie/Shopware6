@@ -525,6 +525,18 @@ final class RouteBuilderTest extends TestCase
         $this->assertSame(['orderId' => 'order-id'], $router->getLastParameters());
     }
 
+    public function testFinalizeUrlCarriesThePaymentToken(): void
+    {
+        $router = new FakeRouter('https://storefront.example/payment/finalize-transaction?_sw_payment_token=token');
+        $routeBuilder = new RouteBuilder($router, $this->createStorefrontRequestStack(), 'https://shop.example');
+
+        $url = $routeBuilder->getFinalizeUrl('token');
+
+        $this->assertSame('https://storefront.example/payment/finalize-transaction?_sw_payment_token=token', $url);
+        $this->assertSame('payment.finalize.transaction', $router->getLastRouteName());
+        $this->assertSame(['_sw_payment_token' => 'token'], $router->getLastParameters());
+    }
+
     public function testPosCheckoutUrlCarriesTheChangePaymentStateUrl(): void
     {
         $payment = new Payment('tr_123');

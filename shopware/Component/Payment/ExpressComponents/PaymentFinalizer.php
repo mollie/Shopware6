@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
 use Mollie\Shopware\Component\Mollie\Session;
-use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentEntity;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\AbstractSessionWebhookRoute;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\SessionWebhookRoute;
 use Mollie\Shopware\Component\Router\RouteBuilder;
@@ -15,7 +14,6 @@ use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Checkout\Payment\Cart\Token\JWTFactoryV2;
 use Shopware\Core\Checkout\Payment\Cart\Token\TokenFactoryInterfaceV2;
 use Shopware\Core\Checkout\Payment\Cart\Token\TokenStruct;
-use Shopware\Core\Framework\Context;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,10 +26,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class PaymentFinalizer implements PaymentFinalizerInterface
 {
-    public const SHOPPER_WAIT_SECONDS = 20;
-
-    private const PAYMENT_ID_CHECK_INTERVAL_MICROSECONDS = 1000000;
-
     /**
      * @phpstan-ignore parameter.deprecatedInterface
      */
@@ -76,7 +70,7 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
             return $this->getFinishUrl($finishUrls, $orderId);
         }
 
-        $sessionPayment = $this->waitForPaymentId($sessionPayment, $context);
+        $sessionPayment = $this->sessionPaymentRepository->getFinishedPayment($sessionPayment, $context);
         $paymentId = (string) $sessionPayment->getPaymentId();
         if ($paymentId === '') {
             $this->logger->info('Express components webhook did not arrive in time, the webhook sets the status later', $logData);
@@ -99,18 +93,6 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         $this->logger->info('Express components checkout continues with the Shopware finalize', $logData);
 
         return $this->getFinalizeUrl($transaction, $finishUrls, $orderId);
-    }
-
-    private function waitForPaymentId(SessionPaymentEntity $sessionPayment, Context $context): SessionPaymentEntity
-    {
-        $checks = 1;
-        while ((string) $sessionPayment->getPaymentId() === '' && $checks < self::SHOPPER_WAIT_SECONDS) {
-            usleep(self::PAYMENT_ID_CHECK_INTERVAL_MICROSECONDS);
-            ++$checks;
-            $sessionPayment = $this->sessionPaymentRepository->findById($sessionPayment->getId(), $context) ?? $sessionPayment;
-        }
-
-        return $sessionPayment;
     }
 
     private function getFinalizeUrl(OrderTransactionEntity $transaction, FinishUrls $finishUrls, string $orderId): string

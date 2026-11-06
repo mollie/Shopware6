@@ -25,6 +25,9 @@ final class FakeSettingsService extends AbstractSettingsService
     /** @var array<string, PaymentSettings> */
     private array $paymentSettingsPerSalesChannel = [];
 
+    /** @var array<string, ExpressComponentsSettings> */
+    private array $expressComponentsSettingsPerSalesChannel = [];
+
     public function __construct(private ?LoggerSettings $loggerSettings = null,
         private ?PaymentSettings $paymentSettings = null,
         private ?ApiSettings $apiSettings = null,
@@ -64,9 +67,18 @@ final class FakeSettingsService extends AbstractSettingsService
         }
     }
 
+    public function setExpressComponentsSettingsForSalesChannel(string $salesChannelId, ExpressComponentsSettings $settings): void
+    {
+        $this->expressComponentsSettingsPerSalesChannel[$salesChannelId] = $settings;
+    }
+
     public function getExpressComponentsSettings(?string $salesChannelId = null): ExpressComponentsSettings
     {
-        return $this->expressComponentsSettings;
+        if ($salesChannelId === null) {
+            return $this->expressComponentsSettings;
+        }
+
+        return $this->expressComponentsSettingsPerSalesChannel[$salesChannelId] ?? $this->expressComponentsSettings;
     }
 
     public function getPaypalExpressSettings(?string $salesChannelId = null): PayPalExpressSettings

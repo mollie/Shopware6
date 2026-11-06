@@ -193,6 +193,9 @@ result.
 - Cross-version Shopware APIs live in `shopware/Component/Compatibility/`, not behind an
   inline `version_compare()`.
 - Config keys via `SystemConfigService` and constants, never a literal key string.
+- Plugin settings are read per sales channel (`get…Settings($salesChannelId)`), even when the
+  setting is global today — it becomes per sales channel later. Code without a sales channel at
+  hand (scheduled tasks) checks the active sales channels.
 - A decorator on a core service where an event would do is a finding.
 
 ---
