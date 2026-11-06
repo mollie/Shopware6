@@ -82,7 +82,7 @@ final class Address implements \JsonSerializable
         $this->streetAndNumber = $this->sanitize($streetAndNumber, self::UNSUPPORTED_ADDRESS_CHARACTERS);
         $this->postalCode = $postalCode;
         $this->city = $this->sanitize($city, self::UNSUPPORTED_ADDRESS_CHARACTERS);
-        $this->country = $country;
+        $this->country = strtoupper(trim($country));
     }
 
     public static function fromAddress(CustomerEntity $customer, OrderAddressEntity $orderAddress): self

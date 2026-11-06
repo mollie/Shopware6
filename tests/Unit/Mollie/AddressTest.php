@@ -124,6 +124,13 @@ final class AddressTest extends TestCase
         $this->assertSame($expected, $address->jsonSerialize());
     }
 
+    public function testCountryCodeIsUppercased(): void
+    {
+        $address = new Address('fake@unit.test', '', 'Tester', 'Test', 'Test Street', '12345', 'Test City', ' de ');
+
+        $this->assertSame('DE', $address->getCountry());
+    }
+
     public function testJsonSerializeDropsWhitespaceOnlyOptionalFields(): void
     {
         $address = new Address('fake@unit.test', 'Not specified', 'Tester', 'Test', 'Test Street', '12345', 'Test City', 'DE');
