@@ -188,6 +188,13 @@ final class RouteBuilder implements RouteBuilderInterface
         return $this->router->generate('frontend.account.edit-order.page', ['orderId' => $orderId], RouterInterface::ABSOLUTE_URL);
     }
 
+    public function getFinalizeUrl(string $paymentToken): string
+    {
+        $url = $this->router->generate('payment.finalize.transaction', ['_sw_payment_token' => $paymentToken], RouterInterface::ABSOLUTE_URL);
+
+        return $this->normalizeUrl($url);
+    }
+
     public function getPosCheckoutUrl(Payment $payment,string $transactionId, string $orderNumber): string
     {
         $parameters = [

@@ -6,22 +6,22 @@ namespace Mollie\Shopware\Component\Payment\ExpressComponents\Route;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Payment\Action\Finalize;
-use Mollie\Shopware\Component\Payment\Action\FinalizeInterface;
+use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentEntity;
 use Mollie\Shopware\Component\Payment\ExpressComponents\ExpressComponentsException;
+use Mollie\Shopware\Component\Payment\ExpressComponents\PaymentFinalizer;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionPaymentRepository;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionPaymentRepositoryInterface;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
+use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
-use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
+use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -32,13 +32,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Mollie calls the webhook of a session payment with the payment id only. Once the shopper is back
- * and the order transaction exists, the payment is attached to it, its webhook is moved to the
- * transaction and the regular finalize runs, so from then on it is an ordinary Shopware payment.
+ * and the order transaction exists, the payment is attached to it and its webhook is moved to the
+ * transaction. The finalize is left to Shopware, which the waiting shopper is sent through.
  */
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
 final class SessionWebhookRoute extends AbstractSessionWebhookRoute
 {
+    private const SHOPPER_WAIT_MARGIN_SECONDS = 2;
+
     public function __construct(
         #[Autowire(service: SessionPaymentRepository::class)]
         private readonly SessionPaymentRepositoryInterface $sessionPaymentRepository,
@@ -49,8 +51,8 @@ final class SessionWebhookRoute extends AbstractSessionWebhookRoute
         #[Autowire(service: PayloadBuilder::class)]
         private readonly PayloadBuilderInterface $payloadBuilder,
         private readonly PaymentHandlerLocator $paymentHandlerLocator,
-        #[Autowire(service: Finalize::class)]
-        private readonly FinalizeInterface $finalize,
+        #[Autowire(service: WebhookRoute::class)]
+        private readonly AbstractWebhookRoute $webhookRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -104,14 +106,29 @@ final class SessionWebhookRoute extends AbstractSessionWebhookRoute
         $this->updatePayment($transactionData, $paymentHandler, $payment, $context);
         $this->logger->info('Express components payment attached to the order transaction', $logData);
 
-        try {
-            $this->finalize->execute($paymentHandler, new MollieTransactionStruct($transactionId, ''), $context);
-        } catch (PaymentException $exception) {
-            $logData['error'] = $exception->getMessage();
-            $this->logger->info('Express components payment finalized as not successful', $logData);
+        if ($this->hasShopperStoppedWaiting($sessionPayment)) {
+            $this->logger->info('Express components shopper stopped waiting for the payment, the webhook sets the status', $logData);
+            $this->webhookRoute->notify($transactionId, $context);
         }
 
         return new WebhookResponse($payment);
+    }
+
+    /**
+     * The finish holds the shopper back for a while after the transaction was assigned and then
+     * runs the Shopware finalize, which sets the status. A webhook arriving later finds nobody
+     * waiting anymore. The margin keeps a webhook close to the end from being missed by both.
+     */
+    private function hasShopperStoppedWaiting(SessionPaymentEntity $sessionPayment): bool
+    {
+        $assignedAt = $sessionPayment->getUpdatedAt() ?? $sessionPayment->getCreatedAt();
+        if ($assignedAt === null) {
+            return false;
+        }
+
+        $waitedSeconds = time() - $assignedAt->getTimestamp();
+
+        return $waitedSeconds >= PaymentFinalizer::SHOPPER_WAIT_SECONDS - self::SHOPPER_WAIT_MARGIN_SECONDS;
     }
 
     private function getPaymentHandler(Payment $payment): AbstractMolliePaymentHandler
