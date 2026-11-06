@@ -194,9 +194,9 @@ Feature: Payment
 
     Examples:
       | paymentMethod | molliePaymentMethod | productNumber | quantity | paymentStatus | billingCountry | currency | issuer             |
-      | giftcard      | paypal              | MOL_REGULAR   | 1        | paid          | NL             | EUR      | beautycadeaukaart  |
-      | giftcard      | paypal              | MOL_REGULAR   | 1        | paid          | NL             | EUR      | biercheque         |
-      | giftcard      | paypal              | MOL_REGULAR   | 1        | paid          | NL             | EUR      | bloemencadeaukaart |
+      | giftcard      | eps                 | MOL_REGULAR   | 1        | paid          | NL             | EUR      | beautycadeaukaart  |
+      | giftcard      | eps                 | MOL_REGULAR   | 1        | paid          | NL             | EUR      | biercheque         |
+      | giftcard      | eps                 | MOL_REGULAR   | 1        | paid          | NL             | EUR      | bloemencadeaukaart |
 
 
 
