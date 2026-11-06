@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Component\Payment\ExpressComponents\DAL;
 
+use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionDefinition;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityDefinition;
+use Shopware\Core\Framework\DataAbstractionLayer\Field\FkField;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\PrimaryKey;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\Flag\Required;
 use Shopware\Core\Framework\DataAbstractionLayer\Field\IdField;
@@ -37,7 +39,8 @@ final class SessionPaymentDefinition extends EntityDefinition
             (new IdField('id', 'id'))->addFlags(new Required(), new PrimaryKey()),
             (new StringField('session_id', 'sessionId'))->addFlags(new Required()),
             new StringField('payment_id', 'paymentId'),
-            new IdField('transaction_id', 'transactionId'),
+            // an IdField would get a random id on Shopware 6.5 when no transaction is assigned yet
+            new FkField('transaction_id', 'transactionId', OrderTransactionDefinition::class),
         ]);
     }
 }
