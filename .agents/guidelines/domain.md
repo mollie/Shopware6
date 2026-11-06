@@ -457,6 +457,16 @@ straight to the `redirectUrl`, and the finish route sends the shopper back to th
 renders the same session again: an endless reload. So a stored session is only reused while its
 status is `open`.
 
+## Express sessions: the return knows no payment id, a failure has no return
+
+The payment id of an express-components session arrives only with the session webhook, and that
+webhook comes sometimes before, sometimes after the shopper is redirected back. The redirect itself
+carries no payment id. A failed payment is never redirected to the return url at all: the express
+tab closes and the shopper sees a red error on the page they came from. So the return only has to
+handle the paid path, and anything that needs payment id and transaction id together (writing the
+payment extension, the Shopware finalize) can only start once both are known — whichever request
+arrives second.
+
 ## The cart of the page is not the cart of the CartService
 
 `StorefrontCartFacade::get()` is what a storefront page renders. When the cart carries a blocked

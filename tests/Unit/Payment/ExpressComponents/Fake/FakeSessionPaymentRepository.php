@@ -15,6 +15,14 @@ final class FakeSessionPaymentRepository implements SessionPaymentRepositoryInte
     /** @var array<string> */
     private array $deletedTransactionIds = [];
 
+    private int $deleteExpiredCalls = 0;
+
+    private ?string $paymentIdArrivingWhileWaiting = null;
+
+    private bool $waitedInVain = false;
+
+    private bool $shopperStoppedWaiting = false;
+
     public function __construct(SessionPaymentEntity ...$entries)
     {
         foreach ($entries as $entry) {
@@ -66,6 +74,46 @@ final class FakeSessionPaymentRepository implements SessionPaymentRepositoryInte
         return self::entry($entry->getId(), $entry->getSessionId(), $entry->getPaymentId(), $transactionId);
     }
 
+    /**
+     * Without a payment id arriving the wait runs out, as when the webhook does not come in time.
+     */
+    public function getFinishedPayment(SessionPaymentEntity $sessionPayment, Context $context): SessionPaymentEntity
+    {
+        if ((string) $sessionPayment->getPaymentId() !== '') {
+            return $sessionPayment;
+        }
+
+        if ($this->paymentIdArrivingWhileWaiting === null) {
+            $this->waitedInVain = true;
+
+            return $sessionPayment;
+        }
+
+        $this->assignPayment($sessionPayment->getId(), $this->paymentIdArrivingWhileWaiting, $context);
+
+        return $this->findById($sessionPayment->getId(), $context) ?? $sessionPayment;
+    }
+
+    public function hasShopperStoppedWaiting(string $webhookId, Context $context): bool
+    {
+        return $this->shopperStoppedWaiting;
+    }
+
+    public function letPaymentIdArriveWhileWaiting(string $paymentId): void
+    {
+        $this->paymentIdArrivingWhileWaiting = $paymentId;
+    }
+
+    public function letShopperStopWaiting(): void
+    {
+        $this->shopperStoppedWaiting = true;
+    }
+
+    public function hasWaitedInVain(): bool
+    {
+        return $this->waitedInVain;
+    }
+
     public function deleteByTransactionId(string $transactionId, Context $context): void
     {
         $this->deletedTransactionIds[] = $transactionId;
@@ -73,7 +121,14 @@ final class FakeSessionPaymentRepository implements SessionPaymentRepositoryInte
 
     public function deleteExpired(\DateTimeImmutable $now, Context $context): int
     {
+        ++$this->deleteExpiredCalls;
+
         return 0;
+    }
+
+    public function getDeleteExpiredCalls(): int
+    {
+        return $this->deleteExpiredCalls;
     }
 
     /**

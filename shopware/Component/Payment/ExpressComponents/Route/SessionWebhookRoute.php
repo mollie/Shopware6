@@ -6,8 +6,6 @@ namespace Mollie\Shopware\Component\Payment\ExpressComponents\Route;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGatewayInterface;
 use Mollie\Shopware\Component\Mollie\Payment;
-use Mollie\Shopware\Component\Payment\Action\Finalize;
-use Mollie\Shopware\Component\Payment\Action\FinalizeInterface;
 use Mollie\Shopware\Component\Payment\ExpressComponents\ExpressComponentsException;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionPaymentRepository;
 use Mollie\Shopware\Component\Payment\ExpressComponents\SessionPaymentRepositoryInterface;
@@ -15,13 +13,13 @@ use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
+use Mollie\Shopware\Component\Payment\Route\AbstractWebhookRoute;
 use Mollie\Shopware\Component\Payment\Route\WebhookResponse;
-use Mollie\Shopware\Component\Payment\Transaction\MollieTransactionStruct;
+use Mollie\Shopware\Component\Payment\Route\WebhookRoute;
 use Mollie\Shopware\Component\Transaction\TransactionDataStruct;
 use Mollie\Shopware\Component\Transaction\TransactionService;
 use Mollie\Shopware\Component\Transaction\TransactionServiceInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Payment\PaymentException;
 use Shopware\Core\Framework\Context;
 use Shopware\Core\Framework\Plugin\Exception\DecorationPatternException;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
@@ -32,8 +30,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Mollie calls the webhook of a session payment with the payment id only. Once the shopper is back
- * and the order transaction exists, the payment is attached to it, its webhook is moved to the
- * transaction and the regular finalize runs, so from then on it is an ordinary Shopware payment.
+ * and the order transaction exists, the payment is attached to it and its webhook is moved to the
+ * transaction. The finalize is left to Shopware, which the waiting shopper is sent through.
  */
 #[AsController]
 #[Route(defaults: ['_routeScope' => ['api'], 'auth_required' => false, 'auth_enabled' => false])]
@@ -49,8 +47,8 @@ final class SessionWebhookRoute extends AbstractSessionWebhookRoute
         #[Autowire(service: PayloadBuilder::class)]
         private readonly PayloadBuilderInterface $payloadBuilder,
         private readonly PaymentHandlerLocator $paymentHandlerLocator,
-        #[Autowire(service: Finalize::class)]
-        private readonly FinalizeInterface $finalize,
+        #[Autowire(service: WebhookRoute::class)]
+        private readonly AbstractWebhookRoute $webhookRoute,
         #[Autowire(service: 'monolog.logger.mollie')]
         private readonly LoggerInterface $logger,
     ) {
@@ -82,6 +80,8 @@ final class SessionWebhookRoute extends AbstractSessionWebhookRoute
         if ($storedPaymentId !== null && $storedPaymentId !== $paymentId) {
             $this->logger->warning('Express components session received a second payment id', $logData + ['storedPaymentId' => $storedPaymentId]);
         }
+        // read before the payment is stored, storing it moves the update time
+        $shopperStoppedWaiting = $sessionPayment->getTransactionId() !== null && $this->sessionPaymentRepository->hasShopperStoppedWaiting($webhookId, $context);
         $this->sessionPaymentRepository->assignPayment($webhookId, $paymentId, $context);
 
         $transactionId = $sessionPayment->getTransactionId();
@@ -104,11 +104,9 @@ final class SessionWebhookRoute extends AbstractSessionWebhookRoute
         $this->updatePayment($transactionData, $paymentHandler, $payment, $context);
         $this->logger->info('Express components payment attached to the order transaction', $logData);
 
-        try {
-            $this->finalize->execute($paymentHandler, new MollieTransactionStruct($transactionId, ''), $context);
-        } catch (PaymentException $exception) {
-            $logData['error'] = $exception->getMessage();
-            $this->logger->info('Express components payment finalized as not successful', $logData);
+        if ($shopperStoppedWaiting) {
+            $this->logger->info('Express components shopper stopped waiting for the payment, the webhook sets the status', $logData);
+            $this->webhookRoute->notify($transactionId, $context);
         }
 
         return new WebhookResponse($payment);

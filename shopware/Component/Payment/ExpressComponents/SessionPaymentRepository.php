@@ -31,6 +31,16 @@ final class SessionPaymentRepository implements SessionPaymentRepositoryInterfac
 
     private const DELETE_BATCH_SIZE = 500;
 
+    private const SHOPPER_WAIT_SECONDS = 20;
+
+    private const PAYMENT_ID_CHECK_INTERVAL_SECONDS = 1;
+
+    /**
+     * A webhook arriving shortly before the shopper stops waiting may be missed by the last check,
+     * so the shopper counts as gone a little earlier. At worst both set the status.
+     */
+    private const SHOPPER_WAIT_MARGIN_SECONDS = 2;
+
     /**
      * @param EntityRepository<SessionPaymentCollection> $repository
      */
@@ -73,6 +83,34 @@ final class SessionPaymentRepository implements SessionPaymentRepositoryInterfac
         $entry->setTransactionId($transactionId);
 
         return $entry;
+    }
+
+    public function getFinishedPayment(SessionPaymentEntity $sessionPayment, Context $context): SessionPaymentEntity
+    {
+        $waited = 0;
+        while ((string) $sessionPayment->getPaymentId() === '' && $waited < self::SHOPPER_WAIT_SECONDS) {
+            sleep(self::PAYMENT_ID_CHECK_INTERVAL_SECONDS);
+            $waited += self::PAYMENT_ID_CHECK_INTERVAL_SECONDS;
+            $sessionPayment = $this->findById($sessionPayment->getId(), $context) ?? $sessionPayment;
+        }
+
+        return $sessionPayment;
+    }
+
+    public function hasShopperStoppedWaiting(string $webhookId, Context $context): bool
+    {
+        if (! Uuid::isValid($webhookId)) {
+            return false;
+        }
+
+        $seconds = self::SHOPPER_WAIT_SECONDS - self::SHOPPER_WAIT_MARGIN_SECONDS;
+        $assignedBefore = (new \DateTimeImmutable())->modify('-' . $seconds . ' seconds')->format(Defaults::STORAGE_DATE_TIME_FORMAT);
+
+        $criteria = new Criteria([$webhookId]);
+        $criteria->addFilter(new NotFilter(NotFilter::CONNECTION_AND, [new EqualsFilter('transactionId', null)]));
+        $criteria->addFilter(new RangeFilter('updatedAt', [RangeFilter::LTE => $assignedBefore]));
+
+        return $this->repository->searchIds($criteria, $context)->getTotal() > 0;
     }
 
     public function deleteByTransactionId(string $transactionId, Context $context): void

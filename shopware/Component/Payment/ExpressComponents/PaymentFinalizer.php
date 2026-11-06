@@ -4,19 +4,16 @@ declare(strict_types=1);
 namespace Mollie\Shopware\Component\Payment\ExpressComponents;
 
 use Mollie\Shopware\Component\Mollie\Session;
-use Mollie\Shopware\Component\Payment\ExpressComponents\DAL\SessionPaymentEntity;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\AbstractSessionWebhookRoute;
 use Mollie\Shopware\Component\Payment\ExpressComponents\Route\SessionWebhookRoute;
 use Mollie\Shopware\Component\Router\RouteBuilder;
 use Mollie\Shopware\Component\Router\RouteBuilderInterface;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEntity;
-use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionStates;
 use Shopware\Core\Checkout\Order\OrderEntity;
-use Shopware\Core\Framework\Context;
-use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
-use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Checkout\Payment\Cart\Token\JWTFactoryV2;
+use Shopware\Core\Checkout\Payment\Cart\Token\TokenFactoryInterfaceV2;
+use Shopware\Core\Checkout\Payment\Cart\Token\TokenStruct;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,36 +21,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * The payment of a session is only known once Mollie calls the session webhook, which may happen
- * before or after the shopper returns. The finish therefore only remembers the transaction of the
- * order, the session webhook attaches the payment to it. The shopper is held back until the
- * webhook set the payment status, so the right page is shown.
+ * before or after the shopper returns. The shopper is held back until the payment id is there,
+ * then sent through the Shopware finalize, which decides between finish and error page.
  */
 final class PaymentFinalizer implements PaymentFinalizerInterface
 {
-    private const STATUS_MAX_CHECKS = 20;
-
-    private const STATUS_CHECK_INTERVAL_MICROSECONDS = 1000000;
-
-    private const PENDING_STATES = [
-        OrderTransactionStates::STATE_OPEN,
-        OrderTransactionStates::STATE_UNCONFIRMED,
-    ];
-
-    private const FAILED_STATES = [
-        OrderTransactionStates::STATE_FAILED,
-        OrderTransactionStates::STATE_CANCELLED,
-    ];
-
-    /**
-     * @param EntityRepository<OrderTransactionCollection> $orderTransactionRepository
-     */
     public function __construct(
         #[Autowire(service: SessionPaymentRepository::class)]
         private SessionPaymentRepositoryInterface $sessionPaymentRepository,
-        #[Autowire(service: 'order_transaction.repository')]
-        private EntityRepository $orderTransactionRepository,
         #[Autowire(service: SessionWebhookRoute::class)]
         private AbstractSessionWebhookRoute $sessionWebhookRoute,
+        /** @phpstan-ignore classConstant.deprecatedClass, parameter.deprecatedInterface */
+        #[Autowire(service: JWTFactoryV2::class)]
+        private TokenFactoryInterfaceV2 $tokenFactory,
         #[Autowire(service: RouteBuilder::class)]
         private RouteBuilderInterface $routeBuilder,
         private RequestStack $requestStack,
@@ -78,81 +58,58 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
             'transactionId' => $transaction->getId(),
         ];
 
+        $finishUrls = $this->getFinishUrls();
         $context = $salesChannelContext->getContext();
         $sessionPayment = $this->sessionPaymentRepository->assignTransaction($session->getId(), $transaction->getId(), $context);
         if ($sessionPayment === null) {
             $this->logger->warning('Express components session has no session payment entry', $logData);
+
+            return $this->getFinishUrl($finishUrls, $orderId);
         }
 
-        if ($sessionPayment instanceof SessionPaymentEntity) {
-            $this->processEarlyWebhook($sessionPayment, $context, $logData);
-        }
-
-        $finishUrls = $this->getFinishUrls();
-        $state = $this->waitForPaymentStatus($transaction->getId(), $context);
-        $logData['paymentStatus'] = $state;
-
-        if (in_array($state, self::FAILED_STATES, true)) {
-            $this->logger->info('Express components payment failed, shopper is sent to the edit order page', $logData);
-
-            return $this->getErrorUrl($finishUrls, $orderId);
-        }
-
-        $this->logger->info('Express components checkout finished', $logData);
-
-        return $this->getFinishUrl($finishUrls, $orderId);
-    }
-
-    /**
-     * Mollie usually calls the session webhook before the shopper is back, it is answered with a
-     * conflict then and only repeated about a minute later. The stored payment id is therefore
-     * processed right away, as if the webhook had just arrived.
-     *
-     * @param array<mixed> $logData
-     */
-    private function processEarlyWebhook(SessionPaymentEntity $sessionPayment, Context $context, array $logData): void
-    {
+        $sessionPayment = $this->sessionPaymentRepository->getFinishedPayment($sessionPayment, $context);
         $paymentId = (string) $sessionPayment->getPaymentId();
         if ($paymentId === '') {
-            return;
-        }
+            $this->logger->info('Express components webhook did not arrive in time, the webhook sets the status later', $logData);
 
+            return $this->getFinishUrl($finishUrls, $orderId);
+        }
+        $logData['paymentId'] = $paymentId;
+
+        // the webhook may still be attaching the payment in its own request, so it is attached here
+        // as well before the finalize reads it from the transaction
         $webhookRequest = new Request([], ['id' => $paymentId]);
         try {
             $this->sessionWebhookRoute->notify($sessionPayment->getId(), $webhookRequest, $context);
         } catch (\Throwable $exception) {
-            $logData['paymentId'] = $paymentId;
             $logData['error'] = $exception->getMessage();
-            $this->logger->error('Express components session webhook could not be processed during the finish', $logData);
+            $this->logger->error('Express components payment could not be attached during the finish', $logData);
+
+            return $this->getFinishUrl($finishUrls, $orderId);
         }
+
+        $this->logger->info('Express components checkout continues with the Shopware finalize', $logData);
+
+        return $this->getFinalizeUrl($transaction, $finishUrls, $orderId);
     }
 
-    /**
-     * The status is set by the webhook in another request. Should it not arrive in time, the order
-     * page is shown anyway and the webhook corrects the status later.
-     */
-    private function waitForPaymentStatus(string $transactionId, Context $context): string
+    private function getFinalizeUrl(OrderTransactionEntity $transaction, FinishUrls $finishUrls, string $orderId): string
     {
-        $state = $this->loadPaymentStatus($transactionId, $context);
-        for ($i = 1; $i < self::STATUS_MAX_CHECKS && in_array($state, self::PENDING_STATES, true); ++$i) {
-            usleep(self::STATUS_CHECK_INTERVAL_MICROSECONDS);
-            $state = $this->loadPaymentStatus($transactionId, $context);
-        }
+        /** @phpstan-ignore method.deprecatedClass, new.deprecatedClass */
+        $tokenStruct = new TokenStruct(
+            null,
+            null,
+            $transaction->getPaymentMethodId(),
+            $transaction->getId(),
+            $this->getFinishUrl($finishUrls, $orderId),
+            null,
+            $this->getErrorUrl($finishUrls, $orderId),
+        );
 
-        return $state;
-    }
+        /** @phpstan-ignore method.deprecatedInterface */
+        $token = $this->tokenFactory->generateToken($tokenStruct);
 
-    private function loadPaymentStatus(string $transactionId, Context $context): string
-    {
-        $criteria = new Criteria([$transactionId]);
-        $criteria->addAssociation('stateMachineState');
-
-        $transaction = $this->orderTransactionRepository->search($criteria, $context)->getEntities()->first();
-        if (! $transaction instanceof OrderTransactionEntity) {
-            return '';
-        }
-
-        return (string) $transaction->getStateMachineState()?->getTechnicalName();
+        return $this->routeBuilder->getFinalizeUrl($token);
     }
 
     /**

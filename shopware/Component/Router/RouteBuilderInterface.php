@@ -27,6 +27,8 @@ interface RouteBuilderInterface
 
     public function getEditOrderUrl(string $orderId): string;
 
+    public function getFinalizeUrl(string $paymentToken): string;
+
     public function getSubscriptionWebhookUrl(string $subscriptionId): string;
 
     public function getSessionWebhookUrl(string $webhookId): string;

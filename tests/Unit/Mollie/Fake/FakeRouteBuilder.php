@@ -74,6 +74,11 @@ final class FakeRouteBuilder implements RouteBuilderInterface
         return $this->editOrderUrl;
     }
 
+    public function getFinalizeUrl(string $paymentToken): string
+    {
+        return 'https://shop.test/payment/finalize-transaction?_sw_payment_token=' . $paymentToken;
+    }
+
     public function getSubscriptionWebhookUrl(string $subscriptionId): string
     {
         return $this->subscriptionWebhookUrl;
