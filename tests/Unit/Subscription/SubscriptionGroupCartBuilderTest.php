@@ -103,16 +103,16 @@ final class SubscriptionGroupCartBuilderTest extends TestCase
     }
 
     /**
-     * The renewal cart must not overwrite the customer's live cart in the database.
+     * The renewal cart is persisted like in the storefront, so the context must not skip the cart persistence.
      */
-    public function testTheRenewalCartIsNotPersisted(): void
+    public function testTheRenewalCartIsPersistedLikeInTheStorefront(): void
     {
         $order = $this->order([$this->subscriptionLineItem('line-1', 'product-1', 1, new Interval(1, IntervalUnit::MONTHS))]);
 
         $this->builder()->buildGroupCart($order, self::MONTHLY, Context::createDefaultContext());
 
         $permissions = $this->orderConverter->getLastOverrideOptions()[SalesChannelContextService::PERMISSIONS];
-        $this->assertTrue($permissions['skipCartPersistence']);
+        $this->assertArrayNotHasKey('skipCartPersistence', $permissions);
     }
 
     /**

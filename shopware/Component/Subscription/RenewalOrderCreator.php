@@ -56,11 +56,21 @@ final class RenewalOrderCreator
             throw RenewException::invalidPaymentId($subscriptionId, (string) $molliePayment->getId());
         }
 
-        $orderResponse = $this->cartOrderRoute->order(
-            $groupCart->getCart(),
-            $groupCart->getSalesChannelContext(),
-            (new DataBag())->toRequestDataBag()
-        );
+        try {
+            $orderResponse = $this->cartOrderRoute->order(
+                $groupCart->getCart(),
+                $groupCart->getSalesChannelContext(),
+                (new DataBag())->toRequestDataBag()
+            );
+        } catch (\Throwable $exception) {
+            $this->logger->error('Renewal order could not be placed', [
+                'subscriptionId' => $subscriptionId,
+                'intervalKey' => $intervalKey,
+                'error' => $exception->getMessage(),
+            ] + $this->describeGroupCart($groupCart));
+
+            throw $exception;
+        }
 
         $newOrder = $orderResponse->getOrder();
         $transaction = $newOrder->getTransactions()?->first();
@@ -115,6 +125,49 @@ final class RenewalOrderCreator
         $this->logger->info('Subscription renewal is linked to an existing order', $logData);
 
         return $this->linkTransaction($order, $transaction, $molliePayment, $context);
+    }
+
+    /**
+     * @return array<string, array<string>|bool|string>
+     */
+    private function describeGroupCart(SubscriptionGroupCart $groupCart): array
+    {
+        $cart = $groupCart->getCart();
+        $context = $groupCart->getSalesChannelContext();
+        $shippingMethod = $context->getShippingMethod();
+        $availabilityRuleId = (string) $shippingMethod->getAvailabilityRuleId();
+        $ruleIds = array_values($context->getRuleIds());
+
+        $deliveryShippingMethodIds = [];
+        foreach ($cart->getDeliveries() as $delivery) {
+            $deliveryShippingMethodIds[] = $delivery->getShippingMethod()->getId();
+        }
+
+        $lineItems = [];
+        foreach ($cart->getLineItems() as $lineItem) {
+            $lineItems[] = $lineItem->getType() . ':' . $lineItem->getId();
+        }
+
+        $errors = [];
+        foreach ($cart->getErrors() as $error) {
+            $errors[] = $error->getId() . ' (level ' . $error->getLevel() . ')';
+        }
+
+        return [
+            'salesChannelId' => $context->getSalesChannelId(),
+            'currencyId' => $context->getCurrencyId(),
+            'customerGroupId' => $context->getCurrentCustomerGroup()->getId(),
+            'paymentMethodId' => $context->getPaymentMethod()->getId(),
+            'shippingMethodId' => $shippingMethod->getId(),
+            'shippingMethodTechnicalName' => (string) $shippingMethod->getTechnicalName(),
+            'shippingMethodAvailabilityRuleId' => $availabilityRuleId,
+            'shippingMethodRuleMatched' => $availabilityRuleId === '' || in_array($availabilityRuleId, $ruleIds, true),
+            'shippingCountry' => (string) $context->getShippingLocation()->getCountry()->getIso(),
+            'contextRuleIds' => $ruleIds,
+            'cartDeliveryShippingMethodIds' => $deliveryShippingMethodIds,
+            'cartLineItems' => $lineItems,
+            'cartErrors' => $errors,
+        ];
     }
 
     private function linkTransaction(OrderEntity $order, OrderTransactionEntity $transaction, Payment $molliePayment, Context $context): OrderTransactionEntity
