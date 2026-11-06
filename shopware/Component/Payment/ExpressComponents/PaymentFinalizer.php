@@ -26,15 +26,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 final class PaymentFinalizer implements PaymentFinalizerInterface
 {
-    /**
-     * @phpstan-ignore parameter.deprecatedInterface
-     */
     public function __construct(
         #[Autowire(service: SessionPaymentRepository::class)]
         private SessionPaymentRepositoryInterface $sessionPaymentRepository,
         #[Autowire(service: SessionWebhookRoute::class)]
         private AbstractSessionWebhookRoute $sessionWebhookRoute,
-        /** @phpstan-ignore classConstant.deprecatedClass */
+        /** @phpstan-ignore classConstant.deprecatedClass, parameter.deprecatedInterface */
         #[Autowire(service: JWTFactoryV2::class)]
         private TokenFactoryInterfaceV2 $tokenFactory,
         #[Autowire(service: RouteBuilder::class)]
@@ -97,7 +94,7 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
 
     private function getFinalizeUrl(OrderTransactionEntity $transaction, FinishUrls $finishUrls, string $orderId): string
     {
-        /** @phpstan-ignore new.deprecatedClass */
+        /** @phpstan-ignore method.deprecatedClass, new.deprecatedClass */
         $tokenStruct = new TokenStruct(
             null,
             null,
