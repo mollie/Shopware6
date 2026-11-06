@@ -78,8 +78,9 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
 
         // the webhook may still be attaching the payment in its own request, so it is attached here
         // as well before the finalize reads it from the transaction
+        $webhookRequest = new Request([], ['id' => $paymentId]);
         try {
-            $this->sessionWebhookRoute->notify($sessionPayment->getId(), new Request([], ['id' => $paymentId]), $context);
+            $this->sessionWebhookRoute->notify($sessionPayment->getId(), $webhookRequest, $context);
         } catch (\Throwable $exception) {
             $logData['error'] = $exception->getMessage();
             $this->logger->error('Express components payment could not be attached during the finish', $logData);
