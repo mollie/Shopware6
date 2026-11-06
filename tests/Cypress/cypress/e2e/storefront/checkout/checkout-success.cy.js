@@ -185,7 +185,7 @@ context("Checkout Tests", () => {
                         // to pay the rest of the total amount
                         mollieVoucher.selectMonizze();
                         molliePayment.selectPaid();
-                        molliePaymentMethods.selectPaypal();
+                        molliePaymentMethods.selectEPS();
                         molliePayment.selectPaid();
                     } else if (payment.key === 'ideal') {
                         idealScreen.selectING();
@@ -194,7 +194,7 @@ context("Checkout Tests", () => {
 
                         mollieGiftCards.selectBeautyCards();
                         molliePayment.selectPaid();
-                        molliePaymentMethods.selectPaypal();
+                        molliePaymentMethods.selectEPS();
                         molliePayment.selectPaid();
 
                     } else if (payment.key === 'credit-card') {

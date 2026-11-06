@@ -94,6 +94,10 @@ function openPaymentLink(orderId) {
     mollieCheckout.continueToCheckout();
 }
 
+function selectWero() {
+    cy.contains('Wero').click();
+}
+
 function visitPayUrl(orderId) {
     shopware.prepareDomainChange();
 
@@ -117,12 +121,11 @@ context("Payment Link", () => {
             adminLogin.login();
 
             // create an order for the customer the same way an admin would
-            createOrder.createOrder('cypress@mollie.com', 'MOL_REGULAR', 'PayPal', 'Mollie Test Shipment').then((orderId) => {
+            createOrder.createOrder('cypress@mollie.com', 'MOL_REGULAR', 'Wero', 'Mollie Test Shipment').then((orderId) => {
 
                 openPaymentLink(orderId);
 
-                // pay with PayPal on the payment link page
-                molliePaymentMethods.selectPaypal();
+                selectWero();
 
                 mollieSandbox.initSandboxCookie();
                 molliePayment.selectPaid();
@@ -144,7 +147,7 @@ context("Payment Link", () => {
             configurePaymentLink(false);
 
             scenarioDummyBasket.execute();
-            paymentAction.switchPaymentMethod('PayPal');
+            paymentAction.switchPaymentMethod('Wero');
 
             shopware.prepareDomainChange();
             checkout.placeOrderOnConfirm();
@@ -159,7 +162,7 @@ context("Payment Link", () => {
 
                 openPaymentLink(orderId);
 
-                molliePaymentMethods.selectPaypal();
+                selectWero();
                 molliePayment.selectPaid();
 
                 cy.url({timeout: 30000}).should('include', '/checkout/finish');

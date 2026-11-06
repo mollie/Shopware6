@@ -104,7 +104,7 @@ final class SessionPaymentRepository implements SessionPaymentRepositoryInterfac
         }
 
         $seconds = self::SHOPPER_WAIT_SECONDS - self::SHOPPER_WAIT_MARGIN_SECONDS;
-        $assignedBefore = (new \DateTimeImmutable())->modify('-' . $seconds . ' seconds')->format(Defaults::STORAGE_DATE_TIME_FORMAT);
+        $assignedBefore = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->modify('-' . $seconds . ' seconds')->format(Defaults::STORAGE_DATE_TIME_FORMAT);
 
         $criteria = new Criteria([$webhookId]);
         $criteria->addFilter(new NotFilter(NotFilter::CONNECTION_AND, [new EqualsFilter('transactionId', null)]));
@@ -123,6 +123,8 @@ final class SessionPaymentRepository implements SessionPaymentRepositoryInterfac
 
     public function deleteExpired(\DateTimeImmutable $now, Context $context): int
     {
+        // the DAL stores dates in UTC
+        $now = $now->setTimezone(new \DateTimeZone('UTC'));
         $unpaidBefore = $now->modify(self::UNPAID_LIFETIME)->format(Defaults::STORAGE_DATE_TIME_FORMAT);
         $paidBefore = $now->modify(self::PAID_LIFETIME)->format(Defaults::STORAGE_DATE_TIME_FORMAT);
 
