@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.9.0
 - Changed: Express Components link the payment to the order as soon as Mollie reports it via webhook.
 - Fixed: Apple Pay Direct on the product page shows the product price again when the cart already contains items.
 - Fixed: Subscription renewals create an order again when Shopware Payments is active in the shop.
