@@ -94,8 +94,10 @@ function openPaymentLink(orderId) {
     mollieCheckout.continueToCheckout();
 }
 
+// Wero is not allowed in a payment link's allowedMethods, so Mollie shows the whole list depending on
+// the visitor's country. There iDEAL can be labelled "iDEAL | Wero", so select by value, not by text.
 function selectWero() {
-    cy.contains('Wero').click();
+    cy.get('button[value="wero"]', {timeout: 30000}).click();
 }
 
 function visitPayUrl(orderId) {
