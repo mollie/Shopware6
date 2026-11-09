@@ -1,6 +1,7 @@
 # Unreleased
 - Geändert: Beim Versand von Bestellungen mit Custom Products werden die Versandkosten mit eingezogen.
 - Behoben: Der Bezahllink einer Wero-Bestellung bietet nur noch Wero an.
+- Behoben: Ein eigenes Logo an einer Mollie-Zahlungsart bleibt beim Plugin-Update und beim Aktualisieren der Zahlungsarten erhalten.
 
 # 5.9.0
 - Geändert: Express Components ordnen die Zahlung der Bestellung zu, sobald Mollie sie per Webhook meldet.
