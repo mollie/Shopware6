@@ -156,10 +156,10 @@ final class ShipmentItemResolver
      *
      * @return list<array{id: string, customFields: array<string, mixed>}>
      */
-    public function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection, CurrencyEntity $currency, string $taxStatus, ?LineItemCollection $mollieLines = null): array
+    public function collectDeliveryUpserts(array $lineUpserts, ShippingItemCollection $shippingItems, OrderDeliveryCollection $deliveryCollection, OrderLineItemCollection $lineItems, CurrencyEntity $currency, string $taxStatus, ?LineItemCollection $mollieLines = null): array
     {
         $deliveryUpserts = [];
-        $targetLineItemIds = array_column($lineUpserts, 'id');
+        $targetLineItemIds = $this->withContainerIds(array_column($lineUpserts, 'id'), $lineItems);
 
         foreach ($deliveryCollection as $delivery) {
             $shippingCosts = $delivery->getShippingCosts();
@@ -308,6 +308,29 @@ final class ShipmentItemResolver
         }
 
         return true;
+    }
+
+    /**
+     * Shopware assigns the delivery position to the top-level line item, so for a container (e.g.
+     * customized-products) it points to the container, which is never shipped itself.
+     *
+     * @param list<string> $lineItemIds
+     *
+     * @return list<string>
+     */
+    public function withContainerIds(array $lineItemIds, OrderLineItemCollection $lineItems): array
+    {
+        $ids = $lineItemIds;
+
+        foreach ($lineItemIds as $lineItemId) {
+            $parentId = $lineItems->get($lineItemId)?->getParentId();
+            while ($parentId !== null && ! in_array($parentId, $ids, true)) {
+                $ids[] = $parentId;
+                $parentId = $lineItems->get($parentId)?->getParentId();
+            }
+        }
+
+        return $ids;
     }
 
     private function findLineItem(OrderLineItemCollection $lineItems, string $idOrProductNumber): ?OrderLineItemEntity

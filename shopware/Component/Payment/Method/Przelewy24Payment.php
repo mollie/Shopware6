@@ -5,8 +5,9 @@ namespace Mollie\Shopware\Component\Payment\Method;
 
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 
-final class Przelewy24Payment extends AbstractMolliePaymentHandler
+final class Przelewy24Payment extends AbstractMolliePaymentHandler implements PaymentLinkAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

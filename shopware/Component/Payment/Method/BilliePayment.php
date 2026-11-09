@@ -8,8 +8,9 @@ use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\AutomaticCaptureAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\BusinessCustomerAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\ManualCaptureModeAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 
-final class BilliePayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface, AutomaticCaptureAwareInterface, BusinessCustomerAwareInterface
+final class BilliePayment extends AbstractMolliePaymentHandler implements ManualCaptureModeAwareInterface, AutomaticCaptureAwareInterface, BusinessCustomerAwareInterface, PaymentLinkAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

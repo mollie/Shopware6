@@ -53,6 +53,7 @@ final class ShippingMethodFixture extends AbstractFixture
             // express checkouts have to be tested with a real card, so shipping costs are kept
             // at a level where a live test does not waste money
             $this->buildShippingMethod('mollie-cheap-shipping-method', 'Mollie Cheap Test Shipment', 'mollie_fixture_cheap_shipment', 0.01),
+            $this->buildShippingMethod('mollie-parcel-shipping-method', 'Mollie Parcel Test Shipment', 'mollie_fixture_parcel_shipment', 5.98),
         ];
 
         $this->shippingMethodRepository->upsert($shippingMethods, $context);
@@ -75,6 +76,7 @@ final class ShippingMethodFixture extends AbstractFixture
         $shippingMethods = [
             ['id' => Uuid::fromStringToHex('mollie-shipping-method')],
             ['id' => Uuid::fromStringToHex('mollie-cheap-shipping-method')],
+            ['id' => Uuid::fromStringToHex('mollie-parcel-shipping-method')],
         ];
         $this->shippingMethodRepository->delete($shippingMethods, $context);
 

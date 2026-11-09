@@ -7,12 +7,13 @@ use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentParameterInterface;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\OrdersApiAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\RecurringAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
-final class PayPalExpressPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, RecurringAwareInterface, OrdersApiAwareInterface
+final class PayPalExpressPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, RecurringAwareInterface, OrdersApiAwareInterface, PaymentLinkAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

@@ -16,6 +16,7 @@ use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentLinkPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentLinkCreatedEvent;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 use Mollie\Shopware\Component\Payment\PayloadBuilder;
 use Mollie\Shopware\Component\Payment\PayloadBuilderInterface;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
@@ -334,7 +335,7 @@ final class PaymentLinkController extends StorefrontController
             // Payment links accept fewer methods than the Payments API in "allowedMethods"; sending
             // an unsupported one makes Mollie reject the whole request, so skip those here.
             $mollieMethod = $extension->getPaymentMethod();
-            if ($mollieMethod->isSupportedForPaymentLink()) {
+            if ($this->isSupportedForPaymentLink($mollieMethod)) {
                 $methods[] = $mollieMethod->value;
             }
         }
@@ -361,7 +362,12 @@ final class PaymentLinkController extends StorefrontController
      */
     private function orderMethodAsAllowedMethods(PaymentMethod $orderPaymentMethod): array
     {
-        return $orderPaymentMethod->isSupportedForPaymentLink() ? [$orderPaymentMethod->value] : [];
+        return $this->isSupportedForPaymentLink($orderPaymentMethod) ? [$orderPaymentMethod->value] : [];
+    }
+
+    private function isSupportedForPaymentLink(PaymentMethod $paymentMethod): bool
+    {
+        return $this->paymentHandlerLocator->findByPaymentMethod($paymentMethod->value) instanceof PaymentLinkAwareInterface;
     }
 
     /**

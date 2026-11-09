@@ -34,10 +34,8 @@ would need. This skill does not cover it.
 Add `case PAY_BY_BANK = 'paybybank';` alphabetically. The value is the API name and also
 drives the technical name and the icon URL — a typo means a silently missing icon.
 
-Add the case to `isSupportedForPaymentLink()` only if payment links were confirmed. The
-`default => false` is deliberate: an unsupported method in `allowedMethods` makes Mollie
-reject the whole payment-link request. Leave `eInvoicePaymentMeansCode()` alone unless it is
-a card (48), bank transfer (58) or direct debit (59).
+Leave `eInvoicePaymentMeansCode()` alone unless it is a card (48), bank transfer (58) or
+direct debit (59).
 
 ### 3. `shopware/Component/Payment/Method/<Name>Payment.php`
 
@@ -57,6 +55,7 @@ Marker interfaces from `Component\Payment\Handler\`, added per answer:
 | subscriptions | `SubscriptionAwareInterface` | keeps `SequenceType::FIRST`. **Without it nothing fails** — the payload drops to `ONEOFF` and the subscription never gets a mandate |
 | stored mandate | `RecurringAwareInterface` | may reuse a mandate and set `SequenceType::RECURRING` |
 | Orders API | `OrdersApiAwareInterface` | `Pay` routes to `executeOrdersApi()` |
+| payment links | `PaymentLinkAwareInterface` | the payment link sends the method in `allowedMethods`, so the customer only gets this method on Mollie. Only add it if the method is listed under `allowedMethods` in the [Mollie payment link API](https://docs.mollie.com/reference/create-payment-link): an unlisted method makes Mollie reject the whole request. Without it the link offers every method of the profile. Every handler of the same Mollie method needs it (PayPal, Klarna have several) |
 
 ### 3a. `AutomaticCaptureAwareInterface` also needs a switch in config.xml
 
@@ -132,7 +131,7 @@ Changelog: one `Hinzugefügt`/`Added` line per file — `changelog` skill.
 ### Expected diff
 
 ```
-shopware/Component/Mollie/PaymentMethod.php         +1 (+1 for payment links)
+shopware/Component/Mollie/PaymentMethod.php         +1
 shopware/Component/Payment/Method/XPayment.php      new, ~20 lines
 tests/Unit/Payment/Method/PaymentMethodsTest.php    +3
 tests/Behat/Features/payment.feature                +1
@@ -163,8 +162,8 @@ Examples: `PayconiqPayment`, `TrustlyPayment`, `DirectDebitPayment`,
   `mollie_payment_method_name` custom field.
 - **Remove** the `tests/Behat/Features/payment.feature` row — a deactivated method cannot
   complete a checkout.
-- **Decide** on `isSupportedForPaymentLink()`. Deprecating does not drop it: `TRUSTLY` is
-  deprecated and still listed. Remove it and say so, or leave it and say so.
+- **Decide** on `PaymentLinkAwareInterface`. Deprecating does not drop it: `TrustlyPayment` is
+  deprecated and still carries it. Remove it and say so, or leave it and say so.
 - Changelog: `Geändert` / `Changed`, e.g. *"Die Zahlungsart X wird nicht mehr angeboten;
   bestehende Bestellungen bleiben unverändert."*
 

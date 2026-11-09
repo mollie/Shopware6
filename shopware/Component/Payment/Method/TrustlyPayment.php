@@ -6,9 +6,10 @@ namespace Mollie\Shopware\Component\Payment\Method;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\DeprecatedMethodAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 
-final class TrustlyPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, DeprecatedMethodAwareInterface
+final class TrustlyPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, DeprecatedMethodAwareInterface, PaymentLinkAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

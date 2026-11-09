@@ -177,7 +177,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
 
         $shippingItems = new ShippingItemCollection();
         $lineUpserts = $this->itemResolver->collectLineItemUpserts($items, $lineItems, $orderId, $shippingItems, $currency, $taxStatus, $mollieLines);
-        $deliveryUpserts = $this->itemResolver->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection, $currency, $taxStatus, $mollieLines);
+        $deliveryUpserts = $this->itemResolver->collectDeliveryUpserts($lineUpserts, $shippingItems, $deliveryCollection, $lineItems, $currency, $taxStatus, $mollieLines);
         $fullyShipped = $this->itemResolver->isFullyShipped($lineItems, $lineUpserts);
 
         $orderShippedEvent->setShippingItems($shippingItems);
@@ -192,7 +192,7 @@ final class ShipOrderRoute extends AbstractShipOrderRoute
         // The Orders API is line-item based and captures on shipment; the Payments API needs an
         // explicit capture. Decide here which one applies and delegate the Mollie call.
         if ($mollieOrderId !== null) {
-            $lineItemIds = array_column($lineUpserts, 'id');
+            $lineItemIds = $this->itemResolver->withContainerIds(array_column($lineUpserts, 'id'), $lineItems);
             $tracking = $this->trackingResolver->resolve($request, $deliveryCollection, $lineItemIds);
             $orderShippedEvent->setTracking($tracking);
 

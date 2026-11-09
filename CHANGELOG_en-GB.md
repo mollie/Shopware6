@@ -1,4 +1,6 @@
 # Unreleased
+- Changed: Shipping orders with Custom Products now also captures the shipping costs.
+- Fixed: The payment link of a Wero order only offers Wero.
 
 # 5.9.0
 - Changed: Express Components link the payment to the order as soon as Mollie reports it via webhook.

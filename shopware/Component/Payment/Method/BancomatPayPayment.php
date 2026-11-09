@@ -6,10 +6,11 @@ namespace Mollie\Shopware\Component\Payment\Method;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentParameterInterface;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
-final class BancomatPayPayment extends AbstractMolliePaymentHandler
+final class BancomatPayPayment extends AbstractMolliePaymentHandler implements PaymentLinkAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {
