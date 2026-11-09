@@ -8,7 +8,7 @@ import CheckoutAction from 'Actions/storefront/checkout/CheckoutAction';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import VoucherScreenAction from "cypress-mollie/src/actions/screens/VoucherScreen";
 import PaymentMethodsScreenAction from "cypress-mollie/src/actions/screens/PaymentListScreen";
 import KBCScreen from "cypress-mollie/src/actions/screens/KBCScreen";

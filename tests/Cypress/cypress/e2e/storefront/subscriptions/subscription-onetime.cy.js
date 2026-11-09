@@ -12,7 +12,7 @@ import PDPAction from "Actions/storefront/products/PDPAction";
 import MollieProductsAction from "Actions/storefront/products/MollieProductsAction";
 import DummyUserScenario from "Scenarios/DummyUserScenario";
 // ------------------------------------------------------
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import CreditCardScreenAction from "../../../support/actions/mollie/screens/CreditCartScreen";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";

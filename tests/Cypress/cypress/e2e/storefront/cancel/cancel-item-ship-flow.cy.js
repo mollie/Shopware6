@@ -1,6 +1,6 @@
 import DummyBasketScenario from 'Scenarios/DummyBasketScenario';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
@@ -92,8 +92,8 @@ context('Cancel item + shipping flow', () => {
             repoOrderDetails.getOrderDetailsGeneralTab().click();
             cy.reload();
 
-            repoOrderDetails.getDeliveryStatusTop().should('contain.text', 'Shipped (partially)', {timeout: 10000});
-            repoOrderDetails.getPaymentStatusTop().should('contain.text', 'Paid', {timeout: 10000});
+            repoOrderDetails.assertDeliveryStatusTop('Shipped (partially)', {timeout: 10000});
+            repoOrderDetails.assertPaymentStatusTop('Paid', {timeout: 10000});
         });
 
 
@@ -131,8 +131,8 @@ context('Cancel item + shipping flow', () => {
             repoOrderDetails.getOrderDetailsGeneralTab().click();
             cy.reload();
 
-            repoOrderDetails.getDeliveryStatusTop().should('contain.text', 'Shipped (partially)', {timeout: 10000});
-            repoOrderDetails.getPaymentStatusTop().should('contain.text', 'Paid', {timeout: 10000});
+            repoOrderDetails.assertDeliveryStatusTop('Shipped (partially)', {timeout: 10000});
+            repoOrderDetails.assertPaymentStatusTop('Paid', {timeout: 10000});
         });
 
     });
@@ -162,6 +162,6 @@ function assertDeliveryStatus(statusLabel) {
     cy.contains('The order has been successfully shipped.', {timeout: 20000});
     repoOrderDetails.getOrderDetailsGeneralTab().click();
     cy.reload();
-    repoOrderDetails.getDeliveryStatusTop().should('contain.text', statusLabel, {timeout: 6000});
+    repoOrderDetails.assertDeliveryStatusTop(statusLabel, {timeout: 6000});
     adminOrders.openMollieTab();
 }

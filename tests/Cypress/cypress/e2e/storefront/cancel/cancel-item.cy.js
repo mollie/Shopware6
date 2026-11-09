@@ -1,6 +1,6 @@
 import DummyBasketScenario from 'Scenarios/DummyBasketScenario';
 import PaymentAction from "Actions/storefront/checkout/PaymentAction";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import CheckoutAction from "Actions/storefront/checkout/CheckoutAction";
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
