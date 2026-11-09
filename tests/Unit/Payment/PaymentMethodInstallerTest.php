@@ -164,6 +164,24 @@ final class PaymentMethodInstallerTest extends TestCase
         $this->assertSame('iDEAL', $upserted[0]['name']);
     }
 
+    public function testTheLogoAMerchantChoseIsNotOverwrittenOnReinstall(): void
+    {
+        $existing = $this->existingPaymentMethod(FakePaymentMethodHandler::class, 'iDEAL', true, 'merchant-logo');
+
+        $upserted = $this->install([new FakePaymentMethodHandler(PaymentMethod::IDEAL, 'iDEAL')], existingMethods: [$existing]);
+
+        $this->assertSame('merchant-logo', $upserted[0]['mediaId']);
+    }
+
+    public function testAnExistingMethodWithoutLogoGetsTheMollieIcon(): void
+    {
+        $existing = $this->existingPaymentMethod(FakePaymentMethodHandler::class, 'iDEAL', true);
+
+        $upserted = $this->install([new FakePaymentMethodHandler(PaymentMethod::IDEAL, 'iDEAL')], existingMethods: [$existing]);
+
+        $this->assertSame('media-1', $upserted[0]['mediaId']);
+    }
+
     public function testAnAlreadyKnownIconIsReusedInsteadOfDownloadedAgain(): void
     {
         $media = new MediaEntity();
@@ -273,7 +291,7 @@ final class PaymentMethodInstallerTest extends TestCase
         return new PayPalExpressPayment(new FakePay(), new FakeFinalize(), $this->logger);
     }
 
-    private function existingPaymentMethod(string $handlerIdentifier, string $name, bool $active): PaymentMethodEntity
+    private function existingPaymentMethod(string $handlerIdentifier, string $name, bool $active, ?string $mediaId = null): PaymentMethodEntity
     {
         $paymentMethod = new PaymentMethodEntity();
         $paymentMethod->setId('existing-payment-method');
@@ -282,6 +300,9 @@ final class PaymentMethodInstallerTest extends TestCase
         $paymentMethod->setActive($active);
         $paymentMethod->setAfterOrderEnabled(true);
         $paymentMethod->setTechnicalName('payment_mollie_ideal');
+        if ($mediaId !== null) {
+            $paymentMethod->setMediaId($mediaId);
+        }
 
         return $paymentMethod;
     }

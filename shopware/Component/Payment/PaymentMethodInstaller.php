@@ -208,6 +208,10 @@ final class PaymentMethodInstaller
 
                 $handler = $handlers[$handlerIdentifier] ?? null;
 
+                if ($paymentMethodEntity->getMediaId() !== null) {
+                    $changedData['mediaId'] = $paymentMethodEntity->getMediaId();
+                }
+
                 if ($handler instanceof DeprecatedMethodAwareInterface) {
                     $changedData['active'] = false;
                 }
