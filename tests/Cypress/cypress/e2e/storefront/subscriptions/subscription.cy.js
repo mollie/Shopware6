@@ -18,7 +18,7 @@ import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsReposi
 import AdminSubscriptionsAction from "Actions/admin/AdminSubscriptionsAction";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import CreditCardScreenAction from "../../../support/actions/mollie/screens/CreditCartScreen";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";

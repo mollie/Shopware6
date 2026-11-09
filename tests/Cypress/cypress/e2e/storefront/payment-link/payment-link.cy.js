@@ -21,7 +21,7 @@ import SubscriptionsListRepository from "Repositories/admin/subscriptions/Subscr
 import SubscriptionDetailsRepository from "Repositories/admin/subscriptions/SubscriptionDetailsRepository";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
-import PaymentStatusScreen from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentStatusScreen from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import PaymentListScreen from "cypress-mollie/src/actions/screens/PaymentListScreen";
 
 

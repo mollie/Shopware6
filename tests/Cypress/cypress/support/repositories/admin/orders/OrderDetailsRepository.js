@@ -2,6 +2,14 @@ import Shopware from "Services/shopware/Shopware";
 
 const shopware = new Shopware();
 
+// Shopware < 6.7.16 renders the state as text, newer versions as value of an mt-select input
+const STATE_SELECT_VALUE = ':is(.sw-single-select__selection-text, .mt-select-selection-list__input)';
+
+function assertStateLabel($el, statusLabel) {
+    const label = $el.is('input') ? $el.val() : $el.text();
+    expect(label).to.contain(statusLabel);
+}
+
 export default class OrderDetailsRepository {
 
 
@@ -11,16 +19,24 @@ export default class OrderDetailsRepository {
      */
     getDeliveryStatusTop(options = {}) {
         if (shopware.isVersionGreaterEqual('6.5')) {
-            return cy.get('.sw-order-general-info__order-state-delivery .sw-block-field__block .sw-single-select__selection-text', options);
+            return cy.get('.sw-order-general-info__order-state-delivery ' + STATE_SELECT_VALUE, options);
         }
         return cy.get(':nth-child(2) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName', options);
     }
 
-    getPaymentStatusTop() {
+    getPaymentStatusTop(options = {}) {
         if (shopware.isVersionGreaterEqual('6.5')) {
-            return cy.get('.sw-order-general-info__order-state-payment .sw-block-field__block .sw-single-select__selection-text');
+            return cy.get('.sw-order-general-info__order-state-payment ' + STATE_SELECT_VALUE, options);
         }
-        return cy.get(':nth-child(1) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName');
+        return cy.get(':nth-child(1) > .sw-order-state-select > .sw-field > .sw-block-field__block > #sw-field--selectedActionName', options);
+    }
+
+    assertDeliveryStatusTop(statusLabel, options = {}) {
+        this.getDeliveryStatusTop(options).should(($el) => assertStateLabel($el, statusLabel));
+    }
+
+    assertPaymentStatusTop(statusLabel, options = {}) {
+        this.getPaymentStatusTop(options).should(($el) => assertStateLabel($el, statusLabel));
     }
 
     /**

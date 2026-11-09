@@ -9,7 +9,7 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 import DummyBasketScenario from "Scenarios/DummyBasketScenario";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
-import PaymentStatusScreen from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentStatusScreen from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";
 import PluginConfiguration from "../../../support/models/PluginConfiguration";
 

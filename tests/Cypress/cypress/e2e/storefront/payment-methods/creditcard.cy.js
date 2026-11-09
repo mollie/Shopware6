@@ -10,7 +10,7 @@ import PaymentAction from "Actions/storefront/checkout/PaymentAction";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
 import CreditCardScreenAction from "../../../support/actions/mollie/screens/CreditCartScreen";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import AdminOrdersAction from "Actions/admin/AdminOrdersAction";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";

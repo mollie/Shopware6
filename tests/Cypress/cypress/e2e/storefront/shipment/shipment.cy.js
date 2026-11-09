@@ -10,7 +10,7 @@ import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import ShipThroughMollieAction from "Actions/admin/ShipThroughMollieAction";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import LineItemShippingRepository from "Repositories/admin/ship-through-mollie/LineItemShippingRepository";
 import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 import FullShippingRepository from "Repositories/admin/ship-through-mollie/FullShippingRepository";
@@ -296,7 +296,8 @@ function assertShippingStatus(statusLabel, shippedItemsCount) {
     // the timeout must live on the cy.get() so the .should() retries the query until the field is
     // populated (an empty "" text otherwise fails the assertion before Vue finished rendering the
     // state select).
-    repoOrderDetails.getDeliveryStatusTop({timeout: 20000}).should('be.visible').and('contain.text', statusLabel);
+    repoOrderDetails.getDeliveryStatusTop({timeout: 20000}).should('be.visible');
+    repoOrderDetails.assertDeliveryStatusTop(statusLabel, {timeout: 20000});
 
     if (shopware.isVersionLower('6.5')) {
         /** since 6.5 you don't see the shipped items in summary **/

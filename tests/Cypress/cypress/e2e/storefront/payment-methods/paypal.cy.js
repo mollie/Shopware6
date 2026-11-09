@@ -12,7 +12,7 @@ import AdminLoginAction from "Actions/admin/AdminLoginAction";
 import OrderDetailsRepository from "Repositories/admin/orders/OrderDetailsRepository";
 // ------------------------------------------------------
 import MollieSandbox from "cypress-mollie/src/actions/MollieSandbox";
-import PaymentScreenAction from "cypress-mollie/src/actions/screens/PaymentStatusScreen";
+import PaymentScreenAction from "../../../support/actions/mollie/screens/PaymentStatusScreen";
 import ShopConfiguration from "../../../support/models/ShopConfiguration";
 import PluginConfiguration from "../../../support/models/PluginConfiguration";
 
