@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Mollie\Shopware\Behat\Context;
 
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Hook\AfterScenario;
 use Behat\Hook\BeforeScenario;
 use Behat\Step\Given;
 use Behat\Step\Then;
 use Behat\Step\When;
 use Mollie\Shopware\Behat\Storage;
+use Mollie\Shopware\Component\Fixture\Product\CustomizedProductsFixture;
 use Mollie\Shopware\Component\Mollie\CreateCapture;
 use Mollie\Shopware\Component\Mollie\Gateway\CachedMollieGateway;
 use Mollie\Shopware\Component\Mollie\Gateway\MollieGateway;
@@ -33,6 +35,7 @@ use Mollie\Shopware\Mollie;
 use PHPUnit\Framework\Assert;
 use Shopware\Core\Checkout\Cart\Price\Struct\CalculatedPrice;
 use Shopware\Core\Checkout\Cart\Price\Struct\CartPrice;
+use Shopware\Core\Checkout\Cart\SalesChannel\CartService;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryCollection;
 use Shopware\Core\Checkout\Order\Aggregate\OrderDelivery\OrderDeliveryEntity;
@@ -42,6 +45,8 @@ use Shopware\Core\Checkout\Order\Aggregate\OrderTransaction\OrderTransactionEnti
 use Shopware\Core\Checkout\Order\Api\OrderActionController;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\Uuid\Uuid;
+use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 use Shopware\Core\System\SalesChannel\Context\SalesChannelContextService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -60,6 +65,7 @@ final class CheckoutContext extends ShopwareContext
     public const STORAGE_MANDATE_IDS = 'mandateIds';
     public const STORAGE_CREATED_MANDATE_ID = 'createdMandateId';
     public const STORAGE_MOLLIE_CUSTOMER_ID = 'mollieCustomerId';
+    private const CUSTOMIZED_PRODUCTS_ADD_TO_CART_ROUTE = 'Swag\CustomizedProducts\Core\Checkout\Cart\Route\AddCustomizedProductsToCartRoute';
 
     /**
      * Custom field and Mollie prefix per id type, as an accounting export reads them from the order.
@@ -87,6 +93,51 @@ final class CheckoutContext extends ShopwareContext
     {
         $salesChannelContext = $this->getCurrentSalesChannelContext();
         $this->addSubscriptionItemToCart($productNumber, $salesChannelContext, $quantity);
+    }
+
+    /**
+     * Posts what the Custom Products buy widget posts. Nested values have to be data bags, the plugin
+     * skips options that arrive as plain arrays. Needs SwagCustomizedProducts and CustomizedProductsFixture.
+     */
+    #[Given('customized product :arg1 with engraving :arg2 is in cart')]
+    public function customizedProductWithEngravingIsInCart(string $productNumber, string $engraving): void
+    {
+        if (! $this->getContainer()->has(self::CUSTOMIZED_PRODUCTS_ADD_TO_CART_ROUTE)) {
+            throw new PendingException('SwagCustomizedProducts is not installed');
+        }
+
+        $salesChannelContext = $this->getCurrentSalesChannelContext();
+        $product = $this->getProductByNumber($productNumber, $salesChannelContext->getContext());
+
+        $request = $this->createStoreFrontRequest($salesChannelContext, Request::METHOD_POST);
+        $request->request->set('lineItems', [
+            $product->getId() => [
+                'id' => $product->getId(),
+                'referencedId' => $product->getId(),
+                'type' => 'product',
+                'quantity' => 1,
+            ],
+        ]);
+
+        $requestDataBag = new RequestDataBag([
+            'customized-products-template' => new RequestDataBag([
+                'id' => Uuid::fromStringToHex(CustomizedProductsFixture::TEMPLATE_ID),
+                'options' => new RequestDataBag([
+                    Uuid::fromStringToHex(CustomizedProductsFixture::OPTION_ENGRAVING_ID) => new RequestDataBag(['value' => $engraving]),
+                    Uuid::fromStringToHex(CustomizedProductsFixture::OPTION_PACKAGING_ID) => new RequestDataBag(['value' => Uuid::fromStringToHex(CustomizedProductsFixture::VALUE_PAPER_ID)]),
+                ]),
+            ]),
+        ]);
+
+        $addToCartRoute = $this->getContainer()->get(self::CUSTOMIZED_PRODUCTS_ADD_TO_CART_ROUTE);
+        $addToCartRoute->add($requestDataBag, $request, $salesChannelContext, null);
+
+        /** @var CartService $cartService */
+        $cartService = $this->getContainer()->get(CartService::class);
+        $cart = $cartService->getCart($salesChannelContext->getToken(), $salesChannelContext);
+        $containers = $cart->getLineItems()->filterType('customized-products');
+
+        Assert::assertCount(1, $containers, 'Custom product was not added to the cart: ' . json_encode($cart->getErrors()));
     }
 
     #[Given('i apply promotion code :arg1')]

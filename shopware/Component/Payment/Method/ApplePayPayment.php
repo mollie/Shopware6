@@ -6,11 +6,12 @@ namespace Mollie\Shopware\Component\Payment\Method;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Mollie\PaymentParameterInterface;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 use Mollie\Shopware\Component\Payment\Handler\SubscriptionAwareInterface;
 use Shopware\Core\Checkout\Customer\CustomerEntity;
 use Shopware\Core\Framework\Validation\DataBag\RequestDataBag;
 
-final class ApplePayPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface
+final class ApplePayPayment extends AbstractMolliePaymentHandler implements SubscriptionAwareInterface, PaymentLinkAwareInterface
 {
     public function getPaymentMethod(): PaymentMethod
     {

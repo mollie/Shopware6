@@ -262,6 +262,7 @@ final class ShipmentItemResolverTest extends TestCase
             [['id' => 'lineitemid', 'customFields' => []]],
             $shippingItems,
             new OrderDeliveryCollection([$delivery]),
+            new OrderLineItemCollection(),
             $this->currency(),
             CartPrice::TAX_STATE_GROSS,
         );
@@ -272,6 +273,30 @@ final class ShipmentItemResolverTest extends TestCase
         self::assertSame(4.99, $shippingItems->getTotalAmount());
     }
 
+    public function testDeliveryOfAContainerIsMarkedWhenItsChildIsShipped(): void
+    {
+        // Custom Products assigns the delivery position to its container, which is filtered from the
+        // shipment, so without the parent lookup the shipping costs would never be captured.
+        $container = $this->orderBuilder->createContainerLineItem('containerid', 'Produkt Konfiguration', 41.96);
+        $product = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 41.96);
+        $product->setParentId('containerid');
+        $delivery = $this->orderBuilder->createShippableDelivery('deliveryid', 'containerid', 5.98);
+        $shippingItems = new ShippingItemCollection();
+
+        $upserts = $this->resolver->collectDeliveryUpserts(
+            [['id' => 'lineitemid', 'customFields' => []]],
+            $shippingItems,
+            new OrderDeliveryCollection([$delivery]),
+            new OrderLineItemCollection([$container, $product]),
+            $this->currency(),
+            CartPrice::TAX_STATE_GROSS,
+        );
+
+        self::assertCount(1, $upserts);
+        self::assertSame('deliveryid', $upserts[0]['id']);
+        self::assertSame(5.98, $shippingItems->getTotalAmount());
+    }
+
     public function testDeliveryOfAnotherShipmentIsNotMarkedAsShipped(): void
     {
         $delivery = $this->orderBuilder->createShippableDelivery('deliveryid', 'otherlineitemid');
@@ -280,6 +305,7 @@ final class ShipmentItemResolverTest extends TestCase
             [['id' => 'lineitemid', 'customFields' => []]],
             new ShippingItemCollection(),
             new OrderDeliveryCollection([$delivery]),
+            new OrderLineItemCollection(),
             $this->currency(),
             CartPrice::TAX_STATE_GROSS,
         );
@@ -295,6 +321,7 @@ final class ShipmentItemResolverTest extends TestCase
             [['id' => 'lineitemid', 'customFields' => []]],
             new ShippingItemCollection(),
             new OrderDeliveryCollection([$delivery]),
+            new OrderLineItemCollection(),
             $this->currency(),
             CartPrice::TAX_STATE_GROSS,
         );
@@ -310,6 +337,7 @@ final class ShipmentItemResolverTest extends TestCase
             [['id' => 'lineitemid', 'customFields' => []]],
             new ShippingItemCollection(),
             new OrderDeliveryCollection([$delivery]),
+            new OrderLineItemCollection(),
             $this->currency(),
             CartPrice::TAX_STATE_GROSS,
         );
@@ -325,6 +353,7 @@ final class ShipmentItemResolverTest extends TestCase
             [['id' => 'lineitemid', 'customFields' => []]],
             new ShippingItemCollection(),
             new OrderDeliveryCollection([$delivery]),
+            new OrderLineItemCollection(),
             $this->currency(),
             CartPrice::TAX_STATE_GROSS,
         );
@@ -391,6 +420,17 @@ final class ShipmentItemResolverTest extends TestCase
         );
 
         self::assertSame(0.0, $total);
+    }
+
+    public function testContainerIdsAreAddedForShippedChildren(): void
+    {
+        $container = $this->orderBuilder->createContainerLineItem('containerid', 'Produkt Konfiguration', 41.96);
+        $product = $this->orderBuilder->createShippableLineItem('lineitemid', 'SW100', 1, 41.96);
+        $product->setParentId('containerid');
+
+        $ids = $this->resolver->withContainerIds(['lineitemid'], new OrderLineItemCollection([$container, $product]));
+
+        self::assertSame(['lineitemid', 'containerid'], $ids);
     }
 
     public function testHasPriorShipmentsIgnoresContainerLineItems(): void

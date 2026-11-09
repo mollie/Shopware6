@@ -48,6 +48,30 @@ Feature: Shipment
     When i select delivery status action "ship"
     Then order payment status is "paid"
 
+  # Needs SwagCustomizedProducts, the scenario stays pending without it. Rebuilds a merchant order:
+  # the container repeats the product price and owns the delivery position, so capturing it exceeds
+  # the authorization and filtering it must not lose the shipping costs.
+  @customized-products
+  Scenario: automatic shipment of a custom products order captures the product and the shipping costs once
+    Given payment method "klarna" exists and active
+    And plugin configuration "directPaymentKlarna" is set to "false"
+    And plugin configuration "automaticShipping" is set to "true"
+    And i select "mollie_fixture_parcel_shipment" as shipping method
+    And i select "DE" as billing country
+    And i select "EUR" as currency
+    And customized product "MOL_CUSTOMIZED_PRODUCT" with engraving "Max Mustermann" is in cart
+    When i start checkout with payment method "klarna"
+    And select payment status "authorized"
+    Then i see success page
+    And order payment status is "authorized"
+    And order total is "47.94"
+    When i select delivery status action "ship"
+    Then order payment status is "paid"
+    And delivery status is "shipped"
+    And the mollie captured amount equals the order total
+    # Only true when the shipping costs on the container's delivery are marked as shipped
+    And the mollie captured amount matches the shipped gross amount
+
   Scenario: automatic shipment captures the gross amount for a net customer
     Given iam logged in as user "cypress-net@mollie.com"
     And payment method "klarna" exists and active

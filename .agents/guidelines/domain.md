@@ -155,6 +155,11 @@ solely so third-party plugins and ERP connectors keep working
 Never let plugin logic depend on the copy at the order: it exists for compatibility. New data goes
 on the transaction.
 
+The shipped quantity on line items and deliveries (`mollie_payments.quantity`) is the exception and
+has one purpose: the administration must not ship the same item twice. The Orders API tracks
+shipped lines at Mollie itself; the Payments API only knows the captured amount, so the shop
+tracks it.
+
 ---
 
 ## A transaction a payment link may be paid for is open, reminded or unconfirmed

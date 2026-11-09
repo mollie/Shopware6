@@ -6,8 +6,9 @@ namespace Mollie\Shopware\Unit\Payment\Fake;
 use Mollie\Shopware\Component\Mollie\PaymentMethod;
 use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\Handler\BankTransferAwareInterface;
+use Mollie\Shopware\Component\Payment\Handler\PaymentLinkAwareInterface;
 
-final class FakeBankTransferPaymentHandler extends AbstractMolliePaymentHandler implements BankTransferAwareInterface
+final class FakeBankTransferPaymentHandler extends AbstractMolliePaymentHandler implements BankTransferAwareInterface, PaymentLinkAwareInterface
 {
     public function __construct()
     {

@@ -14,6 +14,7 @@ use Mollie\Shopware\Component\Mollie\PaymentStatus;
 use Mollie\Shopware\Component\Mollie\SequenceType;
 use Mollie\Shopware\Component\Payment\Event\ModifyCreatePaymentLinkPayloadEvent;
 use Mollie\Shopware\Component\Payment\Event\PaymentLinkCreatedEvent;
+use Mollie\Shopware\Component\Payment\Handler\AbstractMolliePaymentHandler;
 use Mollie\Shopware\Component\Payment\PaymentHandlerLocator;
 use Mollie\Shopware\Component\PaymentLink\Controller\PaymentLinkController;
 use Mollie\Shopware\Component\Settings\Struct\PaymentSettings;
@@ -32,6 +33,7 @@ use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferPaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
 use Mollie\Shopware\Unit\Payment\Fake\FakeOrderTransactionStateHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePayloadBuilder;
+use Mollie\Shopware\Unit\Payment\Fake\FakePaymentLinkAwarePaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakePaymentMethodHandler;
 use Mollie\Shopware\Unit\Payment\MethodRemover\Fake\FakePaymentMethodRoute;
 use Mollie\Shopware\Unit\PaymentLink\Fake\FakePaymentLinkGateway;
@@ -115,7 +117,7 @@ final class PaymentLinkControllerTest extends TestCase
 
     private FakeOrderTransactionStateHandler $transactionStateHandler;
 
-    /** @var list<FakePaymentMethodHandler> */
+    /** @var list<AbstractMolliePaymentHandler> */
     private array $paymentHandlers = [];
 
     protected function setUp(): void
@@ -137,7 +139,12 @@ final class PaymentLinkControllerTest extends TestCase
         $this->paymentSettings = new PaymentSettings('', 0);
         $this->systemConfigService = new StaticSystemConfigService();
         $this->transactionStateHandler = new FakeOrderTransactionStateHandler();
-        $this->paymentHandlers = [new FakePaymentMethodHandler(MolliePaymentMethod::PAYPAL)];
+        $this->paymentHandlers = [
+            new FakePaymentLinkAwarePaymentHandler(MolliePaymentMethod::PAYPAL),
+            new FakePaymentLinkAwarePaymentHandler(MolliePaymentMethod::CREDIT_CARD),
+            new FakePaymentLinkAwarePaymentHandler(MolliePaymentMethod::BLIK),
+            new FakePaymentMethodHandler(MolliePaymentMethod::DIRECT_DEBIT),
+        ];
 
         $this->session = new Session(new MockArraySessionStorage());
         $request = Request::create('https://shop.test/mollie/pay/' . self::ORDER_ID);
@@ -327,7 +334,7 @@ final class PaymentLinkControllerTest extends TestCase
         $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
 
         $handler = $this->payloadBuilder->getLastPaymentLinkCall()['handler'];
-        $this->assertInstanceOf(FakePaymentMethodHandler::class, $handler);
+        $this->assertInstanceOf(FakePaymentLinkAwarePaymentHandler::class, $handler);
         $this->assertSame(MolliePaymentMethod::PAYPAL, $handler->getPaymentMethod());
     }
 
