@@ -99,6 +99,21 @@ final class PaymentFinalizerTest extends TestCase
         $this->assertSame('https://pwa.test/error/order-1', $tokenStruct->getErrorUrl());
     }
 
+    public function testFinalizeTokenCarriesTheContextTokenOfTheOrder(): void
+    {
+        $this->requestStack->push(new Request([
+            FinishUrls::FINISH_URL_PARAMETER => 'https://pwa.test/finish?contextToken=' . FinishUrls::CONTEXT_TOKEN_PLACEHOLDER,
+            FinishUrls::ERROR_URL_PARAMETER => 'https://pwa.test/error?contextToken=' . FinishUrls::CONTEXT_TOKEN_PLACEHOLDER,
+        ]));
+        $order = $this->createOrder($this->createTransaction('transaction-1', '2026-11-03 10:00:00'));
+
+        $this->createPaymentFinalizer()->finalize(new Session('ses_1'), $order, new FakeSalesChannelContext(token: 'new-context-token'));
+
+        $tokenStruct = $this->tokenFactory->getLastTokenStruct();
+        $this->assertSame('https://pwa.test/finish?contextToken=new-context-token', $tokenStruct->getFinishUrl());
+        $this->assertSame('https://pwa.test/error?contextToken=new-context-token', $tokenStruct->getErrorUrl());
+    }
+
     public function testFinalizeTokenFallsBackToTheStorefrontPagesWithoutUrlsInTheRequest(): void
     {
         $order = $this->createOrder($this->createTransaction('transaction-1', '2026-11-03 10:00:00'));

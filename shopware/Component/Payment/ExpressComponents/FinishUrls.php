@@ -11,7 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
  * Like in Shopware's own store-api they can be passed in, so a headless client points at its own
  * pages instead of storefront routes that do not exist there. The client cannot know the order id
  * when it calls the finish route, so it may leave a placeholder in its urls that is filled in
- * here. An empty url means the client passed none and the storefront pages are used instead.
+ * here. The same goes for the context token: logging in the guest gives the context a new one,
+ * and a browser redirect is the only way to hand it back to the client.
+ * An empty url means the client passed none and the storefront pages are used instead.
  */
 final class FinishUrls
 {
@@ -19,6 +21,7 @@ final class FinishUrls
     public const ERROR_URL_PARAMETER = 'errorUrl';
 
     public const ORDER_ID_PLACEHOLDER = '{orderId}';
+    public const CONTEXT_TOKEN_PLACEHOLDER = '{contextToken}';
 
     public function __construct(
         private string $finishUrl,
@@ -44,13 +47,22 @@ final class FinishUrls
         return $this->errorUrl;
     }
 
-    public function getFinishUrl(string $orderId): string
+    public function getFinishUrl(string $orderId, string $contextToken): string
     {
-        return str_replace(self::ORDER_ID_PLACEHOLDER, $orderId, $this->finishUrl);
+        return $this->fill($this->finishUrl, $orderId, $contextToken);
     }
 
-    public function getErrorUrl(string $orderId): string
+    public function getErrorUrl(string $orderId, string $contextToken): string
     {
-        return str_replace(self::ORDER_ID_PLACEHOLDER, $orderId, $this->errorUrl);
+        return $this->fill($this->errorUrl, $orderId, $contextToken);
+    }
+
+    private function fill(string $url, string $orderId, string $contextToken): string
+    {
+        return str_replace(
+            [self::ORDER_ID_PLACEHOLDER, self::CONTEXT_TOKEN_PLACEHOLDER],
+            [$orderId, $contextToken],
+            $url
+        );
     }
 }

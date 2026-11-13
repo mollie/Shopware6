@@ -80,7 +80,7 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
                 return new RedirectResponse($redirectUrl);
             }
 
-            return new RedirectResponse($finishUrls->getFinishUrl($response->getOrderId()));
+            return new RedirectResponse($finishUrls->getFinishUrl($response->getOrderId(), $response->getContextToken()));
         } catch (\Throwable $exception) {
             $this->logger->error('Failed to finish express components checkout', [
                 'error' => $exception->getMessage(),
@@ -89,7 +89,8 @@ final class FinishCheckoutRoute extends AbstractFinishCheckoutRoute
                 'salesChannelId' => $salesChannelId,
             ]);
 
-            $errorUrl = $finishUrls->getErrorUrl($orderId);
+            // the checkout did not get far enough to hand out a new token, so the client keeps its own
+            $errorUrl = $finishUrls->getErrorUrl($orderId, $cartToken);
             if ($errorUrl === '') {
                 throw $exception;
             }

@@ -43,8 +43,8 @@ final class FinishUrlsTest extends TestCase
             'https://frontend.example/checkout/failed/{orderId}'
         );
 
-        $this->assertSame('https://frontend.example/checkout/finish/order-id', $finishUrls->getFinishUrl('order-id'));
-        $this->assertSame('https://frontend.example/checkout/failed/order-id', $finishUrls->getErrorUrl('order-id'));
+        $this->assertSame('https://frontend.example/checkout/finish/order-id', $finishUrls->getFinishUrl('order-id', 'context-token'));
+        $this->assertSame('https://frontend.example/checkout/failed/order-id', $finishUrls->getErrorUrl('order-id', 'context-token'));
     }
 
     /**
@@ -62,6 +62,21 @@ final class FinishUrlsTest extends TestCase
     {
         $finishUrls = new FinishUrls('https://frontend.example/checkout/finish', '');
 
-        $this->assertSame('https://frontend.example/checkout/finish', $finishUrls->getFinishUrl('order-id'));
+        $this->assertSame('https://frontend.example/checkout/finish', $finishUrls->getFinishUrl('order-id', 'context-token'));
+    }
+
+    /**
+     * Logging in the guest gives the context a new token, which a headless client can only get
+     * back through the redirect.
+     */
+    public function testTheContextTokenReplacesThePlaceholder(): void
+    {
+        $finishUrls = new FinishUrls(
+            'https://frontend.example/checkout/success?orderId={orderId}&contextToken={contextToken}',
+            'https://frontend.example/checkout/error?orderId={orderId}&contextToken={contextToken}'
+        );
+
+        $this->assertSame('https://frontend.example/checkout/success?orderId=order-id&contextToken=context-token', $finishUrls->getFinishUrl('order-id', 'context-token'));
+        $this->assertSame('https://frontend.example/checkout/error?orderId=order-id&contextToken=context-token', $finishUrls->getErrorUrl('order-id', 'context-token'));
     }
 }

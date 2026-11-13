@@ -108,6 +108,18 @@ final class FinishCheckoutRouteTest extends TestCase
         $this->assertSame('https://frontend.example/checkout/finish/order-id', $response->getTargetUrl());
     }
 
+    public function testTheFinishPageOfTheClientGetsTheContextTokenOfTheLoggedInGuest(): void
+    {
+        $this->cartCheckoutFinisher = new FakeCartCheckoutFinisher(new FinishCheckoutResponse('ses_cart', 'new-context-token', 'order-id', '10000', ''));
+
+        $response = $this->route(enabled: true)->finish(self::SALES_CHANNEL_ID, $this->request([
+            FinishCheckoutRoute::CART_TOKEN_PARAMETER => 'cart-token',
+            'finishUrl' => 'https://frontend.example/checkout/success?orderId={orderId}&contextToken={contextToken}',
+        ]));
+
+        $this->assertSame('https://frontend.example/checkout/success?orderId=order-id&contextToken=new-context-token', $response->getTargetUrl());
+    }
+
     /**
      * Mollie's redirect carries no context token, so the cart is found through the token that was
      * handed to the redirect url.
@@ -133,6 +145,16 @@ final class FinishCheckoutRouteTest extends TestCase
         ]));
 
         $this->assertSame('https://frontend.example/checkout/failed', $response->getTargetUrl());
+    }
+
+    public function testAFailedCheckoutHandsTheClientItsOwnTokenBack(): void
+    {
+        $response = $this->route(enabled: false)->finish(self::SALES_CHANNEL_ID, $this->request([
+            FinishCheckoutRoute::CART_TOKEN_PARAMETER => 'cart-token',
+            'errorUrl' => 'https://frontend.example/checkout/failed?contextToken={contextToken}',
+        ]));
+
+        $this->assertSame('https://frontend.example/checkout/failed?contextToken=cart-token', $response->getTargetUrl());
     }
 
     /**
