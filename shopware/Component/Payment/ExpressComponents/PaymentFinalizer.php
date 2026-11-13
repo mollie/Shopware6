@@ -59,12 +59,13 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         ];
 
         $finishUrls = $this->getFinishUrls();
+        $contextToken = $salesChannelContext->getToken();
         $context = $salesChannelContext->getContext();
         $sessionPayment = $this->sessionPaymentRepository->assignTransaction($session->getId(), $transaction->getId(), $context);
         if ($sessionPayment === null) {
             $this->logger->warning('Express components session has no session payment entry', $logData);
 
-            return $this->getFinishUrl($finishUrls, $orderId);
+            return $this->getFinishUrl($finishUrls, $orderId, $contextToken);
         }
 
         $sessionPayment = $this->sessionPaymentRepository->getFinishedPayment($sessionPayment, $context);
@@ -72,7 +73,7 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         if ($paymentId === '') {
             $this->logger->info('Express components webhook did not arrive in time, the webhook sets the status later', $logData);
 
-            return $this->getFinishUrl($finishUrls, $orderId);
+            return $this->getFinishUrl($finishUrls, $orderId, $contextToken);
         }
         $logData['paymentId'] = $paymentId;
 
@@ -85,15 +86,15 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
             $logData['error'] = $exception->getMessage();
             $this->logger->error('Express components payment could not be attached during the finish', $logData);
 
-            return $this->getFinishUrl($finishUrls, $orderId);
+            return $this->getFinishUrl($finishUrls, $orderId, $contextToken);
         }
 
         $this->logger->info('Express components checkout continues with the Shopware finalize', $logData);
 
-        return $this->getFinalizeUrl($transaction, $finishUrls, $orderId);
+        return $this->getFinalizeUrl($transaction, $finishUrls, $orderId, $contextToken);
     }
 
-    private function getFinalizeUrl(OrderTransactionEntity $transaction, FinishUrls $finishUrls, string $orderId): string
+    private function getFinalizeUrl(OrderTransactionEntity $transaction, FinishUrls $finishUrls, string $orderId, string $contextToken): string
     {
         /** @phpstan-ignore method.deprecatedClass, new.deprecatedClass */
         $tokenStruct = new TokenStruct(
@@ -101,9 +102,9 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
             null,
             $transaction->getPaymentMethodId(),
             $transaction->getId(),
-            $this->getFinishUrl($finishUrls, $orderId),
+            $this->getFinishUrl($finishUrls, $orderId, $contextToken),
             null,
-            $this->getErrorUrl($finishUrls, $orderId),
+            $this->getErrorUrl($finishUrls, $orderId, $contextToken),
         );
 
         /** @phpstan-ignore method.deprecatedInterface */
@@ -133,9 +134,9 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         return $latest instanceof OrderTransactionEntity ? $latest : null;
     }
 
-    private function getFinishUrl(FinishUrls $finishUrls, string $orderId): string
+    private function getFinishUrl(FinishUrls $finishUrls, string $orderId, string $contextToken): string
     {
-        $finishUrl = $finishUrls->getFinishUrl($orderId);
+        $finishUrl = $finishUrls->getFinishUrl($orderId, $contextToken);
         if ($finishUrl === '') {
             return $this->routeBuilder->getCheckoutFinishUrl($orderId);
         }
@@ -143,9 +144,9 @@ final class PaymentFinalizer implements PaymentFinalizerInterface
         return $finishUrl;
     }
 
-    private function getErrorUrl(FinishUrls $finishUrls, string $orderId): string
+    private function getErrorUrl(FinishUrls $finishUrls, string $orderId, string $contextToken): string
     {
-        $errorUrl = $finishUrls->getErrorUrl($orderId);
+        $errorUrl = $finishUrls->getErrorUrl($orderId, $contextToken);
         if ($errorUrl === '') {
             return $this->routeBuilder->getEditOrderUrl($orderId);
         }
