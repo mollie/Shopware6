@@ -101,6 +101,18 @@ class MigrationUtils
     /**
      * @throws Exception
      */
+    public function dropConstraint(string $tableName, string $constraintName): void
+    {
+        if ($this->isConstraintExisting($tableName, $constraintName) === false) {
+            return;
+        }
+
+        $this->connection->executeStatement('ALTER TABLE `' . $tableName . '` DROP FOREIGN KEY `' . $constraintName . '`');
+    }
+
+    /**
+     * @throws Exception
+     */
     public function buildIndex(string $table, string $indexName, string $targetField): void
     {
         // skip if the target column no longer exists (e.g. removed by a later migration)

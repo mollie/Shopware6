@@ -1,6 +1,7 @@
 # Unreleased
 - Added: Headless shops show the order confirmation after an order via Express Components.
 - Changed: Shipping orders with Custom Products now also captures the shipping costs.
+- Changed: Duplicate indexes in the subscription tables were removed and foreign keys were given unique names.
 - Fixed: The payment link of a Wero order only offers Wero.
 - Fixed: A custom logo on a Mollie payment method is kept on plugin updates and when updating the payment methods.
 
