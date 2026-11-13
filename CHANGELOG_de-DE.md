@@ -1,4 +1,6 @@
 # Unreleased
+
+# 5.10.0
 - Hinzugefügt: Headless-Shops zeigen nach einer Bestellung über Express Components die Bestellbestätigung an.
 - Geändert: Beim Versand von Bestellungen mit Custom Products werden die Versandkosten mit eingezogen.
 - Geändert: Doppelte Indizes in den Abo-Tabellen wurden entfernt und Fremdschlüssel eindeutig benannt.
