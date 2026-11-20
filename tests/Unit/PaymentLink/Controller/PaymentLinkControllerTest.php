@@ -25,9 +25,7 @@ use Mollie\Shopware\Unit\Fake\FakeEntityRepository;
 use Mollie\Shopware\Unit\Fake\FakeOrderSearchRepository;
 use Mollie\Shopware\Unit\Fake\FakeRouter;
 use Mollie\Shopware\Unit\Fake\FakeSalesChannelContext;
-use Mollie\Shopware\Unit\Fake\FakeSalesChannelContextPersister;
 use Mollie\Shopware\Unit\Fake\FakeSettingsService;
-use Mollie\Shopware\Unit\Fake\FakeShopwareAccountService;
 use Mollie\Shopware\Unit\Fake\FakeTokenFactory;
 use Mollie\Shopware\Unit\Payment\Fake\FakeBankTransferPaymentHandler;
 use Mollie\Shopware\Unit\Payment\Fake\FakeGateway;
@@ -97,10 +95,6 @@ final class PaymentLinkControllerTest extends TestCase
 
     private FakePaymentMethodRoute $paymentMethodRoute;
 
-    private FakeShopwareAccountService $accountService;
-
-    private FakeSalesChannelContextPersister $contextPersister;
-
     private FakeTokenFactory $tokenFactory;
 
     private FakeRouter $router;
@@ -108,8 +102,6 @@ final class PaymentLinkControllerTest extends TestCase
     private EventSpy $eventDispatcher;
 
     private RequestStack $requestStack;
-
-    private Session $session;
 
     private PaymentSettings $paymentSettings;
 
@@ -131,8 +123,6 @@ final class PaymentLinkControllerTest extends TestCase
         $this->paymentLinkGateway = new FakePaymentLinkGateway();
         $this->givenMolliePayment(PaymentStatus::EXPIRED);
         $this->paymentMethodRoute = new FakePaymentMethodRoute(new PaymentMethodCollection());
-        $this->accountService = new FakeShopwareAccountService();
-        $this->contextPersister = new FakeSalesChannelContextPersister();
         $this->tokenFactory = new FakeTokenFactory();
         $this->router = new FakeRouter(self::GENERATED_URL);
         $this->eventDispatcher = new EventSpy();
@@ -146,9 +136,8 @@ final class PaymentLinkControllerTest extends TestCase
             new FakePaymentMethodHandler(MolliePaymentMethod::DIRECT_DEBIT),
         ];
 
-        $this->session = new Session(new MockArraySessionStorage());
         $request = Request::create('https://shop.test/mollie/pay/' . self::ORDER_ID);
-        $request->setSession($this->session);
+        $request->setSession(new Session(new MockArraySessionStorage()));
         $this->requestStack = new RequestStack();
         $this->requestStack->push($request);
 
@@ -574,63 +563,6 @@ final class PaymentLinkControllerTest extends TestCase
         $this->assertSame([], $this->transactionStateHandler->getTransitions());
     }
 
-    // ------------------------------------------------------------------- login
-
-    /**
-     * The customer opens the link from a mail and is not logged in, so the checkout finish page
-     * would redirect to the cart. The order's customer is logged into the session instead.
-     */
-    public function testPayLogsTheOrderCustomerIn(): void
-    {
-        $this->givenOrder();
-
-        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
-
-        $this->assertSame(self::CUSTOMER_ID, $this->accountService->getLoggedInId());
-    }
-
-    /**
-     * AccountService only builds the logged-in context in memory. Without persisting the customer
-     * under the new token, the return request rebuilds an anonymous context.
-     */
-    public function testPayPersistsTheCustomerUnderTheNewContextToken(): void
-    {
-        $this->givenOrder();
-
-        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
-
-        $saved = $this->contextPersister->getSaved();
-        $this->assertCount(1, $saved);
-        $this->assertSame('fake-token', $saved[0]['token']);
-        $this->assertSame(self::CUSTOMER_ID, $saved[0]['customerId']);
-        $this->assertSame('sales-channel-1', $saved[0]['salesChannelId']);
-    }
-
-    public function testPayMarksTheLoginAsTemporary(): void
-    {
-        $this->givenOrder();
-
-        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
-
-        $this->assertTrue($this->session->get(PaymentLinkController::TEMPORARY_LOGIN_SESSION_KEY));
-    }
-
-    /**
-     * A failed login must not block the payment - the finish page falls back to its cart redirect,
-     * but the link itself still works.
-     */
-    public function testPayStillCreatesTheLinkWhenTheLoginFails(): void
-    {
-        $this->givenOrder();
-        $this->accountService->withFailure(new \RuntimeException('Customer is inactive'));
-
-        $response = $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
-
-        $this->assertCount(1, $this->paymentLinkGateway->getCreatedPayloads());
-        $this->assertSame('https://mollie.test/pl_created', $response->getTargetUrl());
-        $this->assertSame([], $this->contextPersister->getSaved());
-    }
-
     // ------------------------------------------------------------------- events
 
     public function testPayDispatchesThePaymentLinkCreatedEvent(): void
@@ -712,21 +644,6 @@ final class PaymentLinkControllerTest extends TestCase
 
         $this->assertSame([], $this->paymentLinkGateway->getCreatedPayloads());
         $this->assertSame([], $this->paymentLinkGateway->getUpdatedPayloads());
-    }
-
-    /**
-     * The payment carries the redirect URL of the checkout it was created in, so the return leg
-     * runs through that checkout's own session - the payment link's temporary login would log a
-     * regularly logged-in customer out again.
-     */
-    public function testPayDoesNotLogTheCustomerInWhenItRedirectsToAnOpenPayment(): void
-    {
-        $this->givenOrder(molliePaymentId: 'tr_open');
-        $this->givenMolliePayment(PaymentStatus::OPEN);
-
-        $this->controller()->pay(self::ORDER_ID, $this->salesChannelContext);
-
-        $this->assertNull($this->accountService->getLoggedInId());
     }
 
     public function testPayCreatesALinkWhenThePaymentIsNoLongerOpen(): void
@@ -908,9 +825,6 @@ final class PaymentLinkControllerTest extends TestCase
             new FakeSettingsService(paymentSettings: $this->paymentSettings),
             new PaymentHandlerLocator($this->paymentHandlers),
             $this->tokenFactory,
-            $this->accountService,
-            $this->contextPersister,
-            $this->requestStack,
             $this->eventDispatcher,
             $this->systemConfigService,
             $this->transactionStateHandler,

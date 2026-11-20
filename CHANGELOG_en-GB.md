@@ -1,4 +1,5 @@
 # Unreleased
+- Changed: After paying via a payment link, the customer has to log in to see the order confirmation.
 
 # 5.10.0
 - Added: Headless shops show the order confirmation after an order via Express Components.

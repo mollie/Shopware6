@@ -1,4 +1,5 @@
 # Unreleased
+- Geändert: Nach der Zahlung über einen Bezahllink muss sich der Kunde anmelden, um die Bestellbestätigung zu sehen.
 
 # 5.10.0
 - Hinzugefügt: Headless-Shops zeigen nach einer Bestellung über Express Components die Bestellbestätigung an.
